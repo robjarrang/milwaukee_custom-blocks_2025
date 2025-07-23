@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Full Width Image Block</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <style>
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Full Width Image</h2>
+        
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <!-- General Settings -->
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">General Settings</div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="option-selector" id="backgroundColorSelector">
+                    <div class="option-button selected" data-value="red">Red</div>
+                    <div class="option-button" data-value="black">Black</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Settings -->
+        <div class="section-divider">
+            <div class="section-title">Image Settings</div>
+            <div class="field-group">
+                <label for="imageUrl" class="field-label">Image URL</label>
+                <input type="url" id="imageUrl" class="field-input" placeholder="https://example.com/image.jpg">
+                <div class="field-error" id="imageUrlError">Please enter a valid image URL.</div>
+            </div>
+             <div class="field-group">
+                <label for="imageLink" class="field-label">Image Link URL</label>
+                <input type="url" id="imageLink" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                <div class="field-error" id="imageLinkError">Please enter a valid URL.</div>
+            </div>
+            <div class="field-group">
+                <label for="imageAlt" class="field-label">Image Alt Text</label>
+                <input type="text" id="imageAlt" class="field-input" placeholder="Descriptive text for the image">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        // Module configuration
+        const moduleConfig = {
+            name: 'Full Width Image',
+            fields: {
+                backgroundColor: { type: 'text', defaultValue: 'red' },
+                imageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/8d147ebd-e232-4443-bf2d-3fa8bfe848ef.jpg', validator: 'url' },
+                imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                imageAlt: { type: 'text', defaultValue: 'Promotional Image', maxLength: 200 }
+            },
+            debounceDelay: 300,
+            maxRetries: 3
+        };
+
+        const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const elements = {};
+
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+            isValidUrl(string) {
+                if (!string || string.trim() === '') return true;
+                try {
+                    const url = new URL(string);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) { return false; }
+            },
+            showError(message, permanent = false) {
+                const errorBanner = elements.errorBanner;
+                if (errorBanner) {
+                    errorBanner.textContent = message;
+                    errorBanner.classList.add('show');
+                    if (!permanent) setTimeout(() => errorBanner.classList.remove('show'), 5000);
+                }
+                console.error(`${moduleConfig.name} Error:`, message);
+            },
+            getFieldValue(fieldName) {
+                const value = state.blockData[fieldName];
+                return value !== undefined ? value : moduleConfig.fields[fieldName].defaultValue;
+            }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.imageUrl = document.getElementById('imageUrl');
+            elements.imageUrlError = document.getElementById('imageUrlError');
+            elements.imageLink = document.getElementById('imageLink');
+            elements.imageLinkError = document.getElementById('imageLinkError');
+            elements.imageAlt = document.getElementById('imageAlt');
+        }
+
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer && elements.loadingOverlay) {
+                elements.mainContainer.classList.toggle('loading', loading);
+                elements.loadingOverlay.classList.toggle('show', loading);
+            }
+        }
+
+        function updateData(field, value) {
+            if (state.blockData[field] !== value) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+        
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+
+        function generateTemplate() {
+            const backgroundColor = utils.getFieldValue('backgroundColor');
+            const imageUrl = utils.getFieldValue('imageUrl');
+            const imageLink = utils.getFieldValue('imageLink');
+            const imageAlt = utils.getFieldValue('imageAlt');
+            
+            const colorMap = {
+                red: '#DB021D',
+                black: '#000000'
+            };
+            const bgColorHex = colorMap[backgroundColor] || colorMap.red;
+
+            return `<!-- START .fw-image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
+                <tr>
+                    <td class="side" style="width: 20px;"> </td>
+                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                            <tr>
+                                <td align="center" class="block" style="width: 100%;" valign="top">
+                                    <div>
+                                        <a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="580"></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="side" style="width: 20px;"> </td>
+                </tr>
+            </table><!-- END .fw-image -->`;
+        }
+
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            try {
+                const html = generateTemplate();
+                
+                // Updates the view in the editor
+                state.sdk.setContent(html);
+                
+                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
+                // The key MUST be 'content', not 'html'.
+                if (state.sdk.setData) {
+                    state.sdk.setData({ ...state.blockData, content: html });
+                }
+            } catch (error) {
+                utils.showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function validateUrlInput(input, errorElement) {
+            const value = input.value.trim();
+            const isValid = !value || utils.isValidUrl(value);
+            input.classList.toggle('error', !isValid);
+            if(errorElement) errorElement.style.display = isValid ? 'none' : 'block';
+            return isValid;
+        }
+
+        function initializeEventHandlers() {
+            // Background color selector
+            elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(option => {
+                const handler = (e) => {
+                    const selectedValue = e.target.dataset.value;
+                    updateData('backgroundColor', selectedValue);
+                    elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                };
+                option.addEventListener('click', handler);
+                state.eventListeners.push({ element: option, event: 'click', handler });
+            });
+
+            // Input fields
+            function setupInputField(element, errorElement, dataKey, isUrl = false) {
+                const inputHandler = (e) => {
+                    if (isUrl && !validateUrlInput(element, errorElement)) return;
+                    debouncedUpdateData(dataKey, e.target.value.trim());
+                };
+                element.addEventListener('input', inputHandler);
+                state.eventListeners.push({ element, event: 'input', handler: inputHandler });
+
+                if(isUrl) {
+                    const blurHandler = () => validateUrlInput(element, errorElement);
+                    element.addEventListener('blur', blurHandler);
+                    state.eventListeners.push({ element, event: 'blur', handler: blurHandler });
+                }
+            }
+
+            setupInputField(elements.imageUrl, elements.imageUrlError, 'imageUrl', true);
+            setupInputField(elements.imageLink, elements.imageLinkError, 'imageLink', true);
+            setupInputField(elements.imageAlt, null, 'imageAlt', false);
+        }
+
+        function loadData() {
+            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData = {};
+                    if (data && Object.keys(data).length > 0) {
+                        Object.keys(moduleConfig.fields).forEach(key => {
+                            if (data.hasOwnProperty(key)) {
+                                state.blockData[key] = data[key];
+                            }
+                        });
+                    }
+
+                    // Populate UI
+                    const bgColor = utils.getFieldValue('backgroundColor');
+                    elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => {
+                        o.classList.toggle('selected', o.dataset.value === bgColor);
+                    });
+                    
+                    elements.imageUrl.value = utils.getFieldValue('imageUrl');
+                    elements.imageLink.value = utils.getFieldValue('imageLink');
+                    elements.imageAlt.value = utils.getFieldValue('imageAlt');
+                    
+                    refreshPreview();
+                    state.retryCount = 0;
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = moduleConfig.fields[key].defaultValue; });
+                    refreshPreview();
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        function cleanup() {
+            state.eventListeners.forEach(({ element, event, handler }) => {
+                if (element && element.removeEventListener) element.removeEventListener(event, handler);
+            });
+            state.eventListeners = [];
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEventHandlers();
+                loadData();
+                
+                window.addEventListener('beforeunload', cleanup);
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && state.isInitialized) loadData();
+                });
+                
+                state.isInitialized = true;
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`);
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                } else {
+                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
+                }
+                setLoadingState(false);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWithRetry);
+        } else {
+            initializeWithRetry();
+        }
+    </script>
+</body>
+</html>

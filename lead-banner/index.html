@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lead Banner Block</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <style>
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Lead Banner</h2>
+        
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <!-- Banner Settings -->
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">Banner Settings</div>
+            <div class="field-group">
+                <label for="backgroundImage" class="field-label">Background Image URL</label>
+                <input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg">
+                <div class="field-error" id="backgroundImageError">Please enter a valid image URL (http:// or https://)</div>
+            </div>
+        </div>
+
+        <!-- Content Settings -->
+        <div class="section-divider">
+            <div class="section-title">Content</div>
+            <div class="field-group">
+                <label class="field-label">Title</label>
+                <div id="titleEditor" class="quill-container limited-toolbar"></div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Subtitle</label>
+                <div id="subtitleEditor" class="quill-container"></div>
+            </div>
+            <div class="field-group">
+                <label for="contentUrl" class="field-label">Content Link URL</label>
+                <input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                <div class="field-error" id="contentUrlError">Please enter a valid URL (http:// or https://)</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        // Module configuration
+        const moduleConfig = {
+            name: 'Lead Banner',
+            fields: {
+                backgroundImage: {
+                    type: 'url',
+                    defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/56a309bc-df67-4b80-a64c-cd19ed07769c.jpg',
+                    validator: 'url'
+                },
+                title: {
+                    type: 'richtext',
+                    defaultValue: 'Title goes here',
+                    maxLength: 200
+                },
+                subtitle: {
+                    type: 'richtext',
+                    defaultValue: 'Subtitle goes here',
+                    maxLength: 300
+                },
+                contentUrl: {
+                    type: 'url',
+                    defaultValue: 'https://www.milwaukeetool.eu/',
+                    validator: 'url'
+                }
+            },
+            debounceDelay: 300,
+            maxRetries: 3
+        };
+
+        // State management
+        const state = {
+            sdk: null,
+            editors: {},
+            blockData: {},
+            isLoading: false,
+            isInitialized: false,
+            eventListeners: [],
+            retryCount: 0
+        };
+
+        // DOM element cache
+        const elements = {};
+
+        // Utility functions
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func.apply(this, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            isValidUrl(string) {
+                if (!string || string.trim() === '') return true; // Empty is valid
+                try {
+                    const url = new URL(string);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) {
+                    return false;
+                }
+            },
+
+            sanitizeHtml(html) {
+                if (!html) return '';
+                // Basic XSS prevention - remove script tags and event handlers
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                temp.querySelectorAll('script').forEach(el => el.remove());
+                // Remove event handlers
+                const allElements = temp.getElementsByTagName('*');
+                for (let el of allElements) {
+                    for (let attr of el.attributes) {
+                        if (attr.name.startsWith('on')) {
+                            el.removeAttribute(attr.name);
+                        }
+                    }
+                }
+                return temp.innerHTML;
+            },
+
+            showError(message, permanent = false) {
+                const errorBanner = elements.errorBanner;
+                if (errorBanner) {
+                    errorBanner.textContent = message;
+                    errorBanner.classList.add('show');
+                    if (!permanent) {
+                        setTimeout(() => {
+                            errorBanner.classList.remove('show');
+                        }, 5000);
+                    }
+                }
+                console.error('Lead Banner Error:', message);
+            },
+
+            getFieldValue(fieldName) {
+                return state.blockData[fieldName] || moduleConfig.fields[fieldName].defaultValue;
+            }
+        };
+
+        // Cache DOM elements
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundImage = document.getElementById('backgroundImage');
+            elements.backgroundImageError = document.getElementById('backgroundImageError');
+            elements.contentUrl = document.getElementById('contentUrl');
+            elements.contentUrlError = document.getElementById('contentUrlError');
+            elements.titleEditor = document.getElementById('titleEditor');
+            elements.subtitleEditor = document.getElementById('subtitleEditor');
+        }
+
+        // Loading state management
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer && elements.loadingOverlay) {
+                if (loading) {
+                    elements.mainContainer.classList.add('loading');
+                    elements.loadingOverlay.classList.add('show');
+                } else {
+                    elements.mainContainer.classList.remove('loading');
+                    elements.loadingOverlay.classList.remove('show');
+                }
+            }
+        }
+
+        // Initialize rich text editors
+        function initializeEditors() {
+            if (!window.Quill) {
+                throw new Error('Quill library not loaded');
+            }
+
+            try {
+                // Title editor
+                state.editors.title = new Quill(elements.titleEditor, {
+                    theme: 'snow',
+                    modules: { 
+                        toolbar: [ [{ 'script': 'super' }], ['link'] ],
+                        clipboard: { matchVisual: false } // Prevent formatting issues on paste
+                    },
+                    formats: ['script', 'link'],
+                    placeholder: 'Enter title...'
+                });
+                
+                // Subtitle editor
+                state.editors.subtitle = new Quill(elements.subtitleEditor, {
+                    theme: 'snow',
+                    modules: { 
+                        toolbar: [ ['bold', 'italic'], ['link'] ],
+                        clipboard: { matchVisual: false }
+                    },
+                    formats: ['bold', 'italic', 'link'],
+                    placeholder: 'Enter subtitle...'
+                });
+                
+                // Add change handlers with debouncing
+                const debouncedTitleUpdate = utils.debounce((delta, oldDelta, source) => {
+                    if (source === 'user') {
+                        updateData('title', utils.sanitizeHtml(state.editors.title.root.innerHTML));
+                    }
+                }, moduleConfig.debounceDelay);
+                
+                const debouncedSubtitleUpdate = utils.debounce((delta, oldDelta, source) => {
+                    if (source === 'user') {
+                        updateData('subtitle', utils.sanitizeHtml(state.editors.subtitle.root.innerHTML));
+                    }
+                }, moduleConfig.debounceDelay);
+                
+                state.editors.title.on('text-change', debouncedTitleUpdate);
+                state.editors.subtitle.on('text-change', debouncedSubtitleUpdate);
+                
+                // Enforce max length
+                state.editors.title.on('text-change', () => {
+                    const text = state.editors.title.getText();
+                    if (text.length > moduleConfig.fields.title.maxLength) {
+                        state.editors.title.deleteText(moduleConfig.fields.title.maxLength, text.length);
+                    }
+                });
+                
+                state.editors.subtitle.on('text-change', () => {
+                    const text = state.editors.subtitle.getText();
+                    if (text.length > moduleConfig.fields.subtitle.maxLength) {
+                        state.editors.subtitle.deleteText(moduleConfig.fields.subtitle.maxLength, text.length);
+                    }
+                });
+                
+            } catch (error) {
+                throw new Error(`Failed to initialize editors: ${error.message}`);
+            }
+        }
+
+        // Process rich text content for email
+        function processRichText(html, allowBold = false) {
+            if (!html) return '';
+            
+            const temp = document.createElement('div');
+            temp.innerHTML = utils.sanitizeHtml(html);
+            
+            // Convert bold tags to spans for better email compatibility
+            if (allowBold) {
+                temp.querySelectorAll('strong, b').forEach(el => {
+                    const span = document.createElement('span');
+                    span.style.fontWeight = 'bold';
+                    span.innerHTML = el.innerHTML;
+                    el.replaceWith(span);
+                });
+            }
+            
+            // Ensure links have proper styling
+            temp.querySelectorAll('a').forEach(link => {
+                if (!link.style.color) {
+                    link.style.color = '#ffffff';
+                }
+                link.style.textDecoration = 'none';
+                // Ensure links have href
+                if (!link.getAttribute('href')) {
+                    link.setAttribute('href', '#');
+                }
+            });
+            
+            // Remove paragraph tags and line breaks for inline display
+            return temp.innerHTML
+                .replace(/<p>/g, '')
+                .replace(/<\/p>/g, '')
+                .replace(/<br>/g, '');
+        }
+
+        // Update data and trigger preview refresh
+        function updateData(field, value) {
+            if (state.blockData[field] !== value) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+
+        // Debounced version for input fields
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+
+        // Generate HTML template
+        function generateTemplate() {
+            const bgImage = utils.getFieldValue('backgroundImage');
+            const contentUrl = utils.getFieldValue('contentUrl');
+            const processedTitle = processRichText(utils.getFieldValue('title'));
+            const processedSubtitle = processRichText(utils.getFieldValue('subtitle'), true);
+            
+            // Hardcoded values
+            const logoImage = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/a3a77919-71b9-4b9d-b1ad-90f327487e3f.png';
+            const logoUrl = 'https://%%CountryCode%%.milwaukeetool.eu/';
+            const fallbackColor = '#DB021D';
+
+            const logoHtml = `<!-- Header with logos --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%">
+              <tr>
+               <td align="left" class="leadbanner-logo-cell" style="background-color: transparent; padding: 0 0 0 12px;" valign="top">
+                <a href="${logoUrl}" style="display: inline-block; position: relative; z-index: 2;" target="_blank"><img alt="Logo" src="${logoImage}" style="border: 0; display: block; height: auto; outline: none; text-decoration: none;" width="180"></a>
+               </td>
+              </tr>
+             </table><!-- END Header with logos -->`;
+
+            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${fallbackColor}; width: 620px;">
+                <tr>
+                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="620">
+                        <tr>
+                            <td background="${bgImage}" height="484" style="background-position: center center; background-size: cover; background-repeat: no-repeat;" valign="top" width="620">
+                            <!--[if gte mso 9]>
+                            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;">
+                            <v:fill type="frame" src="${bgImage}" color="${fallbackColor}" />
+                            <v:textbox inset="0,0,0,0">
+                            <![endif]--><div>
+                                ${logoHtml}
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height: 280px; width: 100%;" width="100%">
+                                    <tr>
+                                        <td align="center" class="leadbanner-content" height="280" style="padding: 20px 40px;" valign="middle">
+                                            <h1 class="leadbanner-title" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', sans-serif, 'Open Sans'; font-size: 28px; font-weight: bold; line-height: 44px; margin: 0 0 10px 0; padding: 0; text-transform: uppercase;">
+                                            <a href="${contentUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedTitle}</a></h1>
+                                            <p class="leadbanner-subtitle" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open Sans'; font-size: 18px; font-stretch: condensed; font-weight: normal; line-height: 24px; margin: 0; padding: 0; text-transform: uppercase;">
+                                            <a href="${contentUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedSubtitle}</a></p>
+                                        </td>
+                                    </tr><tr>
+                                    <td class="block" style="width: 100%;">
+                                     <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>
+                                </table>
+                            </div><!--[if gte mso 9]>
+                            </v:textbox>
+                            </v:rect>
+                            <![endif]--></td>
+                        </tr>
+                        </table>
+                    </td>
+                </tr>
+                </table><!-- END .leadbanner -->`;
+        }
+
+        // Refresh preview
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            
+            try {
+                const html = generateTemplate();
+                
+                // Updates the view in the editor
+                state.sdk.setContent(html);
+                
+                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
+                // The key MUST be 'content', not 'html'.
+                if (typeof state.sdk.setData === 'function') {
+                    state.sdk.setData({ ...state.blockData, content: html });
+                }
+            } catch (error) {
+                utils.showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        // Validate URL input
+        function validateUrlInput(input, errorElement) {
+            const value = input.value.trim();
+            
+            if (!value || utils.isValidUrl(value)) {
+                input.classList.remove('error');
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+                return true;
+            } else {
+                input.classList.add('error');
+                if (errorElement) {
+                    errorElement.style.display = 'block';
+                }
+                return false;
+            }
+        }
+
+        // Initialize event handlers
+        function initializeEventHandlers() {
+            // Background image
+            const bgImageHandler = (e) => {
+                if (validateUrlInput(elements.backgroundImage, elements.backgroundImageError)) {
+                    debouncedUpdateData('backgroundImage', e.target.value.trim());
+                }
+            };
+            
+            const bgImageBlurHandler = () => {
+                validateUrlInput(elements.backgroundImage, elements.backgroundImageError);
+            };
+            
+            elements.backgroundImage.addEventListener('input', bgImageHandler);
+            elements.backgroundImage.addEventListener('blur', bgImageBlurHandler);
+            state.eventListeners.push(
+                { element: elements.backgroundImage, event: 'input', handler: bgImageHandler },
+                { element: elements.backgroundImage, event: 'blur', handler: bgImageBlurHandler }
+            );
+            
+            // Content URL
+            const contentUrlHandler = (e) => {
+                if (validateUrlInput(elements.contentUrl, elements.contentUrlError)) {
+                    debouncedUpdateData('contentUrl', e.target.value.trim());
+                }
+            };
+            
+            const contentUrlBlurHandler = () => {
+                validateUrlInput(elements.contentUrl, elements.contentUrlError);
+            };
+            
+            elements.contentUrl.addEventListener('input', contentUrlHandler);
+            elements.contentUrl.addEventListener('blur', contentUrlBlurHandler);
+            state.eventListeners.push(
+                { element: elements.contentUrl, event: 'input', handler: contentUrlHandler },
+                { element: elements.contentUrl, event: 'blur', handler: contentUrlBlurHandler }
+            );
+        }
+
+        // Load data from SDK
+        function loadData() {
+            if (!state.sdk || typeof state.sdk.getData !== 'function') {
+                utils.showError('SDK not available');
+                return;
+            }
+            
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                try {
+                    if (data && Object.keys(data).length > 0) {
+                        // Validate and sanitize incoming data
+                        Object.keys(moduleConfig.fields).forEach(key => {
+                            if (data.hasOwnProperty(key)) {
+                                if (moduleConfig.fields[key].type === 'richtext') {
+                                    state.blockData[key] = utils.sanitizeHtml(data[key]);
+                                } else {
+                                    state.blockData[key] = data[key];
+                                }
+                            }
+                        });
+                        
+                        // Update UI
+                        if (state.blockData.title && state.editors.title) {
+                            state.editors.title.root.innerHTML = state.blockData.title;
+                        }
+                        if (state.blockData.subtitle && state.editors.subtitle) {
+                            state.editors.subtitle.root.innerHTML = state.blockData.subtitle;
+                        }
+                        if (state.blockData.backgroundImage && elements.backgroundImage) {
+                            elements.backgroundImage.value = state.blockData.backgroundImage;
+                            validateUrlInput(elements.backgroundImage, elements.backgroundImageError);
+                        }
+                        if (state.blockData.contentUrl && elements.contentUrl) {
+                            elements.contentUrl.value = state.blockData.contentUrl;
+                            validateUrlInput(elements.contentUrl, elements.contentUrlError);
+                        }
+                    } else {
+                        // Initialize with defaults
+                        Object.keys(moduleConfig.fields).forEach(key => {
+                            state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                        });
+                        
+                        // Update editors with defaults
+                        if (state.editors.title) {
+                            state.editors.title.root.innerHTML = state.blockData.title;
+                        }
+                        if (state.editors.subtitle) {
+                            state.editors.subtitle.root.innerHTML = state.blockData.subtitle;
+                        }
+                    }
+                    
+                    refreshPreview();
+                    state.retryCount = 0; // Reset retry count on success
+                    
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    // Use defaults on error
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                    });
+                    refreshPreview();
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        // Cleanup function
+        function cleanup() {
+            // Remove Quill event listeners
+            if (state.editors.title) {
+                state.editors.title.off('text-change');
+            }
+            if (state.editors.subtitle) {
+                state.editors.subtitle.off('text-change');
+            }
+            
+            // Remove all stored event listeners
+            state.eventListeners.forEach(({ element, event, handler }) => {
+                if (element && typeof element.removeEventListener === 'function') {
+                    element.removeEventListener(event, handler);
+                }
+            });
+            
+            state.eventListeners = [];
+        }
+
+        // Initialize with retry logic
+        function initializeWithRetry() {
+            try {
+                // Check dependencies
+                if (!window.sfdc || !window.sfdc.BlockSDK) {
+                    throw new Error('BlockSDK not loaded');
+                }
+                
+                if (!window.Quill) {
+                    throw new Error('Quill not loaded');
+                }
+                
+                // Initialize SDK
+                state.sdk = new window.sfdc.BlockSDK();
+                
+                // Cache elements
+                cacheElements();
+                
+                // Initialize components
+                initializeEditors();
+                initializeEventHandlers();
+                
+                // Load initial data
+                loadData();
+                
+                // Set up global event handlers
+                window.addEventListener('beforeunload', cleanup);
+                
+                // Handle visibility changes
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && state.isInitialized) {
+                        loadData();
+                    }
+                });
+                
+                state.isInitialized = true;
+                
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`);
+                
+                // Retry logic
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => {
+                        console.log(`Retrying initialization (${state.retryCount}/${moduleConfig.maxRetries})...`);
+                        initializeWithRetry();
+                    }, 1000 * state.retryCount); // Exponential backoff
+                } else {
+                    utils.showError('Failed to initialize after multiple attempts. Please refresh the page.', true);
+                }
+                
+                setLoadingState(false);
+            }
+        }
+
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWithRetry);
+        } else {
+            initializeWithRetry();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Checklist Block</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <style>
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:2em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.items-container{display:flex;flex-direction:column;gap:15px}
+        .item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}
+        .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .item-title{font-weight:bold;font-size:16px;margin:0}
+        .item-controls{display:flex;gap:8px}
+        .item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}
+        .item-control-btn:hover{color:#0074d9}
+        .item-control-btn:disabled{color:#ccc;cursor:not-allowed}
+        .btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Checklist Settings</h2>
+        
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">General Settings</div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="color-selector" id="backgroundColorSelector">
+                    <div class="color-option selected" data-color="red">Red</div>
+                    <div class="color-option" data-color="black">Black</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <div class="section-title">Checklist Items</div>
+            <div id="itemsContainer" class="items-container"></div>
+            <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
+        </div>
+    </div>
+
+    <template id="itemTemplate">
+        <div class="item">
+            <div class="item-header">
+                <h3 class="item-title">Item</h3>
+                <div class="item-controls">
+                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+                </div>
+            </div>
+            <div class="quill-container limited-toolbar"></div>
+        </div>
+    </template>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        const moduleConfig = {
+            name: 'Checklist Block',
+            fields: {
+                backgroundColor: { type: 'text', defaultValue: 'red' },
+                items: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), text: '<strong>Lorem ipsum odor amet</strong>' },
+                        { id: crypto.randomUUID(), text: '<strong>Consectetur adipiscing elit</strong>' },
+                        { id: crypto.randomUUID(), text: '<strong>Donec a diam lectus</strong>' }
+                    ]
+                }
+            },
+            debounceDelay: 400,
+            maxRetries: 3
+        };
+
+        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0 };
+        const elements = {};
+
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+            sanitizeHtml(html) {
+                if (!html) return '';
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                temp.querySelectorAll('script, style').forEach(el => el.remove());
+                // Handle Quill's <p> tags and also allow our <sup> and <a> tags through.
+                temp.querySelectorAll('a').forEach(link => {
+                    if (!link.style.color) link.style.color = '#ffffff';
+                    if (!link.style.textDecoration) link.style.textDecoration = 'underline';
+                    if (!link.getAttribute('href')) link.setAttribute('href', '#');
+                });
+                return temp.innerHTML.replace(/<p>/g, '').replace(/<\/p>/g, '');
+            },
+            showError(message, permanent = false) {
+                if(elements.errorBanner) {
+                    elements.errorBanner.textContent = message;
+                    elements.errorBanner.classList.add('show');
+                    if (!permanent) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000);
+                }
+                console.error(`${moduleConfig.name} Error:`, message);
+            },
+            getFieldValue(fieldName) {
+                return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue;
+            }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
+        }
+
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer) {
+                elements.mainContainer.classList.toggle('loading', loading);
+                elements.loadingOverlay.classList.toggle('show', loading);
+            }
+        }
+
+        function updateDataFromUI() {
+            const selectedColorEl = elements.backgroundColorSelector.querySelector('.selected');
+            state.blockData.backgroundColor = selectedColorEl ? selectedColorEl.dataset.color : 'red';
+            
+            const newItems = [];
+            document.querySelectorAll('#itemsContainer .item').forEach(itemEl => {
+                const id = itemEl.dataset.id;
+                const editor = state.editors[id];
+                if (editor) {
+                    newItems.push({ id: id, text: utils.sanitizeHtml(editor.root.innerHTML) });
+                }
+            });
+            state.blockData.items = newItems;
+
+            refreshPreview();
+        }
+
+        const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
+
+        function generateTemplate() {
+            const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
+            const items = utils.getFieldValue('items');
+
+            const itemRowsHtml = items.map(item => `
+                <tr>
+                   <td valign="top" style="padding-bottom: 8px;">
+                    <img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
+                   <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
+                   <td class="story-intro mobile-text-left" valign="top" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">
+                    ${item.text}
+                   </td>
+                </tr>
+            `).join('');
+
+            return `<!-- START .checklist --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
+              <tr>
+               <td class="side" style="width: 20px;"> </td>
+               <td align="center" class="content-inner" style="width: 580px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                  <tr>
+                   <td align="left" class="block" style="width: 100%;">
+                    <table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr><td colspan="3"><div style="font-size: 28px; height: 28px; line-height: 28px;"> </div></td></tr>
+                      ${itemRowsHtml}
+                      <tr><td colspan="3"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>
+                    </table>
+                   </td>
+                  </tr>
+                </table>
+               </td>
+               <td class="side" style="width: 20px;"> </td>
+              </tr>
+            </table><!-- END .checklist -->`;
+        }
+
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            try {
+                const html = generateTemplate();
+                state.sdk.setContent(html);
+                if (state.sdk.setData) {
+                    state.sdk.setData({ ...state.blockData, content: html });
+                }
+            } catch (error) {
+                utils.showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function renderItemsUI() {
+            const items = utils.getFieldValue('items');
+            elements.itemsContainer.innerHTML = '';
+            const currentIds = new Set(items.map(i => i.id));
+            for (const id in state.editors) {
+                if (!currentIds.has(id)) {
+                    delete state.editors[id];
+                }
+            }
+
+            items.forEach((item, index) => {
+                const itemFragment = elements.itemTemplate.content.cloneNode(true);
+                const itemEl = itemFragment.querySelector('.item');
+                const editorDiv = itemFragment.querySelector('.quill-container');
+
+                itemEl.dataset.id = item.id;
+                itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
+                
+                if(index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
+                if(index === items.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
+
+                elements.itemsContainer.appendChild(itemFragment);
+
+                // Initialize Quill with updated toolbar and formats
+                const editor = new Quill(editorDiv, {
+                    theme: 'snow',
+                    modules: { 
+                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
+                        clipboard: { matchVisual: false } 
+                    },
+                    formats: ['bold', 'script', 'link'],
+                    placeholder: 'Enter item text...'
+                });
+
+                editor.root.innerHTML = item.text;
+                editor.on('text-change', debouncedUpdateDataFromUI);
+                state.editors[item.id] = editor;
+            });
+        }
+        
+        function initializeEventHandlers() {
+            elements.backgroundColorSelector.addEventListener('click', (e) => {
+                if (e.target.classList.contains('color-option')) {
+                    elements.backgroundColorSelector.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                    updateDataFromUI();
+                }
+            });
+
+            elements.addItemBtn.addEventListener('click', () => {
+                const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
+                state.blockData.items.push(newItem);
+                renderItemsUI();
+                updateDataFromUI();
+            });
+
+            elements.itemsContainer.addEventListener('click', (e) => {
+                const itemEl = e.target.closest('.item');
+                if (!itemEl) return;
+                
+                const id = itemEl.dataset.id;
+                const items = state.blockData.items;
+                const currentIndex = items.findIndex(item => item.id === id);
+                let dataChanged = false;
+
+                if (e.target.closest('.remove-btn')) {
+                    items.splice(currentIndex, 1);
+                    delete state.editors[id];
+                    dataChanged = true;
+                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
+                    [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
+                    dataChanged = true;
+                } else if (e.target.closest('.move-down-btn') && currentIndex < items.length - 1) {
+                    [items[currentIndex], items[currentIndex + 1]] = [items[currentIndex + 1], items[currentIndex]];
+                    dataChanged = true;
+                }
+
+                if (dataChanged) {
+                    renderItemsUI();
+                    updateDataFromUI();
+                }
+            });
+        }
+
+        function loadData() {
+            if (!state.sdk) return utils.showError('SDK not available');
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData.backgroundColor = (data && data.backgroundColor) ? data.backgroundColor : moduleConfig.fields.backgroundColor.defaultValue;
+                    state.blockData.items = (data && data.items && data.items.length > 0) ? data.items : moduleConfig.fields.items.defaultValue;
+                    state.blockData.items.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
+                    
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
+                    renderItemsUI();
+                    refreshPreview();
+
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    state.blockData = {};
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                if (!window.Quill) throw new Error('Quill not loaded');
+                
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEventHandlers();
+                loadData();
+                
+                state.isInitialized = true;
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`);
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                } else {
+                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
+                }
+                setLoadingState(false);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWithRetry);
+        } else {
+            initializeWithRetry();
+        }
+    </script>
+</body>
+</html>

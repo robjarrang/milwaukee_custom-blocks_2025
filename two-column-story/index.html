@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>2 Column Story Block</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <style>
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.column-wrapper{display:flex;gap:20px;flex-wrap:wrap}.column{flex:1;min-width:300px;background-color:#fafafa;padding:15px;border-radius:6px;border:1px solid #eee}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">2 Column Story</h2>
+        
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <!-- General Settings -->
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">General Settings</div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="color-selector" id="backgroundColorSelector">
+                    <div class="color-option selected" data-color="black">Black</div>
+                    <div class="color-option" data-color="red">Red</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column-wrapper">
+            <!-- Left Column -->
+            <div class="column">
+                <div class="section-title" style="margin-top:0;">Left Column</div>
+                <div class="field-group">
+                    <label for="left_imageUrl" class="field-label">Image URL</label>
+                    <input type="url" id="left_imageUrl" class="field-input" placeholder="https://example.com/image.jpg">
+                    <div class="field-error" id="left_imageUrlError">Please enter a valid image URL.</div>
+                </div>
+                <div class="field-group">
+                    <label for="left_imageAlt" class="field-label">Image Alt Text</label>
+                    <input type="text" id="left_imageAlt" class="field-input">
+                </div>
+                 <div class="field-group">
+                    <label for="left_imageLink" class="field-label">Image Link URL</label>
+                    <input type="url" id="left_imageLink" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                    <div class="field-error" id="left_imageLinkError">Please enter a valid URL.</div>
+                </div>
+                <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="left_showSubtitle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label>
+                </div>
+                <div class="field-group" id="left_subtitleGroup">
+                    <label for="left_subtitle" class="field-label">Subtitle</label>
+                    <input type="text" id="left_subtitle" class="field-input">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Title</label>
+                    <div id="left_titleEditor" class="quill-container limited-toolbar"></div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description</label>
+                    <div id="left_descriptionEditor" class="quill-container"></div>
+                </div>
+                <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="left_showButton" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label for="left_showButton" class="checkbox-label">Show Button</label>
+                </div>
+                <div id="left_buttonFieldsGroup">
+                    <div class="field-group">
+                        <label for="left_buttonText" class="field-label">Button Text</label>
+                        <input type="text" id="left_buttonText" class="field-input">
+                    </div>
+                    <div class="field-group">
+                        <label for="left_buttonLink" class="field-label">Button Link URL</label>
+                        <input type="url" id="left_buttonLink" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                        <div class="field-error" id="left_buttonLinkError">Please enter a valid URL.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="column">
+                <div class="section-title" style="margin-top:0;">Right Column</div>
+                <div class="field-group">
+                    <label for="right_imageUrl" class="field-label">Image URL</label>
+                    <input type="url" id="right_imageUrl" class="field-input" placeholder="https://example.com/image.jpg">
+                    <div class="field-error" id="right_imageUrlError">Please enter a valid image URL.</div>
+                </div>
+                <div class="field-group">
+                    <label for="right_imageAlt" class="field-label">Image Alt Text</label>
+                    <input type="text" id="right_imageAlt" class="field-input">
+                </div>
+                 <div class="field-group">
+                    <label for="right_imageLink" class="field-label">Image Link URL</label>
+                    <input type="url" id="right_imageLink" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                    <div class="field-error" id="right_imageLinkError">Please enter a valid URL.</div>
+                </div>
+                <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="right_showSubtitle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label>
+                </div>
+                <div class="field-group" id="right_subtitleGroup">
+                    <label for="right_subtitle" class="field-label">Subtitle</label>
+                    <input type="text" id="right_subtitle" class="field-input">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Title</label>
+                    <div id="right_titleEditor" class="quill-container limited-toolbar"></div>
+                </div>
+                 <div class="field-group">
+                    <label class="field-label">Description</label>
+                    <div id="right_descriptionEditor" class="quill-container"></div>
+                </div>
+                <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="right_showButton" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label for="right_showButton" class="checkbox-label">Show Button</label>
+                </div>
+                <div id="right_buttonFieldsGroup">
+                    <div class="field-group">
+                        <label for="right_buttonText" class="field-label">Button Text</label>
+                        <input type="text" id="right_buttonText" class="field-input">
+                    </div>
+                    <div class="field-group">
+                        <label for="right_buttonLink" class="field-label">Button Link URL</label>
+                        <input type="url" id="right_buttonLink" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                        <div class="field-error" id="right_buttonLinkError">Please enter a valid URL.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        // Module configuration
+        const moduleConfig = {
+            name: '2 Column Story',
+            fields: {
+                backgroundColor: { type: 'text', defaultValue: 'black' },
+                // Left Column Fields
+                left_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
+                left_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
+                left_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                left_showSubtitle: { type: 'boolean', defaultValue: true },
+                left_subtitle: { type: 'text', defaultValue: 'M12 FHAC16-502X', maxLength: 80 },
+                left_title: { type: 'richtext', defaultValue: 'Left Column Title', maxLength: 100 },
+                left_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', maxLength: 250 },
+                left_showButton: { type: 'boolean', defaultValue: true },
+                left_buttonText: { type: 'text', defaultValue: 'Learn More', maxLength: 40 },
+                left_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                // Right Column Fields
+                right_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
+                right_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
+                right_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                right_showSubtitle: { type: 'boolean', defaultValue: true },
+                right_subtitle: { type: 'text', defaultValue: 'M12 SIM-0', maxLength: 80 },
+                right_title: { type: 'richtext', defaultValue: 'Right Column Title', maxLength: 100 },
+                right_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', maxLength: 250 },
+                right_showButton: { type: 'boolean', defaultValue: true },
+                right_buttonText: { type: 'text', defaultValue: 'Find Out More', maxLength: 40 },
+                right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
+            },
+            debounceDelay: 300,
+            maxRetries: 3
+        };
+
+        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const elements = {};
+
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+            isValidUrl(string) {
+                if (!string || string.trim() === '') return true;
+                try {
+                    const url = new URL(string);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) { return false; }
+            },
+            sanitizeHtml(html) {
+                if (!html) return '';
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                temp.querySelectorAll('script, style').forEach(el => el.remove());
+                const allElements = temp.getElementsByTagName('*');
+                for (let el of allElements) {
+                    for (let attr of el.attributes) {
+                        if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
+                    }
+                }
+                return temp.innerHTML;
+            },
+            showError(message, permanent = false) {
+                const errorBanner = elements.errorBanner;
+                if (errorBanner) {
+                    errorBanner.textContent = message;
+                    errorBanner.classList.add('show');
+                    if (!permanent) setTimeout(() => errorBanner.classList.remove('show'), 5000);
+                }
+                console.error(`${moduleConfig.name} Error:`, message);
+            },
+            getFieldValue(fieldName) {
+                return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue;
+            }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+
+            const prefixes = ['left_', 'right_'];
+            prefixes.forEach(p => {
+                elements[p + 'imageUrl'] = document.getElementById(p + 'imageUrl');
+                elements[p + 'imageUrlError'] = document.getElementById(p + 'imageUrlError');
+                elements[p + 'imageAlt'] = document.getElementById(p + 'imageAlt');
+                elements[p + 'imageLink'] = document.getElementById(p + 'imageLink');
+                elements[p + 'imageLinkError'] = document.getElementById(p + 'imageLinkError');
+                elements[p + 'showSubtitle'] = document.getElementById(p + 'showSubtitle');
+                elements[p + 'subtitleGroup'] = document.getElementById(p + 'subtitleGroup');
+                elements[p + 'subtitle'] = document.getElementById(p + 'subtitle');
+                elements[p + 'titleEditor'] = document.getElementById(p + 'titleEditor');
+                elements[p + 'descriptionEditor'] = document.getElementById(p + 'descriptionEditor');
+                elements[p + 'showButton'] = document.getElementById(p + 'showButton');
+                elements[p + 'buttonFieldsGroup'] = document.getElementById(p + 'buttonFieldsGroup');
+                elements[p + 'buttonText'] = document.getElementById(p + 'buttonText');
+                elements[p + 'buttonLink'] = document.getElementById(p + 'buttonLink');
+                elements[p + 'buttonLinkError'] = document.getElementById(p + 'buttonLinkError');
+            });
+        }
+
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer && elements.loadingOverlay) {
+                elements.mainContainer.classList.toggle('loading', loading);
+                elements.loadingOverlay.classList.toggle('show', loading);
+            }
+        }
+
+        function initializeEditors() {
+            if (!window.Quill) throw new Error('Quill library not loaded');
+            const prefixes = ['left_', 'right_'];
+            
+            prefixes.forEach(p => {
+                try {
+                    state.editors[p + 'title'] = new Quill(elements[p + 'titleEditor'], {
+                        theme: 'snow', modules: { toolbar: [['bold']], clipboard: { matchVisual: false } },
+                        formats: ['bold'], placeholder: 'Enter title...'
+                    });
+                    state.editors[p + 'description'] = new Quill(elements[p + 'descriptionEditor'], {
+                        theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } },
+                        formats: ['bold', 'italic', 'link'], placeholder: 'Enter description...'
+                    });
+
+                    ['title', 'description'].forEach(type => {
+                        const editor = state.editors[p + type];
+                        const fieldName = p + type;
+                        const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                            if (source === 'user') updateData(fieldName, utils.sanitizeHtml(editor.root.innerHTML));
+                        }, moduleConfig.debounceDelay);
+                        editor.on('text-change', debouncedUpdate);
+
+                        editor.on('text-change', () => {
+                            const text = editor.getText();
+                            const maxLength = moduleConfig.fields[fieldName].maxLength;
+                            if (text.length > maxLength) editor.deleteText(maxLength, text.length);
+                        });
+                    });
+                } catch(error) {
+                    throw new Error(`Failed to initialize ${p} editors: ${error.message}`);
+                }
+            });
+        }
+
+        function processRichText(html, isDescription = false) {
+            if (!html) return '';
+            const temp = document.createElement('div');
+            temp.innerHTML = utils.sanitizeHtml(html);
+            
+            if (isDescription) {
+                temp.querySelectorAll('a').forEach(link => {
+                    if (!link.style.color) link.style.color = '#ffffff';
+                    link.style.textDecoration = 'underline';
+                    if (!link.getAttribute('href')) link.setAttribute('href', '#');
+                });
+            }
+            
+            return temp.innerHTML.replace(/<p>/g, '').replace(/<\/p>/g, '').replace(/<br>/g, '');
+        }
+
+        function updateData(field, value) {
+            if (state.blockData[field] !== value) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+
+        function generateColumnHtml(prefix) {
+            const imageUrl = utils.getFieldValue(prefix + 'imageUrl');
+            const imageAlt = utils.getFieldValue(prefix + 'imageAlt');
+            const imageLink = utils.getFieldValue(prefix + 'imageLink');
+            const showSubtitle = utils.getFieldValue(prefix + 'showSubtitle');
+            const subtitle = utils.getFieldValue(prefix + 'subtitle');
+            const title = processRichText(utils.getFieldValue(prefix + 'title'));
+            const description = processRichText(utils.getFieldValue(prefix + 'description'), true);
+            const showButton = utils.getFieldValue(prefix + 'showButton');
+            const buttonText = utils.getFieldValue(prefix + 'buttonText');
+            const buttonLink = utils.getFieldValue(prefix + 'buttonLink');
+
+            const subtitleHtml = showSubtitle ? `<tr>
+               <td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly; text-align: center; mso-hyphenate: none; hyphens: none;">
+                ${subtitle}</td></tr><tr>
+               <td>
+                <div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
+                  </div></td></tr>` : '';
+
+            const buttonHtml = showButton ? `<tr>
+               <td>
+                <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
+                  </div></td></tr><tr>
+               <td>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                  <tr>
+                   <td align="center" class="block" style="width: 100%;" valign="top">
+                    <table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;">
+                      <tr>
+                       <td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;">
+                        <a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr>
+               <td>
+                <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
+                  </div></td></tr>` : '';
+
+            const topSpacer = `<div style="clear: both; display: block; font-size: 12px; height: 12px; line-height: 12px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div>`;
+            
+            return `<td align="center" class="block" style="width: 280px;" valign="top">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                    <tr>
+                        <td>
+                            <div>
+                                <a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="280"></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 12px; padding-top: 12px;">
+                            <table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">
+                                <tr><td>${topSpacer}</td></tr>
+                                ${subtitleHtml}
+                                <tr>
+                                    <td class="mobile-text-center" style="text-align: center;">
+                                        <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-stretch: condensed; font-weight: bold; line-height: 28px; margin: 0; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${title}</h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: center; mso-hyphenate: none; hyphens: none;">${description}</td>
+                                </tr>
+                                ${!showButton ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div></td></tr>' : ''}
+                                ${buttonHtml}
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>`;
+        }
+
+        function generateTemplate() {
+            const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
+            const leftColHtml = generateColumnHtml('left_');
+            const rightColHtml = generateColumnHtml('right_');
+
+            return `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
+                <tr>
+                    <td class="side" style="width: 20px;"> </td>
+                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                            <tr>
+                                ${leftColHtml}
+                                <td class="gap block" style="width: 20px;"> </td>
+                                ${rightColHtml}
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="side" style="width: 20px;"> </td>
+                </tr>
+            </table><!-- END .story-2col -->`;
+        }
+
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            try {
+                const html = generateTemplate();
+
+                // Updates the view in the editor
+                state.sdk.setContent(html);
+
+                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
+                // The key MUST be 'content', not 'html'.
+                if (state.sdk.setData) {
+                    state.sdk.setData({ ...state.blockData, content: html });
+                }
+            } catch (error) {
+                utils.showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function validateUrlInput(input, errorElement) {
+            const value = input.value.trim();
+            const isValid = !value || utils.isValidUrl(value);
+            input.classList.toggle('error', !isValid);
+            if(errorElement) errorElement.style.display = isValid ? 'none' : 'block';
+            return isValid;
+        }
+
+        function initializeEventHandlers() {
+            // General settings - Background Color
+            document.querySelectorAll('.color-option').forEach(option => {
+                const handler = (e) => {
+                    const selectedColor = e.target.dataset.color;
+                    updateData('backgroundColor', selectedColor);
+                    // Update UI
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                };
+                option.addEventListener('click', handler);
+                state.eventListeners.push({ element: option, event: 'click', handler });
+            });
+
+            // Column settings
+            const prefixes = ['left_', 'right_'];
+            prefixes.forEach(p => {
+                // Text and URL inputs
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
+                    const el = elements[p + type];
+                    const errEl = elements[p + type + 'Error'];
+                    const fieldName = p + type;
+                    const config = moduleConfig.fields[fieldName];
+                    
+                    const handler = (e) => {
+                        let value = e.target.value;
+                        if (config.validator === 'url' && !validateUrlInput(el, errEl)) return;
+                        if (config.maxLength) value = value.substring(0, config.maxLength);
+                        e.target.value = value;
+                        debouncedUpdateData(fieldName, value.trim());
+                    };
+                    el.addEventListener('input', handler);
+                    state.eventListeners.push({ element: el, event: 'input', handler });
+
+                    if(config.validator === 'url') {
+                        const blurHandler = () => validateUrlInput(el, errEl);
+                        el.addEventListener('blur', blurHandler);
+                        state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler });
+                    }
+                });
+
+                // Toggles
+                ['showSubtitle', 'showButton'].forEach(type => {
+                    const el = elements[p + type];
+                    const fieldName = p + type;
+                    const groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')];
+
+                    const handler = (e) => {
+                        const isChecked = e.target.checked;
+                        updateData(fieldName, isChecked);
+                        groupEl.classList.toggle('disabled-field', !isChecked);
+                    };
+                    el.addEventListener('change', handler);
+                    state.eventListeners.push({ element: el, event: 'change', handler });
+                });
+            });
+        }
+
+        function loadData() {
+            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData = {};
+                    if (data && Object.keys(data).length > 0) {
+                        Object.keys(moduleConfig.fields).forEach(key => {
+                            if (data.hasOwnProperty(key)) {
+                                state.blockData[key] = moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key];
+                            }
+                        });
+                    }
+
+                    // Populate UI
+                    const bgColor = utils.getFieldValue('backgroundColor');
+                    document.querySelectorAll('.color-option').forEach(o => {
+                        o.classList.remove('selected');
+                        if (o.dataset.color === bgColor) {
+                            o.classList.add('selected');
+                        }
+                    });
+
+                    const prefixes = ['left_', 'right_'];
+                    prefixes.forEach(p => {
+                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
+                            const fieldName = p + type;
+                            if (elements[fieldName]) elements[fieldName].value = utils.getFieldValue(fieldName);
+                        });
+                        
+                        ['title', 'description'].forEach(type => {
+                            const editor = state.editors[p + type];
+                            if(editor) editor.root.innerHTML = utils.getFieldValue(p + type);
+                        });
+
+                        ['showSubtitle', 'showButton'].forEach(type => {
+                            const checkbox = elements[p + type];
+                            const group = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')];
+                            const isChecked = utils.getFieldValue(p + type);
+                            if (checkbox) checkbox.checked = isChecked;
+                            if (group) group.classList.toggle('disabled-field', !isChecked);
+                        });
+                    });
+
+                    refreshPreview();
+                    state.retryCount = 0;
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = moduleConfig.fields[key].defaultValue; });
+                    refreshPreview();
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        function cleanup() {
+            Object.values(state.editors).forEach(editor => editor && editor.off('text-change'));
+            state.eventListeners.forEach(({ element, event, handler }) => {
+                if (element && element.removeEventListener) element.removeEventListener(event, handler);
+            });
+            state.eventListeners = [];
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                if (!window.Quill) throw new Error('Quill not loaded');
+                
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEditors();
+                initializeEventHandlers();
+                loadData();
+                
+                window.addEventListener('beforeunload', cleanup);
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && state.isInitialized) loadData();
+                });
+                
+                state.isInitialized = true;
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`);
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                } else {
+                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
+                }
+                setLoadingState(false);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWithRetry);
+        } else {
+            initializeWithRetry();
+        }
+    </script>
+</body>
+</html>

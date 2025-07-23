@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Spacer Block</title>
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <style>
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.option-selector{display:flex;gap:10px;margin-bottom:15px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.slider-group{display:flex;align-items:center;gap:15px}.slider-input{flex-grow:1;cursor:pointer}.slider-value{font-size:14px;font-weight:bold;color:#333;background-color:#f0f0f0;padding:4px 8px;border-radius:4px;min-width:50px;text-align:center}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Spacer Settings</h2>
+        
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">Customisation</div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="option-selector" id="backgroundColorSelector">
+                    <div class="option-button selected" data-value="black">Black</div>
+                    <div class="option-button" data-value="red">Red</div>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label for="spacerHeight" class="field-label">Spacer Height</label>
+                <div class="slider-group">
+                    <input type="range" id="spacerHeight" class="slider-input" min="8" max="120" step="8">
+                    <span id="spacerHeightValue" class="slider-value"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        // Module configuration
+        const moduleConfig = {
+            name: 'Spacer',
+            fields: {
+                backgroundColor: { type: 'text', defaultValue: 'black' },
+                spacerHeight: { type: 'number', defaultValue: 40 }
+            },
+            debounceDelay: 200, // Shorter delay for responsive slider
+            maxRetries: 3
+        };
+
+        // State management
+        const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const elements = {};
+
+        // Utility functions
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+            showError(message, permanent = false) {
+                const errorBanner = elements.errorBanner;
+                if (errorBanner) {
+                    errorBanner.textContent = message;
+                    errorBanner.classList.add('show');
+                    if (!permanent) setTimeout(() => errorBanner.classList.remove('show'), 5000);
+                }
+                console.error('Spacer Block Error:', message);
+            },
+            getFieldValue(fieldName) {
+                if (fieldName === 'spacerHeight') {
+                    const value = state.blockData[fieldName];
+                    return (typeof value === 'number' && value > 0) ? value : moduleConfig.fields[fieldName].defaultValue;
+                }
+                return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue;
+            }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.spacerHeight = document.getElementById('spacerHeight');
+            elements.spacerHeightValue = document.getElementById('spacerHeightValue');
+        }
+
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer && elements.loadingOverlay) {
+                elements.mainContainer.classList.toggle('loading', loading);
+                elements.loadingOverlay.classList.toggle('show', loading);
+            }
+        }
+
+        function updateData(field, value) {
+            if (state.blockData[field] !== value) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+
+        function generateTemplate() {
+            const backgroundColorValue = utils.getFieldValue('backgroundColor');
+            const spacerHeightValue = utils.getFieldValue('spacerHeight');
+            
+            const bgColor = backgroundColorValue === 'red' ? '#DB021D' : '#000000';
+            const height = `${spacerHeightValue}px`;
+
+            return `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
+                <tr>
+                    <td align="center" class="content-inner" style="width: 580px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                            <tr>
+                                <td class="block" style="width: 100%;">
+                                    <div style="clear: both; display: block; font-size: ${height}; height: ${height}; line-height: ${height}; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table><!-- END .fw-spacer -->`;
+        }
+
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            try {
+                const html = generateTemplate();
+
+                // Updates the view in the editor
+                state.sdk.setContent(html);
+
+                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
+                // The key MUST be 'content', not 'html'.
+                if (state.sdk.setData) {
+                    state.sdk.setData({ ...state.blockData, content: html });
+                }
+            } catch (error) {
+                utils.showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function initializeEventHandlers() {
+            // Background color selector
+            elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(option => {
+                const handler = (e) => {
+                    const selectedValue = e.target.dataset.value;
+                    updateData('backgroundColor', selectedValue);
+                    elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                };
+                option.addEventListener('click', handler);
+                state.eventListeners.push({ element: option, event: 'click', handler });
+            });
+            
+            // Spacer height slider
+            const sliderHandler = (e) => {
+                const value = parseInt(e.target.value, 10);
+                elements.spacerHeightValue.textContent = `${value}px`;
+                debouncedUpdateData('spacerHeight', value);
+            };
+
+            elements.spacerHeight.addEventListener('input', sliderHandler);
+            state.eventListeners.push({ element: elements.spacerHeight, event: 'input', handler: sliderHandler });
+        }
+
+        function loadData() {
+            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData = {};
+                    if (data && Object.keys(data).length > 0) {
+                       Object.keys(moduleConfig.fields).forEach(key => {
+                            if (data.hasOwnProperty(key)) {
+                                state.blockData[key] = data[key];
+                            }
+                        });
+                    }
+                    
+                    // Update UI from loaded or default data
+                    const bgColor = utils.getFieldValue('backgroundColor');
+                    const height = utils.getFieldValue('spacerHeight');
+
+                    elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => {
+                        o.classList.toggle('selected', o.dataset.value === bgColor);
+                    });
+                    
+                    elements.spacerHeight.value = height;
+                    elements.spacerHeightValue.textContent = `${height}px`;
+
+                    refreshPreview();
+                    state.retryCount = 0;
+                    
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                    });
+                    refreshPreview();
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        function cleanup() {
+            state.eventListeners.forEach(({ element, event, handler }) => {
+                if (element && typeof element.removeEventListener === 'function') {
+                    element.removeEventListener(event, handler);
+                }
+            });
+            state.eventListeners = [];
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) {
+                    throw new Error('BlockSDK not loaded');
+                }
+                
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEventHandlers();
+                loadData();
+                
+                window.addEventListener('beforeunload', cleanup);
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && state.isInitialized) loadData();
+                });
+                
+                state.isInitialized = true;
+                
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`);
+                
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                } else {
+                    utils.showError('Failed to initialize after multiple attempts. Please refresh the page.', true);
+                }
+                
+                setLoadingState(false);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWithRetry);
+        } else {
+            initializeWithRetry();
+        }
+    </script>
+</body>
+</html>
