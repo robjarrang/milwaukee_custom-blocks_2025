@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Events List Block</title>
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <style>
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.events-container{display:flex;flex-direction:column;gap:15px}.event-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.event-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.event-title{font-weight:bold;font-size:16px}.event-controls{display:flex;gap:8px}.event-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.event-control-btn:hover{color:#0074d9}.event-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-event-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Events List Settings</h2>
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">General Settings</div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="color-selector" id="backgroundColorSelector">
+                    <div class="color-option selected" data-color="red">Red</div>
+                    <div class="color-option" data-color="black">Black</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <div class="section-title">Events</div>
+            <div id="eventsContainer" class="events-container"></div>
+            <button id="addEventBtn" class="btn add-event-btn">Add Event</button>
+        </div>
+    </div>
+
+    <template id="eventTemplate">
+        <div class="event-item">
+            <div class="event-header">
+                <h3 class="event-title">Event</h3>
+                <div class="event-controls">
+                    <button class="event-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="event-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="event-control-btn remove-btn" title="Remove Event">×</button>
+                </div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Image URL (178px wide)</label>
+                <input type="url" class="field-input" data-field="imageUrl" placeholder="https://example.com/event-image.jpg">
+                <div class="field-error">Please enter a valid image URL.</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Title</label>
+                <input type="text" class="field-input" data-field="title" placeholder="EXECUTIVE HIRE SHOW">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Date</label>
+                <input type="text" class="field-input" data-field="date" placeholder="3rd February">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Location</label>
+                <input type="text" class="field-input" data-field="location" placeholder="CBS Arena, Coventry">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Button Text</label>
+                <input type="text" class="field-input" data-field="buttonText" placeholder="Learn More">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Button/Image Link URL</label>
+                <input type="url" class="field-input" data-field="buttonUrl" placeholder="https://example.com/event-details">
+                <div class="field-error">Please enter a valid link URL.</div>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        const moduleConfig = {
+            name: 'Events List Block',
+            fields: {
+                backgroundColor: { type: 'text', defaultValue: 'red' },
+                events: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), imageUrl: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/c7b1bd3a-e211-477b-a55d-434c62155ba6.jpg", title: "EXECUTIVE HIRE SHOW", date: "3rd February", location: "CBS Arena, Phoenix Way, Foleshill, Coventry CV6 6GE", buttonText: "Phasellus a mauris", buttonUrl: "https://www.milwaukeetool.eu/"},
+                        { id: crypto.randomUUID(), imageUrl: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/755d24cf-a6c2-49f6-ad73-d5cbe3dc6dea.jpg", title: "DOE SHOW", date: "4th - 6th February", location: "Ernest Doe Head Office, Ulting, Maldon CM9 6QH", buttonText: "Phasellus a mauris", buttonUrl: "https://www.milwaukeetool.eu/"}
+                    ]
+                }
+            },
+            debounceDelay: 400,
+            maxRetries: 3
+        };
+
+        const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0 };
+        const elements = {};
+
+        const utils = {
+            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (e) { return false; } },
+            showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
+            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.eventsContainer = document.getElementById('eventsContainer');
+            elements.addEventBtn = document.getElementById('addEventBtn');
+            elements.eventTemplate = document.getElementById('eventTemplate');
+        }
+
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            elements.mainContainer.classList.toggle('loading', loading);
+            elements.loadingOverlay.classList.toggle('show', loading);
+        }
+
+        function updateDataFromUI() {
+            const selectedColorEl = elements.backgroundColorSelector.querySelector('.selected');
+            state.blockData.backgroundColor = selectedColorEl ? selectedColorEl.dataset.color : 'red';
+            
+            const newEvents = Array.from(elements.eventsContainer.querySelectorAll('.event-item')).map(itemEl => {
+                const event = { id: itemEl.dataset.id };
+                itemEl.querySelectorAll('.field-input').forEach(input => {
+                    event[input.dataset.field] = input.value;
+                });
+                return event;
+            });
+            state.blockData.events = newEvents;
+            refreshPreview();
+        }
+
+        const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
+
+        function generateEventHtml(event) {
+            return `<!-- Event Item --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%">
+              <tr>
+               <td>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" dir="ltr" role="presentation" style="width: 100%;" width="100%">
+                  <tr>
+                   <td align="center" class="col-1-3-full block" dir="ltr" style="padding: 20px 0; width: 193px;" valign="top">
+                    <div class="event-image"><a href="${event.buttonUrl}" target="_blank"><img alt="${event.title}" src="${event.imageUrl}" style="border: none; display: block; height: auto; max-width: 100%; outline: none; text-decoration: none;" width="178"></a></div>
+                   </td>
+                   <td align="left" class="col-2-3-full block" dir="ltr" style="padding: 20px 0; width: 387px;" valign="middle">
+                    <table align="left" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%">
+                      <tr>
+                       <td class="desktop-text-left mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 36px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">${event.title}</td>
+                      </tr>
+                      <tr>
+                       <td class="desktop-text-left mobile-text-center" style="color: #FFFFFF; font-family: Arial, Helvetica, sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 22px; padding-bottom: 5px; text-align: left;">
+                        <table align="left" border="0" cellpadding="0" cellspacing="0" class="mobile-center" style="width: auto; margin: 0 auto;">
+                          <tr>
+                           <td style="width: 26px; vertical-align: top;" valign="top" width="26"><img alt="Date" height="16" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/5b97a7a8-c1a1-4504-9e33-01176fea95b3.png" style="display: block; height: auto; outline: none; padding-top: 4px; text-decoration: none; vertical-align: top;" width="16"></td>
+                           <td class="mobile-text-center" style="vertical-align: top; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly; text-align: left;" valign="top">${event.date}</td>
+                          </tr>
+                        </table>
+                       </td>
+                      </tr>
+                      <tr>
+                       <td class="desktop-text-left mobile-text-center" style="color: #FFFFFF; font-family: Arial, Helvetica, sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 22px; padding-bottom: 15px; text-align: left;">
+                        <table align="left" border="0" cellpadding="0" cellspacing="0" class="mobile-center" style="width: auto; margin: 0 auto;">
+                          <tr>
+                           <td style="width: 26px; vertical-align: top;" valign="top" width="26"><img alt="Location" height="16" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/250ddee1-7470-40ba-bfcd-9bd28f261411.png" style="display: block; height: auto; outline: none; padding-top: 4px; text-decoration: none; vertical-align: top;" width="16"></td>
+                           <td class="mobile-text-center" style="vertical-align: top; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly; text-align: left;" valign="top">${event.location}</td>
+                          </tr>
+                        </table>
+                       </td>
+                      </tr>
+                      <tr>
+                       <td align="left" class="mobile-text-center">
+                        <table align="left" border="0" cellpadding="0" cellspacing="0" class="sect sect-button" role="presentation" style="width: 100%;">
+                          <tr>
+                           <td align="left" class="block" style="width: 100%;" valign="middle">
+                            <table border="0" cellpadding="0" cellspacing="0" class="button-1-black" role="presentation" style="background-color: #000000; border-radius: 4px !important;">
+                              <tr>
+                               <td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;">
+                                <a href="${event.buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${event.buttonText}</a>
+                               </td>
+                              </tr>
+                            </table>
+                           </td>
+                          </tr>
+                        </table>
+                       </td>
+                      </tr>
+                      <tr><td><div> </div></td></tr>
+                    </table>
+                   </td>
+                  </tr>
+                </table>
+               </td>
+              </tr>
+            </table>`;
+        }
+
+        function generateTemplate() {
+            const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
+            const events = utils.getFieldValue('events');
+            const dividerHtml = `<!-- Divider --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%"><tr><td style="padding: 20px 0;"><hr style="border: 0; height: 1px; background-color: #ffffff; opacity: 0.3; margin: 0;"></td></tr></table>`;
+            
+            const allEventsHtml = events.map((event, index) => {
+                const eventHtml = generateEventHtml(event);
+                return index < events.length - 1 ? eventHtml + dividerHtml : eventHtml;
+            }).join('');
+
+            return `<!-- START .event-listing --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer event-listing" role="presentation" style="background-color: ${bgColor}; width: 620px;">
+              <tr>
+               <td class="side" style="width: 20px;"> </td>
+               <td align="center" class="content-inner" style="width: 580px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                  <tr>
+                   <td align="center" class="block" style="width: 100%;">${allEventsHtml}</td>
+                  </tr>
+                </table>
+               </td>
+               <td class="side" style="width: 20px;"> </td>
+              </tr>
+            </table><!-- END .event-listing -->`;
+        }
+
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            try {
+                const html = generateTemplate();
+                state.sdk.setContent(html);
+                if (state.sdk.setData) {
+                    state.sdk.setData({ ...state.blockData, content: html });
+                }
+            } catch (error) {
+                utils.showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function renderEventsUI() {
+            const events = utils.getFieldValue('events');
+            elements.eventsContainer.innerHTML = '';
+
+            events.forEach((event, index) => {
+                const itemFragment = elements.eventTemplate.content.cloneNode(true);
+                const itemEl = itemFragment.querySelector('.event-item');
+                itemEl.dataset.id = event.id;
+                itemEl.querySelector('.event-title').textContent = `Event ${index + 1}`;
+                
+                itemEl.querySelectorAll('.field-input').forEach(input => {
+                    input.value = event[input.dataset.field] || '';
+                });
+
+                if(index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
+                if(index === events.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
+
+                elements.eventsContainer.appendChild(itemFragment);
+            });
+        }
+        
+        function initializeEventHandlers() {
+            elements.backgroundColorSelector.addEventListener('click', e => {
+                if (e.target.classList.contains('color-option')) {
+                    elements.backgroundColorSelector.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                    updateDataFromUI();
+                }
+            });
+
+            elements.addEventBtn.addEventListener('click', () => {
+                const newEvent = { id: crypto.randomUUID(), imageUrl: "https://placehold.co/178x118", title: "New Event", date: "TBC", location: "TBC", buttonText: "Learn More", buttonUrl: "https://www.milwaukeetool.eu/"};
+                state.blockData.events.push(newEvent);
+                renderEventsUI();
+                updateDataFromUI();
+            });
+
+            elements.eventsContainer.addEventListener('input', e => {
+                if(e.target.classList.contains('field-input')) {
+                    const input = e.target;
+                    if(input.type === 'url') {
+                        const isValid = utils.isValidUrl(input.value);
+                        input.classList.toggle('error', !isValid);
+                        const errorEl = input.nextElementSibling;
+                        if(errorEl) errorEl.style.display = isValid ? 'none' : 'block';
+                        if(!isValid) return;
+                    }
+                    debouncedUpdateDataFromUI();
+                }
+            });
+
+            elements.eventsContainer.addEventListener('click', e => {
+                const itemEl = e.target.closest('.event-item');
+                if (!itemEl) return;
+                
+                const id = itemEl.dataset.id;
+                const events = state.blockData.events;
+                const currentIndex = events.findIndex(event => event.id === id);
+                let dataChanged = false;
+
+                if (e.target.closest('.remove-btn')) {
+                    events.splice(currentIndex, 1);
+                    dataChanged = true;
+                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
+                    [events[currentIndex], events[currentIndex - 1]] = [events[currentIndex - 1], events[currentIndex]];
+                    dataChanged = true;
+                } else if (e.target.closest('.move-down-btn') && currentIndex < events.length - 1) {
+                    [events[currentIndex], events[currentIndex + 1]] = [events[currentIndex + 1], events[currentIndex]];
+                    dataChanged = true;
+                }
+
+                if (dataChanged) {
+                    renderEventsUI();
+                    updateDataFromUI();
+                }
+            });
+        }
+
+        function loadData() {
+            if (!state.sdk) return utils.showError('SDK not available');
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData.backgroundColor = (data && data.backgroundColor) || moduleConfig.fields.backgroundColor.defaultValue;
+                    state.blockData.events = (data && data.events && data.events.length > 0) ? data.events : moduleConfig.fields.events.defaultValue;
+                    state.blockData.events.forEach(event => { if (!event.id) event.id = crypto.randomUUID(); });
+                    
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
+                    renderEventsUI();
+                    refreshPreview();
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEventHandlers();
+                loadData();
+                
+                state.isInitialized = true;
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`);
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                } else {
+                    utils.showError('Failed to initialize after multiple attempts.', true);
+                }
+                setLoadingState(false);
+            }
+        }
+
+        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initializeWithRetry) : initializeWithRetry();
+    </script>
+</body>
+</html>
