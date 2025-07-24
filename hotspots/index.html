@@ -86,16 +86,14 @@
         const moduleConfig = {
             name: 'Hotspots',
             fields: {
-                // Default image URLs
                 backgroundImageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/723acaf7-6e04-48f7-9bf6-cce69ec81b2f.png' },
                 fallbackImageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/723acaf7-6e04-48f7-9bf6-cce69ec81b2f.png' },
                 fallbackLinkUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 hotspots: {
                     type: 'list',
-                    // Default hotspot examples
                     defaultValue: [
-                        { id: crypto.randomUUID(), text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 100, tooltipPosY: -50 },
-                        { id: crypto.randomUUID(), text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: -150, tooltipPosY: 0 },
+                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 100, tooltipPosY: -50 },
+                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: -150, tooltipPosY: 0 },
                     ]
                 }
             },
@@ -287,7 +285,7 @@
                 
                 if (e.target.closest('.remove-btn')) {
                     state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
-                    if (state.selectedHotspotId === id) state.selectedHotspotId = null;
+                    if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
                 } else if (e.target.closest('.move-up-btn')) {
                     const index = state.blockData.hotspots.findIndex(h => h.id === id);
                     if (index > 0) [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]];
@@ -315,12 +313,32 @@
             setLoadingState(true);
             state.sdk.getData((data) => {
                 const newBlockData = {};
+                // THE FIX: Loop through configured fields to populate the state.
                 Object.keys(moduleConfig.fields).forEach(key => {
-                    newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
+                    const savedValue = data && data[key];
+                    if (savedValue !== undefined) {
+                        // Use saved data if it exists.
+                        newBlockData[key] = savedValue;
+                    } else {
+                        // Otherwise, use the default, creating a fresh copy for arrays.
+                        const defaultValue = moduleConfig.fields[key].defaultValue;
+                        if (Array.isArray(defaultValue)) {
+                            // Create a deep copy with NEW unique IDs for each hotspot.
+                            newBlockData[key] = defaultValue.map(item => ({ ...item, id: crypto.randomUUID() }));
+                        } else {
+                            newBlockData[key] = defaultValue;
+                        }
+                    }
                 });
                 state.blockData = newBlockData;
                 
-                if (!state.selectedHotspotId && state.blockData.hotspots.length > 0) {
+                // Ensure IDs are present on loaded data as a fallback.
+                if(state.blockData.hotspots) {
+                    state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); });
+                }
+
+                // Set initial selection
+                if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) {
                     state.selectedHotspotId = state.blockData.hotspots[0].id;
                 }
 
