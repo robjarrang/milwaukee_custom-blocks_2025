@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Interactive Hotspots Block</title>
     <style>
-        body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Visual Editor Styles */
         #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
         /* Tooltip Position Selector Styles */
@@ -36,9 +36,8 @@
         <div class="item">
             <div class="item-header">
                 <h3 class="item-title">Hotspot</h3>
+                <!-- REMOVED: Up/Down arrows from the controls -->
                 <div class="item-controls">
-                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
-                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
                     <button class="item-control-btn remove-btn" title="Remove Item">×</button>
                 </div>
             </div>
@@ -136,9 +135,7 @@
                 const posButton = el.querySelector(`.position-button[data-position="${hotspot.tooltipPosition}"]`);
                 if (posButton) posButton.classList.add('selected');
 
-                el.querySelector('.move-up-btn').disabled = (index === 0);
-                el.querySelector('.move-down-btn').disabled = (hotspots.length === 1 || index === hotspots.length - 1);
-
+                // REMOVED: Logic to disable up/down buttons.
                 elements.itemsContainer.appendChild(fragment);
             });
 
@@ -190,19 +187,10 @@
                     <td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; text-align: left;">${h.text}</td>
                    </tr>`).join('');
 
-            return `<!-- THE FIX: New CSS for mobile fallback -->
-            <style type="text/css">
-              .hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; }
-              .hotspots-fallback { display: none; max-height: 0; overflow: hidden; }
-              @media screen and (max-width: 580px) {
-                .hotspots-interactive { display: none !important; }
-                .hotspots-fallback { display: block !important; max-height: none !important; overflow: visible !important; }
-              }
-            </style>
+            return `<style type="text/css">.hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; } .hotspots-fallback { display: none; max-height: 0; overflow: hidden; } @media screen and (max-width: 580px) { .hotspots-interactive { display: none !important; } .hotspots-fallback { display: block !important; max-height: none !important; overflow: visible !important; } }</style>
             <!--[if !mso]><!-->
             <div class="hotspots-interactive" style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div>
             <!--<![endif]-->
-            <!-- THE FIX: New fallback structure for all clients -->
             <div class="hotspots-fallback">
               <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; max-width: 620px; background-color: #DB021d;">
                 <tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; max-width: 620px; height: auto;" width="620"></a></td></tr>
@@ -275,13 +263,8 @@
                         state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
                         if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
                         dataChanged = true;
-                    } else if (controlButton.classList.contains('move-up-btn')) {
-                        const index = state.blockData.hotspots.findIndex(h => h.id === id);
-                        if (index > 0) {[state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]]; dataChanged = true;}
-                    } else if (controlButton.classList.contains('move-down-btn')) {
-                        const index = state.blockData.hotspots.findIndex(h => h.id === id);
-                        if (index < state.blockData.hotspots.length - 1) {[state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]]; dataChanged = true;}
-                    }
+                    } 
+                    // REMOVED: Logic for move-up and move-down buttons.
                     
                     if (dataChanged) { updateUI(); refreshPreview(); }
                     return;
