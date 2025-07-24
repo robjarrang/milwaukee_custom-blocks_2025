@@ -3,16 +3,10 @@
 <head>
     <meta charset="utf-8">
     <title>Interactive Hotspots Block</title>
-    <!-- Basic styling for the editor UI -->
     <style>
         body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        /* Visual Editor Styles */
-        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px;-webkit-user-select:none;user-select:none}#previewImage{display:block;width:100%;height:auto}
-        .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}
-        .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
-        .tooltip-proxy{position:absolute;background-color:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:4px;font-size:12px;font-weight:bold;text-align:center;transform:translate(-50%,-50%);white-space:nowrap;cursor:move;z-index:11}
-        .connector-line{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible !important}
-        .slider-group{display:flex;align-items:center;gap:15px}.slider-input{flex-grow:1;cursor:pointer}.slider-value{font-size:12px;font-weight:bold;color:#333;background-color:#f0f0f0;padding:2px 6px;border-radius:4px;min-width:40px;text-align:center}
+        /* --- UX IMPROVEMENT: Visual Editor Styles --- */
+        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px;user-select:none;-webkit-user-select:none}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}#visualEditor .visual-tooltip{position:absolute;background-color:rgba(0,0,0,0.8);color:white;padding:8px;border-radius:4px;font-size:12px;text-align:center;white-space:nowrap;transform:translate(-50%, -50%);display:none;z-index:11;border:2px dashed #0074d9;cursor:move}#visualEditor .visual-tooltip.visible{display:block}#visualEditor .visual-tooltip.dragging{cursor:grabbing;border-style:solid}
     </style>
 </head>
 <body>
@@ -27,12 +21,8 @@
         <div class="field-group"><label for="fallbackLinkUrl" class="field-label">Fallback Image Link URL</label><input type="url" id="fallbackLinkUrl" class="field-input"></div>
 
         <div class="section-title">Visual Editor</div>
-        <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Click a hotspot in the list to select it. Click on the image to place the hotspot icon. Click and drag the text box to position the tooltip.</p>
-        <div id="visualEditorWrapper">
-            <div id="visualEditor">
-                <img id="previewImage" src="" alt="Image Preview">
-            </div>
-        </div>
+        <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Click an item below to select it. Click on the image to place the hotspot icon. Drag the blue-dashed tooltip to position it.</p>
+        <div id="visualEditorWrapper"><div id="visualEditor"><img id="previewImage" src="" alt="Image Preview"></div></div>
 
         <div class="section-title" style="margin-top: 20px;">Hotspots</div>
         <div id="itemsContainer" class="items-container"></div>
@@ -42,9 +32,7 @@
     <template id="itemTemplate">
         <div class="item">
             <div class="item-header"><h3 class="item-title">Hotspot</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div>
-            <div class="field-group"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text" placeholder="Enter hotspot text"></div>
-            <div class="field-group"><label class="field-label" style="font-size:12px;">Horizontal Offset (fine-tune)</label><div class="slider-group"><input type="range" class="slider-input" data-field="tooltipPosX" min="-100" max="200" step="1"><span class="slider-value" data-field-value="tooltipPosX"></span></div></div>
-            <div class="field-group" style="margin-bottom:0;"><label class="field-label" style="font-size:12px;">Vertical Offset (fine-tune)</label><div class="slider-group"><input type="range" class="slider-input" data-field="tooltipPosY" min="-100" max="200" step="1"><span class="slider-value" data-field-value="tooltipPosY"></span></div></div>
+            <div class="field-group" style="margin-bottom:0;"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text" placeholder="Enter hotspot text"></div>
         </div>
     </template>
 
@@ -62,15 +50,15 @@
                 hotspots: {
                     type: 'list',
                     defaultValue: [
-                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 35, tooltipPosY: -10 },
-                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: 57, tooltipPosY: 90 },
+                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 100, tooltipPosY: -50 },
+                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: -150, tooltipPosY: 0 },
                     ]
                 }
             },
             debounceDelay: 400
         };
 
-        const state = { sdk: null, blockData: {}, selectedHotspotId: null, isDraggingTooltip: false };
+        const state = { sdk: null, blockData: {}, selectedHotspotId: null };
         const elements = {};
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
@@ -78,16 +66,18 @@
         };
 
         function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.backgroundImageUrl = document.getElementById('backgroundImageUrl');
-            elements.fallbackImageUrl = document.getElementById('fallbackImageUrl');
-            elements.fallbackLinkUrl = document.getElementById('fallbackLinkUrl');
-            elements.visualEditor = document.getElementById('visualEditor');
-            elements.previewImage = document.getElementById('previewImage');
-            elements.itemsContainer = document.getElementById('itemsContainer');
-            elements.addItemBtn = document.getElementById('addItemBtn');
-            elements.itemTemplate = document.getElementById('itemTemplate');
+            Object.assign(elements, {
+                mainContainer: document.getElementById('mainContainer'),
+                loadingOverlay: document.getElementById('loadingOverlay'),
+                backgroundImageUrl: document.getElementById('backgroundImageUrl'),
+                fallbackImageUrl: document.getElementById('fallbackImageUrl'),
+                fallbackLinkUrl: document.getElementById('fallbackLinkUrl'),
+                visualEditor: document.getElementById('visualEditor'),
+                previewImage: document.getElementById('previewImage'),
+                itemsContainer: document.getElementById('itemsContainer'),
+                addItemBtn: document.getElementById('addItemBtn'),
+                itemTemplate: document.getElementById('itemTemplate')
+            });
         }
 
         function setLoadingState(loading) {
@@ -109,13 +99,12 @@
                 if (originalHotspot) {
                     newHotspots.push({
                         ...originalHotspot,
-                        text: itemEl.querySelector('[data-field="text"]').value,
-                        tooltipPosX: parseFloat(itemEl.querySelector('[data-field="tooltipPosX"]').value),
-                        tooltipPosY: parseFloat(itemEl.querySelector('[data-field="tooltipPosY"]').value)
+                        text: itemEl.querySelector('[data-field="text"]').value
                     });
                 }
             });
             state.blockData.hotspots = newHotspots;
+
             refreshPreview();
         }, moduleConfig.debounceDelay);
         
@@ -134,23 +123,12 @@
                 el.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
                 el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
                 el.querySelector('[data-field="text"]').value = hotspot.text;
-                
-                const tooltipXSlider = el.querySelector('[data-field="tooltipPosX"]');
-                const tooltipYSlider = el.querySelector('[data-field="tooltipPosY"]');
-                const tooltipXValue = el.querySelector('[data-field-value="tooltipPosX"]');
-                const tooltipYValue = el.querySelector('[data-field-value="tooltipPosY"]');
-
-                tooltipXSlider.value = hotspot.tooltipPosX;
-                tooltipYSlider.value = hotspot.tooltipPosY;
-                tooltipXValue.textContent = `${Math.round(hotspot.tooltipPosX)}%`;
-                tooltipYValue.textContent = `${Math.round(hotspot.tooltipPosY)}%`;
                 el.querySelector('.move-up-btn').disabled = (index === 0);
                 el.querySelector('.move-down-btn').disabled = (hotspots.length === 1 || index === hotspots.length - 1);
                 elements.itemsContainer.appendChild(fragment);
             });
 
-            // Render markers and tooltips on visual editor
-            elements.visualEditor.querySelectorAll('.hotspot-marker, .tooltip-proxy, .connector-line').forEach(m => m.remove());
+            elements.visualEditor.querySelectorAll('.hotspot-marker, .visual-tooltip').forEach(m => m.remove());
             hotspots.forEach(hotspot => {
                 const marker = document.createElement('div');
                 marker.className = 'hotspot-marker';
@@ -159,29 +137,16 @@
                 marker.style.top = `${hotspot.posY}%`;
                 marker.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
                 elements.visualEditor.appendChild(marker);
-
-                if (hotspot.id === state.selectedHotspotId) {
-                    const tooltip = document.createElement('div');
-                    tooltip.className = 'tooltip-proxy';
-                    tooltip.textContent = hotspot.text || 'Tooltip';
-                    tooltip.dataset.id = hotspot.id;
-                    tooltip.style.left = `${hotspot.tooltipPosX}%`;
-                    tooltip.style.top = `${hotspot.tooltipPosY}%`;
-                    elements.visualEditor.appendChild(tooltip);
-
-                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svg.setAttribute('class', 'connector-line');
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', `${hotspot.posX}%`);
-                    line.setAttribute('y1', `${hotspot.posY}%`);
-                    line.setAttribute('x2', `${hotspot.tooltipPosX}%`);
-                    line.setAttribute('y2', `${hotspot.tooltipPosY}%`);
-                    line.setAttribute('stroke', 'rgba(0,116,217,0.7)');
-                    line.setAttribute('stroke-width', '2');
-                    line.setAttribute('stroke-dasharray', '4 4');
-                    svg.appendChild(line);
-                    elements.visualEditor.insertBefore(svg, marker);
-                }
+                
+                // UX IMPROVEMENT: Render a draggable tooltip in the editor
+                const tooltip = document.createElement('div');
+                tooltip.className = 'visual-tooltip';
+                tooltip.dataset.id = hotspot.id;
+                tooltip.textContent = hotspot.text || 'Tooltip';
+                tooltip.style.left = `calc(${hotspot.posX}% + ${hotspot.tooltipPosX}%)`;
+                tooltip.style.top = `calc(${hotspot.posY}% + ${hotspot.tooltipPosY}%)`;
+                tooltip.classList.toggle('visible', hotspot.id === state.selectedHotspotId);
+                elements.visualEditor.appendChild(tooltip);
             });
         }
         
@@ -191,96 +156,142 @@
             const fallbackLink = utils.getFieldValue('fallbackLinkUrl');
             const hotspots = utils.getFieldValue('hotspots');
 
-            // NOTE: Tooltip position in final HTML is relative to its hotspot icon.
             const interactiveHotspots = hotspots.map((h, i) => `
             <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; transform: translate(-50%, -50%); z-index: ${i+1};">
               <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
-              <div class="tooltip-wrapper" style="position: absolute; left: calc(${h.tooltipPosX}% - ${h.posX}%); top: calc(${h.tooltipPosY}% - ${h.posY}%); width: 200px; transform: translate(-50%,-50%); z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px;">
+              <div class="tooltip-wrapper" style="position: absolute; left: ${h.tooltipPosX}%; top: ${h.tooltipPosY}%; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px; transform: translateX(-50%);">
                 <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase;">${h.text}</span>
               </div>
             </div>`).join('');
 
             const fallbackItems = hotspots.map(h => `
-                   <tr><td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block; width: 20px; height: auto;"></td><td style="width: 12px; padding-bottom: 8px;"> </td><td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px;">${h.text}</td></tr>`).join('');
+                   <tr><td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block;" width="20"></td><td style="width: 12px; padding-bottom: 8px;"> </td><td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; line-height: 24px; text-align: left;">${h.text}</td></tr>`).join('');
 
             return `<style type="text/css">.hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; }</style>
-            <!--[if !mso]><!--><div class="interactive-hotspots" style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div><!--<![endif]-->
-            <!--[if mso]><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 620px; background-color: #DB021d;"><tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; max-width: 620px; height: auto;" width="620"></a></td></tr><tr><td style="padding: 0 20px;"><div style="font-size: 20px; height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="font-size: 20px; height: 20px;"> </div></td></tr></table><![endif]-->`;
+            <!--[if !mso]><!--><div style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div><!--<![endif]-->
+            <!--[if mso]><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 620px; background-color: #DB021d;"><tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%;" width="620"></a></td></tr><tr><td style="padding: 0 20px;"><div style="height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="height: 20px;"> </div></td></tr></table><![endif]-->`;
         }
 
-        function refreshPreview() { if (!state.sdk) return; try { const html = generateTemplate(); state.sdk.setContent(html); state.sdk.setData({ ...state.blockData, content: html }); } catch (error) { console.error(`Preview update failed: ${error.message}`); } }
+        function refreshPreview() {
+            if (!state.sdk) return;
+            try {
+                const html = generateTemplate();
+                state.sdk.setContent(html);
+                state.sdk.setData({ ...state.blockData, content: html });
+            } catch (error) { console.error(`Preview update failed: ${error.message}`); }
+        }
 
         function initializeEventHandlers() {
-            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => input.addEventListener('input', updateStateFromUI));
+            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
+                input.addEventListener('input', updateStateFromUI);
+            });
+
             elements.addItemBtn.addEventListener('click', () => {
-                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosX: 50, tooltipPosY: 75 };
+                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosX: 0, tooltipPosY: 100 };
                 state.blockData.hotspots.push(newHotspot);
                 state.selectedHotspotId = newHotspot.id;
                 updateUI();
                 updateStateFromUI();
             });
-
+            
+            // UX IMPROVEMENT: New drag-and-drop logic for tooltips
             elements.visualEditor.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('tooltip-proxy')) {
-                    state.isDraggingTooltip = true;
-                    document.body.style.cursor = 'move';
-                }
-            });
+                if (e.target.classList.contains('visual-tooltip')) {
+                    const tooltip = e.target;
+                    tooltip.classList.add('dragging');
+                    const rect = elements.visualEditor.getBoundingClientRect();
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    
+                    function onMouseMove(moveEvent) {
+                        const dx = moveEvent.clientX - startX;
+                        const dy = moveEvent.clientY - startY;
+                        tooltip.style.transform = `translate(${dx}px, ${dy}px)`;
+                    }
 
-            document.addEventListener('mouseup', () => {
-                if (state.isDraggingTooltip) {
-                    state.isDraggingTooltip = false;
-                    document.body.style.cursor = 'default';
-                    updateStateFromUI(); // Save the final position
-                }
-            });
+                    function onMouseUp(upEvent) {
+                        tooltip.classList.remove('dragging');
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
 
-            document.addEventListener('mousemove', (e) => {
-                if (!state.isDraggingTooltip) return;
-                const rect = elements.previewImage.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
-                if (hotspot) {
-                    hotspot.tooltipPosX = (x / rect.width) * 100;
-                    hotspot.tooltipPosY = (y / rect.height) * 100;
-                    updateUI(); // Quick visual update
+                        const hotspot = state.blockData.hotspots.find(h => h.id === tooltip.dataset.id);
+                        if(hotspot) {
+                            const dxPercent = ((upEvent.clientX - startX) / rect.width) * 100;
+                            const dyPercent = ((upEvent.clientY - startY) / rect.height) * 100;
+                            hotspot.tooltipPosX += dxPercent;
+                            hotspot.tooltipPosY += dyPercent;
+                            updateUI();
+                            updateStateFromUI();
+                        }
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
                 }
             });
 
             elements.visualEditor.addEventListener('click', (e) => {
                 const targetIsMarker = e.target.classList.contains('hotspot-marker');
-                if (targetIsMarker) { state.selectedHotspotId = e.target.dataset.id; updateUI(); return; }
-                if (e.target.classList.contains('tooltip-proxy')) return; // Ignore clicks on the tooltip itself
+                if (!state.selectedHotspotId && !targetIsMarker) {
+                    alert('Please select a hotspot from the list below before placing it.');
+                    return;
+                }
                 
-                if (!state.selectedHotspotId) { alert('Please select a hotspot from the list below before placing it.'); return; }
+                if (targetIsMarker || e.target.classList.contains('visual-tooltip')) {
+                    const id = e.target.dataset.id;
+                    if (state.selectedHotspotId !== id) {
+                        state.selectedHotspotId = id;
+                        updateUI();
+                    }
+                    return;
+                }
+
                 const rect = elements.previewImage.getBoundingClientRect();
-                hotspot.posX = ((e.clientX - rect.left) / rect.width) * 100;
-                hotspot.posY = ((e.clientY - rect.top) / rect.height) * 100;
-                updateUI();
-                updateStateFromUI();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const posX = (x / rect.width) * 100;
+                const posY = (y / rect.height) * 100;
+
+                const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
+                if (hotspot) {
+                    hotspot.posX = parseFloat(posX.toFixed(2));
+                    hotspot.posY = parseFloat(posY.toFixed(2));
+                    updateUI();
+                    updateStateFromUI();
+                }
             });
             
             elements.itemsContainer.addEventListener('click', (e) => {
                 const itemEl = e.target.closest('.item');
                 if (!itemEl) return;
                 const id = itemEl.dataset.id;
-                if (e.target.closest('.item-control-btn')) {
+                
+                const isControlButton = e.target.closest('.item-control-btn');
+                if (isControlButton) {
                     let dataChanged = false;
-                    if (e.target.closest('.remove-btn')) { state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id); if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null; dataChanged = true; }
-                    else if (e.target.closest('.move-up-btn')) { const i = state.blockData.hotspots.findIndex(h => h.id === id); if (i > 0) { [state.blockData.hotspots[i], state.blockData.hotspots[i - 1]] = [state.blockData.hotspots[i-1], state.blockData.hotspots[i]]; dataChanged = true; } }
-                    else if (e.target.closest('.move-down-btn')) { const i = state.blockData.hotspots.findIndex(h => h.id === id); if (i < state.blockData.hotspots.length - 1) { [state.blockData.hotspots[i], state.blockData.hotspots[i+1]] = [state.blockData.hotspots[i+1], state.blockData.hotspots[i]]; dataChanged = true; } }
+                    const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                    if (e.target.closest('.remove-btn')) {
+                        state.blockData.hotspots.splice(index, 1);
+                        if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
+                        dataChanged = true;
+                    } else if (e.target.closest('.move-up-btn') && index > 0) {
+                        [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]];
+                        dataChanged = true;
+                    } else if (e.target.closest('.move-down-btn') && index < state.blockData.hotspots.length - 1) {
+                        [state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]];
+                        dataChanged = true;
+                    }
                     if (dataChanged) { updateUI(); updateStateFromUI(); }
                     return;
                 }
-                if (state.selectedHotspotId !== id) { state.selectedHotspotId = id; updateUI(); }
+
+                if (state.selectedHotspotId !== id) {
+                    state.selectedHotspotId = id;
+                    updateUI();
+                }
             });
-            elements.itemsContainer.addEventListener('input', (e) => {
-                const itemEl = e.target.closest('.item');
-                if (!itemEl) return;
-                if(e.target.type === 'range') { const valueEl = itemEl.querySelector(`[data-field-value="${e.target.dataset.field}"]`); if(valueEl) valueEl.textContent = `${Math.round(e.target.value)}%`; }
-                updateStateFromUI();
-            });
+
+            elements.itemsContainer.addEventListener('input', updateStateFromUI);
         }
         
         function loadData() {
@@ -289,12 +300,27 @@
                 const newBlockData = {};
                 Object.keys(moduleConfig.fields).forEach(key => {
                     const savedValue = data && data[key];
-                    if (savedValue !== undefined) { newBlockData[key] = savedValue; }
-                    else { const defaultValue = moduleConfig.fields[key].defaultValue; if (Array.isArray(defaultValue)) { newBlockData[key] = defaultValue.map(item => ({ ...item, id: crypto.randomUUID() })); } else { newBlockData[key] = defaultValue; } }
+                    if (savedValue !== undefined) {
+                        newBlockData[key] = savedValue;
+                    } else {
+                        const defaultValue = moduleConfig.fields[key].defaultValue;
+                        if (Array.isArray(defaultValue)) {
+                            newBlockData[key] = defaultValue.map(item => ({ ...item, id: crypto.randomUUID() }));
+                        } else {
+                            newBlockData[key] = defaultValue;
+                        }
+                    }
                 });
                 state.blockData = newBlockData;
-                if(state.blockData.hotspots) { state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); }); }
-                if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) { state.selectedHotspotId = state.blockData.hotspots[0].id; }
+                
+                if(state.blockData.hotspots) {
+                    state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); });
+                }
+
+                if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) {
+                    state.selectedHotspotId = state.blockData.hotspots[0].id;
+                }
+
                 updateUI();
                 refreshPreview();
                 setLoadingState(false);
@@ -308,8 +334,12 @@
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
-            } catch (error) { console.error(`Initialization failed: ${error.message}`); setLoadingState(false); }
+            } catch (error) {
+                console.error(`Initialization failed: ${error.message}`);
+                setLoadingState(false);
+            }
         }
+
         document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
     </script>
 </body>
