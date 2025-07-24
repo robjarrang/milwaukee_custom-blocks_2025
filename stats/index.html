@@ -286,11 +286,16 @@
                     elements.imageLink.value = state.blockData.imageLink;
                     elements.imageAlt.value = state.blockData.imageAlt;
                     renderStatsUI();
-                    refreshPreview();
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
+                    // Fallback to defaults if data processing fails
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                    });
+                    renderStatsUI();
                 } finally {
                     setLoadingState(false);
+                    refreshPreview();
                 }
             });
         }
