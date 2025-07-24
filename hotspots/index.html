@@ -5,13 +5,12 @@
     <title>Interactive Hotspots Block</title>
     <!-- Basic styling for the editor UI -->
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-coords{font-size:11px;font-weight:normal;color:#666;margin-left:8px}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Visual Editor Styles */
-        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px;user-select:none;-webkit-user-select:none;}#previewImage{display:block;width:100%;height:auto;pointer-events:none}
-        .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}
-        .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
-        .tooltip-preview{position:absolute;background-color:rgba(0,0,0,0.8);color:white;padding:8px;border-radius:4px;font-size:12px;white-space:nowrap;transform:translate(-50%,-50%);cursor:move;border:1px dashed #fff;z-index:11}
-        .drag-line{position:absolute;border:1px dashed rgba(0,116,217,0.7);pointer-events:none;z-index:9}
+        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px;overflow:hidden}#previewImage{display:block;width:100%;height:auto}
+        #visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}
+        #visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
+        #visualEditor .tooltip-preview{position:absolute;width:150px;background-color:rgba(0,0,0,0.8);color:white;padding:8px;border-radius:4px;font-size:12px;text-align:center;line-height:1.3;font-family:Arial,sans-serif;transform:translate(-50%,-50%);cursor:move;border:2px dashed #0074d9;z-index:20;user-select:none}
     </style>
 </head>
 <body>
@@ -35,11 +34,11 @@
         </div>
 
         <div class="section-title">Visual Editor</div>
-        <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select an item to edit. Click on the image to place the hotspot. Click and drag the tooltip to position it.</p>
+        <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list. Click on the image to place the marker. Click and drag the blue tooltip to position it.</p>
         <div id="visualEditorWrapper">
             <div id="visualEditor">
                 <img id="previewImage" src="" alt="Image Preview">
-                <!-- Hotspot markers and tooltip previews will be injected here -->
+                <!-- Hotspot markers and previews will be injected here -->
             </div>
         </div>
 
@@ -54,7 +53,7 @@
     <template id="itemTemplate">
         <div class="item">
             <div class="item-header">
-                <h3 class="item-title">Hotspot</h3>
+                <h3 class="item-title">Hotspot<span class="item-coords"></span></h3>
                 <div class="item-controls">
                     <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
                     <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
@@ -82,16 +81,18 @@
                 hotspots: {
                     type: 'list',
                     defaultValue: [
-                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 130, tooltipPosY: 0 },
-                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: -130, tooltipPosY: 0 },
+                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 45, tooltipPosY: 10 },
+                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: 40, tooltipPosY: 85 },
                     ]
                 }
             },
             debounceDelay: 400
         };
 
-        const state = { sdk: null, blockData: {}, selectedHotspotId: null, drag: { active: false, type: null, id: null, startX: 0, startY: 0, initialLeft: 0, initialTop: 0 } };
+        const state = { sdk: null, blockData: {}, selectedHotspotId: null };
+        const dragState = { isDragging: false, element: null, startX: 0, startY: 0, initialLeft: 0, initialTop: 0 };
         const elements = {};
+        
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
@@ -122,13 +123,18 @@
             state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
             state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
             
-            const hotspotItems = Array.from(elements.itemsContainer.querySelectorAll('.item'));
-            state.blockData.hotspots.forEach(hotspot => {
-                const itemEl = hotspotItems.find(el => el.dataset.id === hotspot.id);
-                if (itemEl) {
-                    hotspot.text = itemEl.querySelector('[data-field="text"]').value;
+            const newHotspots = [];
+            elements.itemsContainer.querySelectorAll('.item').forEach(itemEl => {
+                const id = itemEl.dataset.id;
+                const originalHotspot = state.blockData.hotspots.find(h => h.id === id);
+                if (originalHotspot) {
+                    newHotspots.push({
+                        ...originalHotspot, // This preserves posX, posY, etc.
+                        text: itemEl.querySelector('[data-field="text"]').value
+                    });
                 }
             });
+            state.blockData.hotspots = newHotspots;
 
             refreshPreview();
         }, moduleConfig.debounceDelay);
@@ -146,15 +152,17 @@
                 const el = fragment.querySelector('.item');
                 el.dataset.id = hotspot.id;
                 el.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
-                el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
+                el.querySelector('.item-title').innerHTML = `Hotspot ${index + 1} <span class="item-coords">(X:${hotspot.posX}%, Y:${hotspot.posY}%)</span>`;
                 el.querySelector('[data-field="text"]').value = hotspot.text;
                 el.querySelector('.move-up-btn').disabled = (index === 0);
                 el.querySelector('.move-down-btn').disabled = (hotspots.length === 1 || index === hotspots.length - 1);
                 elements.itemsContainer.appendChild(fragment);
             });
 
-            elements.visualEditor.querySelectorAll('.hotspot-marker, .tooltip-preview, .drag-line').forEach(m => m.remove());
+            // Render markers and active tooltip preview
+            elements.visualEditor.querySelectorAll('.hotspot-marker, .tooltip-preview').forEach(m => m.remove());
             hotspots.forEach(hotspot => {
+                // Render marker
                 const marker = document.createElement('div');
                 marker.className = 'hotspot-marker';
                 marker.dataset.id = hotspot.id;
@@ -163,29 +171,14 @@
                 marker.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
                 elements.visualEditor.appendChild(marker);
 
+                // Render tooltip preview ONLY for the selected hotspot
                 if (hotspot.id === state.selectedHotspotId) {
                     const tooltip = document.createElement('div');
                     tooltip.className = 'tooltip-preview';
                     tooltip.dataset.id = hotspot.id;
-                    tooltip.textContent = hotspot.text || 'Tooltip';
-                    
-                    const markerRect = marker.getBoundingClientRect();
-                    const editorRect = elements.visualEditor.getBoundingClientRect();
-                    
-                    const leftPos = marker.offsetLeft + (hotspot.tooltipPosX / 100 * markerRect.width);
-                    const topPos = marker.offsetTop + (hotspot.tooltipPosY / 100 * markerRect.height);
-                    
-                    tooltip.style.left = `${leftPos}px`;
-                    tooltip.style.top = `${topPos}px`;
-                    
-                    const line = document.createElement('div');
-                    line.className = 'drag-line';
-                    line.style.left = `${Math.min(marker.offsetLeft, leftPos)}px`;
-                    line.style.top = `${Math.min(marker.offsetTop, topPos)}px`;
-                    line.style.width = `${Math.abs(leftPos - marker.offsetLeft)}px`;
-                    line.style.height = `${Math.abs(topPos - marker.offsetTop)}px`;
-
-                    elements.visualEditor.appendChild(line);
+                    tooltip.textContent = hotspot.text || "Tooltip Preview";
+                    tooltip.style.left = `${hotspot.tooltipPosX}%`;
+                    tooltip.style.top = `${hotspot.tooltipPosY}%`;
                     elements.visualEditor.appendChild(tooltip);
                 }
             });
@@ -197,13 +190,18 @@
             const fallbackLink = utils.getFieldValue('fallbackLinkUrl');
             const hotspots = utils.getFieldValue('hotspots');
 
-            const interactiveHotspots = hotspots.map((h, i) => `
-            <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; transform: translate(-50%, -50%); z-index: ${i+1};">
-              <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
-              <div class="tooltip-wrapper" style="position: absolute; left: ${h.tooltipPosX}%; top: ${h.tooltipPosY}%; transform: translateX(-50%); width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px;">
-                <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase;">${h.text}</span>
-              </div>
-            </div>`).join('');
+            const interactiveHotspots = hotspots.map((h, i) => {
+                // Convert center-based preview position to top-left based email position
+                const tooltipRenderX = h.tooltipPosX - (100 / (elements.previewImage.width || 580) * 100);
+                const tooltipRenderY = h.tooltipPosY - (100 / (elements.previewImage.height || 500) * 20); // Rough estimate for tooltip height
+                return `
+                <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; transform: translate(-50%, -50%); z-index: ${i + 1};">
+                  <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
+                  <div class="tooltip-wrapper" style="position: absolute; left: ${tooltipRenderX}%; top: ${tooltipRenderY}%; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px;">
+                    <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase;">${h.text}</span>
+                  </div>
+                </div>`;
+            }).join('');
 
             const fallbackItems = hotspots.map(h => `
                    <tr>
@@ -238,93 +236,77 @@
                 state.sdk.setData({ ...state.blockData, content: html });
             } catch (error) { console.error(`Preview update failed: ${error.message}`); }
         }
-        
-        // --- DRAG AND DROP LOGIC ---
-        function onDragStart(e, type) {
-            e.preventDefault();
-            const id = e.target.dataset.id;
-            state.drag.active = true;
-            state.drag.type = type;
-            state.drag.id = id;
-            state.drag.startX = e.clientX;
-            state.drag.startY = e.clientY;
-            const targetEl = e.target;
-            state.drag.initialLeft = targetEl.offsetLeft;
-            state.drag.initialTop = targetEl.offsetTop;
-            document.addEventListener('mousemove', onDragMove);
-            document.addEventListener('mouseup', onDragEnd);
-        }
 
-        function onDragMove(e) {
-            if (!state.drag.active) return;
-            const dx = e.clientX - state.drag.startX;
-            const dy = e.clientY - state.drag.startY;
-            const hotspot = state.blockData.hotspots.find(h => h.id === state.drag.id);
-            if (!hotspot) return;
-
-            if (state.drag.type === 'tooltip') {
-                const marker = elements.visualEditor.querySelector(`.hotspot-marker[data-id="${hotspot.id}"]`);
-                if (!marker) return;
-                const markerRect = marker.getBoundingClientRect();
-                hotspot.tooltipPosX = (dx / markerRect.width) * 100;
-                hotspot.tooltipPosY = (dy / markerRect.height) * 100;
-            }
-            updateUI(); // Live update the UI
-        }
-
-        function onDragEnd() {
-            if (state.drag.active) {
-                state.drag.active = false;
-                document.removeEventListener('mousemove', onDragMove);
-                document.removeEventListener('mouseup', onDragEnd);
-                updateStateFromUI(); // Save final position
-            }
-        }
-        
         function initializeEventHandlers() {
             [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
                 input.addEventListener('input', updateStateFromUI);
             });
 
             elements.addItemBtn.addEventListener('click', () => {
-                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosX: 0, tooltipPosY: 120 };
+                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosX: 50, tooltipPosY: 60 };
                 state.blockData.hotspots.push(newHotspot);
                 state.selectedHotspotId = newHotspot.id;
                 updateUI();
                 updateStateFromUI();
             });
 
-            elements.visualEditor.addEventListener('mousedown', (e) => {
-                if(e.target.classList.contains('tooltip-preview')) {
-                    onDragStart(e, 'tooltip');
-                }
-            });
-
             elements.visualEditor.addEventListener('click', (e) => {
+                if (dragState.isDragging) return;
                 const targetIsMarker = e.target.classList.contains('hotspot-marker');
-                const targetIsTooltip = e.target.classList.contains('tooltip-preview');
-
+                if (!state.selectedHotspotId && !targetIsMarker) {
+                    alert('Please select a hotspot from the list below before placing it.');
+                    return;
+                }
                 if (targetIsMarker) {
                     state.selectedHotspotId = e.target.dataset.id;
                     updateUI();
                     return;
                 }
-                
-                if (targetIsTooltip) return; // Prevent placing a hotspot when clicking a tooltip
 
-                if (!state.selectedHotspotId) {
-                    alert('Please select a hotspot from the list below before placing it.');
-                    return;
-                }
-                
                 const rect = elements.previewImage.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
                 if (hotspot) {
-                    hotspot.posX = (x / rect.width) * 100;
-                    hotspot.posY = (y / rect.height) * 100;
+                    hotspot.posX = parseFloat(((x / rect.width) * 100).toFixed(2));
+                    hotspot.posY = parseFloat(((y / rect.height) * 100).toFixed(2));
                     updateUI();
+                    updateStateFromUI();
+                }
+            });
+
+            elements.visualEditor.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('tooltip-preview')) {
+                    dragState.isDragging = true;
+                    dragState.element = e.target;
+                    const rect = elements.visualEditor.getBoundingClientRect();
+                    dragState.startX = e.clientX;
+                    dragState.startY = e.clientY;
+                    dragState.initialLeft = dragState.element.offsetLeft;
+                    dragState.initialTop = dragState.element.offsetTop;
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!dragState.isDragging) return;
+                const dx = e.clientX - dragState.startX;
+                const dy = e.clientY - dragState.startY;
+                const newLeft = dragState.initialLeft + dx;
+                const newTop = dragState.initialTop + dy;
+                dragState.element.style.left = `${newLeft}px`;
+                dragState.element.style.top = `${newTop}px`;
+            });
+            
+            document.addEventListener('mouseup', (e) => {
+                if (!dragState.isDragging) return;
+                dragState.isDragging = false;
+                const rect = elements.visualEditor.getBoundingClientRect();
+                const newLeftPercent = (dragState.element.offsetLeft / rect.width) * 100;
+                const newTopPercent = (dragState.element.offsetTop / rect.height) * 100;
+                const hotspot = state.blockData.hotspots.find(h => h.id === dragState.element.dataset.id);
+                if (hotspot) {
+                    hotspot.tooltipPosX = parseFloat(newLeftPercent.toFixed(2));
+                    hotspot.tooltipPosY = parseFloat(newTopPercent.toFixed(2));
                     updateStateFromUI();
                 }
             });
@@ -347,11 +329,12 @@
                     }
                     updateUI();
                     updateStateFromUI();
-                } else {
-                    if (state.selectedHotspotId !== id) {
-                        state.selectedHotspotId = id;
-                        updateUI();
-                    }
+                    return;
+                }
+
+                if (state.selectedHotspotId !== id) {
+                    state.selectedHotspotId = id;
+                    updateUI();
                 }
             });
 
