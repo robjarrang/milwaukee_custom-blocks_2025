@@ -294,11 +294,17 @@
                     document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
                     elements.showButtonsToggle.checked = state.blockData.showButtons;
                     renderEventsUI();
-                    refreshPreview();
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
+                    // Fallback to defaults if data processing fails
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                    });
+                    renderEventsUI();
                 } finally {
+                    // **THE FIX IS HERE:** Unset loading state BEFORE refreshing the preview.
                     setLoadingState(false);
+                    refreshPreview();
                 }
             });
         }
