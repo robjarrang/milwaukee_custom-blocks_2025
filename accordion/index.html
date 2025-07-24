@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Interactive Accordion Block</title>
+    <!-- Basic styling for the editor UI -->
+    <style>
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input,.field-textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;font-family:inherit}.field-textarea{min-height:100px;resize:vertical}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+    
+    <div class="container" id="mainContainer">
+        <div class="section-title">Accordion Items</div>
+        <div id="itemsContainer" class="items-container">
+            <!-- Accordion items will be dynamically inserted here -->
+        </div>
+        <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
+    </div>
+
+    <!-- Template for a single accordion item's UI -->
+    <template id="itemTemplate">
+        <div class="item">
+            <div class="item-header">
+                <h3 class="item-title">Item</h3>
+                <div class="item-controls">
+                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+                </div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Title</label>
+                <input type="text" class="field-input" data-field="title" placeholder="What are the shipping options?">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Content</label>
+                <textarea class="field-textarea" data-field="content" placeholder="We offer standard, expedited, and overnight shipping..."></textarea>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        const moduleConfig = {
+            name: 'Interactive Accordion',
+            fields: {
+                accordionItems: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), title: 'What are the shipping options?', content: 'We offer standard, expedited, and overnight shipping. Costs and delivery times vary by location and are calculated at checkout.' },
+                        { id: crypto.randomUUID(), title: 'How do I track my order?', content: "Once your order has shipped, you will receive an email with a tracking number and a link to the carrier's website." },
+                        { id: crypto.randomUUID(), title: 'What is the return policy?', content: 'We accept returns within 30 days of purchase for a full refund. Items must be in their original condition.' }
+                    ]
+                }
+            },
+            debounceDelay: 400
+        };
+
+        const state = { sdk: null, blockData: {} };
+        const elements = {};
+        const utils = {
+            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
+            getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
+        }
+
+        function setLoadingState(loading) {
+            elements.mainContainer.classList.toggle('loading', loading);
+            elements.loadingOverlay.classList.toggle('show', loading);
+        }
+        
+        const updateDataFromUI = utils.debounce(() => {
+            const newItems = [];
+            const itemElements = elements.itemsContainer.querySelectorAll('.item');
+            itemElements.forEach(el => {
+                newItems.push({
+                    id: el.dataset.id,
+                    title: el.querySelector('[data-field="title"]').value,
+                    content: el.querySelector('[data-field="content"]').value
+                });
+            });
+            state.blockData.accordionItems = newItems;
+            refreshPreview();
+        }, moduleConfig.debounceDelay);
+
+        function renderItemsUI() {
+            const items = utils.getFieldValue('accordionItems');
+            elements.itemsContainer.innerHTML = '';
+            
+            if (!items || items.length === 0) return;
+
+            items.forEach((item, index) => {
+                const fragment = elements.itemTemplate.content.cloneNode(true);
+                const el = fragment.querySelector('.item');
+                el.dataset.id = item.id;
+                el.querySelector('.item-title').textContent = `Item ${index + 1}`;
+                el.querySelector('[data-field="title"]').value = item.title || '';
+                el.querySelector('[data-field="content"]').value = item.content || '';
+                el.querySelector('.move-up-btn').disabled = (index === 0);
+                el.querySelector('.move-down-btn').disabled = (index === items.length - 1);
+                elements.itemsContainer.appendChild(fragment);
+            });
+        }
+        
+        function initializeEventHandlers() {
+            elements.addItemBtn.addEventListener('click', () => {
+                state.blockData.accordionItems.push({ id: crypto.randomUUID(), title: '', content: '' });
+                renderItemsUI();
+                updateDataFromUI();
+            });
+
+            elements.mainContainer.addEventListener('input', e => {
+                if(e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
+                    updateDataFromUI();
+                }
+            });
+
+            elements.itemsContainer.addEventListener('click', e => {
+                const itemEl = e.target.closest('.item');
+                if (!itemEl) return;
+                const id = itemEl.dataset.id;
+                const items = state.blockData.accordionItems;
+                const currentIndex = items.findIndex(item => item.id === id);
+                let dataChanged = false;
+
+                if (e.target.closest('.remove-btn')) {
+                    items.splice(currentIndex, 1);
+                    dataChanged = true;
+                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
+                    [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
+                    dataChanged = true;
+                } else if (e.target.closest('.move-down-btn') && currentIndex < items.length - 1) {
+                    [items[currentIndex], items[currentIndex + 1]] = [items[currentIndex + 1], items[currentIndex]];
+                    dataChanged = true;
+                }
+                
+                if (dataChanged) {
+                    renderItemsUI();
+                    updateDataFromUI();
+                }
+            });
+        }
+
+        function generateTemplate() {
+            const items = utils.getFieldValue('accordionItems');
+            if (!items || items.length === 0) {
+                return '<table align="center" style="width:620px; background-color:#313131;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
+            }
+
+            const interactiveItems = items.map((item, i) => `
+          <div class="accordion-item">
+            <input type="checkbox" id="accordion-${i + 1}" name="accordion-group">
+            <label class="accordion-title" for="accordion-${i + 1}">${item.title}</label>
+            <div class="accordion-content">
+              <p>${item.content.replace(/\n/g, '<br />')}</p>
+            </div>
+          </div>`).join('');
+
+            const fallbackItems = items.map(item => `
+            <tr>
+              <td style="padding-bottom: 20px;">
+                <h3 style="font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 18px; font-weight: bold; color: #ffffff; margin: 0 0 8px 0;">
+                  ${item.title}
+                </h3>
+                <p style="font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 16px; line-height: 22px; color: #dddddd; margin: 0;">
+                  ${item.content.replace(/\n/g, '<br />')}
+                </p>
+              </td>
+            </tr>`).join('');
+
+            return `<!--[if !mso]><!-->
+<style type="text/css">
+body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+input[type="checkbox"] { display: none !important; mso-hide: all !important; }
+@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } }
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .fallback { display: none !important; }
+    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
+    .accordion-item { border-bottom: 1px solid #555555; }
+    .accordion-item:first-of-type { border-top: 1px solid #555555; }
+    .accordion-title { display: block; cursor: pointer; padding: 15px 20px; position: relative; font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 18px; font-weight: bold; color: #ffffff; -webkit-tap-highlight-color: transparent; }
+    .accordion-title::after { content: '+'; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; font-weight: normal; color: #D3D810; transition: transform 0.3s ease; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease; background-color: #2a2a2a; padding: 0 20px; font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 16px; line-height: 22px; color: #dddddd; }
+    .accordion-content p { margin: 0; padding: 0; }
+    input[type="checkbox"]:checked ~ .accordion-title { background-color: #444444; }
+    input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
+    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; padding: 20px; transition: max-height 0.5s ease-in, padding 0.5s ease; }
+}
+#MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
+#MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
+[class~="x_accordion-wrapper"] { display: none !important; }
+[class~="x_fallback"] { display: block !important; }
+.accordion-wrapper\\0 { display: none !important; }
+.fallback\\0 { display: block !important; }
+@media screen yahoo {
+    .fallback { display: block !important; max-height: none !important; }
+    .accordion-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
+}
+</style>
+<!--<![endif]-->
+<style type="text/css">
+.accordion-wrapper\\0 { display: none !important; }
+.fallback\\0 { display: block !important; }
+</style>
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #313131; width: 620px;">
+  <tr>
+    <td align="center" style="padding: 20px;" valign="top">
+      <!--[if !mso]><!-->
+      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden;">
+        ${interactiveItems}
+      </div>
+      <!--<![endif]-->
+      <div class="fallback">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%;">
+          ${fallbackItems}
+        </table>
+      </div>
+    </td>
+  </tr>
+</table>`;
+        }
+
+        function refreshPreview() {
+            try {
+                const html = generateTemplate();
+                state.sdk.setContent(html);
+                state.sdk.setData({ ...state.blockData, content: html });
+            } catch (error) {
+                console.error(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function initialize() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not available');
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEventHandlers();
+                setLoadingState(true);
+                state.sdk.getData((data) => {
+                    state.blockData.accordionItems = (data && data.accordionItems && data.accordionItems.length > 0) ? data.accordionItems : utils.getFieldValue('accordionItems');
+                    state.blockData.accordionItems.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
+                    renderItemsUI();
+                    refreshPreview();
+                    setLoadingState(false);
+                });
+            } catch (error) {
+                console.error(`Initialization failed: ${error.message}`);
+                setLoadingState(false);
+            }
+        }
+
+        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
+    </script>
+</body>
+</html>
