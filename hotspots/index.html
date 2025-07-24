@@ -86,13 +86,13 @@
         const moduleConfig = {
             name: 'Hotspots',
             fields: {
-                // ADDED: Default image URLs
+                // Default image URLs
                 backgroundImageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/723acaf7-6e04-48f7-9bf6-cce69ec81b2f.png' },
                 fallbackImageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/723acaf7-6e04-48f7-9bf6-cce69ec81b2f.png' },
                 fallbackLinkUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 hotspots: {
                     type: 'list',
-                    // ADDED: Two example hotspots by default
+                    // Default hotspot examples
                     defaultValue: [
                         { id: crypto.randomUUID(), text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosX: 100, tooltipPosY: -50 },
                         { id: crypto.randomUUID(), text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosX: -150, tooltipPosY: 0 },
