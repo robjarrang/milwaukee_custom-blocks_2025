@@ -239,11 +239,10 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
     .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
     .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
     .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
-    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; }
-    /* REMOVED: The rule to change the background color on check has been deleted from here. */
+    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
     input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
     input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
-    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; transition: padding 0.5s ease-in; }
+    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; /* THE FIX: Override with the opening transition. */ transition: padding 0.5s ease-in; }
 }
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
