@@ -314,7 +314,6 @@
         function loadData() {
             setLoadingState(true);
             state.sdk.getData((data) => {
-                // THE FIX: Ensure state.blockData is always populated with either saved data or defaults.
                 const newBlockData = {};
                 Object.keys(moduleConfig.fields).forEach(key => {
                     newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
