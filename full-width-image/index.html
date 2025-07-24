@@ -2,282 +2,138 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Interactive Accordion Block (Milwaukee Style)</title>
-    <!-- Quill.js CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
-    <!-- Basic styling for the editor UI -->
+    <title>Full Width Image Block</title>
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        /* Quill-specific styles */
-        .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
     
     <div class="container" id="mainContainer">
-        <div class="section-title">Accordion Items</div>
-        <div id="itemsContainer" class="items-container">
-            <!-- Accordion items will be dynamically inserted here -->
-        </div>
-        <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
-    </div>
-
-    <!-- Template for a single accordion item's UI -->
-    <template id="itemTemplate">
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">Item</h3>
-                <div class="item-controls">
-                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
-                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
-                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+        <h2 style="margin-top: 0; color: #333;">Full Width Image</h2>
+        <div class="error-banner" id="errorBanner"></div>
+        
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">General Settings</div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="option-selector" id="backgroundColorSelector">
+                    <div class="option-button" data-value="red">Red</div>
+                    <div class="option-button" data-value="black">Black</div>
                 </div>
             </div>
+        </div>
+
+        <div class="section-divider">
+            <div class="section-title">Image Settings</div>
             <div class="field-group">
-                <label class="field-label">Title</label>
-                <input type="text" class="field-input" data-field="title" placeholder="ACCORDION ITEM TITLE">
+                <label for="imageUrl" class="field-label">Image URL</label>
+                <input type="url" id="imageUrl" class="field-input" placeholder="https://example.com/image.jpg">
+                <div class="field-error" id="imageUrlError">Please enter a valid image URL.</div>
+            </div>
+             <div class="field-group">
+                <label for="imageLink" class="field-label">Image Link URL</label>
+                <input type="url" id="imageLink" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                <div class="field-error" id="imageLinkError">Please enter a valid URL.</div>
             </div>
             <div class="field-group">
-                <label class="field-label">Content</label>
-                <!-- This div will be replaced by the Quill editor -->
-                <div class="quill-container limited-toolbar"></div>
+                <label for="imageAlt" class="field-label">Image Alt Text</label>
+                <input type="text" id="imageAlt" class="field-input" placeholder="Descriptive text for the image">
             </div>
         </div>
-    </template>
+    </div>
 
-    <!-- Quill.js script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
         
         const moduleConfig = {
-            name: 'Interactive Accordion',
+            name: 'Full Width Image',
             fields: {
-                accordionItems: {
-                    type: 'list',
-                    defaultValue: [
-                        { id: crypto.randomUUID(), title: 'Lorem ipsum dolor sit amet', content: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. <strong>Aenean nisl risus</strong>, consequat eu diam sit amet, consectetur pulvinar nisi.' },
-                        { id: crypto.randomUUID(), title: 'Nunc nec est non mi faucibus', content: "Phasellus a mauris vitae massa dapibus consequat. Duis non pulvinar lorem, ut varius orci. <a href=\"https://www.milwaukeetool.eu\" target=\"_blank\">Nam et ligula</a> vel justo interdum consectetur." },
-                    ]
-                }
+                backgroundColor: { type: 'text', defaultValue: 'red' },
+                imageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/8d147ebd-e232-4443-bf2d-3fa8bfe848ef.jpg' },
+                imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
+                imageAlt: { type: 'text', defaultValue: 'Promotional Image' }
             },
-            debounceDelay: 500
+            debounceDelay: 400
         };
 
-        const state = { sdk: null, editors: {}, blockData: {} };
+        const state = { sdk: null, blockData: {} };
         const elements = {};
-        
+
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; },
-            sanitizeHtml(html) {
-                if (!html) return '';
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                temp.querySelectorAll('script, style').forEach(el => el.remove());
-                
-                temp.querySelectorAll('a').forEach(link => {
-                    link.style.color = '#ffffff';
-                    link.style.textDecoration = 'underline';
-                    if (!link.getAttribute('href')) link.setAttribute('href', '#');
-                    if (!link.hasAttribute('target')) link.setAttribute('target', '_blank');
-                });
-                
-                return temp.innerHTML.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
-            }
+            isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (_) { return false; } },
+            getFieldValue(fieldName) { return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue; }
         };
 
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.itemsContainer = document.getElementById('itemsContainer');
-            elements.addItemBtn = document.getElementById('addItemBtn');
-            elements.itemTemplate = document.getElementById('itemTemplate');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.imageUrl = document.getElementById('imageUrl');
+            elements.imageLink = document.getElementById('imageLink');
+            elements.imageAlt = document.getElementById('imageAlt');
         }
 
         function setLoadingState(loading) {
             elements.mainContainer.classList.toggle('loading', loading);
             elements.loadingOverlay.classList.toggle('show', loading);
         }
-        
-        const updateDataFromUI = utils.debounce(() => {
-            const newItems = [];
-            const itemElements = elements.itemsContainer.querySelectorAll('.item');
-            itemElements.forEach(el => {
-                const id = el.dataset.id;
-                const editor = state.editors[id];
-                newItems.push({
-                    id: id,
-                    title: el.querySelector('[data-field="title"]').value,
-                    content: editor ? utils.sanitizeHtml(editor.root.innerHTML) : ''
-                });
-            });
-            state.blockData.accordionItems = newItems;
+
+        const updateStateFromUI = utils.debounce(() => {
+            state.blockData.backgroundColor = elements.backgroundColorSelector.querySelector('.selected')?.dataset.value || 'red';
+            state.blockData.imageUrl = elements.imageUrl.value;
+            state.blockData.imageLink = elements.imageLink.value;
+            state.blockData.imageAlt = elements.imageAlt.value;
             refreshPreview();
         }, moduleConfig.debounceDelay);
 
-        function renderItemsUI() {
-            const items = utils.getFieldValue('accordionItems');
-            elements.itemsContainer.innerHTML = '';
-            
-            const currentIds = new Set(items.map(i => i.id));
-            for (const id in state.editors) { if (!currentIds.has(id)) delete state.editors[id]; }
-
-            items.forEach((item, index) => {
-                const fragment = elements.itemTemplate.content.cloneNode(true);
-                const el = fragment.querySelector('.item');
-                const editorDiv = fragment.querySelector('.quill-container');
-
-                el.dataset.id = item.id;
-                el.querySelector('.item-title').textContent = `Item ${index + 1}`;
-                el.querySelector('[data-field="title"]').value = item.title || '';
-                
-                el.querySelector('.move-up-btn').disabled = (index === 0);
-                el.querySelector('.move-down-btn').disabled = (index === items.length - 1);
-                
-                elements.itemsContainer.appendChild(fragment);
-
-                const editor = new Quill(editorDiv, {
-                    theme: 'snow',
-                    modules: { 
-                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false }
-                    },
-                    formats: ['bold', 'script', 'link'],
-                    placeholder: 'Enter content here...'
-                });
-
-                editor.root.innerHTML = item.content || '';
-                editor.on('text-change', updateDataFromUI);
-                state.editors[item.id] = editor;
+        function updateUIFromState() {
+            const bgColor = utils.getFieldValue('backgroundColor');
+            elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => {
+                o.classList.toggle('selected', o.dataset.value === bgColor);
             });
-        }
-        
-        function initializeEventHandlers() {
-            elements.addItemBtn.addEventListener('click', () => {
-                state.blockData.accordionItems.push({ id: crypto.randomUUID(), title: 'NEW TITLE', content: 'New content...' });
-                renderItemsUI();
-                updateDataFromUI();
-            });
-
-            elements.itemsContainer.addEventListener('input', e => {
-                if(e.target.matches('[data-field="title"]')) {
-                    updateDataFromUI();
-                }
-            });
-
-            elements.itemsContainer.addEventListener('click', e => {
-                const itemEl = e.target.closest('.item');
-                if (!itemEl) return;
-                const id = itemEl.dataset.id;
-                const items = state.blockData.accordionItems;
-                const currentIndex = items.findIndex(item => item.id === id);
-                let dataChanged = false;
-
-                if (e.target.closest('.remove-btn')) {
-                    items.splice(currentIndex, 1);
-                    delete state.editors[id];
-                    dataChanged = true;
-                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
-                    [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
-                    dataChanged = true;
-                } else if (e.target.closest('.move-down-btn') && currentIndex < items.length - 1) {
-                    [items[currentIndex], items[currentIndex + 1]] = [items[currentIndex + 1], items[currentIndex]];
-                    dataChanged = true;
-                }
-                
-                if (dataChanged) {
-                    renderItemsUI();
-                    updateDataFromUI();
-                }
-            });
+            elements.imageUrl.value = utils.getFieldValue('imageUrl');
+            elements.imageLink.value = utils.getFieldValue('imageLink');
+            elements.imageAlt.value = utils.getFieldValue('imageAlt');
         }
 
         function generateTemplate() {
-            const items = utils.getFieldValue('accordionItems');
-            if (!items || items.length === 0) {
-                return '<table align="center" style="width:620px; background-color:#DB021D;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
+            const backgroundColor = utils.getFieldValue('backgroundColor');
+            const imageUrl = utils.getFieldValue('imageUrl');
+            const imageLink = utils.getFieldValue('imageLink');
+            const imageAlt = utils.getFieldValue('imageAlt');
+            
+            const bgColorHex = backgroundColor === 'red' ? '#DB021D' : '#000000';
+
+            // Return a placeholder if the image URL is missing
+            if (!imageUrl) {
+                return `<table align="center" style="width:620px; background-color:${bgColorHex};"><tr><td style="padding:40px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Please provide an image URL.</td></tr></table>`;
             }
 
-            const interactiveItems = items.map((item, i) => `
-          <div class="accordion-item">
-            <input type="checkbox" id="accordion-${i + 1}" name="accordion-group">
-            <label class="accordion-title" for="accordion-${i + 1}">${item.title}</label>
-            <div class="accordion-content">
-              <div class="accordion-content-inner">
-                ${item.content}
-              </div>
-            </div>
-          </div>`).join('');
-
-            const fallbackItems = items.map(item => `
-            <tr>
-              <td style="padding-bottom: 30px;">
-                <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; margin: 0 0 8px 0; text-transform: uppercase;">
-                  ${item.title}
-                </h3>
-                <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
-                  ${item.content}
-                </div>
-              </td>
-            </tr>`).join('');
-
-            return `<!--[if !mso]><!-->
-<style type="text/css">
-body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
-input[type="checkbox"] { display: none !important; mso-hide: all !important; }
-@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } .side { width: 20px !important; } .content-inner { width: calc(100% - 40px) !important; } }
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .fallback { display: none !important; }
-    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
-    .accordion-item { border-bottom: 1px solid #000000; }
-    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
-    .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
-    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; transition: padding 0.4s ease-out; }
-    input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
-    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
-    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; transition: padding 0.5s ease-in; }
-}
-#MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
-#MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
-[class~="x_accordion-wrapper"] { display: none !important; }
-[class~="x_fallback"] { display: block !important; }
-.accordion-wrapper\\0 { display: none !important; }
-.fallback\\0 { display: block !important; }
-@media screen yahoo {
-    .fallback { display: block !important; max-height: none !important; }
-    .accordion-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
-}
-</style>
-<!--<![endif]-->
-<style type="text/css">
-.accordion-wrapper\\0 { display: none !important; }
-.fallback\\0 { display: block !important; }
-</style>
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
-  <tr>
-    <td class="side" style="width: 20px;"> </td>
-    <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
-      <!--[if !mso]><!-->
-      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
-        ${interactiveItems}
-      </div>
-      <!--<![endif]-->
-      <div class="fallback">
-        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%;">
-          ${fallbackItems}
-        </table>
-      </div>
-    </td>
-    <td class="side" style="width: 20px;"> </td>
-  </tr>
-</table>`;
+            return `<!-- START .fw-image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
+                <tr>
+                    <td class="side" style="width: 20px;"> </td>
+                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                            <tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>
+                            <tr>
+                                <td align="center" class="block" style="width: 100%;" valign="top">
+                                    <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
+                                      <img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580">
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>
+                        </table>
+                    </td>
+                    <td class="side" style="width: 20px;"> </td>
+                </tr>
+            </table><!-- END .fw-image -->`;
         }
 
         function refreshPreview() {
@@ -290,45 +146,51 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
             }
         }
 
-        // --- FIX STARTS HERE ---
+        function initializeEventHandlers() {
+            elements.mainContainer.addEventListener('input', e => {
+                if(e.target.classList.contains('field-input')) {
+                    updateStateFromUI();
+                }
+            });
+            elements.backgroundColorSelector.addEventListener('click', e => {
+                if (e.target.classList.contains('option-button')) {
+                    elements.backgroundColorSelector.querySelector('.selected')?.classList.remove('selected');
+                    e.target.classList.add('selected');
+                    updateStateFromUI();
+                }
+            });
+        }
+
+        function loadData() {
+            if (!state.sdk) return console.error('SDK not available');
+            setLoadingState(true);
+            
+            state.sdk.getData((data) => {
+                // THE FIX: Ensure state.blockData is always populated with either saved data or defaults.
+                const newBlockData = {};
+                Object.keys(moduleConfig.fields).forEach(key => {
+                    newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
+                });
+                state.blockData = newBlockData;
+
+                updateUIFromState(); // Populate the UI from the now-complete state
+                refreshPreview();   // Render the initial preview
+                setLoadingState(false);
+            });
+        }
+
         function initialize() {
             try {
-                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not available');
-                if (!window.Quill) throw new Error('Quill.js not loaded');
-                
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEventHandlers();
-                setLoadingState(true);
-                
-                state.sdk.getData((data) => {
-                    // Determine if this is a new block by checking for saved data.
-                    const isNewBlock = !data || Object.keys(data).length === 0 || !data.accordionItems;
-
-                    if (isNewBlock) {
-                        // For a new block, load the default values into the state.
-                        state.blockData.accordionItems = utils.getFieldValue('accordionItems');
-                    } else {
-                        // For an existing block, load the saved data.
-                        state.blockData.accordionItems = data.accordionItems;
-                    }
-                    
-                    // Now that the state is set (either from defaults or saved data),
-                    // render the settings panel UI.
-                    renderItemsUI();
-
-                    // And finally, render the preview in the email canvas.
-                    // For a new block, this is the CRITICAL step that saves the initial content.
-                    refreshPreview();
-
-                    setLoadingState(false);
-                });
+                loadData();
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);
             }
         }
-        // --- FIX ENDS HERE ---
 
         document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
     </script>
