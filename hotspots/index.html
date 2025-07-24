@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Interactive Hotspots Block</title>
+    <!-- Basic styling for the editor UI -->
+    <style>
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        /* Visual Editor Styles */
+        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}.slider-group{display:flex;align-items:center;gap:15px}.slider-input{flex-grow:1;cursor:pointer}.slider-value{font-size:12px;font-weight:bold;color:#333;background-color:#f0f0f0;padding:2px 6px;border-radius:4px;min-width:40px;text-align:center}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+    
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Hotspots Module</h2>
+
+        <div class="section-title">Global Settings</div>
+        <div class="field-group">
+            <label for="backgroundImageUrl" class="field-label">Interactive Background Image URL</label>
+            <input type="url" id="backgroundImageUrl" class="field-input" placeholder="https://example.com/interactive-image.png">
+        </div>
+        <div class="field-group">
+            <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
+            <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://example.com/fallback-image.png">
+        </div>
+        <div class="field-group">
+            <label for="fallbackLinkUrl" class="field-label">Fallback Image Link URL</label>
+            <input type="url" id="fallbackLinkUrl" class="field-input" placeholder="https://example.com/fallback-link">
+        </div>
+
+        <div class="section-title">Visual Editor</div>
+        <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
+        <div id="visualEditorWrapper">
+            <div id="visualEditor">
+                <img id="previewImage" src="" alt="Image Preview">
+                <!-- Hotspot markers will be injected here -->
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 20px;">Hotspots</div>
+        <div id="itemsContainer" class="items-container">
+            <!-- Hotspot control items will be injected here -->
+        </div>
+        <button id="addItemBtn" class="btn add-item-btn">Add New Hotspot</button>
+    </div>
+
+    <!-- Template for a single hotspot item's UI -->
+    <template id="itemTemplate">
+        <div class="item">
+            <div class="item-header">
+                <h3 class="item-title">Hotspot</h3>
+                <div class="item-controls">
+                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+                </div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Tooltip Text</label>
+                <input type="text" class="field-input" data-field="text" placeholder="Enter hotspot text">
+            </div>
+            <div class="field-group">
+                <label class="field-label" style="font-size:12px;">Tooltip X Position</label>
+                <div class="slider-group">
+                    <input type="range" class="slider-input" data-field="tooltipPosX" min="0" max="100" step="1">
+                    <span class="slider-value" data-field-value="tooltipPosX"></span>
+                </div>
+            </div>
+            <div class="field-group" style="margin-bottom:0;">
+                <label class="field-label" style="font-size:12px;">Tooltip Y Position</label>
+                <div class="slider-group">
+                    <input type="range" class="slider-input" data-field="tooltipPosY" min="0" max="100" step="1">
+                    <span class="slider-value" data-field-value="tooltipPosY"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
+    <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script>
+        'use strict';
+        
+        const moduleConfig = {
+            name: 'Hotspots',
+            fields: {
+                backgroundImageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/d8876326-53b2-461f-ac80-35d29a81b639.png' },
+                fallbackImageUrl: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/723acaf7-6e04-48f7-9bf6-cce69ec81b2f.png' },
+                fallbackLinkUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
+                hotspots: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), text: 'Mechanical Clutch', posX: 35, posY: 10, tooltipPosX: 5, tooltipPosY: 2 },
+                        { id: crypto.randomUUID(), text: 'Two Speed Control', posX: 48, posY: 11, tooltipPosX: 38, tooltipPosY: 0 },
+                    ]
+                }
+            },
+            debounceDelay: 400
+        };
+
+        const state = { sdk: null, blockData: {}, selectedHotspotId: null };
+        const elements = {};
+        const utils = {
+            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
+            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
+        };
+
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.backgroundImageUrl = document.getElementById('backgroundImageUrl');
+            elements.fallbackImageUrl = document.getElementById('fallbackImageUrl');
+            elements.fallbackLinkUrl = document.getElementById('fallbackLinkUrl');
+            elements.visualEditor = document.getElementById('visualEditor');
+            elements.previewImage = document.getElementById('previewImage');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
+        }
+
+        const updateStateFromUI = utils.debounce(() => {
+            state.blockData.backgroundImageUrl = elements.backgroundImageUrl.value;
+            state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
+            state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
+            
+            const newHotspots = [];
+            elements.itemsContainer.querySelectorAll('.item').forEach(itemEl => {
+                const id = itemEl.dataset.id;
+                const originalHotspot = state.blockData.hotspots.find(h => h.id === id);
+                if (originalHotspot) {
+                    newHotspots.push({
+                        ...originalHotspot,
+                        text: itemEl.querySelector('[data-field="text"]').value,
+                        tooltipPosX: parseFloat(itemEl.querySelector('[data-field="tooltipPosX"]').value),
+                        tooltipPosY: parseFloat(itemEl.querySelector('[data-field="tooltipPosY"]').value)
+                    });
+                }
+            });
+            state.blockData.hotspots = newHotspots;
+
+            refreshPreview();
+        }, moduleConfig.debounceDelay);
+        
+        function updateUI() {
+            // Update main settings
+            elements.backgroundImageUrl.value = utils.getFieldValue('backgroundImageUrl');
+            elements.fallbackImageUrl.value = utils.getFieldValue('fallbackImageUrl');
+            elements.fallbackLinkUrl.value = utils.getFieldValue('fallbackLinkUrl');
+            elements.previewImage.src = utils.getFieldValue('backgroundImageUrl');
+
+            // Render hotspot list
+            elements.itemsContainer.innerHTML = '';
+            utils.getFieldValue('hotspots').forEach((hotspot, index) => {
+                const fragment = elements.itemTemplate.content.cloneNode(true);
+                const el = fragment.querySelector('.item');
+                el.dataset.id = hotspot.id;
+                el.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
+                el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
+                el.querySelector('[data-field="text"]').value = hotspot.text;
+                
+                const tooltipXSlider = el.querySelector('[data-field="tooltipPosX"]');
+                const tooltipYSlider = el.querySelector('[data-field="tooltipPosY"]');
+                const tooltipXValue = el.querySelector('[data-field-value="tooltipPosX"]');
+                const tooltipYValue = el.querySelector('[data-field-value="tooltipPosY"]');
+
+                tooltipXSlider.value = hotspot.tooltipPosX;
+                tooltipYSlider.value = hotspot.tooltipPosY;
+                tooltipXValue.textContent = `${hotspot.tooltipPosX}%`;
+                tooltipYValue.textContent = `${hotspot.tooltipPosY}%`;
+
+                el.querySelector('.move-up-btn').disabled = (index === 0);
+                el.querySelector('.move-down-btn').disabled = (index === utils.getFieldValue('hotspots').length - 1);
+
+                elements.itemsContainer.appendChild(fragment);
+            });
+
+            // Render markers on visual editor
+            elements.visualEditor.querySelectorAll('.hotspot-marker').forEach(m => m.remove());
+            utils.getFieldValue('hotspots').forEach(hotspot => {
+                const marker = document.createElement('div');
+                marker.className = 'hotspot-marker';
+                marker.dataset.id = hotspot.id;
+                marker.style.left = `${hotspot.posX}%`;
+                marker.style.top = `${hotspot.posY}%`;
+                marker.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
+                elements.visualEditor.appendChild(marker);
+            });
+        }
+        
+        function generateTemplate() {
+            const bgImg = utils.getFieldValue('backgroundImageUrl');
+            const fallbackImg = utils.getFieldValue('fallbackImageUrl');
+            const fallbackLink = utils.getFieldValue('fallbackLinkUrl');
+            const hotspots = utils.getFieldValue('hotspots');
+
+            const interactiveHotspots = hotspots.map((h, i) => `
+       <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; transform: translate(-50%, -50%);">
+        <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
+        <div class="tooltip-wrapper" style="position: absolute; left: ${h.tooltipPosX}%; top: ${h.tooltipPosY}%; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.7); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease;">
+         <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 24px; font-weight: bold; line-height: 30px; text-transform: uppercase;">${h.text}</span>
+        </div>
+       </div>`).join('');
+
+            const fallbackItems = hotspots.map(h => `
+                   <tr>
+                    <td valign="top" style="padding-bottom: 8px;">
+                     <img alt="Checkmark" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
+                    <td style="width: 20px; padding-bottom: 8px;"> </td>
+                    <td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">
+                     ${h.text}</td>
+                   </tr>`).join('');
+
+            return `<style type="text/css">
+                .hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; }
+                @media only screen and (max-width: 580px) { .bg-img-container { height: 350px !important; } }
+                @media only screen and (max-width: 400px) { .bg-img-container { height: 320px !important; } }
+            </style>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer interactive" role="presentation" style="background-color: #DB021d; width: 620px;">
+              <tr>
+                <td align="center" class="content-inner" style="width: 100%;" valign="top">
+                  <!--[if !mso]><!-->
+                  <div class="outlookhide yahoohide">
+                    <div class="bg-img-container" style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; display: block; height: 500px; position: relative; width: 100%;">
+                      ${interactiveHotspots}
+                    </div>
+                  </div>
+                  <!--<![endif]-->
+                  <!--[if mso]>
+                  <div class="outlookshow yahooshow">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%;">
+                      <tr>
+                        <td align="center" valign="top">
+                          <a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; max-width: 620px; height: auto;" width="620"></a>
+                        </td>
+                      </tr>
+                      <tr><td style="padding: 0 20px;"><div style="font-size: 20px; height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="font-size: 20px; height: 20px;"> </div></td></tr>
+                    </table>
+                  </div>
+                  <![endif]-->
+                </td>
+              </tr>
+            </table>`;
+        }
+
+        function refreshPreview() {
+            if (!state.sdk) return;
+            try {
+                const html = generateTemplate();
+                state.sdk.setContent(html);
+                state.sdk.setData({ ...state.blockData, content: html });
+            } catch (error) { console.error(`Preview update failed: ${error.message}`); }
+        }
+
+        function initializeEventHandlers() {
+            // Main settings
+            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
+                input.addEventListener('input', updateStateFromUI);
+            });
+
+            // Add new hotspot
+            elements.addItemBtn.addEventListener('click', () => {
+                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosX: 50, tooltipPosY: 50 };
+                state.blockData.hotspots.push(newHotspot);
+                state.selectedHotspotId = newHotspot.id;
+                updateUI();
+                updateStateFromUI();
+            });
+
+            // Visual editor click
+            elements.visualEditor.addEventListener('click', (e) => {
+                if (!state.selectedHotspotId) {
+                    alert('Please select a hotspot from the list below before placing it.');
+                    return;
+                }
+                const rect = elements.previewImage.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const posX = (x / rect.width) * 100;
+                const posY = (y / rect.height) * 100;
+
+                const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
+                if (hotspot) {
+                    hotspot.posX = parseFloat(posX.toFixed(2));
+                    hotspot.posY = parseFloat(posY.toFixed(2));
+                    updateUI();
+                    updateStateFromUI();
+                }
+            });
+            
+            // Event delegation for items container
+            elements.itemsContainer.addEventListener('click', (e) => {
+                const itemEl = e.target.closest('.item');
+                if (!itemEl) return;
+                const id = itemEl.dataset.id;
+                
+                // Select item
+                state.selectedHotspotId = id;
+                
+                // Handle controls
+                if (e.target.closest('.remove-btn')) {
+                    state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
+                    if (state.selectedHotspotId === id) state.selectedHotspotId = null;
+                } else if (e.target.closest('.move-up-btn')) {
+                    const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                    if (index > 0) {
+                        [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]];
+                    }
+                } else if (e.target.closest('.move-down-btn')) {
+                    const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                    if (index < state.blockData.hotspots.length - 1) {
+                        [state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]];
+                    }
+                }
+                updateUI();
+                updateStateFromUI();
+            });
+
+            elements.itemsContainer.addEventListener('input', (e) => {
+                const itemEl = e.target.closest('.item');
+                if (!itemEl) return;
+                
+                // Update slider value display
+                if(e.target.type === 'range') {
+                    const valueEl = itemEl.querySelector(`[data-field-value="${e.target.dataset.field}"]`);
+                    if(valueEl) valueEl.textContent = `${e.target.value}%`;
+                }
+                updateStateFromUI();
+            });
+        }
+        
+        function loadData() {
+            setLoadingState(true);
+            state.sdk.getData((data) => {
+                const newBlockData = {};
+                Object.keys(moduleConfig.fields).forEach(key => {
+                    newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
+                });
+                state.blockData = newBlockData;
+                
+                if (state.blockData.hotspots.length > 0) {
+                    state.selectedHotspotId = state.blockData.hotspots[0].id;
+                }
+
+                updateUI();
+                refreshPreview();
+                setLoadingState(false);
+            });
+        }
+
+        function initialize() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEventHandlers();
+                loadData();
+            } catch (error) {
+                console.error(`Initialization failed: ${error.message}`);
+                setLoadingState(false);
+            }
+        }
+
+        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
+    </script>
+</body>
+</html>
