@@ -2,10 +2,14 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Interactive Accordion Block</title>
+    <title>Interactive Accordion Block (Milwaukee Style)</title>
+    <!-- Quill.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <!-- Basic styling for the editor UI -->
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input,.field-textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;font-family:inherit}.field-textarea{min-height:100px;resize:vertical}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        /* Quill-specific styles */
+        .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
     </style>
 </head>
 <body>
@@ -32,15 +36,18 @@
             </div>
             <div class="field-group">
                 <label class="field-label">Title</label>
-                <input type="text" class="field-input" data-field="title" placeholder="What are the shipping options?">
+                <input type="text" class="field-input" data-field="title" placeholder="ACCORDION ITEM TITLE">
             </div>
             <div class="field-group">
                 <label class="field-label">Content</label>
-                <textarea class="field-textarea" data-field="content" placeholder="We offer standard, expedited, and overnight shipping..."></textarea>
+                <!-- This div will be replaced by the Quill editor -->
+                <div class="quill-container limited-toolbar"></div>
             </div>
         </div>
     </template>
 
+    <!-- Quill.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
@@ -52,20 +59,37 @@
                 accordionItems: {
                     type: 'list',
                     defaultValue: [
-                        { id: crypto.randomUUID(), title: 'What are the shipping options?', content: 'We offer standard, expedited, and overnight shipping. Costs and delivery times vary by location and are calculated at checkout.' },
-                        { id: crypto.randomUUID(), title: 'How do I track my order?', content: "Once your order has shipped, you will receive an email with a tracking number and a link to the carrier's website." },
-                        { id: crypto.randomUUID(), title: 'What is the return policy?', content: 'We accept returns within 30 days of purchase for a full refund. Items must be in their original condition.' }
+                        { id: crypto.randomUUID(), title: 'Lorem ipsum dolor sit amet', content: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. <strong>Aenean nisl risus</strong>, consequat eu diam sit amet, consectetur pulvinar nisi.' },
+                        { id: crypto.randomUUID(), title: 'Nunc nec est non mi faucibus', content: "Phasellus a mauris vitae massa dapibus consequat. Duis non pulvinar lorem, ut varius orci. <a href=\"https://www.milwaukeetool.eu\" target=\"_blank\">Nam et ligula</a> vel justo interdum consectetur." },
                     ]
                 }
             },
-            debounceDelay: 400
+            debounceDelay: 500
         };
 
-        const state = { sdk: null, blockData: {} };
+        const state = { sdk: null, editors: {}, blockData: {} };
         const elements = {};
+        
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; }
+            getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; },
+            sanitizeHtml(html) {
+                if (!html) return '';
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                temp.querySelectorAll('script, style').forEach(el => el.remove());
+                
+                // Style links to match Milwaukee brand and ensure they work in email
+                temp.querySelectorAll('a').forEach(link => {
+                    link.style.color = '#ffffff';
+                    link.style.textDecoration = 'underline';
+                    if (!link.getAttribute('href')) link.setAttribute('href', '#');
+                    if (!link.hasAttribute('target')) link.setAttribute('target', '_blank');
+                });
+                
+                // Quill often wraps content in <p> tags. We remove them for cleaner email code.
+                return temp.innerHTML.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
+            }
         };
 
         function cacheElements() {
@@ -85,10 +109,12 @@
             const newItems = [];
             const itemElements = elements.itemsContainer.querySelectorAll('.item');
             itemElements.forEach(el => {
+                const id = el.dataset.id;
+                const editor = state.editors[id];
                 newItems.push({
-                    id: el.dataset.id,
+                    id: id,
                     title: el.querySelector('[data-field="title"]').value,
-                    content: el.querySelector('[data-field="content"]').value
+                    content: editor ? utils.sanitizeHtml(editor.root.innerHTML) : ''
                 });
             });
             state.blockData.accordionItems = newItems;
@@ -99,30 +125,51 @@
             const items = utils.getFieldValue('accordionItems');
             elements.itemsContainer.innerHTML = '';
             
-            if (!items || items.length === 0) return;
+            // Clean up any stale editor instances
+            const currentIds = new Set(items.map(i => i.id));
+            for (const id in state.editors) { if (!currentIds.has(id)) delete state.editors[id]; }
 
             items.forEach((item, index) => {
                 const fragment = elements.itemTemplate.content.cloneNode(true);
                 const el = fragment.querySelector('.item');
+                const editorDiv = fragment.querySelector('.quill-container');
+
                 el.dataset.id = item.id;
                 el.querySelector('.item-title').textContent = `Item ${index + 1}`;
                 el.querySelector('[data-field="title"]').value = item.title || '';
-                el.querySelector('[data-field="content"]').value = item.content || '';
+                
                 el.querySelector('.move-up-btn').disabled = (index === 0);
                 el.querySelector('.move-down-btn').disabled = (index === items.length - 1);
+                
                 elements.itemsContainer.appendChild(fragment);
+
+                // Initialize Quill on the new element
+                const editor = new Quill(editorDiv, {
+                    theme: 'snow',
+                    modules: { 
+                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
+                        clipboard: { matchVisual: false } // Important for clean paste
+                    },
+                    formats: ['bold', 'script', 'link'],
+                    placeholder: 'Enter content here...'
+                });
+
+                editor.root.innerHTML = item.content || '';
+                editor.on('text-change', updateDataFromUI);
+                state.editors[item.id] = editor;
             });
         }
         
         function initializeEventHandlers() {
             elements.addItemBtn.addEventListener('click', () => {
-                state.blockData.accordionItems.push({ id: crypto.randomUUID(), title: '', content: '' });
+                state.blockData.accordionItems.push({ id: crypto.randomUUID(), title: 'NEW TITLE', content: 'New content...' });
                 renderItemsUI();
                 updateDataFromUI();
             });
 
-            elements.mainContainer.addEventListener('input', e => {
-                if(e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
+            elements.itemsContainer.addEventListener('input', e => {
+                // Handle title input separately from Quill
+                if(e.target.matches('[data-field="title"]')) {
                     updateDataFromUI();
                 }
             });
@@ -137,6 +184,7 @@
 
                 if (e.target.closest('.remove-btn')) {
                     items.splice(currentIndex, 1);
+                    delete state.editors[id]; // Clean up editor instance
                     dataChanged = true;
                 } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
                     [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
@@ -147,7 +195,7 @@
                 }
                 
                 if (dataChanged) {
-                    renderItemsUI();
+                    renderItemsUI(); // Re-render to update order and button states
                     updateDataFromUI();
                 }
             });
@@ -156,7 +204,7 @@
         function generateTemplate() {
             const items = utils.getFieldValue('accordionItems');
             if (!items || items.length === 0) {
-                return '<table align="center" style="width:620px; background-color:#313131;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
+                return '<table align="center" style="width:620px; background-color:#DB021D;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
             }
 
             const interactiveItems = items.map((item, i) => `
@@ -164,19 +212,21 @@
             <input type="checkbox" id="accordion-${i + 1}" name="accordion-group">
             <label class="accordion-title" for="accordion-${i + 1}">${item.title}</label>
             <div class="accordion-content">
-              <p>${item.content.replace(/\n/g, '<br />')}</p>
+              <div class="accordion-content-inner">
+                ${item.content}
+              </div>
             </div>
           </div>`).join('');
 
             const fallbackItems = items.map(item => `
             <tr>
-              <td style="padding-bottom: 20px;">
-                <h3 style="font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 18px; font-weight: bold; color: #ffffff; margin: 0 0 8px 0;">
+              <td style="padding-bottom: 30px;">
+                <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; margin: 0 0 8px 0; text-transform: uppercase;">
                   ${item.title}
                 </h3>
-                <p style="font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 16px; line-height: 22px; color: #dddddd; margin: 0;">
-                  ${item.content.replace(/\n/g, '<br />')}
-                </p>
+                <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
+                  ${item.content}
+                </div>
               </td>
             </tr>`).join('');
 
@@ -186,19 +236,19 @@ body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;
 table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
 img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 input[type="checkbox"] { display: none !important; mso-hide: all !important; }
-@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } }
+@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } .side { width: 20px !important; } .content-inner { width: calc(100% - 40px) !important; } }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .fallback { display: none !important; }
     .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
-    .accordion-item { border-bottom: 1px solid #555555; }
-    .accordion-item:first-of-type { border-top: 1px solid #555555; }
-    .accordion-title { display: block; cursor: pointer; padding: 15px 20px; position: relative; font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 18px; font-weight: bold; color: #ffffff; -webkit-tap-highlight-color: transparent; }
-    .accordion-title::after { content: '+'; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; font-weight: normal; color: #D3D810; transition: transform 0.3s ease; }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease; background-color: #2a2a2a; padding: 0 20px; font-family: Arial, Helvetica, sans-serif, 'Lato'; font-size: 16px; line-height: 22px; color: #dddddd; }
-    .accordion-content p { margin: 0; padding: 0; }
-    input[type="checkbox"]:checked ~ .accordion-title { background-color: #444444; }
+    .accordion-item { border-bottom: 1px solid #000000; }
+    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+    .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
+    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; }
+    input[type="checkbox"]:checked ~ .accordion-title { background-color: #000000; }
     input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
-    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; padding: 20px; transition: max-height 0.5s ease-in, padding 0.5s ease; }
+    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
+    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; transition: padding 0.5s ease-in; }
 }
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
@@ -216,11 +266,12 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
 </style>
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #313131; width: 620px;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
   <tr>
-    <td align="center" style="padding: 20px;" valign="top">
+    <td class="side" style="width: 20px;"> </td>
+    <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
       <!--[if !mso]><!-->
-      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden;">
+      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
         ${interactiveItems}
       </div>
       <!--<![endif]-->
@@ -230,6 +281,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         </table>
       </div>
     </td>
+    <td class="side" style="width: 20px;"> </td>
   </tr>
 </table>`;
         }
@@ -247,10 +299,13 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         function initialize() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not available');
+                if (!window.Quill) throw new Error('Quill.js not loaded');
+                
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEventHandlers();
                 setLoadingState(true);
+                
                 state.sdk.getData((data) => {
                     state.blockData.accordionItems = (data && data.accordionItems && data.accordionItems.length > 0) ? data.accordionItems : utils.getFieldValue('accordionItems');
                     state.blockData.accordionItems.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
