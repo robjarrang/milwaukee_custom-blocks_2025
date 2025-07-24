@@ -5,23 +5,16 @@
     <title>Interactive Hotspots Block</title>
     <!-- Basic styling for the editor UI -->
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-weight:bold}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Visual Editor Styles */
-        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px;overflow:hidden}#previewImage{display:block;width:100%;height:auto}
-        #visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer;z-index:5}
-        #visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
-        #visualEditor .tooltip-preview{position:absolute;background-color:rgba(0,0,0,0.8);color:white;padding:5px 8px;font-size:12px;border-radius:3px;white-space:nowrap;pointer-events:none;z-index:20;transition:all 0.1s linear}
-        /* Position Selector Styles */
-        .position-selector{display:grid;grid-template-columns:repeat(3, 1fr);gap:5px;margin-bottom:15px}
-        .position-btn{background-color:#e9e9e9;border:2px solid #ccc;height:30px;position:relative;cursor:pointer;transition:all .2s ease}.position-btn:hover{border-color:#0074d9}.position-btn.selected{border-color:#0074d9;background-color:#0074d9}
-        .position-btn::after{content:'';position:absolute;width:6px;height:6px;background-color:#888;border-radius:50%}.position-btn.selected::after{background-color:white}
-        .position-btn[data-position="top-left"]::after{top:3px;left:3px}.position-btn[data-position="top-center"]::after{top:3px;left:50%;transform:translateX(-50%)}.position-btn[data-position="top-right"]::after{top:3px;right:3px}
-        .position-btn[data-position="middle-left"]::after{top:50%;left:3px;transform:translateY(-50%)}.position-btn[data-position="middle-center"]::after{top:50%;left:50%;transform:translate(-50%,-50%)}.position-btn[data-position="middle-right"]::after{top:50%;right:3px;transform:translateY(-50%)}
-        .position-btn[data-position="bottom-left"]::after{bottom:3px;left:3px}.position-btn[data-position="bottom-center"]::after{bottom:3px;left:50%;transform:translateX(-50%)}.position-btn[data-position="bottom-right"]::after{bottom:3px;right:3px}
-        .slider-group{display:flex;align-items:center;gap:15px}.slider-input{flex-grow:1;cursor:pointer}.slider-value{font-size:12px;font-weight:bold;color:#333;background-color:#f0f0f0;padding:2px 6px;border-radius:4px;min-width:40px;text-align:center}
+        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px;overflow:hidden}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer;z-index:5}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}#previewTooltip{position:absolute;background-color:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:4px;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif;font-size:14px;font-weight:bold;line-height:1.3;text-transform:uppercase;text-align:center;width:150px;display:none;z-index:15;pointer-events:none}
+        /* New UX Styles */
+        .placement-selector{display:flex;gap:8px}.placement-btn{flex:1;padding:8px;font-size:18px;line-height:1;border:2px solid #ddd;border-radius:4px;background-color:white;cursor:pointer;transition:all .2s ease}.placement-btn:hover{border-color:#0074d9;background-color:#f0f8ff}.placement-btn.selected{border-color:#0074d9;background-color:#0074d9;color:white}.slider-group{display:flex;align-items:center;gap:15px}.slider-input{flex-grow:1;cursor:pointer}.slider-value{font-size:12px;font-weight:bold;color:#333;background-color:#f0f0f0;padding:2px 6px;border-radius:4px;min-width:40px;text-align:center}
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+    
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Hotspots Module</h2>
 
@@ -32,7 +25,12 @@
 
         <div class="section-title">Visual Editor</div>
         <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
-        <div id="visualEditorWrapper"><div id="visualEditor"><img id="previewImage" src="" alt="Image Preview"></div></div>
+        <div id="visualEditorWrapper">
+            <div id="visualEditor">
+                <img id="previewImage" src="" alt="Image Preview">
+                <div id="previewTooltip"></div>
+            </div>
+        </div>
 
         <div class="section-title" style="margin-top: 20px;">Hotspots</div>
         <div id="itemsContainer" class="items-container"></div>
@@ -43,10 +41,9 @@
         <div class="item">
             <div class="item-header"><h3 class="item-title">Hotspot</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div>
             <div class="field-group"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text"></div>
-            <!-- THE UX FIX: Replaced abstract sliders with an intuitive button grid and clear offset controls -->
-            <div class="field-group"><label class="field-label">Tooltip Position</label><div class="position-selector" data-field="tooltipPosition"><button class="position-btn" data-position="top-left"></button><button class="position-btn" data-position="top-center"></button><button class="position-btn" data-position="top-right"></button><button class="position-btn" data-position="middle-left"></button><button class="position-btn" data-position="middle-center"></button><button class="position-btn" data-position="middle-right"></button><button class="position-btn" data-position="bottom-left"></button><button class="position-btn" data-position="bottom-center"></button><button class="position-btn" data-position="bottom-right"></button></div></div>
-            <div class="field-group"><label class="field-label" style="font-size:12px;">Horizontal Offset</label><div class="slider-group"><input type="range" class="slider-input" data-field="tooltipOffsetX" min="-50" max="50" step="1"><span class="slider-value" data-field-value="tooltipOffsetX"></span></div></div>
-            <div class="field-group" style="margin-bottom:0;"><label class="field-label" style="font-size:12px;">Vertical Offset</label><div class="slider-group"><input type="range" class="slider-input" data-field="tooltipOffsetY" min="-50" max="50" step="1"><span class="slider-value" data-field-value="tooltipOffsetY"></span></div></div>
+            <!-- NEW UX CONTROLS -->
+            <div class="field-group"><label class="field-label">Tooltip Placement</label><div class="placement-selector" data-control="placement"><button class="placement-btn" data-value="top" title="Top">▲</button><button class="placement-btn" data-value="right" title="Right">►</button><button class="placement-btn" data-value="bottom" title="Bottom">▼</button><button class="placement-btn" data-value="left" title="Left">◄</button></div></div>
+            <div class="field-group" style="margin-bottom:0;"><label class="field-label">Distance</label><div class="slider-group"><input type="range" class="slider-input" data-field="offset" min="0" max="50" step="1"><span class="slider-value" data-field-value="offset"></span></div></div>
         </div>
     </template>
 
@@ -64,9 +61,9 @@
                 hotspots: {
                     type: 'list',
                     defaultValue: [
-                        // THE UX FIX: Default value now uses the new positioning system.
-                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosition: 'top-right', tooltipOffsetX: 0, tooltipOffsetY: 0 },
-                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosition: 'middle-left', tooltipOffsetX: 0, tooltipOffsetY: 0 },
+                        // UPDATED: New structure for tooltip positioning
+                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPlacement: 'right', tooltipOffset: 15 },
+                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPlacement: 'left', tooltipOffset: 15 },
                     ]
                 }
             },
@@ -80,6 +77,37 @@
             getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
         };
 
+        function getTooltipStyles(placement, offset) {
+            const styles = {
+                top: 'auto', bottom: 'auto', left: 'auto', right: 'auto', transform: 'none'
+            };
+            const offsetPx = `${offset || 0}px`;
+
+            switch (placement) {
+                case 'top':
+                    styles.left = '50%';
+                    styles.bottom = `calc(100% + ${offsetPx})`;
+                    styles.transform = 'translateX(-50%)';
+                    break;
+                case 'bottom':
+                    styles.left = '50%';
+                    styles.top = `calc(100% + ${offsetPx})`;
+                    styles.transform = 'translateX(-50%)';
+                    break;
+                case 'left':
+                    styles.top = '50%';
+                    styles.right = `calc(100% + ${offsetPx})`;
+                    styles.transform = 'translateY(-50%)';
+                    break;
+                case 'right':
+                    styles.top = '50%';
+                    styles.left = `calc(100% + ${offsetPx})`;
+                    styles.transform = 'translateY(-50%)';
+                    break;
+            }
+            return `top:${styles.top}; left:${styles.left}; bottom:${styles.bottom}; right:${styles.right}; transform:${styles.transform};`;
+        }
+        
         function cacheElements() {
             Object.assign(elements, {
                 mainContainer: document.getElementById('mainContainer'),
@@ -89,6 +117,7 @@
                 fallbackLinkUrl: document.getElementById('fallbackLinkUrl'),
                 visualEditor: document.getElementById('visualEditor'),
                 previewImage: document.getElementById('previewImage'),
+                previewTooltip: document.getElementById('previewTooltip'),
                 itemsContainer: document.getElementById('itemsContainer'),
                 addItemBtn: document.getElementById('addItemBtn'),
                 itemTemplate: document.getElementById('itemTemplate')
@@ -96,9 +125,8 @@
         }
 
         function setLoadingState(loading) {
-            if (elements.mainContainer) {
-                elements.mainContainer.classList.toggle('loading', loading);
-            }
+            elements.mainContainer.classList.toggle('loading', loading);
+            elements.loadingOverlay.classList.toggle('show', loading);
         }
 
         const updateStateFromUI = utils.debounce(() => {
@@ -114,14 +142,12 @@
                     newHotspots.push({
                         ...originalHotspot,
                         text: itemEl.querySelector('[data-field="text"]').value,
-                        tooltipPosition: itemEl.querySelector('.position-btn.selected')?.dataset.position || 'top-center',
-                        tooltipOffsetX: parseFloat(itemEl.querySelector('[data-field="tooltipOffsetX"]').value),
-                        tooltipOffsetY: parseFloat(itemEl.querySelector('[data-field="tooltipOffsetY"]').value)
+                        tooltipPlacement: itemEl.querySelector('.placement-btn.selected')?.dataset.value || 'top',
+                        tooltipOffset: parseInt(itemEl.querySelector('[data-field="offset"]').value, 10)
                     });
                 }
             });
             state.blockData.hotspots = newHotspots;
-
             refreshPreview();
         }, moduleConfig.debounceDelay);
         
@@ -140,15 +166,14 @@
                 el.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
                 el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
                 el.querySelector('[data-field="text"]').value = hotspot.text;
-
-                el.querySelectorAll('.position-btn').forEach(btn => btn.classList.toggle('selected', btn.dataset.position === hotspot.tooltipPosition));
                 
-                const offsetXSlider = el.querySelector('[data-field="tooltipOffsetX"]');
-                const offsetYSlider = el.querySelector('[data-field="tooltipOffsetY"]');
-                offsetXSlider.value = hotspot.tooltipOffsetX;
-                offsetYSlider.value = hotspot.tooltipOffsetY;
-                el.querySelector('[data-field-value="tooltipOffsetX"]').textContent = `${hotspot.tooltipOffsetX}px`;
-                el.querySelector('[data-field-value="tooltipOffsetY"]').textContent = `${hotspot.tooltipOffsetY}px`;
+                el.querySelector('.placement-btn.selected')?.classList.remove('selected');
+                el.querySelector(`.placement-btn[data-value="${hotspot.tooltipPlacement}"]`)?.classList.add('selected');
+
+                const offsetSlider = el.querySelector('[data-field="offset"]');
+                const offsetValue = el.querySelector('[data-field-value="offset"]');
+                offsetSlider.value = hotspot.tooltipOffset;
+                offsetValue.textContent = `${hotspot.tooltipOffset}px`;
 
                 el.querySelector('.move-up-btn').disabled = (index === 0);
                 el.querySelector('.move-down-btn').disabled = (hotspots.length === 1 || index === hotspots.length - 1);
@@ -156,8 +181,9 @@
                 elements.itemsContainer.appendChild(fragment);
             });
 
-            // THE UX FIX: Render markers AND live tooltip preview
-            elements.visualEditor.querySelectorAll('.hotspot-marker, .tooltip-preview').forEach(m => m.remove());
+            elements.visualEditor.querySelectorAll('.hotspot-marker').forEach(m => m.remove());
+            elements.previewTooltip.style.display = 'none';
+
             hotspots.forEach(hotspot => {
                 const marker = document.createElement('div');
                 marker.className = 'hotspot-marker';
@@ -168,62 +194,37 @@
                 elements.visualEditor.appendChild(marker);
 
                 if (hotspot.id === state.selectedHotspotId) {
-                    const tooltip = document.createElement('div');
-                    tooltip.className = 'tooltip-preview';
-                    tooltip.textContent = hotspot.text || 'Tooltip';
-                    const styles = getTooltipPositionStyles(hotspot.tooltipPosition, hotspot.tooltipOffsetX, hotspot.tooltipOffsetY, true);
-                    Object.assign(tooltip.style, styles, { left: `${hotspot.posX}%`, top: `${hotspot.posY}%` });
-                    elements.visualEditor.appendChild(tooltip);
+                    elements.previewTooltip.style.cssText = `display:block; left:${hotspot.posX}%; top:${hotspot.posY}%;`;
+                    elements.previewTooltip.innerHTML = `<div style="position:absolute; ${getTooltipStyles(hotspot.tooltipPlacement, hotspot.tooltipOffset)}">${hotspot.text || 'Tooltip'}</div>`;
                 }
             });
         }
         
-        function getTooltipPositionStyles(position, offsetX, offsetY, isEditor = false) {
-            const gap = isEditor ? '5px' : '10px';
-            const styles = { transform: `translate(${offsetX}px, ${offsetY}px)` };
-            switch (position) {
-                case 'top-left': Object.assign(styles, { right: `calc(100% + ${gap})`, bottom: `calc(50% + ${gap})` }); break;
-                case 'top-center': Object.assign(styles, { left: '50%', bottom: `calc(100% + ${gap})`, transform: `translateX(-50%) translate(${offsetX}px, ${offsetY}px)` }); break;
-                case 'top-right': Object.assign(styles, { left: `calc(100% + ${gap})`, bottom: `calc(50% + ${gap})` }); break;
-                case 'middle-left': Object.assign(styles, { top: '50%', right: `calc(100% + ${gap})`, transform: `translateY(-50%) translate(${offsetX}px, ${offsetY}px)` }); break;
-                case 'middle-right': Object.assign(styles, { top: '50%', left: `calc(100% + ${gap})`, transform: `translateY(-50%) translate(${offsetX}px, ${offsetY}px)` }); break;
-                case 'bottom-left': Object.assign(styles, { top: `calc(50% + ${gap})`, right: `calc(100% + ${gap})` }); break;
-                case 'bottom-center': Object.assign(styles, { left: '50%', top: `calc(100% + ${gap})`, transform: `translateX(-50%) translate(${offsetX}px, ${offsetY}px)` }); break;
-                case 'bottom-right': Object.assign(styles, { top: `calc(50% + ${gap})`, left: `calc(100% + ${gap})` }); break;
-                default: Object.assign(styles, { left: '50%', top: '50%', transform: `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)` }); break; // middle-center
-            }
-            return styles;
-        }
-
         function generateTemplate() {
             const bgImg = utils.getFieldValue('backgroundImageUrl');
             const fallbackImg = utils.getFieldValue('fallbackImageUrl');
             const fallbackLink = utils.getFieldValue('fallbackLinkUrl');
             const hotspots = utils.getFieldValue('hotspots');
 
-            const interactiveHotspots = hotspots.map((h, i) => {
-                const pos = getTooltipPositionStyles(h.tooltipPosition, h.tooltipOffsetX, h.tooltipOffsetY);
-                const styleString = Object.entries(pos).map(([key, value]) => `${key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)}:${value}`).join(';');
-                return `
+            const interactiveHotspots = hotspots.map((h, i) => `
             <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; z-index: ${i+1};">
-              <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
-              <div class="tooltip-wrapper" style="position: absolute; ${styleString}; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px;">
+              <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px; transform: translate(-50%, -50%);" width="36">
+              <div class="tooltip-wrapper" style="position: absolute; ${getTooltipStyles(h.tooltipPlacement, h.tooltipOffset)} width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px;">
                 <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase;">${h.text}</span>
               </div>
-            </div>`;
-            }).join('');
+            </div>`).join('');
 
-            const fallbackItems = hotspots.map(h => `
-                   <tr><td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block;" width="20"></td><td style="width: 12px; padding-bottom: 8px;"> </td><td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; line-height: 24px; text-align: left; padding-bottom: 8px;">${h.text}</td></tr>`).join('');
+            const fallbackItems = hotspots.map(h => `<tr><td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block;" width="20"></td><td style="width: 12px; padding-bottom: 8px;"> </td><td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; line-height: 24px; text-align: left;">${h.text}</td></tr>`).join('');
 
             return `<style type="text/css">.hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; }</style>
             <!--[if !mso]><!--><div class="interactive-hotspots" style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div><!--<![endif]-->
-            <!--[if mso]><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 620px; background-color: #DB021d;"><tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; height: auto;" width="620"></a></td></tr><tr><td style="padding: 0 20px;"><div style="height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="height: 20px;"> </div></td></tr></table><![endif]-->`;
+            <!--[if mso]><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 620px; background-color: #DB021d;"><tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width:100%; max-width:620px; height:auto;" width="620"></a></td></tr><tr><td style="padding: 0 20px;"><div style="font-size: 20px; height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="font-size: 20px; height: 20px;"> </div></td></tr></table><![endif]-->`;
         }
 
         function refreshPreview() {
             if (!state.sdk) return;
             try {
+                updateUI();
                 const html = generateTemplate();
                 state.sdk.setContent(html);
                 state.sdk.setData({ ...state.blockData, content: html });
@@ -231,29 +232,39 @@
         }
 
         function initializeEventHandlers() {
-            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => input.addEventListener('input', updateStateFromUI));
+            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
+                input.addEventListener('input', updateStateFromUI);
+            });
 
             elements.addItemBtn.addEventListener('click', () => {
-                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosition: 'top-center', tooltipOffsetX: 0, tooltipOffsetY: 0 };
+                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPlacement: 'top', tooltipOffset: 10 };
                 state.blockData.hotspots.push(newHotspot);
                 state.selectedHotspotId = newHotspot.id;
-                updateUI();
-                updateStateFromUI();
+                refreshPreview();
             });
 
             elements.visualEditor.addEventListener('click', (e) => {
                 const targetIsMarker = e.target.classList.contains('hotspot-marker');
-                if (!state.selectedHotspotId && !targetIsMarker) { alert('Please select a hotspot from the list below before placing it.'); return; }
-                if (targetIsMarker) { if (state.selectedHotspotId !== e.target.dataset.id) { state.selectedHotspotId = e.target.dataset.id; updateUI(); } return; }
+                if (targetIsMarker) {
+                    state.selectedHotspotId = e.target.dataset.id;
+                    refreshPreview();
+                    return;
+                }
+                if (!state.selectedHotspotId) {
+                    alert('Please select a hotspot from the list below before placing it.');
+                    return;
+                }
                 const rect = elements.previewImage.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                const posX = (x / rect.width) * 100;
+                const posY = (y / rect.height) * 100;
+
                 const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
                 if (hotspot) {
-                    hotspot.posX = parseFloat(((x / rect.width) * 100).toFixed(2));
-                    hotspot.posY = parseFloat(((y / rect.height) * 100).toFixed(2));
-                    updateUI();
-                    updateStateFromUI();
+                    hotspot.posX = parseFloat(posX.toFixed(2));
+                    hotspot.posY = parseFloat(posY.toFixed(2));
+                    refreshPreview();
                 }
             });
             
@@ -261,42 +272,35 @@
                 const itemEl = e.target.closest('.item');
                 if (!itemEl) return;
                 const id = itemEl.dataset.id;
-                const isControlButton = e.target.closest('.item-control-btn, .position-btn');
-
-                if (isControlButton) {
-                    let dataChanged = false;
-                    const hotspotIndex = state.blockData.hotspots.findIndex(h => h.id === id);
-                    if (hotspotIndex === -1) return;
-
+                
+                if (e.target.closest('.item-control-btn') || e.target.closest('.placement-selector')) {
                     if (e.target.closest('.remove-btn')) {
-                        state.blockData.hotspots.splice(hotspotIndex, 1);
+                        state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
                         if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
-                        dataChanged = true;
-                    } else if (e.target.closest('.move-up-btn') && hotspotIndex > 0) {
-                        [state.blockData.hotspots[hotspotIndex], state.blockData.hotspots[hotspotIndex - 1]] = [state.blockData.hotspots[hotspotIndex - 1], state.blockData.hotspots[hotspotIndex]];
-                        dataChanged = true;
-                    } else if (e.target.closest('.move-down-btn') && hotspotIndex < state.blockData.hotspots.length - 1) {
-                        [state.blockData.hotspots[hotspotIndex], state.blockData.hotspots[hotspotIndex + 1]] = [state.blockData.hotspots[hotspotIndex + 1], state.blockData.hotspots[hotspotIndex]];
-                        dataChanged = true;
-                    } else if (e.target.closest('.position-btn')) {
-                        state.blockData.hotspots[hotspotIndex].tooltipPosition = e.target.dataset.position;
-                        state.blockData.hotspots[hotspotIndex].tooltipOffsetX = 0; // Reset offsets
-                        state.blockData.hotspots[hotspotIndex].tooltipOffsetY = 0;
-                        dataChanged = true;
+                    } else if (e.target.closest('.move-up-btn')) {
+                        const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                        if (index > 0) [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]];
+                    } else if (e.target.closest('.move-down-btn')) {
+                        const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                        if (index < state.blockData.hotspots.length - 1) [state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]];
                     }
-                    if (dataChanged) { updateUI(); updateStateFromUI(); }
-                } else if (state.selectedHotspotId !== id) {
                     state.selectedHotspotId = id;
-                    updateUI();
+                    updateStateFromUI(); // This now handles placement button changes too.
+                } else {
+                    if (state.selectedHotspotId !== id) {
+                        state.selectedHotspotId = id;
+                        updateUI();
+                    }
                 }
             });
 
             elements.itemsContainer.addEventListener('input', (e) => {
                 const itemEl = e.target.closest('.item');
                 if (!itemEl) return;
-                if (e.target.type === 'range') {
-                    itemEl.querySelector(`[data-field-value="${e.target.dataset.field}"]`).textContent = `${e.target.value}px`;
-                    updateUI(); // Re-render live tooltip preview
+                
+                if(e.target.type === 'range') {
+                    const valueEl = itemEl.querySelector(`[data-field-value="${e.target.dataset.field}"]`);
+                    if(valueEl) valueEl.textContent = `${e.target.value}px`;
                 }
                 updateStateFromUI();
             });
@@ -320,9 +324,15 @@
                     }
                 });
                 state.blockData = newBlockData;
-                if(state.blockData.hotspots) { state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); }); }
-                if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) { state.selectedHotspotId = state.blockData.hotspots[0].id; }
-                updateUI();
+                
+                if(state.blockData.hotspots) {
+                    state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); });
+                }
+
+                if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) {
+                    state.selectedHotspotId = state.blockData.hotspots[0].id;
+                }
+
                 refreshPreview();
                 setLoadingState(false);
             });
@@ -340,7 +350,8 @@
                 setLoadingState(false);
             }
         }
-        document.addEventListener('DOMContentLoaded', initialize);
+
+        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
     </script>
 </body>
 </html>
