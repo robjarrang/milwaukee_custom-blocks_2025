@@ -120,7 +120,6 @@
             elements.itemTemplate = document.getElementById('itemTemplate');
         }
 
-        // THE FIX: The missing setLoadingState function has been re-added here.
         function setLoadingState(loading) {
             if (elements.mainContainer && elements.loadingOverlay) {
                 elements.mainContainer.classList.toggle('loading', loading);
@@ -284,25 +283,48 @@
                 }
             });
             
+            // THE FIX: This event handler is now more intelligent.
             elements.itemsContainer.addEventListener('click', (e) => {
                 const itemEl = e.target.closest('.item');
                 if (!itemEl) return;
                 const id = itemEl.dataset.id;
                 
-                state.selectedHotspotId = id;
-                
-                if (e.target.closest('.remove-btn')) {
-                    state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
-                    if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
-                } else if (e.target.closest('.move-up-btn')) {
-                    const index = state.blockData.hotspots.findIndex(h => h.id === id);
-                    if (index > 0) [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]];
-                } else if (e.target.closest('.move-down-btn')) {
-                    const index = state.blockData.hotspots.findIndex(h => h.id === id);
-                    if (index < state.blockData.hotspots.length - 1) [state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]];
+                const isControlButton = e.target.closest('.item-control-btn');
+
+                // If a control button was clicked, handle the action.
+                if (isControlButton) {
+                    let dataChanged = false;
+                    if (e.target.closest('.remove-btn')) {
+                        state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
+                        if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
+                        dataChanged = true;
+                    } else if (e.target.closest('.move-up-btn')) {
+                        const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                        if (index > 0) {
+                            [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]];
+                            dataChanged = true;
+                        }
+                    } else if (e.target.closest('.move-down-btn')) {
+                        const index = state.blockData.hotspots.findIndex(h => h.id === id);
+                        if (index < state.blockData.hotspots.length - 1) {
+                            [state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]];
+                            dataChanged = true;
+                        }
+                    }
+
+                    if (dataChanged) {
+                        updateUI();
+                        updateStateFromUI();
+                    }
+                    return; // Stop processing after a button click.
                 }
-                updateUI();
-                updateStateFromUI();
+
+                // If it wasn't a button, it's a click to select the item.
+                // Only re-render the UI if the selection has actually changed.
+                if (state.selectedHotspotId !== id) {
+                    state.selectedHotspotId = id;
+                    updateUI(); // Re-render to show the new selection highlight.
+                }
             });
 
             elements.itemsContainer.addEventListener('input', (e) => {
