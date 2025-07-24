@@ -219,8 +219,9 @@
             let fallbackLinkUrl = utils.getFieldValue('fallbackLinkUrl');
             let fallbackAltText = utils.getFieldValue('fallbackAltText');
 
-            if (!fallbackImageUrl) {
-                const firstSlide = slides[0] || {};
+            // Fallback logic remains the same: default to the first slide if fields are empty
+            if (!fallbackImageUrl && slides.length > 0) {
+                const firstSlide = slides[0];
                 fallbackImageUrl = firstSlide.imageUrl || '';
                 fallbackLinkUrl = firstSlide.linkUrl || '#';
                 fallbackAltText = firstSlide.altText || '';
@@ -228,12 +229,13 @@
 
             const slideCount = slides.length;
             const carouselSlidesWidth = slideCount * 100;
-            const carouselSlideWidth = (100 / slideCount).toFixed(2);
+            // FIX 1: Use the raw calculation for better precision, matching AMPscript's output more closely.
+            const carouselSlideWidth = 100 / slideCount; 
             
-            const radioInputs = slides.map((s, i) => `<input type="radio" name="carousel" id="slide${i + 1}" ${i === 0 ? 'checked="checked"' : ''} style="display: none !important; mso-hide: all !important;">`).join('\n');
-            const slideDivs = slides.map(s => `<div class="carousel-slide"><a href="${s.linkUrl || '#'}" target="_blank"><img src="${s.imageUrl || ''}" alt="${s.altText || ''}" width="620" height="350" style="display: block; width: 100%; height: 100%;"></a></div>`).join('\n');
-            const arrowLabels = Array.from({length: slideCount}, (_, i) => `<label for="slide${i + 1}" class="arrow-left"></label>\n<label for="slide${i + 1}" class="arrow-right"></label>`).join('\n');
-            const dotLabels = Array.from({length: slideCount}, (_, i) => `<label for="slide${i + 1}"></label>`).join('\n');
+            const radioInputs = slides.map((s, i) => `<input type="radio" name="carousel" id="slide${i + 1}" ${i === 0 ? 'checked="checked"' : ''} style="display: none !important; mso-hide: all !important;">`).join('\n        ');
+            const slideDivs = slides.map(s => `<div class="carousel-slide"><a href="${s.linkUrl || '#'}" target="_blank"><img src="${s.imageUrl || ''}" alt="${s.altText || ''}" width="620" height="350" style="display: block; width: 100%; height: 100%;"></a></div>`).join('\n            ');
+            const arrowLabels = Array.from({length: slideCount}, (_, i) => `<label for="slide${i + 1}" class="arrow-left"></label>\n            <label for="slide${i + 1}" class="arrow-right"></label>`).join('\n          ');
+            const dotLabels = Array.from({length: slideCount}, (_, i) => `<label for="slide${i + 1}"></label>`).join('\n            ');
 
             const dynamicCSS = slides.map((s, i) => {
                 const slideNum = i + 1;
@@ -241,80 +243,258 @@
                 const prevSlide = slideNum - 1;
                 const nextSlide = slideNum + 1;
                 return `
-                    #slide${slideNum}:checked ~ .carousel-container .carousel-slides { transform: translateX(-${transformX}%); -webkit-transform: translateX(-${transformX}%); }
-                    ${slideNum > 1 ? `#slide${slideNum}:checked ~ .carousel-container .arrow-controls .arrow-left[for="slide${prevSlide}"] { display: block; }` : ''}
-                    ${slideNum < slideCount ? `#slide${slideNum}:checked ~ .carousel-container .arrow-controls .arrow-right[for="slide${nextSlide}"] { display: block; }` : ''}
-                    #slide${slideNum}:checked ~ .carousel-container .progress-dots label[for="slide${slideNum}"] { background-color: #DB021D; border-color: rgba(0, 0, 0, 0.5); }
-                `;
-            }).join('\n');
+      #slide${slideNum}:checked ~ .carousel-container .carousel-slides {
+        transform: translateX(-${transformX}%);
+        -webkit-transform: translateX(-${transformX}%);
+      }
+      ${slideNum > 1 ? `
+      #slide${slideNum}:checked ~ .carousel-container .arrow-controls .arrow-left[for="slide${prevSlide}"] { display: block; }` : ''}
+      ${slideNum < slideCount ? `
+      #slide${slideNum}:checked ~ .carousel-container .arrow-controls .arrow-right[for="slide${nextSlide}"] { display: block; }` : ''}
+
+      #slide${slideNum}:checked ~ .carousel-container .progress-dots label[for="slide${slideNum}"] {
+        /* FIX 2: Corrected the active dot color to match the original. */
+        background-color: #D3D810;
+        border-color: rgba(0, 0, 0, 0.5);
+      }
+    `;
+            }).join('');
 
             return `
-            <!--[if !mso]><!-->
-            <style type="text/css">
-                body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-                img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
-                input[type="radio"] { display: none !important; mso-hide: all !important; }
-                @media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } }
-                @media screen and (-webkit-min-device-pixel-ratio: 0) {
-                    .fallback { display: none !important; }
-                    .carousel-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
-                    .carousel-container { position: relative; overflow: hidden; width: 620px; height: 350px; }
-                    .carousel-slides { position: relative; width: ${carouselSlidesWidth}%; height: 100%; transition: transform 0.5s ease-in-out; -webkit-transition: -webkit-transform 0.5s ease-in-out; }
-                    .carousel-slide { float: left; width: ${carouselSlideWidth}%; height: 100%; }
-                    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-                    .arrow-controls { position: absolute; top: 50%; width: 100%; margin-top: -25px; pointer-events: none; }
-                    .arrow-controls label { display: none; position: absolute; width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; cursor: pointer; pointer-events: all; transition: background-color 0.3s; }
-                    .arrow-controls label:hover { background-color: rgba(0, 0, 0, 0.7); }
-                    .arrow-controls label:before { content: ''; position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -4px; border-top: 3px solid #ffffff; border-right: 3px solid #ffffff; }
-                    .arrow-left { left: 20px; }
-                    .arrow-left:before { transform: rotate(-135deg); -webkit-transform: rotate(-135deg); }
-                    .arrow-right { right: 20px; }
-                    .arrow-right:before { transform: rotate(45deg); -webkit-transform: rotate(45deg); margin-left: -8px !important; }
-                    .progress-dots { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; }
-                    .progress-dots label { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.5); margin: 0 5px; cursor: pointer; transition: background-color 0.3s; border: 2px solid rgba(0, 0, 0, 0.3); }
-                    .progress-dots label:hover { background-color: rgba(255, 255, 255, 0.8); }
-                    ${dynamicCSS}
-                    @media only screen and (max-width: 620px) {
-                        .carousel-container { width: 100% !important; height: auto !important; }
-                        .carousel-container img { height: auto !important; }
-                    }
-                }
-                #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
-                #MessageViewBody .carousel-wrapper, body.MsgBody .carousel-wrapper { display: none !important; }
-                [class~="x_carousel-wrapper"] { display: none !important; }
-                [class~="x_fallback"] { display: block !important; }
-            </style>
-            <!--<![endif]-->
-            <style type="text/css"> .carousel-wrapper\0 { display: none !important; } .fallback\0 { display: block !important; } </style>
+<!--[if !mso]><!-->
+<style type="text/css">
+/* Reset styles */
+body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+
+/* Hide radio buttons */
+input[type="radio"] {
+    display: none !important;
+    mso-hide: all !important;
+}
+
+/* Mobile responsive styles */
+@media screen and (max-width: 580px) {
+    .content-outer {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* Interactive carousel styles for supporting clients */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* Hide fallback content */
+    .fallback {
+        display: none !important;
+    }
+    
+    /* Show carousel */
+    .carousel-wrapper {
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    
+    .carousel-container {
+        position: relative;
+        overflow: hidden;
+        width: 620px;
+        height: 350px;
+    }
+    
+    /* Carousel slides container */
+    .carousel-slides {
+        position: relative;
+        width: ${carouselSlidesWidth}%;
+        height: 100%;
+        transition: transform 0.5s ease-in-out;
+        -webkit-transition: -webkit-transform 0.5s ease-in-out;
+    }
+    
+    /* Individual slides */
+    .carousel-slide {
+        float: left;
+        width: ${carouselSlideWidth}%;
+        height: 100%;
+    }
+    
+    .carousel-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    /* Arrow controls */
+    .arrow-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        margin-top: -25px;
+        pointer-events: none;
+    }
+    
+    .arrow-controls label {
+        display: none;
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: all;
+        transition: background-color 0.3s;
+    }
+    
+    .arrow-controls label:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    /* Arrow icons */
+    .arrow-controls label:before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 12px;
+        height: 12px;
+        margin: -6px 0 0 -4px;
+        border-top: 3px solid #ffffff;
+        border-right: 3px solid #ffffff;
+    }
+    
+    .arrow-left {
+        left: 20px;
+    }
+    
+    .arrow-left:before {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+    }
+    
+    .arrow-right {
+        right: 20px;
+    }
+    
+    .arrow-right:before {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        margin-left: -8px !important;
+    }
+    
+    /* Progress dots */
+    .progress-dots {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
+    
+    .progress-dots label {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.5);
+        margin: 0 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        border: 2px solid rgba(0, 0, 0, 0.3);
+    }
+    
+    .progress-dots label:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* --- DYNAMIC CSS GENERATED BY JAVASCRIPT --- */
+    ${dynamicCSS}
+    /* --- END DYNAMIC CSS --- */
+
+    @media only screen and (max-width: 620px) {
+        .carousel-container {
+            width: 100% !important;
+            height: auto !important;
+        }
+        
+        .carousel-container img {
+            height: auto !important;
+        }
+    }
+}
+
+/* Hide carousel from problematic clients */
+#MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
+#MessageViewBody .carousel-wrapper, body.MsgBody .carousel-wrapper { display: none !important; }
+
+/* Outlook.com specific targeting */
+[class~="x_carousel-wrapper"] { display: none !important; }
+[class~="x_fallback"] { display: block !important; }
+
+/* FIX 3: Added the missing Yahoo-specific media query. */
+@media screen yahoo {
+    .fallback { display: block !important; max-height: none !important; }
+    .carousel-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
+}
+</style>
+<!--<![endif]-->
+<!-- Separate style block for Outlook.com \\0 hack -->
+<style type="text/css">
+.carousel-wrapper\\0 { display: none !important; }
+.fallback\\0 { display: block !important; }
+</style>
+
+<!-- Full Width Image Carousel -->
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="width: 620px;">
+  <tr>
+    <td align="center" style="padding: 0;" valign="top">
+      
+      <!-- Interactive Carousel with Arrows -->
+      <!--[if !mso]><!-->
+      <div class="carousel-wrapper" style="display: none; max-height: 0; overflow: hidden;">
+        
+        <!-- Radio buttons for slide control (DYNAMIC) -->
+        ${radioInputs}
+
+        <div class="carousel-container">
+          <div class="carousel-slides">
             
-            <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="width: 620px;">
-              <tr>
-                <td align="center" style="padding: 0;" valign="top">
-                  <!--[if !mso]><!-->
-                  <div class="carousel-wrapper" style="display: none; max-height: 0; overflow: hidden;">
-                    ${radioInputs}
-                    <div class="carousel-container">
-                      <div class="carousel-slides">${slideDivs}</div>
-                      <div class="arrow-controls">${arrowLabels}</div>
-                      <div class="progress-dots">${dotLabels}</div>
-                    </div>
-                  </div>
-                  <!--<![endif]-->
-                  <div class="fallback">
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
-                      <tr>
-                        <td align="center" style="padding: 0;">
-                          <a href="${fallbackLinkUrl}" target="_blank">
-                            <img src="${fallbackImageUrl}" alt="${fallbackAltText}" width="620" height="350" style="display: block; width: 100%; max-width: 620px; height: auto;">
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-            </table>`;
+            <!-- Slides (DYNAMIC) -->
+            ${slideDivs}
+
+          </div>
+          
+          <!-- Arrow Controls (DYNAMIC) -->
+          <div class="arrow-controls">
+            ${arrowLabels}
+          </div>
+          
+          <!-- Progress Dots (DYNAMIC) -->
+          <div class="progress-dots">
+            ${dotLabels}
+          </div>
+
+        </div>
+      </div>
+      <!--<![endif]-->
+      
+      <!-- Fallback Content (Shown by default) - Single Hero Image -->
+      <div class="fallback">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+          <tr>
+            <td align="center" style="padding: 0;">
+              <a href="${fallbackLinkUrl}" target="_blank">
+                <img src="${fallbackImageUrl}" alt="${fallbackAltText}" width="620" height="350" style="display: block; width: 100%; max-width: 620px; height: auto;">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+    </td>
+  </tr>
+</table>`;
         }
 
         function refreshPreview() {
