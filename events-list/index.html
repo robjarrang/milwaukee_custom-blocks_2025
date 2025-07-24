@@ -360,11 +360,7 @@
             }
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeWithRetry);
-        } else {
-            initializeWithRetry();
-        }
+        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
     </script>
 </body>
 </html>
