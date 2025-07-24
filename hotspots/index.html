@@ -120,6 +120,14 @@
             elements.itemTemplate = document.getElementById('itemTemplate');
         }
 
+        // THE FIX: The missing setLoadingState function has been re-added here.
+        function setLoadingState(loading) {
+            if (elements.mainContainer && elements.loadingOverlay) {
+                elements.mainContainer.classList.toggle('loading', loading);
+                elements.loadingOverlay.classList.toggle('show', loading);
+            }
+        }
+
         const updateStateFromUI = utils.debounce(() => {
             state.blockData.backgroundImageUrl = elements.backgroundImageUrl.value;
             state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
@@ -313,17 +321,13 @@
             setLoadingState(true);
             state.sdk.getData((data) => {
                 const newBlockData = {};
-                // THE FIX: Loop through configured fields to populate the state.
                 Object.keys(moduleConfig.fields).forEach(key => {
                     const savedValue = data && data[key];
                     if (savedValue !== undefined) {
-                        // Use saved data if it exists.
                         newBlockData[key] = savedValue;
                     } else {
-                        // Otherwise, use the default, creating a fresh copy for arrays.
                         const defaultValue = moduleConfig.fields[key].defaultValue;
                         if (Array.isArray(defaultValue)) {
-                            // Create a deep copy with NEW unique IDs for each hotspot.
                             newBlockData[key] = defaultValue.map(item => ({ ...item, id: crypto.randomUUID() }));
                         } else {
                             newBlockData[key] = defaultValue;
@@ -332,12 +336,10 @@
                 });
                 state.blockData = newBlockData;
                 
-                // Ensure IDs are present on loaded data as a fallback.
                 if(state.blockData.hotspots) {
                     state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); });
                 }
 
-                // Set initial selection
                 if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) {
                     state.selectedHotspotId = state.blockData.hotspots[0].id;
                 }
