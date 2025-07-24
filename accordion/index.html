@@ -79,7 +79,6 @@
                 temp.innerHTML = html;
                 temp.querySelectorAll('script, style').forEach(el => el.remove());
                 
-                // Style links to match Milwaukee brand and ensure they work in email
                 temp.querySelectorAll('a').forEach(link => {
                     link.style.color = '#ffffff';
                     link.style.textDecoration = 'underline';
@@ -87,7 +86,6 @@
                     if (!link.hasAttribute('target')) link.setAttribute('target', '_blank');
                 });
                 
-                // Quill often wraps content in <p> tags. We remove them for cleaner email code.
                 return temp.innerHTML.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             }
         };
@@ -125,7 +123,6 @@
             const items = utils.getFieldValue('accordionItems');
             elements.itemsContainer.innerHTML = '';
             
-            // Clean up any stale editor instances
             const currentIds = new Set(items.map(i => i.id));
             for (const id in state.editors) { if (!currentIds.has(id)) delete state.editors[id]; }
 
@@ -143,12 +140,11 @@
                 
                 elements.itemsContainer.appendChild(fragment);
 
-                // Initialize Quill on the new element
                 const editor = new Quill(editorDiv, {
                     theme: 'snow',
                     modules: { 
                         toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false } // Important for clean paste
+                        clipboard: { matchVisual: false }
                     },
                     formats: ['bold', 'script', 'link'],
                     placeholder: 'Enter content here...'
@@ -168,7 +164,6 @@
             });
 
             elements.itemsContainer.addEventListener('input', e => {
-                // Handle title input separately from Quill
                 if(e.target.matches('[data-field="title"]')) {
                     updateDataFromUI();
                 }
@@ -184,7 +179,7 @@
 
                 if (e.target.closest('.remove-btn')) {
                     items.splice(currentIndex, 1);
-                    delete state.editors[id]; // Clean up editor instance
+                    delete state.editors[id];
                     dataChanged = true;
                 } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
                     [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
@@ -195,7 +190,7 @@
                 }
                 
                 if (dataChanged) {
-                    renderItemsUI(); // Re-render to update order and button states
+                    renderItemsUI();
                     updateDataFromUI();
                 }
             });
@@ -245,7 +240,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
     .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
     .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
     .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; }
-    input[type="checkbox"]:checked ~ .accordion-title { background-color: #000000; }
+    /* REMOVED: The rule to change the background color on check has been deleted from here. */
     input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
     input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
     input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; transition: padding 0.5s ease-in; }
