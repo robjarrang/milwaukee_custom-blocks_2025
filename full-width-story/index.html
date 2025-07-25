@@ -76,10 +76,7 @@
                 <div class="field-group">
                     <label for="buttonText" class="field-label">Button Text</label>
                     <div id="buttonTextEditor" class="quill-container limited-toolbar"></div>
-                    <div class="field-group-inline">
-                        <label for="buttonFontSize" class="field-label">Button Font Size (px)</label>
-                        <input type="number" id="buttonFontSize" class="field-input" min="12" max="28" step="4">
-                    </div>
+                    <!-- Button Font Size Control has been removed -->
                 </div>
                 <div class="field-group">
                     <label for="buttonUrl" class="field-label">Button Link URL</label>
@@ -114,7 +111,7 @@
                 bodyFontSize: { type: 'number', defaultValue: 16 },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
-                buttonFontSize: { type: 'number', defaultValue: 16 },
+                // buttonFontSize removed
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 buttonAlignment: { type: 'text', defaultValue: 'left' }
             },
@@ -183,7 +180,7 @@
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
-            elements.buttonFontSize = document.getElementById('buttonFontSize');
+            // elements.buttonFontSize removed
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
@@ -230,7 +227,7 @@
         }
 
         function updateData(field, value) {
-            if (state.blockData[field] != value) { // Use != for loose comparison to handle numbers and strings
+            if (state.blockData[field] != value) {
                 state.blockData[field] = value;
                 refreshPreview();
             }
@@ -262,10 +259,10 @@
                 const buttonAlign = utils.getFieldValue('buttonAlignment');
                 const buttonUrl = utils.getFieldValue('buttonUrl');
                 const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
-                const buttonSize = utils.getFieldValue('buttonFontSize');
-                const buttonLineHeight = buttonSize + 12;
                 const buttonTableStyle = backgroundColor === 'black' ? `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;` : `background-color: #000000; border-radius: 4px !important;`;
-                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${buttonSize}px; font-weight: bold; line-height: ${buttonLineHeight}px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
+                
+                // Button font size and line height are now hardcoded
+                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
             return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}${titleHtml}${bodyHtml}${buttonHtml}<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .fw-lead -->`;
@@ -319,51 +316,31 @@
             setupToggle(elements.showTitle, elements.titleGroup, 'showTitle');
             setupToggle(elements.showButton, elements.buttonFieldsGroup, 'showButton');
 
-            // --- START: ROBUST NUMBER INPUT HANDLER ---
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
-                
-                // This handler corrects the value on blur (when user clicks away)
                 const correctValueOnBlur = (e) => {
                     const input = e.target;
                     let value = parseInt(input.value, 10);
                     const min = parseInt(input.min, 10);
                     const max = parseInt(input.max, 10);
-
-                    // If not a number, revert to the default
-                    if (isNaN(value)) {
-                        value = moduleConfig.fields[dataKey].defaultValue;
-                    }
-
-                    // Clamp the value within the min/max range
+                    if (isNaN(value)) { value = moduleConfig.fields[dataKey].defaultValue; }
                     value = Math.max(min, Math.min(value, max));
-
-                    // Round to the nearest multiple of the step
                     const correctedValue = Math.round(value / step) * step;
-                    
-                    // Update the input field and the block data
                     input.value = correctedValue;
-                    updateData(dataKey, correctedValue); // Use non-debounced for finality
+                    updateData(dataKey, correctedValue);
                 };
-
-                // This handler updates the preview live while typing
                 const liveUpdateOnInput = (e) => {
                     const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value)) {
-                        debouncedUpdateData(dataKey, value);
-                    }
+                    if (!isNaN(value)) { debouncedUpdateData(dataKey, value); }
                 };
-
                 inputElement.addEventListener('input', liveUpdateOnInput);
                 inputElement.addEventListener('blur', correctValueOnBlur);
-                
                 state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.bodyFontSize, 'bodyFontSize');
-            setupNumberInput(elements.buttonFontSize, 'buttonFontSize');
-            // --- END: ROBUST NUMBER INPUT HANDLER ---
+            // setupNumberInput for buttonFontSize removed
 
             const urlHandler = (e) => {
                 if (validateUrlInput(elements.buttonUrl, elements.buttonUrlError)) {
@@ -407,7 +384,6 @@
                     
                     if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
-                    if (elements.buttonFontSize) elements.buttonFontSize.value = utils.getFieldValue('buttonFontSize');
                     
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
                     Object.keys(state.editors).forEach(key => {
