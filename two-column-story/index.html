@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.column-wrapper{display:flex;gap:20px;flex-wrap:wrap}.column{flex:1;min-width:300px;background-color:#fafafa;padding:15px;border-radius:6px;border:1px solid #eee}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        
+        /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
+        .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
+        .field-group-inline .field-label { margin-bottom: 0; }
+        .field-group-inline .field-input { width: 80px; }
     </style>
 </head>
 <body>
@@ -60,14 +65,26 @@
                 <div class="field-group" id="left_subtitleGroup">
                     <label for="left_subtitle" class="field-label">Subtitle</label>
                     <input type="text" id="left_subtitle" class="field-input">
+                    <div class="field-group-inline">
+                        <label for="left_subtitleFontSize" class="field-label">Font Size (px)</label>
+                        <input type="number" id="left_subtitleFontSize" class="field-input" min="12" max="24" step="4">
+                    </div>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Title</label>
                     <div id="left_titleEditor" class="quill-container limited-toolbar"></div>
+                    <div class="field-group-inline">
+                        <label for="left_titleFontSize" class="field-label">Font Size (px)</label>
+                        <input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4">
+                    </div>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Description</label>
                     <div id="left_descriptionEditor" class="quill-container"></div>
+                    <div class="field-group-inline">
+                        <label for="left_descriptionFontSize" class="field-label">Font Size (px)</label>
+                        <input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4">
+                    </div>
                 </div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container">
@@ -118,14 +135,26 @@
                 <div class="field-group" id="right_subtitleGroup">
                     <label for="right_subtitle" class="field-label">Subtitle</label>
                     <input type="text" id="right_subtitle" class="field-input">
+                     <div class="field-group-inline">
+                        <label for="right_subtitleFontSize" class="field-label">Font Size (px)</label>
+                        <input type="number" id="right_subtitleFontSize" class="field-input" min="12" max="24" step="4">
+                    </div>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Title</label>
                     <div id="right_titleEditor" class="quill-container limited-toolbar"></div>
+                     <div class="field-group-inline">
+                        <label for="right_titleFontSize" class="field-label">Font Size (px)</label>
+                        <input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4">
+                    </div>
                 </div>
                  <div class="field-group">
                     <label class="field-label">Description</label>
                     <div id="right_descriptionEditor" class="quill-container"></div>
+                     <div class="field-group-inline">
+                        <label for="right_descriptionFontSize" class="field-label">Font Size (px)</label>
+                        <input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4">
+                    </div>
                 </div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container">
@@ -156,7 +185,6 @@
     <script>
         'use strict';
         
-        // Module configuration
         const moduleConfig = {
             name: '2 Column Story',
             fields: {
@@ -167,8 +195,11 @@
                 left_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 left_showSubtitle: { type: 'boolean', defaultValue: true },
                 left_subtitle: { type: 'text', defaultValue: 'M12 FHAC16-502X', maxLength: 80 },
+                left_subtitleFontSize: { type: 'number', defaultValue: 16 },
                 left_title: { type: 'richtext', defaultValue: 'Left Column Title', maxLength: 100 },
+                left_titleFontSize: { type: 'number', defaultValue: 20 },
                 left_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', maxLength: 250 },
+                left_descriptionFontSize: { type: 'number', defaultValue: 16 },
                 left_showButton: { type: 'boolean', defaultValue: true },
                 left_buttonText: { type: 'text', defaultValue: 'Learn More', maxLength: 40 },
                 left_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -178,8 +209,11 @@
                 right_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 right_showSubtitle: { type: 'boolean', defaultValue: true },
                 right_subtitle: { type: 'text', defaultValue: 'M12 SIM-0', maxLength: 80 },
+                right_subtitleFontSize: { type: 'number', defaultValue: 16 },
                 right_title: { type: 'richtext', defaultValue: 'Right Column Title', maxLength: 100 },
+                right_titleFontSize: { type: 'number', defaultValue: 20 },
                 right_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', maxLength: 250 },
+                right_descriptionFontSize: { type: 'number', defaultValue: 16 },
                 right_showButton: { type: 'boolean', defaultValue: true },
                 right_buttonText: { type: 'text', defaultValue: 'Find Out More', maxLength: 40 },
                 right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
@@ -214,9 +248,7 @@
                 temp.querySelectorAll('script, style').forEach(el => el.remove());
                 const allElements = temp.getElementsByTagName('*');
                 for (let el of allElements) {
-                    for (let attr of el.attributes) {
-                        if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
-                    }
+                    for (let attr of el.attributes) { if (attr.name.startsWith('on')) el.removeAttribute(attr.name); }
                 }
                 return temp.innerHTML;
             },
@@ -230,7 +262,12 @@
                 console.error(`${moduleConfig.name} Error:`, message);
             },
             getFieldValue(fieldName) {
-                return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue;
+                const value = state.blockData[fieldName];
+                const fieldConfig = moduleConfig.fields[fieldName];
+                if (value !== undefined && value !== null) {
+                    return fieldConfig.type === 'number' ? parseFloat(value) : value;
+                }
+                return fieldConfig.defaultValue;
             }
         };
 
@@ -250,8 +287,11 @@
                 elements[p + 'showSubtitle'] = document.getElementById(p + 'showSubtitle');
                 elements[p + 'subtitleGroup'] = document.getElementById(p + 'subtitleGroup');
                 elements[p + 'subtitle'] = document.getElementById(p + 'subtitle');
+                elements[p + 'subtitleFontSize'] = document.getElementById(p + 'subtitleFontSize'); // NEW
                 elements[p + 'titleEditor'] = document.getElementById(p + 'titleEditor');
+                elements[p + 'titleFontSize'] = document.getElementById(p + 'titleFontSize'); // NEW
                 elements[p + 'descriptionEditor'] = document.getElementById(p + 'descriptionEditor');
+                elements[p + 'descriptionFontSize'] = document.getElementById(p + 'descriptionFontSize'); // NEW
                 elements[p + 'showButton'] = document.getElementById(p + 'showButton');
                 elements[p + 'buttonFieldsGroup'] = document.getElementById(p + 'buttonFieldsGroup');
                 elements[p + 'buttonText'] = document.getElementById(p + 'buttonText');
@@ -271,35 +311,24 @@
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             const prefixes = ['left_', 'right_'];
-            
             prefixes.forEach(p => {
                 try {
-                    state.editors[p + 'title'] = new Quill(elements[p + 'titleEditor'], {
-                        theme: 'snow', modules: { toolbar: [['bold']], clipboard: { matchVisual: false } },
-                        formats: ['bold'], placeholder: 'Enter title...'
-                    });
-                    state.editors[p + 'description'] = new Quill(elements[p + 'descriptionEditor'], {
-                        theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } },
-                        formats: ['bold', 'italic', 'link'], placeholder: 'Enter description...'
-                    });
-
+                    state.editors[p + 'title'] = new Quill(elements[p + 'titleEditor'], { theme: 'snow', modules: { toolbar: [['bold']], clipboard: { matchVisual: false } }, formats: ['bold'], placeholder: 'Enter title...' });
+                    state.editors[p + 'description'] = new Quill(elements[p + 'descriptionEditor'], { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter description...' });
                     ['title', 'description'].forEach(type => {
                         const editor = state.editors[p + type];
                         const fieldName = p + type;
-                        const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                        const debouncedUpdate = utils.debounce((d, o, source) => {
                             if (source === 'user') updateData(fieldName, utils.sanitizeHtml(editor.root.innerHTML));
                         }, moduleConfig.debounceDelay);
                         editor.on('text-change', debouncedUpdate);
-
                         editor.on('text-change', () => {
                             const text = editor.getText();
                             const maxLength = moduleConfig.fields[fieldName].maxLength;
                             if (text.length > maxLength) editor.deleteText(maxLength, text.length);
                         });
                     });
-                } catch(error) {
-                    throw new Error(`Failed to initialize ${p} editors: ${error.message}`);
-                }
+                } catch(error) { throw new Error(`Failed to initialize ${p} editors: ${error.message}`); }
             });
         }
 
@@ -307,7 +336,6 @@
             if (!html) return '';
             const temp = document.createElement('div');
             temp.innerHTML = utils.sanitizeHtml(html);
-            
             if (isDescription) {
                 temp.querySelectorAll('a').forEach(link => {
                     if (!link.style.color) link.style.color = '#ffffff';
@@ -315,12 +343,11 @@
                     if (!link.getAttribute('href')) link.setAttribute('href', '#');
                 });
             }
-            
-            return temp.innerHTML.replace(/<p>/g, '').replace(/<\/p>/g, '').replace(/<br>/g, '');
+            return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
 
         function updateData(field, value) {
-            if (state.blockData[field] !== value) {
+            if (state.blockData[field] != value) {
                 state.blockData[field] = value;
                 refreshPreview();
             }
@@ -329,6 +356,7 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         function generateColumnHtml(prefix) {
+            // Get text values
             const imageUrl = utils.getFieldValue(prefix + 'imageUrl');
             const imageAlt = utils.getFieldValue(prefix + 'imageAlt');
             const imageLink = utils.getFieldValue(prefix + 'imageLink');
@@ -340,105 +368,37 @@
             const buttonText = utils.getFieldValue(prefix + 'buttonText');
             const buttonLink = utils.getFieldValue(prefix + 'buttonLink');
 
-            const subtitleHtml = showSubtitle ? `<tr>
-               <td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly; text-align: center; mso-hyphenate: none; hyphens: none;">
-                ${subtitle}</td></tr><tr>
-               <td>
-                <div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
-                  </div></td></tr>` : '';
+            // Get font size values
+            const subtitleSize = utils.getFieldValue(prefix + 'subtitleFontSize');
+            const titleSize = utils.getFieldValue(prefix + 'titleFontSize');
+            const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize');
 
-            const buttonHtml = showButton ? `<tr>
-               <td>
-                <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
-                  </div></td></tr><tr>
-               <td>
-                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                  <tr>
-                   <td align="center" class="block" style="width: 100%;" valign="top">
-                    <table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;">
-                      <tr>
-                       <td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;">
-                        <a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr>
-               <td>
-                <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
-                  </div></td></tr>` : '';
+            // Calculate dynamic line heights
+            const subtitleLineHeight = subtitleSize + 12;
+            const titleLineHeight = titleSize + 8;
+            const descriptionLineHeight = descriptionSize + 8;
 
+            const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${subtitleSize}px; font-weight: normal; line-height: ${subtitleLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: center; mso-hyphenate: none; hyphens: none;">${subtitle}</td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>` : '';
+            const buttonHtml = showButton ? `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="center" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>` : '';
             const topSpacer = `<div style="clear: both; display: block; font-size: 12px; height: 12px; line-height: 12px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div>`;
             
-            return `<td align="center" class="block" style="width: 280px;" valign="top">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                    <tr>
-                        <td>
-                            <div>
-                                <a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="280"></a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="padding-bottom: 12px; padding-top: 12px;">
-                            <table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">
-                                <tr><td>${topSpacer}</td></tr>
-                                ${subtitleHtml}
-                                <tr>
-                                    <td class="mobile-text-center" style="text-align: center;">
-                                        <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-stretch: condensed; font-weight: bold; line-height: 28px; margin: 0; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${title}</h3>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: center; mso-hyphenate: none; hyphens: none;">${description}</td>
-                                </tr>
-                                ${!showButton ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div></td></tr>' : ''}
-                                ${buttonHtml}
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>`;
+            return `<td align="center" class="block" style="width: 280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="280"></a></div></td></tr><tr><td align="center" style="padding-bottom: 12px; padding-top: 12px;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align: center;"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-stretch: condensed; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${title}</h3></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: center; mso-hyphenate: none; hyphens: none;">${description}</td></tr>${!showButton ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
         }
 
         function generateTemplate() {
             const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
             const leftColHtml = generateColumnHtml('left_');
             const rightColHtml = generateColumnHtml('right_');
-
-            return `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
-                <tr>
-                    <td class="side" style="width: 20px;"> </td>
-                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
-                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                            <tr>
-                                ${leftColHtml}
-                                <td class="gap block" style="width: 20px;"> </td>
-                                ${rightColHtml}
-                            </tr>
-                        </table>
-                    </td>
-                    <td class="side" style="width: 20px;"> </td>
-                </tr>
-            </table><!-- END .story-2col -->`;
+            return `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${leftColHtml}<td class="gap block" style="width: 20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .story-2col -->`;
         }
 
         function refreshPreview() {
             if (state.isLoading || !state.sdk) return;
             try {
                 const html = generateTemplate();
-
-                // Updates the view in the editor
                 state.sdk.setContent(html);
-
-                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
-                // The key MUST be 'content', not 'html'.
-                if (state.sdk.setData) {
-                    state.sdk.setData({ ...state.blockData, content: html });
-                }
-            } catch (error) {
-                utils.showError(`Preview update failed: ${error.message}`);
-            }
+                if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); }
+            } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
 
         function validateUrlInput(input, errorElement) {
@@ -450,12 +410,11 @@
         }
 
         function initializeEventHandlers() {
-            // General settings - Background Color
+            state.eventListeners = []; // Clear previous listeners
+            
             document.querySelectorAll('.color-option').forEach(option => {
                 const handler = (e) => {
-                    const selectedColor = e.target.dataset.color;
-                    updateData('backgroundColor', selectedColor);
-                    // Update UI
+                    updateData('backgroundColor', e.target.dataset.color);
                     document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
                     e.target.classList.add('selected');
                 };
@@ -463,16 +422,37 @@
                 state.eventListeners.push({ element: option, event: 'click', handler });
             });
 
-            // Column settings
+            // --- ROBUST NUMBER INPUT HANDLER ---
+            function setupNumberInput(inputElement, dataKey) {
+                const step = 4;
+                const correctValueOnBlur = (e) => {
+                    const input = e.target;
+                    let value = parseInt(input.value, 10);
+                    const min = parseInt(input.min, 10);
+                    const max = parseInt(input.max, 10);
+                    if (isNaN(value)) value = moduleConfig.fields[dataKey].defaultValue;
+                    value = Math.max(min, Math.min(value, max));
+                    const correctedValue = Math.round(value / step) * step;
+                    input.value = correctedValue;
+                    updateData(dataKey, correctedValue);
+                };
+                const liveUpdateOnInput = (e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value)) debouncedUpdateData(dataKey, value);
+                };
+                inputElement.addEventListener('input', liveUpdateOnInput);
+                inputElement.addEventListener('blur', correctValueOnBlur);
+                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
+                state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
+            }
+
             const prefixes = ['left_', 'right_'];
             prefixes.forEach(p => {
-                // Text and URL inputs
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
                     const el = elements[p + type];
                     const errEl = elements[p + type + 'Error'];
                     const fieldName = p + type;
                     const config = moduleConfig.fields[fieldName];
-                    
                     const handler = (e) => {
                         let value = e.target.value;
                         if (config.validator === 'url' && !validateUrlInput(el, errEl)) return;
@@ -482,7 +462,6 @@
                     };
                     el.addEventListener('input', handler);
                     state.eventListeners.push({ element: el, event: 'input', handler });
-
                     if(config.validator === 'url') {
                         const blurHandler = () => validateUrlInput(el, errEl);
                         el.addEventListener('blur', blurHandler);
@@ -490,65 +469,55 @@
                     }
                 });
 
-                // Toggles
                 ['showSubtitle', 'showButton'].forEach(type => {
                     const el = elements[p + type];
                     const fieldName = p + type;
                     const groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')];
-
                     const handler = (e) => {
-                        const isChecked = e.target.checked;
-                        updateData(fieldName, isChecked);
-                        groupEl.classList.toggle('disabled-field', !isChecked);
+                        updateData(fieldName, e.target.checked);
+                        groupEl.classList.toggle('disabled-field', !e.target.checked);
                     };
                     el.addEventListener('change', handler);
                     state.eventListeners.push({ element: el, event: 'change', handler });
                 });
+
+                // Setup font size inputs
+                setupNumberInput(elements[p + 'subtitleFontSize'], p + 'subtitleFontSize');
+                setupNumberInput(elements[p + 'titleFontSize'], p + 'titleFontSize');
+                setupNumberInput(elements[p + 'descriptionFontSize'], p + 'descriptionFontSize');
             });
         }
 
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
-            
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
-                    if (data && Object.keys(data).length > 0) {
-                        Object.keys(moduleConfig.fields).forEach(key => {
-                            if (data.hasOwnProperty(key)) {
-                                state.blockData[key] = moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key];
-                            }
-                        });
-                    }
-
-                    // Populate UI
-                    const bgColor = utils.getFieldValue('backgroundColor');
-                    document.querySelectorAll('.color-option').forEach(o => {
-                        o.classList.remove('selected');
-                        if (o.dataset.color === bgColor) {
-                            o.classList.add('selected');
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        if (data && data.hasOwnProperty(key)) {
+                            state.blockData[key] = moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key];
+                        } else {
+                            state.blockData[key] = moduleConfig.fields[key].defaultValue;
                         }
                     });
 
+                    const bgColor = utils.getFieldValue('backgroundColor');
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === bgColor));
+
                     const prefixes = ['left_', 'right_'];
                     prefixes.forEach(p => {
-                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
+                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => {
                             const fieldName = p + type;
                             if (elements[fieldName]) elements[fieldName].value = utils.getFieldValue(fieldName);
                         });
-                        
                         ['title', 'description'].forEach(type => {
-                            const editor = state.editors[p + type];
-                            if(editor) editor.root.innerHTML = utils.getFieldValue(p + type);
+                            if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type);
                         });
-
                         ['showSubtitle', 'showButton'].forEach(type => {
-                            const checkbox = elements[p + type];
-                            const group = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')];
                             const isChecked = utils.getFieldValue(p + type);
-                            if (checkbox) checkbox.checked = isChecked;
-                            if (group) group.classList.toggle('disabled-field', !isChecked);
+                            elements[p + type].checked = isChecked;
+                            elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked);
                         });
                     });
 
@@ -556,7 +525,7 @@
                     state.retryCount = 0;
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = moduleConfig.fields[key].defaultValue; });
+                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
                     refreshPreview();
                 } finally {
                     setLoadingState(false);
@@ -584,9 +553,7 @@
                 loadData();
                 
                 window.addEventListener('beforeunload', cleanup);
-                document.addEventListener('visibilitychange', () => {
-                    if (!document.hidden && state.isInitialized) loadData();
-                });
+                document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
                 
                 state.isInitialized = true;
             } catch (error) {
