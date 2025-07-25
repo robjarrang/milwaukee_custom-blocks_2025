@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-editor{min-height:40px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        
+        /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
+        .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
+        .field-group-inline .field-label { margin-bottom: 0; }
+        .field-group-inline .field-input { width: 80px; }
     </style>
 </head>
 <body>
@@ -44,10 +49,20 @@
             <div class="field-group" id="titleGroup">
                 <label class="field-label">Title</label>
                 <div id="titleEditor" class="quill-container limited-toolbar"></div>
+                <!-- NEW: Title Font Size Control -->
+                <div class="field-group-inline">
+                    <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
+                    <input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4">
+                </div>
             </div>
             <div class="field-group">
                 <label class="field-label">Body Text</label>
                 <div id="bodyEditor" class="quill-container"></div>
+                 <!-- NEW: Body Font Size Control -->
+                <div class="field-group-inline">
+                    <label for="bodyFontSize" class="field-label">Body Font Size (px)</label>
+                    <input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4">
+                </div>
             </div>
         </div>
         
@@ -65,6 +80,11 @@
                 <div class="field-group">
                     <label for="buttonText" class="field-label">Button Text</label>
                     <div id="buttonTextEditor" class="quill-container limited-toolbar"></div>
+                    <!-- NEW: Button Font Size Control -->
+                    <div class="field-group-inline">
+                        <label for="buttonFontSize" class="field-label">Button Font Size (px)</label>
+                        <input type="number" id="buttonFontSize" class="field-input" min="12" max="28" step="4">
+                    </div>
                 </div>
                 <div class="field-group">
                     <label for="buttonUrl" class="field-label">Button Link URL</label>
@@ -95,9 +115,12 @@
                 backgroundColor: { type: 'text', defaultValue: 'red' },
                 showTitle: { type: 'boolean', defaultValue: true },
                 title: { type: 'richtext', defaultValue: 'Lorem ipsum dolor sit amet', maxLength: 100 },
+                titleFontSize: { type: 'number', defaultValue: 24 }, // NEW
                 bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.', maxLength: 400 },
+                bodyFontSize: { type: 'number', defaultValue: 16 }, // NEW
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
+                buttonFontSize: { type: 'number', defaultValue: 16 }, // NEW
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 buttonAlignment: { type: 'text', defaultValue: 'left' }
             },
@@ -144,7 +167,8 @@
             },
             getFieldValue(fieldName) {
                 const value = state.blockData[fieldName];
-                return value !== undefined ? value : moduleConfig.fields[fieldName].defaultValue;
+                const parsedValue = typeof moduleConfig.fields[fieldName].defaultValue === 'number' ? parseFloat(value) : value;
+                return !isNaN(parsedValue) && parsedValue !== null ? parsedValue : moduleConfig.fields[fieldName].defaultValue;
             }
         };
 
@@ -156,10 +180,13 @@
             elements.showTitle = document.getElementById('showTitle');
             elements.titleGroup = document.getElementById('titleGroup');
             elements.titleEditor = document.getElementById('titleEditor');
+            elements.titleFontSize = document.getElementById('titleFontSize'); // NEW
             elements.bodyEditor = document.getElementById('bodyEditor');
+            elements.bodyFontSize = document.getElementById('bodyFontSize'); // NEW
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
+            elements.buttonFontSize = document.getElementById('buttonFontSize'); // NEW
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
@@ -197,15 +224,9 @@
             }
 
             try {
-                // Title Editor
                 createEditor('#titleEditor', 'title', 'Enter title...', ['script', 'link'], [[{ 'script': 'super' }], ['link']]);
-                
-                // Body Text Editor
                 createEditor('#bodyEditor', 'bodyText', 'Enter body text...', ['bold', 'italic', 'script', 'link'], [['bold', 'italic', { 'script': 'super' }], ['link']]);
-                
-                // Button Text Editor (MODIFIED)
                 createEditor('#buttonTextEditor', 'buttonText', 'Enter button text...', ['script'], [[{ 'script': 'super' }]]);
-
             } catch (error) {
                 throw new Error(`Failed to initialize editors: ${error.message}`);
             }
@@ -236,9 +257,12 @@
             let titleHtml = '';
             if (showTitle) {
                 const processedTitle = processRichText(utils.getFieldValue('title'));
+                const titleSize = utils.getFieldValue('titleFontSize'); // UPDATED
+                const titleLineHeight = titleSize + 8; // UPDATED
+
                 titleHtml = `<tr>
            <td class="mobile-text-left" style="text-align: left;">
-            <h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">
+            <h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">
              ${processedTitle}</h1></td></tr><tr>
            <td>
             <div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">
@@ -246,8 +270,11 @@
             }
 
             const processedBody = processRichText(utils.getFieldValue('bodyText'));
+            const bodySize = utils.getFieldValue('bodyFontSize'); // UPDATED
+            const bodyLineHeight = bodySize + 12; // UPDATED
+
             const bodyHtml = `<tr>
-           <td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly; text-align: left; mso-hyphenate: none; hyphens: none;">
+           <td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: left; mso-hyphenate: none; hyphens: none;">
             ${processedBody}</td></tr>`;
             
             let buttonHtml = '';
@@ -255,6 +282,8 @@
                 const buttonAlign = utils.getFieldValue('buttonAlignment');
                 const buttonUrl = utils.getFieldValue('buttonUrl');
                 const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
+                const buttonSize = utils.getFieldValue('buttonFontSize'); // UPDATED
+                const buttonLineHeight = buttonSize + 12; // UPDATED
                 
                 const buttonTableStyle = backgroundColor === 'black'
                     ? `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`
@@ -270,7 +299,7 @@
                <td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle">
                 <table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}">
                   <tr>
-                   <td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;">
+                   <td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${buttonSize}px; font-weight: bold; line-height: ${buttonLineHeight}px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;">
                     <a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
@@ -297,12 +326,7 @@
             if (state.isLoading || !state.sdk) return;
             try {
                 const html = generateTemplate();
-                
-                // Updates the view in the editor
                 state.sdk.setContent(html);
-                
-                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
-                // The key MUST be 'content', not 'html'.
                 if (state.sdk.setData) {
                     state.sdk.setData({ ...state.blockData, content: html });
                 }
@@ -349,6 +373,21 @@
             setupToggle(elements.showTitle, elements.titleGroup, 'showTitle');
             setupToggle(elements.showButton, elements.buttonFieldsGroup, 'showButton');
 
+            // NEW: Number inputs for font sizes
+            function setupNumberInput(inputElement, dataKey) {
+                const handler = (e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value)) {
+                        debouncedUpdateData(dataKey, value);
+                    }
+                };
+                inputElement.addEventListener('input', handler);
+                state.eventListeners.push({ element: inputElement, event: 'input', handler });
+            }
+            setupNumberInput(elements.titleFontSize, 'titleFontSize');
+            setupNumberInput(elements.bodyFontSize, 'bodyFontSize');
+            setupNumberInput(elements.buttonFontSize, 'buttonFontSize');
+
             // URL input
             const urlHandler = (e) => {
                 if (validateUrlInput(elements.buttonUrl, elements.buttonUrlError)) {
@@ -390,6 +429,11 @@
                     }
                     setToggleState(elements.showTitle, elements.titleGroup, 'showTitle');
                     setToggleState(elements.showButton, elements.buttonFieldsGroup, 'showButton');
+                    
+                    // NEW: Populate font size inputs
+                    if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
+                    if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
+                    if (elements.buttonFontSize) elements.buttonFontSize.value = utils.getFieldValue('buttonFontSize');
                     
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
                     Object.keys(state.editors).forEach(key => {
