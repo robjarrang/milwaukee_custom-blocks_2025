@@ -10,6 +10,13 @@
         .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
         .field-group-inline .field-label { margin-bottom: 0; }
         .field-group-inline .field-input { width: 80px; }
+        
+        /* -- NEW STYLE FOR ALIGNMENT ICONS -- */
+        .option-button svg {
+            display: block;
+            margin: 0 auto;
+            fill: currentColor; /* This makes the icon color change with the button text color */
+        }
     </style>
 </head>
 <body>
@@ -51,12 +58,16 @@
                     <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
                     <input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4">
                 </div>
-                <!-- NEW: Title Alignment -->
+                <!-- UPDATED: Title Alignment -->
                 <div class="field-group" style="margin-top: 15px;">
                     <label class="field-label">Title Alignment</label>
                     <div class="option-selector" id="titleAlignmentSelector">
-                        <div class="option-button selected" data-value="left">Left</div>
-                        <div class="option-button" data-value="center">Center</div>
+                        <div class="option-button selected" data-value="left" title="Align Left">
+                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg>
+                        </div>
+                        <div class="option-button" data-value="center" title="Align Center">
+                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,12 +78,16 @@
                     <label for="bodyFontSize" class="field-label">Body Font Size (px)</label>
                     <input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4">
                 </div>
-                <!-- NEW: Body Alignment -->
+                <!-- UPDATED: Body Alignment -->
                 <div class="field-group" style="margin-top: 15px;">
                     <label class="field-label">Body Alignment</label>
                     <div class="option-selector" id="bodyAlignmentSelector">
-                        <div class="option-button selected" data-value="left">Left</div>
-                        <div class="option-button" data-value="center">Center</div>
+                        <div class="option-button selected" data-value="left" title="Align Left">
+                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg>
+                        </div>
+                        <div class="option-button" data-value="center" title="Align Center">
+                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,9 +115,14 @@
                 </div>
                 <div class="field-group">
                     <label class="field-label">Button Alignment</label>
+                     <!-- UPDATED: Button Alignment -->
                     <div class="option-selector" id="buttonAlignmentSelector">
-                        <div class="option-button" data-value="left">Left</div>
-                        <div class="option-button selected" data-value="center">Center</div>
+                        <div class="option-button" data-value="left" title="Align Left">
+                             <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg>
+                        </div>
+                        <div class="option-button selected" data-value="center" title="Align Center">
+                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,14 +142,14 @@
                 showTitle: { type: 'boolean', defaultValue: true },
                 title: { type: 'richtext', defaultValue: 'Lorem ipsum dolor sit amet', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 24 },
-                titleAlignment: { type: 'text', defaultValue: 'left' }, // NEW
+                titleAlignment: { type: 'text', defaultValue: 'left' },
                 bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.', maxLength: 400 },
                 bodyFontSize: { type: 'number', defaultValue: 16 },
-                bodyAlignment: { type: 'text', defaultValue: 'left' }, // NEW
+                bodyAlignment: { type: 'text', defaultValue: 'left' },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                buttonAlignment: { type: 'text', defaultValue: 'left' }
+                buttonAlignment: { type: 'text', defaultValue: 'center' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -191,10 +211,10 @@
             elements.titleGroup = document.getElementById('titleGroup');
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
-            elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector'); // NEW
+            elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
             elements.bodyEditor = document.getElementById('bodyEditor');
             elements.bodyFontSize = document.getElementById('bodyFontSize');
-            elements.bodyAlignmentSelector = document.getElementById('bodyAlignmentSelector'); // NEW
+            elements.bodyAlignmentSelector = document.getElementById('bodyAlignmentSelector');
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
@@ -262,17 +282,15 @@
             if (showTitle) {
                 const processedTitle = processRichText(utils.getFieldValue('title'));
                 const titleSize = utils.getFieldValue('titleFontSize');
-                const titleAlign = utils.getFieldValue('titleAlignment'); // UPDATED
+                const titleAlign = utils.getFieldValue('titleAlignment');
                 const titleLineHeight = titleSize + 8;
-                // UPDATED: Added titleAlign to style
                 titleHtml = `<tr><td class="mobile-text-left" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
             }
 
             const processedBody = processRichText(utils.getFieldValue('bodyText'));
             const bodySize = utils.getFieldValue('bodyFontSize');
-            const bodyAlign = utils.getFieldValue('bodyAlignment'); // UPDATED
+            const bodyAlign = utils.getFieldValue('bodyAlignment');
             const bodyLineHeight = bodySize + 12;
-            // UPDATED: Added bodyAlign to style
             const bodyHtml = `<tr><td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${bodyAlign}; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
             
             let buttonHtml = '';
@@ -310,11 +328,13 @@
 
         function initializeEventHandlers() {
             function setupOptionSelector(selectorElement, dataKey) {
+                if (!selectorElement) return;
                 selectorElement.querySelectorAll('.option-button').forEach(option => {
                     const handler = (e) => {
-                        updateData(dataKey, e.target.dataset.value);
+                        const button = e.currentTarget;
+                        updateData(dataKey, button.dataset.value);
                         selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
-                        e.target.classList.add('selected');
+                        button.classList.add('selected');
                     };
                     option.addEventListener('click', handler);
                     state.eventListeners.push({ element: option, event: 'click', handler });
@@ -322,8 +342,8 @@
             }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
-            setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment'); // NEW
-            setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment'); // NEW
+            setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
+            setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment');
 
             function setupToggle(toggleElement, groupElement, dataKey) {
                  const handler = (e) => {
@@ -395,9 +415,8 @@
                     }
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
-                    setSelectorState(elements.titleAlignmentSelector, 'titleAlignment'); // NEW
-                    setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment'); // NEW
-
+                    setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
+                    setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment');
 
                     function setToggleState(toggleEl, groupEl, dataKey) {
                         const isChecked = utils.getFieldValue(dataKey);
