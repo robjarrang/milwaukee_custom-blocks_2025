@@ -62,6 +62,7 @@
                 <div id="left_buttonFieldsGroup">
                     <div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><input type="text" id="left_buttonText" class="field-input"></div>
                     <div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"><div class="field-error" id="left_buttonLinkError">Please enter a valid URL.</div></div>
+                    <div class="field-group" style="margin-top: 15px;"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right" title="Align Right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
                 </div>
             </div>
 
@@ -93,6 +94,7 @@
                 <div id="right_buttonFieldsGroup">
                     <div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><input type="text" id="right_buttonText" class="field-input"></div>
                     <div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"><div class="field-error" id="right_buttonLinkError">Please enter a valid URL.</div></div>
+                    <div class="field-group" style="margin-top: 15px;"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right" title="Align Right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
                 </div>
             </div>
         </div>
@@ -125,6 +127,7 @@
                 left_showButton: { type: 'boolean', defaultValue: true },
                 left_buttonText: { type: 'text', defaultValue: 'Learn More', maxLength: 40 },
                 left_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                left_buttonAlignment: { type: 'text', defaultValue: 'center' },
                 // Right Column Fields
                 right_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
                 right_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
@@ -141,7 +144,8 @@
                 right_descriptionAlignment: { type: 'text', defaultValue: 'center' },
                 right_showButton: { type: 'boolean', defaultValue: true },
                 right_buttonText: { type: 'text', defaultValue: 'Find Out More', maxLength: 40 },
-                right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
+                right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                right_buttonAlignment: { type: 'text', defaultValue: 'center' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -151,49 +155,11 @@
         const elements = {};
 
         const utils = {
-            debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            },
-            isValidUrl(string) {
-                if (!string || string.trim() === '') return true;
-                try {
-                    const url = new URL(string);
-                    return url.protocol === 'http:' || url.protocol === 'https:';
-                } catch (_) { return false; }
-            },
-            sanitizeHtml(html) {
-                if (!html) return '';
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                temp.querySelectorAll('script, style').forEach(el => el.remove());
-                const allElements = temp.getElementsByTagName('*');
-                for (let el of allElements) {
-                    for (let attr of el.attributes) { if (attr.name.startsWith('on')) el.removeAttribute(attr.name); }
-                }
-                return temp.innerHTML;
-            },
-            showError(message, permanent = false) {
-                const errorBanner = elements.errorBanner;
-                if (errorBanner) {
-                    errorBanner.textContent = message;
-                    errorBanner.classList.add('show');
-                    if (!permanent) setTimeout(() => errorBanner.classList.remove('show'), 5000);
-                }
-                console.error(`${moduleConfig.name} Error:`, message);
-            },
-            getFieldValue(fieldName) {
-                const value = state.blockData[fieldName];
-                const fieldConfig = moduleConfig.fields[fieldName];
-                if (value !== undefined && value !== null) {
-                    return fieldConfig.type === 'number' ? parseFloat(value) : value;
-                }
-                return fieldConfig.defaultValue;
-            }
+            debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
+            sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
+            showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
         };
 
         function cacheElements() {
@@ -201,30 +167,10 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
-
             const prefixes = ['left_', 'right_'];
             prefixes.forEach(p => {
-                elements[p + 'imageUrl'] = document.getElementById(p + 'imageUrl');
-                elements[p + 'imageUrlError'] = document.getElementById(p + 'imageUrlError');
-                elements[p + 'imageAlt'] = document.getElementById(p + 'imageAlt');
-                elements[p + 'imageLink'] = document.getElementById(p + 'imageLink');
-                elements[p + 'imageLinkError'] = document.getElementById(p + 'imageLinkError');
-                elements[p + 'showSubtitle'] = document.getElementById(p + 'showSubtitle');
-                elements[p + 'subtitleGroup'] = document.getElementById(p + 'subtitleGroup');
-                elements[p + 'subtitle'] = document.getElementById(p + 'subtitle');
-                elements[p + 'subtitleFontSize'] = document.getElementById(p + 'subtitleFontSize');
-                elements[p + 'subtitleAlignmentSelector'] = document.getElementById(p + 'subtitleAlignmentSelector');
-                elements[p + 'titleEditor'] = document.getElementById(p + 'titleEditor');
-                elements[p + 'titleFontSize'] = document.getElementById(p + 'titleFontSize');
-                elements[p + 'titleAlignmentSelector'] = document.getElementById(p + 'titleAlignmentSelector');
-                elements[p + 'descriptionEditor'] = document.getElementById(p + 'descriptionEditor');
-                elements[p + 'descriptionFontSize'] = document.getElementById(p + 'descriptionFontSize');
-                elements[p + 'descriptionAlignmentSelector'] = document.getElementById(p + 'descriptionAlignmentSelector');
-                elements[p + 'showButton'] = document.getElementById(p + 'showButton');
-                elements[p + 'buttonFieldsGroup'] = document.getElementById(p + 'buttonFieldsGroup');
-                elements[p + 'buttonText'] = document.getElementById(p + 'buttonText');
-                elements[p + 'buttonLink'] = document.getElementById(p + 'buttonLink');
-                elements[p + 'buttonLinkError'] = document.getElementById(p + 'buttonLinkError');
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector'].forEach(k => { elements[p + k] = document.getElementById(p + k); });
+                ['imageUrlError', 'imageLinkError', 'buttonLinkError', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup'].forEach(k => { elements[p + k] = document.getElementById(p + k); });
             });
         }
 
@@ -246,15 +192,9 @@
                     ['title', 'description'].forEach(type => {
                         const editor = state.editors[p + type];
                         const fieldName = p + type;
-                        const debouncedUpdate = utils.debounce((d, o, source) => {
-                            if (source === 'user') updateData(fieldName, utils.sanitizeHtml(editor.root.innerHTML));
-                        }, moduleConfig.debounceDelay);
+                        const debouncedUpdate = utils.debounce((d, o, source) => { if (source === 'user') updateData(fieldName, utils.sanitizeHtml(editor.root.innerHTML)); }, moduleConfig.debounceDelay);
                         editor.on('text-change', debouncedUpdate);
-                        editor.on('text-change', () => {
-                            const text = editor.getText();
-                            const maxLength = moduleConfig.fields[fieldName].maxLength;
-                            if (text.length > maxLength) editor.deleteText(maxLength, text.length);
-                        });
+                        editor.on('text-change', () => { const text = editor.getText(); const maxLength = moduleConfig.fields[fieldName].maxLength; if (text.length > maxLength) editor.deleteText(maxLength, text.length); });
                     });
                 } catch(error) { throw new Error(`Failed to initialize ${p} editors: ${error.message}`); }
             });
@@ -264,13 +204,7 @@
             if (!html) return '';
             const temp = document.createElement('div');
             temp.innerHTML = utils.sanitizeHtml(html);
-            if (isDescription) {
-                temp.querySelectorAll('a').forEach(link => {
-                    if (!link.style.color) link.style.color = '#ffffff';
-                    link.style.textDecoration = 'underline';
-                    if (!link.getAttribute('href')) link.setAttribute('href', '#');
-                });
-            }
+            if (isDescription) { temp.querySelectorAll('a').forEach(link => { if (!link.style.color) link.style.color = '#ffffff'; link.style.textDecoration = 'underline'; if (!link.getAttribute('href')) link.setAttribute('href', '#'); }); }
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
 
@@ -284,31 +218,16 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         function generateColumnHtml(prefix) {
-            const imageUrl = utils.getFieldValue(prefix + 'imageUrl');
-            const imageAlt = utils.getFieldValue(prefix + 'imageAlt');
-            const imageLink = utils.getFieldValue(prefix + 'imageLink');
-            const showSubtitle = utils.getFieldValue(prefix + 'showSubtitle');
-            const subtitle = utils.getFieldValue(prefix + 'subtitle');
-            const title = processRichText(utils.getFieldValue(prefix + 'title'));
-            const description = processRichText(utils.getFieldValue(prefix + 'description'), true);
-            const showButton = utils.getFieldValue(prefix + 'showButton');
-            const buttonText = utils.getFieldValue(prefix + 'buttonText');
-            const buttonLink = utils.getFieldValue(prefix + 'buttonLink');
+            const imageUrl = utils.getFieldValue(prefix + 'imageUrl'), imageAlt = utils.getFieldValue(prefix + 'imageAlt'), imageLink = utils.getFieldValue(prefix + 'imageLink');
+            const showSubtitle = utils.getFieldValue(prefix + 'showSubtitle'), subtitle = utils.getFieldValue(prefix + 'subtitle');
+            const title = processRichText(utils.getFieldValue(prefix + 'title')), description = processRichText(utils.getFieldValue(prefix + 'description'), true);
+            const showButton = utils.getFieldValue(prefix + 'showButton'), buttonText = utils.getFieldValue(prefix + 'buttonText'), buttonLink = utils.getFieldValue(prefix + 'buttonLink');
+            const subtitleSize = utils.getFieldValue(prefix + 'subtitleFontSize'), titleSize = utils.getFieldValue(prefix + 'titleFontSize'), descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize');
+            const subtitleAlign = utils.getFieldValue(prefix + 'subtitleAlignment'), titleAlign = utils.getFieldValue(prefix + 'titleAlignment'), descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment'), buttonAlign = utils.getFieldValue(prefix + 'buttonAlignment');
+            const subtitleLineHeight = subtitleSize + 12, titleLineHeight = titleSize + 8, descriptionLineHeight = descriptionSize + 8;
             
-            const subtitleSize = utils.getFieldValue(prefix + 'subtitleFontSize');
-            const titleSize = utils.getFieldValue(prefix + 'titleFontSize');
-            const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize');
-            
-            const subtitleAlign = utils.getFieldValue(prefix + 'subtitleAlignment');
-            const titleAlign = utils.getFieldValue(prefix + 'titleAlignment');
-            const descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment');
-
-            const subtitleLineHeight = subtitleSize + 12;
-            const titleLineHeight = titleSize + 8;
-            const descriptionLineHeight = descriptionSize + 8;
-
             const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${subtitleSize}px; font-weight: normal; line-height: ${subtitleLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${subtitleAlign}; mso-hyphenate: none; hyphens: none;">${subtitle}</td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>` : '';
-            const buttonHtml = showButton ? `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="center" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>` : '';
+            const buttonHtml = showButton ? `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>` : '';
             const topSpacer = `<div style="clear: both; display: block; font-size: 12px; height: 12px; line-height: 12px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div>`;
             
             return `<td align="center" class="block" style="width: 280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="280"></a></div></td></tr><tr><td align="center" style="padding-bottom: 12px; padding-top: 12px;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-stretch: condensed; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${title}</h3></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${descriptionAlign}; mso-hyphenate: none; hyphens: none;">${description}</td></tr>${!showButton ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0; mso-line-height-rule: exactly; padding: 0;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
@@ -330,107 +249,31 @@
             } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
 
-        function validateUrlInput(input, errorElement) {
-            const value = input.value.trim();
-            const isValid = !value || utils.isValidUrl(value);
-            input.classList.toggle('error', !isValid);
-            if(errorElement) errorElement.style.display = isValid ? 'none' : 'block';
-            return isValid;
-        }
-
         function initializeEventHandlers() {
-            state.eventListeners = []; // Clear previous listeners
-            
-            function setupOptionSelector(selectorElement, dataKey) {
-                if (!selectorElement) return;
-                selectorElement.querySelectorAll('.option-button').forEach(option => {
-                    const handler = (e) => {
-                        const button = e.currentTarget;
-                        updateData(dataKey, button.dataset.value);
-                        selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
-                        button.classList.add('selected');
-                    };
-                    option.addEventListener('click', handler);
-                    state.eventListeners.push({ element: option, event: 'click', handler });
-                });
-            }
-            
-            document.querySelectorAll('.color-option').forEach(option => {
-                const handler = (e) => {
-                    updateData('backgroundColor', e.target.dataset.color);
-                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
-                    e.target.classList.add('selected');
-                };
-                option.addEventListener('click', handler);
-                state.eventListeners.push({ element: option, event: 'click', handler });
-            });
-
-            function setupNumberInput(inputElement, dataKey) {
-                if (!inputElement) return;
-                const step = 4;
-                const correctValueOnBlur = (e) => {
-                    const input = e.target;
-                    let value = parseInt(input.value, 10);
-                    const min = parseInt(input.min, 10);
-                    const max = parseInt(input.max, 10);
-                    if (isNaN(value)) value = moduleConfig.fields[dataKey].defaultValue;
-                    value = Math.max(min, Math.min(value, max));
-                    const correctedValue = Math.round(value / step) * step;
-                    input.value = correctedValue;
-                    updateData(dataKey, correctedValue);
-                };
-                const liveUpdateOnInput = (e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value)) debouncedUpdateData(dataKey, value);
-                };
-                inputElement.addEventListener('input', liveUpdateOnInput);
-                inputElement.addEventListener('blur', correctValueOnBlur);
-                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
-                state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
-            }
-
+            state.eventListeners = []; 
+            function setupOptionSelector(selectorElement, dataKey) { if (!selectorElement) return; selectorElement.querySelectorAll('.option-button').forEach(option => { const handler = (e) => { const button = e.currentTarget; updateData(dataKey, button.dataset.value); selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); button.classList.add('selected'); }; option.addEventListener('click', handler); state.eventListeners.push({ element: option, event: 'click', handler }); }); }
+            document.querySelectorAll('.color-option').forEach(option => { const handler = (e) => { updateData('backgroundColor', e.target.dataset.color); document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected')); e.target.classList.add('selected'); }; option.addEventListener('click', handler); state.eventListeners.push({ element: option, event: 'click', handler }); });
+            function setupNumberInput(inputElement, dataKey) { if (!inputElement) return; const step = 4; const correctValueOnBlur = (e) => { const input = e.target; let value = parseInt(input.value, 10); const min = parseInt(input.min, 10), max = parseInt(input.max, 10); if (isNaN(value)) value = moduleConfig.fields[dataKey].defaultValue; value = Math.max(min, Math.min(value, max)); const correctedValue = Math.round(value / step) * step; input.value = correctedValue; updateData(dataKey, correctedValue); }; const liveUpdateOnInput = (e) => { const value = parseInt(e.target.value, 10); if (!isNaN(value)) debouncedUpdateData(dataKey, value); }; inputElement.addEventListener('input', liveUpdateOnInput); inputElement.addEventListener('blur', correctValueOnBlur); state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput }); state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur }); }
             const prefixes = ['left_', 'right_'];
             prefixes.forEach(p => {
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
-                    const el = elements[p + type];
-                    const errEl = elements[p + type + 'Error'];
-                    const fieldName = p + type;
-                    const config = moduleConfig.fields[fieldName];
-                    const handler = (e) => {
-                        let value = e.target.value;
-                        if (config.validator === 'url' && !validateUrlInput(el, errEl)) return;
-                        if (config.maxLength) value = value.substring(0, config.maxLength);
-                        e.target.value = value;
-                        debouncedUpdateData(fieldName, value.trim());
-                    };
-                    el.addEventListener('input', handler);
-                    state.eventListeners.push({ element: el, event: 'input', handler });
-                    if(config.validator === 'url') {
-                        const blurHandler = () => validateUrlInput(el, errEl);
-                        el.addEventListener('blur', blurHandler);
-                        state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler });
-                    }
+                    const el = elements[p + type], errEl = elements[p + type + 'Error'], fieldName = p + type, config = moduleConfig.fields[fieldName];
+                    const handler = (e) => { let value = e.target.value; if (config.validator === 'url' && !utils.isValidUrl(value)) return; if (config.maxLength) value = value.substring(0, config.maxLength); e.target.value = value; debouncedUpdateData(fieldName, value.trim()); };
+                    el.addEventListener('input', handler); state.eventListeners.push({ element: el, event: 'input', handler });
+                    if(config.validator === 'url') { const blurHandler = () => utils.isValidUrl(el.value, errEl); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
                 });
-
                 ['showSubtitle', 'showButton'].forEach(type => {
-                    const el = elements[p + type];
-                    const fieldName = p + type;
-                    const groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')];
-                    const handler = (e) => {
-                        updateData(fieldName, e.target.checked);
-                        groupEl.classList.toggle('disabled-field', !e.target.checked);
-                    };
-                    el.addEventListener('change', handler);
-                    state.eventListeners.push({ element: el, event: 'change', handler });
+                    const el = elements[p + type], fieldName = p + type, groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')];
+                    const handler = (e) => { updateData(fieldName, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); };
+                    el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler });
                 });
-
                 setupNumberInput(elements[p + 'subtitleFontSize'], p + 'subtitleFontSize');
                 setupNumberInput(elements[p + 'titleFontSize'], p + 'titleFontSize');
                 setupNumberInput(elements[p + 'descriptionFontSize'], p + 'descriptionFontSize');
-
                 setupOptionSelector(elements[p + 'subtitleAlignmentSelector'], p + 'subtitleAlignment');
                 setupOptionSelector(elements[p + 'titleAlignmentSelector'], p + 'titleAlignment');
                 setupOptionSelector(elements[p + 'descriptionAlignmentSelector'], p + 'descriptionAlignment');
+                setupOptionSelector(elements[p + 'buttonAlignmentSelector'], p + 'buttonAlignment');
             });
         }
 
@@ -440,44 +283,17 @@
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => {
-                        if (data && data.hasOwnProperty(key)) {
-                            state.blockData[key] = moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key];
-                        } else {
-                            state.blockData[key] = moduleConfig.fields[key].defaultValue;
-                        }
-                    });
-
+                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
                     const bgColor = utils.getFieldValue('backgroundColor');
                     document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === bgColor));
-                    
-                    function setSelectorState(selectorElement, dataKey) {
-                        const value = utils.getFieldValue(dataKey);
-                        if (selectorElement) {
-                            selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value));
-                        }
-                    }
-
+                    function setSelectorState(selectorElement, dataKey) { const value = utils.getFieldValue(dataKey); if (selectorElement) selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value)); }
                     const prefixes = ['left_', 'right_'];
                     prefixes.forEach(p => {
-                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => {
-                            const fieldName = p + type;
-                            if (elements[fieldName]) elements[fieldName].value = utils.getFieldValue(fieldName);
-                        });
-                        ['title', 'description'].forEach(type => {
-                            if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type);
-                        });
-                        ['showSubtitle', 'showButton'].forEach(type => {
-                            const isChecked = utils.getFieldValue(p + type);
-                            elements[p + type].checked = isChecked;
-                            elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked);
-                        });
-
-                        setSelectorState(elements[p + 'subtitleAlignmentSelector'], p + 'subtitleAlignment');
-                        setSelectorState(elements[p + 'titleAlignmentSelector'], p + 'titleAlignment');
-                        setSelectorState(elements[p + 'descriptionAlignmentSelector'], p + 'descriptionAlignment');
+                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
+                        ['title', 'description'].forEach(type => { if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); });
+                        ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
+                        ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => { setSelectorState(elements[p + type + 'Selector'], p + type); });
                     });
-
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
@@ -490,28 +306,19 @@
             });
         }
 
-        function cleanup() {
-            Object.values(state.editors).forEach(editor => editor && editor.off('text-change'));
-            state.eventListeners.forEach(({ element, event, handler }) => {
-                if (element && element.removeEventListener) element.removeEventListener(event, handler);
-            });
-            state.eventListeners = [];
-        }
+        function cleanup() { Object.values(state.editors).forEach(e => e && e.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
 
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
-                
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
-                
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
-                
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
@@ -525,11 +332,7 @@
             }
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeWithRetry);
-        } else {
-            initializeWithRetry();
-        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
     </script>
 </body>
 </html>
