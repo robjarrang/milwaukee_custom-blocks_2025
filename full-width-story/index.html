@@ -51,6 +51,14 @@
                     <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
                     <input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4">
                 </div>
+                <!-- NEW: Title Alignment -->
+                <div class="field-group" style="margin-top: 15px;">
+                    <label class="field-label">Title Alignment</label>
+                    <div class="option-selector" id="titleAlignmentSelector">
+                        <div class="option-button selected" data-value="left">Left</div>
+                        <div class="option-button" data-value="center">Center</div>
+                    </div>
+                </div>
             </div>
             <div class="field-group">
                 <label class="field-label">Body Text</label>
@@ -58,6 +66,14 @@
                 <div class="field-group-inline">
                     <label for="bodyFontSize" class="field-label">Body Font Size (px)</label>
                     <input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4">
+                </div>
+                <!-- NEW: Body Alignment -->
+                <div class="field-group" style="margin-top: 15px;">
+                    <label class="field-label">Body Alignment</label>
+                    <div class="option-selector" id="bodyAlignmentSelector">
+                        <div class="option-button selected" data-value="left">Left</div>
+                        <div class="option-button" data-value="center">Center</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,7 +92,6 @@
                 <div class="field-group">
                     <label for="buttonText" class="field-label">Button Text</label>
                     <div id="buttonTextEditor" class="quill-container limited-toolbar"></div>
-                    <!-- Button Font Size Control has been removed -->
                 </div>
                 <div class="field-group">
                     <label for="buttonUrl" class="field-label">Button Link URL</label>
@@ -107,11 +122,12 @@
                 showTitle: { type: 'boolean', defaultValue: true },
                 title: { type: 'richtext', defaultValue: 'Lorem ipsum dolor sit amet', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 24 },
+                titleAlignment: { type: 'text', defaultValue: 'left' }, // NEW
                 bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.', maxLength: 400 },
                 bodyFontSize: { type: 'number', defaultValue: 16 },
+                bodyAlignment: { type: 'text', defaultValue: 'left' }, // NEW
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
-                // buttonFontSize removed
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 buttonAlignment: { type: 'text', defaultValue: 'left' }
             },
@@ -175,12 +191,13 @@
             elements.titleGroup = document.getElementById('titleGroup');
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
+            elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector'); // NEW
             elements.bodyEditor = document.getElementById('bodyEditor');
             elements.bodyFontSize = document.getElementById('bodyFontSize');
+            elements.bodyAlignmentSelector = document.getElementById('bodyAlignmentSelector'); // NEW
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
-            // elements.buttonFontSize removed
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
@@ -245,14 +262,18 @@
             if (showTitle) {
                 const processedTitle = processRichText(utils.getFieldValue('title'));
                 const titleSize = utils.getFieldValue('titleFontSize');
+                const titleAlign = utils.getFieldValue('titleAlignment'); // UPDATED
                 const titleLineHeight = titleSize + 8;
-                titleHtml = `<tr><td class="mobile-text-left" style="text-align: left;"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
+                // UPDATED: Added titleAlign to style
+                titleHtml = `<tr><td class="mobile-text-left" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
             }
 
             const processedBody = processRichText(utils.getFieldValue('bodyText'));
             const bodySize = utils.getFieldValue('bodyFontSize');
+            const bodyAlign = utils.getFieldValue('bodyAlignment'); // UPDATED
             const bodyLineHeight = bodySize + 12;
-            const bodyHtml = `<tr><td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: left; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
+            // UPDATED: Added bodyAlign to style
+            const bodyHtml = `<tr><td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${bodyAlign}; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
             
             let buttonHtml = '';
             if (showButton) {
@@ -260,8 +281,6 @@
                 const buttonUrl = utils.getFieldValue('buttonUrl');
                 const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
                 const buttonTableStyle = backgroundColor === 'black' ? `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;` : `background-color: #000000; border-radius: 4px !important;`;
-                
-                // Button font size and line height are now hardcoded
                 buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
@@ -303,6 +322,8 @@
             }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
+            setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment'); // NEW
+            setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment'); // NEW
 
             function setupToggle(toggleElement, groupElement, dataKey) {
                  const handler = (e) => {
@@ -340,7 +361,6 @@
             }
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.bodyFontSize, 'bodyFontSize');
-            // setupNumberInput for buttonFontSize removed
 
             const urlHandler = (e) => {
                 if (validateUrlInput(elements.buttonUrl, elements.buttonUrlError)) {
@@ -369,10 +389,15 @@
 
                     function setSelectorState(selectorElement, dataKey) {
                         const value = utils.getFieldValue(dataKey);
-                        selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value));
+                        if (selectorElement) {
+                            selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value));
+                        }
                     }
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
+                    setSelectorState(elements.titleAlignmentSelector, 'titleAlignment'); // NEW
+                    setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment'); // NEW
+
 
                     function setToggleState(toggleEl, groupEl, dataKey) {
                         const isChecked = utils.getFieldValue(dataKey);

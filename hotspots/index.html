@@ -9,8 +9,6 @@
         #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
         /* Tooltip Position Selector Styles */
         .position-selector{display:grid;grid-template-columns:repeat(3, 1fr);gap:5px;width:100px;margin-top:5px}.position-button{width:30px;height:30px;border:1px solid #ccc;border-radius:4px;background-color:#fff;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}.position-button:hover{background-color:#e9e9e9}.position-button.selected{background-color:#0074d9;border-color:#005a9e}.position-button .dot{width:6px;height:6px;background-color:#333;border-radius:50%}.position-button.selected .dot{background-color:#fff}
-        /* NEW: Text Alignment Selector Styles */
-        .option-selector{display:flex;gap:5px;margin-top:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;font-size:12px;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}
     </style>
 </head>
 <body>
@@ -28,6 +26,7 @@
         <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
         <div id="visualEditorWrapper"><div id="visualEditor"><img id="previewImage" src="" alt="Image Preview"></div></div>
 
+        <!-- THE FIX: The "Add New Hotspot" button has been moved here -->
         <button id="addItemBtn" class="btn add-item-btn">Add New Hotspot</button>
 
         <div class="section-title" style="margin-top: 20px;">Hotspots</div>
@@ -46,14 +45,6 @@
                 </div>
             </div>
             <div class="field-group"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text"></div>
-            <!-- NEW: Text Alignment Selector -->
-            <div class="field-group"><label class="field-label">Text Alignment</label>
-                <div class="alignment-selector option-selector">
-                    <div class="option-button" data-align="left">Left</div>
-                    <div class="option-button" data-align="center">Center</div>
-                    <div class="option-button" data-align="right">Right</div>
-                </div>
-            </div>
             <div class="field-group" style="margin-bottom:0;"><label class="field-label">Tooltip Position</label>
                 <div class="position-selector">
                     <button class="position-button" data-position="top-left"><div class="dot"></div></button>
@@ -84,8 +75,8 @@
                 hotspots: {
                     type: 'list',
                     defaultValue: [
-                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosition: 'right', textAlign: 'center' }, // ADDED textAlign
-                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosition: 'top-left', textAlign: 'center' }, // ADDED textAlign
+                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosition: 'right' },
+                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosition: 'top-left' },
                     ]
                 }
             },
@@ -144,16 +135,12 @@
                 el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
                 el.querySelector('[data-field="text"]').value = hotspot.text;
                 
-                // Set selected tooltip position button
-                const posButton = el.querySelector(`.position-button[data-position="${hotspot.tooltipPosition || 'top'}"]`);
+                const posButton = el.querySelector(`.position-button[data-position="${hotspot.tooltipPosition}"]`);
                 if (posButton) posButton.classList.add('selected');
-
-                // NEW: Set selected text alignment button
-                const alignButton = el.querySelector(`.option-button[data-align="${hotspot.textAlign || 'center'}"]`);
-                if (alignButton) alignButton.classList.add('selected');
 
                 el.querySelector('.move-up-btn').disabled = (index === 0);
                 el.querySelector('.move-down-btn').disabled = (hotspots.length === 1 || index === hotspots.length - 1);
+
                 elements.itemsContainer.appendChild(fragment);
             });
 
@@ -171,15 +158,16 @@
         
         function getTooltipCss(position) {
             switch (position) {
-                case 'top-left': return 'left: 0; top: 0; transform: translate(-100%, -100%) translateY(-10px) translateX(-10px);';
-                case 'top': return 'left: 50%; top: 0; transform: translate(-50%, -100%) translateY(-10px);';
-                case 'top-right': return 'left: 100%; top: 0; transform: translate(0, -100%) translateY(-10px) translateX(10px);';
-                case 'left': return 'left: 0; top: 50%; transform: translate(-100%, -50%) translateX(-10px);';
-                case 'right': return 'left: 100%; top: 50%; transform: translate(0, -50%) translateX(10px);';
-                case 'bottom-left': return 'left: 0; top: 100%; transform: translate(-100%, 0) translateY(10px) translateX(-10px);';
-                case 'bottom': return 'left: 50%; top: 100%; transform: translate(-50%, 0) translateY(10px);';
+                case 'top-left':     return 'left: 0; top: 0; transform: translate(-100%, -100%) translateY(-10px) translateX(-10px);';
+                case 'top':          return 'left: 50%; top: 0; transform: translate(-50%, -100%) translateY(-10px);';
+                case 'top-right':    return 'left: 100%; top: 0; transform: translate(0, -100%) translateY(-10px) translateX(10px);';
+                case 'left':         return 'left: 0; top: 50%; transform: translate(-100%, -50%) translateX(-10px);';
+                case 'right':        return 'left: 100%; top: 50%; transform: translate(0, -50%) translateX(10px);';
+                case 'bottom-left':  return 'left: 0; top: 100%; transform: translate(-100%, 0) translateY(10px) translateX(-10px);';
+                case 'bottom':       return 'left: 50%; top: 100%; transform: translate(-50%, 0) translateY(10px);';
                 case 'bottom-right': return 'left: 100%; top: 100%; transform: translate(0, 0) translateY(10px) translateX(10px);';
-                case 'center': default: return 'left: 50%; top: 50%; transform: translate(-50%, -50%);';
+                case 'center':
+                default:             return 'left: 50%; top: 50%; transform: translate(-50%, -50%);';
             }
         }
 
@@ -192,8 +180,8 @@
             const interactiveHotspots = hotspots.map((h, i) => `
             <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; z-index: ${i+1};">
               <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
-              <div class="tooltip-wrapper" style="position: absolute; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; transition: all 0.3s ease; border-radius: 4px; ${getTooltipCss(h.tooltipPosition)}">
-                <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase; text-align: ${h.textAlign || 'center'};">${h.text}</span>
+              <div class="tooltip-wrapper" style="position: absolute; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px; ${getTooltipCss(h.tooltipPosition)}">
+                <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase;">${h.text}</span>
               </div>
             </div>`).join('');
 
@@ -201,10 +189,26 @@
                    <tr>
                     <td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block; height: auto;" width="20"></td>
                     <td style="width: 12px; padding-bottom: 8px;"> </td>
-                    <td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; text-align: ${h.textAlign || 'left'};">${h.text}</td>
+                    <td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; text-align: left;">${h.text}</td>
                    </tr>`).join('');
 
-            return `<style type="text/css">.hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; } .hotspots-fallback { display: none; max-height: 0; overflow: hidden; } @media screen and (max-width: 580px) { .hotspots-interactive { display: none !important; } .hotspots-fallback { display: block !important; max-height: none !important; overflow: visible !important; } }</style><!--[if !mso]><!--><div class="hotspots-interactive" style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div><!--<![endif]--><div class="hotspots-fallback"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; max-width: 620px; background-color: #DB021d;"><tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; max-width: 620px; height: auto;" width="620"></a></td></tr><tr><td style="padding: 0 20px;"><div style="font-size: 20px; height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="font-size: 20px; height: 20px;"> </div></td></tr></table></div>`;
+            return `<style type="text/css">
+              .hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; }
+              .hotspots-fallback { display: none; max-height: 0; overflow: hidden; }
+              @media screen and (max-width: 580px) {
+                .hotspots-interactive { display: none !important; }
+                .hotspots-fallback { display: block !important; max-height: none !important; overflow: visible !important; }
+              }
+            </style>
+            <!--[if !mso]><!-->
+            <div class="hotspots-interactive" style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div>
+            <!--<![endif]-->
+            <div class="hotspots-fallback">
+              <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; max-width: 620px; background-color: #DB021d;">
+                <tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; max-width: 620px; height: auto;" width="620"></a></td></tr>
+                <tr><td style="padding: 0 20px;"><div style="font-size: 20px; height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="font-size: 20px; height: 20px;"> </div></td></tr>
+              </table>
+            </div>`;
         }
 
         function refreshPreview() {
@@ -221,7 +225,7 @@
             });
 
             elements.addItemBtn.addEventListener('click', () => {
-                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosition: 'top', textAlign: 'center' };
+                const newHotspot = { id: crypto.randomUUID(), text: 'New Hotspot', posX: 50, posY: 50, tooltipPosition: 'top' };
                 state.blockData.hotspots.push(newHotspot);
                 state.selectedHotspotId = newHotspot.id;
                 updateUI();
@@ -229,7 +233,8 @@
             });
 
             elements.visualEditor.addEventListener('click', (e) => {
-                if (e.target.classList.contains('hotspot-marker')) {
+                const targetIsMarker = e.target.classList.contains('hotspot-marker');
+                if (targetIsMarker) {
                     state.selectedHotspotId = e.target.dataset.id;
                     updateUI();
                     return;
@@ -254,28 +259,28 @@
                 const itemEl = e.target.closest('.item');
                 if (!itemEl) return;
                 const id = itemEl.dataset.id;
-                // UPDATED: Include .option-button in the selector
-                const controlButton = e.target.closest('.item-control-btn, .position-button, .option-button');
+                const controlButton = e.target.closest('.item-control-btn, .position-button');
 
                 if (controlButton) {
                     e.stopPropagation();
                     let dataChanged = false;
-                    const hotspot = state.blockData.hotspots.find(h => h.id === id);
-
-                    if (controlButton.classList.contains('option-button')) { // NEW: Handle alignment
-                        if (hotspot) { hotspot.textAlign = controlButton.dataset.align; dataChanged = true; }
-                    } else if (controlButton.classList.contains('position-button')) {
-                        if (hotspot) { hotspot.tooltipPosition = controlButton.dataset.position; dataChanged = true; }
+                    
+                    if (controlButton.classList.contains('position-button')) {
+                        const hotspot = state.blockData.hotspots.find(h => h.id === id);
+                        if (hotspot) {
+                            hotspot.tooltipPosition = controlButton.dataset.position;
+                            dataChanged = true;
+                        }
                     } else if (controlButton.classList.contains('remove-btn')) {
                         state.blockData.hotspots = state.blockData.hotspots.filter(h => h.id !== id);
                         if (state.selectedHotspotId === id) state.selectedHotspotId = state.blockData.hotspots.length > 0 ? state.blockData.hotspots[0].id : null;
                         dataChanged = true;
                     } else if (controlButton.classList.contains('move-up-btn')) {
                         const index = state.blockData.hotspots.findIndex(h => h.id === id);
-                        if (index > 0) { [state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]]; dataChanged = true; }
+                        if (index > 0) {[state.blockData.hotspots[index], state.blockData.hotspots[index - 1]] = [state.blockData.hotspots[index - 1], state.blockData.hotspots[index]]; dataChanged = true;}
                     } else if (controlButton.classList.contains('move-down-btn')) {
                         const index = state.blockData.hotspots.findIndex(h => h.id === id);
-                        if (index < state.blockData.hotspots.length - 1) { [state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]]; dataChanged = true; }
+                        if (index < state.blockData.hotspots.length - 1) {[state.blockData.hotspots[index], state.blockData.hotspots[index + 1]] = [state.blockData.hotspots[index + 1], state.blockData.hotspots[index]]; dataChanged = true;}
                     }
                     
                     if (dataChanged) { updateUI(); refreshPreview(); }
@@ -305,19 +310,19 @@
             state.sdk.getData((data) => {
                 const newBlockData = {};
                 Object.keys(moduleConfig.fields).forEach(key => {
-                    newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
+                    const savedValue = data && data[key];
+                    if (savedValue !== undefined) {
+                        newBlockData[key] = savedValue;
+                    } else {
+                        const defaultValue = moduleConfig.fields[key].defaultValue;
+                        newBlockData[key] = Array.isArray(defaultValue) ? defaultValue.map(item => ({ ...item, id: crypto.randomUUID() })) : defaultValue;
+                    }
                 });
-
-                if (newBlockData.hotspots) {
-                    newBlockData.hotspots = newBlockData.hotspots.map(h => ({
-                        ...h,
-                        id: h.id || crypto.randomUUID(),
-                        textAlign: h.textAlign || 'center', // Ensure default textAlign
-                        tooltipPosition: h.tooltipPosition || 'top' // Ensure default tooltipPosition
-                    }));
-                }
-                
                 state.blockData = newBlockData;
+                
+                if(state.blockData.hotspots) {
+                    state.blockData.hotspots.forEach(h => { if(!h.id) h.id = crypto.randomUUID(); });
+                }
 
                 if (!state.selectedHotspotId && state.blockData.hotspots && state.blockData.hotspots.length > 0) {
                     state.selectedHotspotId = state.blockData.hotspots[0].id;
