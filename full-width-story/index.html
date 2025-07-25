@@ -46,18 +46,10 @@
             </div>
             <div class="field-group" id="titleGroup">
                 <label class="field-label">Title</label>
-                <div id="titleEditor" class="quill-container limited-toolbar"></div>
+                <div id="titleEditor" class="quill-container"></div>
                 <div class="field-group-inline">
                     <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
                     <input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4">
-                </div>
-                <!-- NEW: Title Alignment -->
-                <div class="field-group" style="margin-top: 15px;">
-                    <label class="field-label">Title Alignment</label>
-                    <div class="option-selector" id="titleAlignmentSelector">
-                        <div class="option-button selected" data-value="left">Left</div>
-                        <div class="option-button" data-value="center">Center</div>
-                    </div>
                 </div>
             </div>
             <div class="field-group">
@@ -66,14 +58,6 @@
                 <div class="field-group-inline">
                     <label for="bodyFontSize" class="field-label">Body Font Size (px)</label>
                     <input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4">
-                </div>
-                <!-- NEW: Body Alignment -->
-                <div class="field-group" style="margin-top: 15px;">
-                    <label class="field-label">Body Alignment</label>
-                    <div class="option-selector" id="bodyAlignmentSelector">
-                        <div class="option-button selected" data-value="left">Left</div>
-                        <div class="option-button" data-value="center">Center</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -122,14 +106,14 @@
                 showTitle: { type: 'boolean', defaultValue: true },
                 title: { type: 'richtext', defaultValue: 'Lorem ipsum dolor sit amet', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 24 },
-                titleAlignment: { type: 'text', defaultValue: 'left' }, // NEW
+                titleAlignment: { type: 'text', defaultValue: 'left' },
                 bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.', maxLength: 400 },
                 bodyFontSize: { type: 'number', defaultValue: 16 },
-                bodyAlignment: { type: 'text', defaultValue: 'left' }, // NEW
+                bodyAlignment: { type: 'text', defaultValue: 'left' },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                buttonAlignment: { type: 'text', defaultValue: 'left' }
+                buttonAlignment: { type: 'text', defaultValue: 'center' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -191,10 +175,8 @@
             elements.titleGroup = document.getElementById('titleGroup');
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
-            elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector'); // NEW
             elements.bodyEditor = document.getElementById('bodyEditor');
             elements.bodyFontSize = document.getElementById('bodyFontSize');
-            elements.bodyAlignmentSelector = document.getElementById('bodyAlignmentSelector'); // NEW
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
@@ -213,27 +195,88 @@
 
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
-            function createEditor(selector, fieldName, placeholder, formats, toolbarOptions) {
-                state.editors[fieldName] = new Quill(selector, {
+
+            // --- UPDATED: createEditor now handles alignment controls in the toolbar ---
+            function createEditor(selector, fieldName, alignmentDataKey, placeholder, toolbarOptions) {
+                const editor = new Quill(selector, {
                     theme: 'snow',
                     modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } },
-                    formats: formats, placeholder: placeholder
+                    placeholder: placeholder
                 });
-                const debouncedUpdate = utils.debounce((d, o, source) => {
-                    if (source === 'user') updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML));
+                state.editors[fieldName] = editor;
+
+                // Handle text changes
+                const debouncedUpdate = utils.debounce(() => {
+                    updateData(fieldName, utils.sanitizeHtml(editor.root.innerHTML));
                 }, moduleConfig.debounceDelay);
-                state.editors[fieldName].on('text-change', debouncedUpdate);
-                state.editors[fieldName].on('text-change', () => {
-                    const text = state.editors[fieldName].getText();
-                    const maxLength = moduleConfig.fields[fieldName].maxLength;
-                    if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length);
+                editor.on('text-change', (delta, oldDelta, source) => {
+                    if (source === 'user') debouncedUpdate();
                 });
+
+                // Enforce max length
+                editor.on('text-change', () => {
+                    const text = editor.getText();
+                    const maxLength = moduleConfig.fields[fieldName].maxLength;
+                    if (text.length > maxLength) editor.deleteText(maxLength, text.length);
+                });
+                
+                // --- NEW: Custom handler for the alignment tool ---
+                if (alignmentDataKey) {
+                    const toolbar = editor.getModule('toolbar');
+                    toolbar.addHandler('align', function(value) {
+                        // When an alignment button is clicked, update our external data state
+                        // The `|| 'left'` ensures that deselecting an alignment defaults to left
+                        updateData(alignmentDataKey, value || 'left');
+                        // Then, manually update the toolbar's visual state
+                        updateQuillToolbarAlignment(editor, value || 'left');
+                    });
+                }
             }
+
             try {
-                createEditor('#titleEditor', 'title', 'Enter title...', ['script', 'link'], [[{ 'script': 'super' }], ['link']]);
-                createEditor('#bodyEditor', 'bodyText', 'Enter body text...', ['bold', 'italic', 'script', 'link'], [['bold', 'italic', { 'script': 'super' }], ['link']]);
-                createEditor('#buttonTextEditor', 'buttonText', 'Enter button text...', ['script'], [[{ 'script': 'super' }]]);
+                // Title Editor with Alignment
+                createEditor('#titleEditor', 'title', 'titleAlignment', 'Enter title...', 
+                    [[{ 'script': 'super' }], ['link'], [{ 'align': [] }]]
+                );
+                
+                // Body Text Editor with Alignment
+                createEditor('#bodyEditor', 'bodyText', 'bodyAlignment', 'Enter body text...', 
+                    [['bold', 'italic', { 'script': 'super' }], ['link'], [{ 'align': [] }]]
+                );
+                
+                // Button Text Editor (no alignment)
+                createEditor('#buttonTextEditor', 'buttonText', null, 'Enter button text...', 
+                    [[{ 'script': 'super' }]]
+                );
+
             } catch (error) { throw new Error(`Failed to initialize editors: ${error.message}`); }
+        }
+        
+        // --- NEW: Helper to visually update the Quill toolbar alignment buttons ---
+        function updateQuillToolbarAlignment(editor, alignment) {
+            const toolbarNode = editor.container.previousSibling;
+            if (!toolbarNode) return;
+            
+            // Remove active class from all alignment buttons
+            const alignButtons = toolbarNode.querySelectorAll('.ql-align .ql-picker-item');
+            alignButtons.forEach(button => button.classList.remove('ql-selected'));
+
+            // Add active class to the correct button
+            const selectedButton = toolbarNode.querySelector(`.ql-align .ql-picker-item[data-value="${alignment}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('ql-selected');
+            } else {
+                // Default to left if value is invalid or not found
+                const leftButton = toolbarNode.querySelector('.ql-align .ql-picker-item');
+                if (leftButton) leftButton.classList.add('ql-selected');
+            }
+
+            // Update the main icon display
+            const mainIcon = toolbarNode.querySelector('.ql-align .ql-picker-label');
+            if (mainIcon) {
+                const selectedIcon = (selectedButton || toolbarNode.querySelector('.ql-align .ql-picker-item')).innerHTML;
+                mainIcon.innerHTML = selectedIcon;
+            }
         }
         
         function processRichText(html) {
@@ -262,17 +305,15 @@
             if (showTitle) {
                 const processedTitle = processRichText(utils.getFieldValue('title'));
                 const titleSize = utils.getFieldValue('titleFontSize');
-                const titleAlign = utils.getFieldValue('titleAlignment'); // UPDATED
+                const titleAlign = utils.getFieldValue('titleAlignment');
                 const titleLineHeight = titleSize + 8;
-                // UPDATED: Added titleAlign to style
                 titleHtml = `<tr><td class="mobile-text-left" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
             }
 
             const processedBody = processRichText(utils.getFieldValue('bodyText'));
             const bodySize = utils.getFieldValue('bodyFontSize');
-            const bodyAlign = utils.getFieldValue('bodyAlignment'); // UPDATED
+            const bodyAlign = utils.getFieldValue('bodyAlignment');
             const bodyLineHeight = bodySize + 12;
-            // UPDATED: Added bodyAlign to style
             const bodyHtml = `<tr><td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${bodyAlign}; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
             
             let buttonHtml = '';
@@ -295,9 +336,7 @@
                 if (state.sdk.setData) {
                     state.sdk.setData({ ...state.blockData, content: html });
                 }
-            } catch (error) {
-                utils.showError(`Preview update failed: ${error.message}`);
-            }
+            } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
 
         function validateUrlInput(input, errorElement) {
@@ -309,6 +348,7 @@
         }
 
         function initializeEventHandlers() {
+            state.eventListeners = []; // Clear previous listeners
             function setupOptionSelector(selectorElement, dataKey) {
                 selectorElement.querySelectorAll('.option-button').forEach(option => {
                     const handler = (e) => {
@@ -322,14 +362,11 @@
             }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
-            setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment'); // NEW
-            setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment'); // NEW
 
             function setupToggle(toggleElement, groupElement, dataKey) {
                  const handler = (e) => {
-                    const isChecked = e.target.checked;
-                    updateData(dataKey, isChecked);
-                    groupElement.classList.toggle('disabled-field', !isChecked);
+                    updateData(dataKey, e.target.checked);
+                    groupElement.classList.toggle('disabled-field', !e.target.checked);
                 };
                 toggleElement.addEventListener('change', handler);
                 state.eventListeners.push({ element: toggleElement, event: 'change', handler });
@@ -344,7 +381,7 @@
                     let value = parseInt(input.value, 10);
                     const min = parseInt(input.min, 10);
                     const max = parseInt(input.max, 10);
-                    if (isNaN(value)) { value = moduleConfig.fields[dataKey].defaultValue; }
+                    if (isNaN(value)) value = moduleConfig.fields[dataKey].defaultValue;
                     value = Math.max(min, Math.min(value, max));
                     const correctedValue = Math.round(value / step) * step;
                     input.value = correctedValue;
@@ -352,7 +389,7 @@
                 };
                 const liveUpdateOnInput = (e) => {
                     const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value)) { debouncedUpdateData(dataKey, value); }
+                    if (!isNaN(value)) debouncedUpdateData(dataKey, value);
                 };
                 inputElement.addEventListener('input', liveUpdateOnInput);
                 inputElement.addEventListener('blur', correctValueOnBlur);
@@ -379,14 +416,14 @@
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
-                    if (data && Object.keys(data).length > 0) {
-                        Object.keys(moduleConfig.fields).forEach(key => {
-                            if (data.hasOwnProperty(key)) {
-                                state.blockData[key] = utils.sanitizeHtml(data[key]);
-                            }
-                        });
-                    }
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue;
+                        if (moduleConfig.fields[key].type === 'richtext' || (typeof state.blockData[key] === 'string' && (state.blockData[key].includes('<') || state.blockData[key].includes('>')))) {
+                            state.blockData[key] = utils.sanitizeHtml(state.blockData[key]);
+                        }
+                    });
 
+                    // Set UI state from data
                     function setSelectorState(selectorElement, dataKey) {
                         const value = utils.getFieldValue(dataKey);
                         if (selectorElement) {
@@ -395,9 +432,9 @@
                     }
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
-                    setSelectorState(elements.titleAlignmentSelector, 'titleAlignment'); // NEW
-                    setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment'); // NEW
-
+                    
+                    updateQuillToolbarAlignment(state.editors.title, utils.getFieldValue('titleAlignment'));
+                    updateQuillToolbarAlignment(state.editors.bodyText, utils.getFieldValue('bodyAlignment'));
 
                     function setToggleState(toggleEl, groupEl, dataKey) {
                         const isChecked = utils.getFieldValue(dataKey);
@@ -409,8 +446,8 @@
                     
                     if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
-                    
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
+
                     Object.keys(state.editors).forEach(key => {
                         if (state.editors[key]) state.editors[key].root.innerHTML = utils.getFieldValue(key);
                     });
