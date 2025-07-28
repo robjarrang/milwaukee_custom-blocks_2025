@@ -7,15 +7,25 @@
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-editor{min-height:40px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
-        .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
-        .field-group-inline .field-label { margin-bottom: 0; }
-        .field-group-inline .field-input { width: 80px; }
-        
-        /* -- NEW STYLE FOR ALIGNMENT ICONS -- */
-        .option-button svg {
-            display: block;
-            margin: 0 auto;
-            fill: currentColor; /* This makes the icon color change with the button text color */
+        .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
+
+        /* -- NEW COMPACT LAYOUT STYLES -- */
+        .style-controls-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .style-control-group .field-label {
+            margin-bottom: 5px;
+        }
+        .style-control-group .field-input {
+            width: 80px;
+            padding: 6px 8px; /* Slightly smaller padding for compact view */
+        }
+        .style-control-group .option-selector {
+            width: 110px; /* Give alignment buttons a fixed width */
         }
     </style>
 </head>
@@ -26,69 +36,32 @@
     
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Full Width Story</h2>
-        
         <div class="error-banner" id="errorBanner"></div>
         
         <!-- General Settings -->
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
-            <div class="field-group">
-                <label class="field-label">Background Colour</label>
-                <div class="option-selector" id="backgroundColorSelector">
-                    <div class="option-button selected" data-value="red">Red</div>
-                    <div class="option-button" data-value="black">Black</div>
-                </div>
-            </div>
+            <div class="field-group"><label class="field-label">Background Colour</label><div class="option-selector" id="backgroundColorSelector"><div class="option-button selected" data-value="red">Red</div><div class="option-button" data-value="black">Black</div></div></div>
         </div>
 
         <!-- Content Settings -->
         <div class="section-divider">
             <div class="section-title">Content Settings</div>
-             <div class="toggle-container">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="showTitle" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <label for="showTitle" class="checkbox-label">Show Title</label>
-            </div>
+            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showTitle" checked><span class="toggle-slider"></span></label><label for="showTitle" class="checkbox-label">Show Title</label></div>
             <div class="field-group" id="titleGroup">
                 <label class="field-label">Title</label>
                 <div id="titleEditor" class="quill-container limited-toolbar"></div>
-                <div class="field-group-inline">
-                    <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
-                    <input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4">
-                </div>
-                <!-- UPDATED: Title Alignment -->
-                <div class="field-group" style="margin-top: 15px;">
-                    <label class="field-label">Title Alignment</label>
-                    <div class="option-selector" id="titleAlignmentSelector">
-                        <div class="option-button selected" data-value="left" title="Align Left">
-                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg>
-                        </div>
-                        <div class="option-button" data-value="center" title="Align Center">
-                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg>
-                        </div>
-                    </div>
+                <div class="style-controls-wrapper">
+                    <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4"></div>
+                    <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
             <div class="field-group">
                 <label class="field-label">Body Text</label>
                 <div id="bodyEditor" class="quill-container"></div>
-                <div class="field-group-inline">
-                    <label for="bodyFontSize" class="field-label">Body Font Size (px)</label>
-                    <input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4">
-                </div>
-                <!-- UPDATED: Body Alignment -->
-                <div class="field-group" style="margin-top: 15px;">
-                    <label class="field-label">Body Alignment</label>
-                    <div class="option-selector" id="bodyAlignmentSelector">
-                        <div class="option-button selected" data-value="left" title="Align Left">
-                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg>
-                        </div>
-                        <div class="option-button" data-value="center" title="Align Center">
-                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg>
-                        </div>
-                    </div>
+                <div class="style-controls-wrapper">
+                    <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4"></div>
+                    <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="bodyAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
         </div>
@@ -96,34 +69,12 @@
         <!-- Button Settings -->
         <div class="section-divider">
             <div class="section-title">Button Settings</div>
-            <div class="toggle-container">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="showButton" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <label for="showButton" class="checkbox-label">Show Button</label>
-            </div>
+            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
             <div id="buttonFieldsGroup">
-                <div class="field-group">
-                    <label for="buttonText" class="field-label">Button Text</label>
-                    <div id="buttonTextEditor" class="quill-container limited-toolbar"></div>
-                </div>
-                <div class="field-group">
-                    <label for="buttonUrl" class="field-label">Button Link URL</label>
-                    <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
-                    <div class="field-error" id="buttonUrlError">Please enter a valid URL.</div>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">Button Alignment</label>
-                     <!-- UPDATED: Button Alignment -->
-                    <div class="option-selector" id="buttonAlignmentSelector">
-                        <div class="option-button" data-value="left" title="Align Left">
-                             <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg>
-                        </div>
-                        <div class="option-button selected" data-value="center" title="Align Center">
-                            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg>
-                        </div>
-                    </div>
+                <div class="field-group"><label for="buttonText" class="field-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div>
+                <div class="field-group"><label for="buttonUrl" class="field-label">Button Link URL</label><input type="url" id="buttonUrl" class="field-input"><div class="field-error" id="buttonUrlError">Please enter a valid URL.</div></div>
+                <div class="style-controls-wrapper">
+                    <div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
         </div>
@@ -159,47 +110,11 @@
         const elements = {};
 
         const utils = {
-            debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            },
-            isValidUrl(string) {
-                if (!string || string.trim() === '') return true;
-                try {
-                    const url = new URL(string);
-                    return url.protocol === 'http:' || url.protocol === 'https:';
-                } catch (_) { return false; }
-            },
-            sanitizeHtml(html) {
-                if (!html) return '';
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                temp.querySelectorAll('script, style').forEach(el => el.remove());
-                const allElements = temp.getElementsByTagName('*');
-                for (let el of allElements) { for (let attr of el.attributes) { if (attr.name.startsWith('on')) el.removeAttribute(attr.name); } }
-                return temp.innerHTML;
-            },
-            showError(message, permanent = false) {
-                const errorBanner = elements.errorBanner;
-                if (errorBanner) {
-                    errorBanner.textContent = message;
-                    errorBanner.classList.add('show');
-                    if (!permanent) setTimeout(() => errorBanner.classList.remove('show'), 5000);
-                }
-                console.error(`${moduleConfig.name} Error:`, message);
-            },
-            getFieldValue(fieldName) {
-                const value = state.blockData[fieldName];
-                const fieldConfig = moduleConfig.fields[fieldName];
-                if (value !== undefined && value !== null) {
-                    return fieldConfig.type === 'number' ? parseFloat(value) : value;
-                }
-                return fieldConfig.defaultValue;
-            }
+            debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
+            sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
+            showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
         };
 
         function cacheElements() {
@@ -234,20 +149,10 @@
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             function createEditor(selector, fieldName, placeholder, formats, toolbarOptions) {
-                state.editors[fieldName] = new Quill(selector, {
-                    theme: 'snow',
-                    modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } },
-                    formats: formats, placeholder: placeholder
-                });
-                const debouncedUpdate = utils.debounce((d, o, source) => {
-                    if (source === 'user') updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML));
-                }, moduleConfig.debounceDelay);
+                state.editors[fieldName] = new Quill(selector, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats: formats, placeholder: placeholder });
+                const debouncedUpdate = utils.debounce((d, o, source) => { if (source === 'user') updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML)); }, moduleConfig.debounceDelay);
                 state.editors[fieldName].on('text-change', debouncedUpdate);
-                state.editors[fieldName].on('text-change', () => {
-                    const text = state.editors[fieldName].getText();
-                    const maxLength = moduleConfig.fields[fieldName].maxLength;
-                    if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length);
-                });
+                state.editors[fieldName].on('text-change', () => { const text = state.editors[fieldName].getText(); const maxLength = moduleConfig.fields[fieldName].maxLength; if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length); });
             }
             try {
                 createEditor('#titleEditor', 'title', 'Enter title...', ['script', 'link'], [[{ 'script': 'super' }], ['link']]);
@@ -307,132 +212,52 @@
 
         function refreshPreview() {
             if (state.isLoading || !state.sdk) return;
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                if (state.sdk.setData) {
-                    state.sdk.setData({ ...state.blockData, content: html });
-                }
-            } catch (error) {
-                utils.showError(`Preview update failed: ${error.message}`);
-            }
-        }
-
-        function validateUrlInput(input, errorElement) {
-            const value = input.value.trim();
-            const isValid = !value || utils.isValidUrl(value);
-            input.classList.toggle('error', !isValid);
-            if(errorElement) errorElement.style.display = isValid ? 'none' : 'block';
-            return isValid;
+            try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
 
         function initializeEventHandlers() {
-            function setupOptionSelector(selectorElement, dataKey) {
-                if (!selectorElement) return;
-                selectorElement.querySelectorAll('.option-button').forEach(option => {
-                    const handler = (e) => {
-                        const button = e.currentTarget;
-                        updateData(dataKey, button.dataset.value);
-                        selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
-                        button.classList.add('selected');
-                    };
-                    option.addEventListener('click', handler);
-                    state.eventListeners.push({ element: option, event: 'click', handler });
-                });
-            }
+            state.eventListeners = [];
+            function setupOptionSelector(selectorElement, dataKey) { if (!selectorElement) return; selectorElement.querySelectorAll('.option-button').forEach(option => { const handler = (e) => { const button = e.currentTarget; updateData(dataKey, button.dataset.value); selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); button.classList.add('selected'); }; option.addEventListener('click', handler); state.eventListeners.push({ element: option, event: 'click', handler }); }); }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
             setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment');
 
-            function setupToggle(toggleElement, groupElement, dataKey) {
-                 const handler = (e) => {
-                    const isChecked = e.target.checked;
-                    updateData(dataKey, isChecked);
-                    groupElement.classList.toggle('disabled-field', !isChecked);
-                };
-                toggleElement.addEventListener('change', handler);
-                state.eventListeners.push({ element: toggleElement, event: 'change', handler });
-            }
+            function setupToggle(toggleElement, groupElement, dataKey) { const handler = (e) => { const isChecked = e.target.checked; updateData(dataKey, isChecked); groupElement.classList.toggle('disabled-field', !isChecked); }; toggleElement.addEventListener('change', handler); state.eventListeners.push({ element: toggleElement, event: 'change', handler }); }
             setupToggle(elements.showTitle, elements.titleGroup, 'showTitle');
             setupToggle(elements.showButton, elements.buttonFieldsGroup, 'showButton');
 
-            function setupNumberInput(inputElement, dataKey) {
-                const step = 4;
-                const correctValueOnBlur = (e) => {
-                    const input = e.target;
-                    let value = parseInt(input.value, 10);
-                    const min = parseInt(input.min, 10);
-                    const max = parseInt(input.max, 10);
-                    if (isNaN(value)) { value = moduleConfig.fields[dataKey].defaultValue; }
-                    value = Math.max(min, Math.min(value, max));
-                    const correctedValue = Math.round(value / step) * step;
-                    input.value = correctedValue;
-                    updateData(dataKey, correctedValue);
-                };
-                const liveUpdateOnInput = (e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value)) { debouncedUpdateData(dataKey, value); }
-                };
-                inputElement.addEventListener('input', liveUpdateOnInput);
-                inputElement.addEventListener('blur', correctValueOnBlur);
-                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
-                state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
-            }
+            function setupNumberInput(inputElement, dataKey) { const step = 4; const correctValueOnBlur = (e) => { const input = e.target; let value = parseInt(input.value, 10); const min = parseInt(input.min, 10), max = parseInt(input.max, 10); if (isNaN(value)) { value = moduleConfig.fields[dataKey].defaultValue; } value = Math.max(min, Math.min(value, max)); const correctedValue = Math.round(value / step) * step; input.value = correctedValue; updateData(dataKey, correctedValue); }; const liveUpdateOnInput = (e) => { const value = parseInt(e.target.value, 10); if (!isNaN(value)) { debouncedUpdateData(dataKey, value); } }; inputElement.addEventListener('input', liveUpdateOnInput); inputElement.addEventListener('blur', correctValueOnBlur); state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput }); state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur }); }
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.bodyFontSize, 'bodyFontSize');
 
-            const urlHandler = (e) => {
-                if (validateUrlInput(elements.buttonUrl, elements.buttonUrlError)) {
-                    debouncedUpdateData('buttonUrl', e.target.value.trim());
-                }
-            };
+            const urlHandler = (e) => { if (utils.isValidUrl(elements.buttonUrl.value, elements.buttonUrlError)) { debouncedUpdateData('buttonUrl', e.target.value.trim()); } };
             elements.buttonUrl.addEventListener('input', urlHandler);
-            elements.buttonUrl.addEventListener('blur', () => validateUrlInput(elements.buttonUrl, elements.buttonUrlError));
+            elements.buttonUrl.addEventListener('blur', () => utils.isValidUrl(elements.buttonUrl.value, elements.buttonUrlError));
             state.eventListeners.push({ element: elements.buttonUrl, event: 'input', handler: urlHandler });
         }
 
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
-            
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
-                    if (data && Object.keys(data).length > 0) {
-                        Object.keys(moduleConfig.fields).forEach(key => {
-                            if (data.hasOwnProperty(key)) {
-                                state.blockData[key] = utils.sanitizeHtml(data[key]);
-                            }
-                        });
-                    }
-
-                    function setSelectorState(selectorElement, dataKey) {
-                        const value = utils.getFieldValue(dataKey);
-                        if (selectorElement) {
-                            selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value));
-                        }
-                    }
+                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
+                    function setSelectorState(selectorElement, dataKey) { const value = utils.getFieldValue(dataKey); if (selectorElement) { selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value)); } }
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
                     setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
                     setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment');
 
-                    function setToggleState(toggleEl, groupEl, dataKey) {
-                        const isChecked = utils.getFieldValue(dataKey);
-                        toggleEl.checked = isChecked;
-                        groupEl.classList.toggle('disabled-field', !isChecked);
-                    }
+                    function setToggleState(toggleEl, groupEl, dataKey) { const isChecked = utils.getFieldValue(dataKey); toggleEl.checked = isChecked; groupEl.classList.toggle('disabled-field', !isChecked); }
                     setToggleState(elements.showTitle, elements.titleGroup, 'showTitle');
                     setToggleState(elements.showButton, elements.buttonFieldsGroup, 'showButton');
                     
                     if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
-                    
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-                    Object.keys(state.editors).forEach(key => {
-                        if (state.editors[key]) state.editors[key].root.innerHTML = utils.getFieldValue(key);
-                    });
+                    Object.keys(state.editors).forEach(key => { if (state.editors[key]) state.editors[key].root.innerHTML = utils.getFieldValue(key); });
                     
                     refreshPreview();
                     state.retryCount = 0;
@@ -446,28 +271,19 @@
             });
         }
 
-        function cleanup() {
-            Object.values(state.editors).forEach(editor => editor && editor.off('text-change'));
-            state.eventListeners.forEach(({ element, event, handler }) => {
-                if (element && element.removeEventListener) element.removeEventListener(event, handler);
-            });
-            state.eventListeners = [];
-        }
+        function cleanup() { Object.values(state.editors).forEach(e => e && e.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
 
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
-                
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
-                
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
-                
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
@@ -481,11 +297,7 @@
             }
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeWithRetry);
-        } else {
-            initializeWithRetry();
-        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
     </script>
 </body>
 </html>
