@@ -6,58 +6,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
-        
-        /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
         .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
         .field-group-inline .field-label { margin-bottom: 0; }
         .field-group-inline .field-input { width: 80px; }
+        .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
     
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Lead Banner</h2>
-        
         <div class="error-banner" id="errorBanner"></div>
         
-        <!-- Banner Settings -->
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
-            <div class="field-group">
-                <label for="backgroundImage" class="field-label">Background Image URL</label>
-                <input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg">
-                <div class="field-error" id="backgroundImageError">Please enter a valid image URL (http:// or https://)</div>
-            </div>
+            <div class="field-group"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
         </div>
 
-        <!-- Content Settings -->
         <div class="section-divider">
             <div class="section-title">Content</div>
-            <div class="field-group">
-                <label class="field-label">Title</label>
-                <div id="titleEditor" class="quill-container limited-toolbar"></div>
-                 <div class="field-group-inline">
-                    <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
-                    <input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4">
-                </div>
-            </div>
-            <div class="field-group">
-                <label class="field-label">Subtitle</label>
-                <div id="subtitleEditor" class="quill-container"></div>
-                 <div class="field-group-inline">
-                    <label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label>
-                    <input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4">
-                </div>
-            </div>
-            <div class="field-group">
-                <label for="contentUrl" class="field-label">Content Link URL</label>
-                <input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
-                <div class="field-error" id="contentUrlError">Please enter a valid URL (http:// or https://)</div>
-            </div>
+            <!-- NEW: Position Controls -->
+            <div class="field-group"><label class="field-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
+            <div class="field-group"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
+            <div class="section-divider" style="margin:20px 0; padding-top:15px;"></div>
+
+            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="field-group-inline"><label for="titleFontSize" class="field-label">Title Font Size (px)</label><input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4"></div></div>
+            <div class="field-group"><label class="field-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
+            <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
         </div>
     </div>
 
@@ -66,131 +43,72 @@
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
-        
         const moduleConfig = {
             name: 'Lead Banner',
             fields: {
                 backgroundImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/56a309bc-df67-4b80-a64c-cd19ed07769c.jpg', validator: 'url' },
+                verticalAlign: { type: 'text', defaultValue: 'middle' },
+                textAlign: { type: 'text', defaultValue: 'center' },
                 title: { type: 'richtext', defaultValue: 'Title goes here', maxLength: 200 },
-                titleFontSize: { type: 'number', defaultValue: 28 }, // NEW
+                titleFontSize: { type: 'number', defaultValue: 28 },
                 subtitle: { type: 'richtext', defaultValue: 'Subtitle goes here', maxLength: 300 },
-                subtitleFontSize: { type: 'number', defaultValue: 18 }, // NEW
+                subtitleFontSize: { type: 'number', defaultValue: 18 },
                 contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
             },
-            debounceDelay: 300,
-            maxRetries: 3
+            debounceDelay: 300, maxRetries: 3
         };
-
         const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
         const elements = {};
-
         const utils = {
-            debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => { clearTimeout(timeout); func.apply(this, args); };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            },
-            isValidUrl(string) {
-                if (!string || string.trim() === '') return true;
-                try {
-                    const url = new URL(string);
-                    return url.protocol === 'http:' || url.protocol === 'https:';
-                } catch (_) { return false; }
-            },
-            sanitizeHtml(html) {
-                if (!html) return '';
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                temp.querySelectorAll('script, style').forEach(el => el.remove());
-                const allElements = temp.getElementsByTagName('*');
-                for (let el of allElements) { for (let attr of el.attributes) { if (attr.name.startsWith('on')) el.removeAttribute(attr.name); } }
-                return temp.innerHTML;
-            },
-            showError(message, permanent = false) {
-                const errorBanner = elements.errorBanner;
-                if (errorBanner) {
-                    errorBanner.textContent = message;
-                    errorBanner.classList.add('show');
-                    if (!permanent) setTimeout(() => errorBanner.classList.remove('show'), 5000);
-                }
-                console.error('Lead Banner Error:', message);
-            },
-            getFieldValue(fieldName) {
-                const value = state.blockData[fieldName];
-                const fieldConfig = moduleConfig.fields[fieldName];
-                if (value !== undefined && value !== null) {
-                    return fieldConfig.type === 'number' ? parseFloat(value) : value;
-                }
-                return fieldConfig.defaultValue;
-            }
+            debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
+            isValidUrl(string) { if (!string || string.trim() === '') return true; try { const url = new URL(string); return url.protocol === 'http:' || url.protocol === 'https:'; } catch (_) { return false; } },
+            sanitizeHtml(html) { if (!html) return ''; const temp = document.createElement('div'); temp.innerHTML = html; temp.querySelectorAll('script, style').forEach(el => el.remove()); const allElements = temp.getElementsByTagName('*'); for (let el of allElements) { for (let attr of el.attributes) { if (attr.name.startsWith('on')) el.removeAttribute(attr.name); } } return temp.innerHTML; },
+            showError(message, permanent = false) { if (elements.errorBanner) { elements.errorBanner.textContent = message; elements.errorBanner.classList.add('show'); if (!permanent) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error('Lead Banner Error:', message); },
+            getFieldValue(fieldName) { const value = state.blockData[fieldName]; const fieldConfig = moduleConfig.fields[fieldName]; return (value !== undefined && value !== null) ? (fieldConfig.type === 'number' ? parseFloat(value) : value) : fieldConfig.defaultValue; }
         };
-
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundImage = document.getElementById('backgroundImage');
             elements.backgroundImageError = document.getElementById('backgroundImageError');
+            elements.verticalAlignSelector = document.getElementById('verticalAlignSelector');
+            elements.textAlignSelector = document.getElementById('textAlignSelector');
             elements.titleEditor = document.getElementById('titleEditor');
-            elements.titleFontSize = document.getElementById('titleFontSize'); // NEW
+            elements.titleFontSize = document.getElementById('titleFontSize');
             elements.subtitleEditor = document.getElementById('subtitleEditor');
-            elements.subtitleFontSize = document.getElementById('subtitleFontSize'); // NEW
+            elements.subtitleFontSize = document.getElementById('subtitleFontSize');
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
         }
-
         function setLoadingState(loading) {
             state.isLoading = loading;
-            if (elements.mainContainer && elements.loadingOverlay) {
-                elements.mainContainer.classList.toggle('loading', loading);
-                elements.loadingOverlay.classList.toggle('show', loading);
-            }
+            if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
         }
-
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             try {
                 const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
                     state.editors[fieldName] = new Quill(element, { theme: 'snow', modules: { toolbar, clipboard: { matchVisual: false } }, formats, placeholder });
-                    const debouncedUpdate = utils.debounce((d, o, source) => {
-                        if (source === 'user') updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML));
-                    }, moduleConfig.debounceDelay);
+                    const debouncedUpdate = utils.debounce(() => updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML)), moduleConfig.debounceDelay);
                     state.editors[fieldName].on('text-change', debouncedUpdate);
-                    state.editors[fieldName].on('text-change', () => {
-                        const text = state.editors[fieldName].getText();
-                        const maxLength = moduleConfig.fields[fieldName].maxLength;
-                        if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length);
-                    });
+                    state.editors[fieldName].on('text-change', () => { const text = state.editors[fieldName].getText(); const maxLength = moduleConfig.fields[fieldName].maxLength; if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length); });
                 };
                 createEditor('title', elements.titleEditor, [[{ 'script': 'super' }], ['link']], ['script', 'link'], 'Enter title...');
                 createEditor('subtitle', elements.subtitleEditor, [['bold', 'italic'], ['link']], ['bold', 'italic', 'link'], 'Enter subtitle...');
             } catch (error) { throw new Error(`Failed to initialize editors: ${error.message}`); }
         }
-
         function processRichText(html) {
             if (!html) return '';
             const temp = document.createElement('div');
             temp.innerHTML = utils.sanitizeHtml(html);
-            temp.querySelectorAll('a').forEach(link => {
-                if (!link.style.color) link.style.color = '#ffffff';
-                link.style.textDecoration = 'none';
-                if (!link.getAttribute('href')) link.setAttribute('href', '#');
-            });
+            temp.querySelectorAll('a').forEach(link => { if (!link.style.color) link.style.color = '#ffffff'; link.style.textDecoration = 'none'; if (!link.getAttribute('href')) link.setAttribute('href', '#'); });
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
-
         function updateData(field, value) {
-            if (state.blockData[field] != value) {
-                state.blockData[field] = value;
-                refreshPreview();
-            }
+            if (state.blockData[field] != value) { state.blockData[field] = value; refreshPreview(); }
         }
-
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
-
         function generateTemplate() {
             const bgImage = utils.getFieldValue('backgroundImage');
             const contentUrl = utils.getFieldValue('contentUrl');
@@ -198,154 +116,106 @@
             const processedSubtitle = processRichText(utils.getFieldValue('subtitle'));
             const titleSize = utils.getFieldValue('titleFontSize');
             const subtitleSize = utils.getFieldValue('subtitleFontSize');
+            const verticalAlign = utils.getFieldValue('verticalAlign');
+            const textAlign = utils.getFieldValue('textAlign');
             const titleLineHeight = titleSize + 16;
             const subtitleLineHeight = subtitleSize + 8;
-            
             const logoImage = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/a3a77919-71b9-4b9d-b1ad-90f327487e3f.png';
             const logoUrl = 'https://%%CountryCode%%.milwaukeetool.eu/';
             const fallbackColor = '#DB021D';
-
-            const logoHtml = `<!-- Header with logos --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%"><tr><td align="left" class="leadbanner-logo-cell" style="background-color: transparent; padding: 0 0 0 12px;" valign="top"><a href="${logoUrl}" style="display: inline-block; position: relative; z-index: 2;" target="_blank"><img alt="Logo" src="${logoImage}" style="border: 0; display: block; height: auto; outline: none; text-decoration: none;" width="180"></a></td></tr></table><!-- END Header with logos -->`;
-
-            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${fallbackColor}; width: 620px;"><tr><td align="center" class="content-inner" style="width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position: center center; background-size: cover; background-repeat: no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height: 280px; width: 100%;" width="100%"><tr><td align="center" class="leadbanner-content" height="280" style="padding: 20px 40px;" valign="middle"><h1 class="leadbanner-title" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', sans-serif, 'Open Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0 0 10px 0; padding: 0; text-transform: uppercase;"><a href="${contentUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open Sans'; font-size: ${subtitleSize}px; font-stretch: condensed; font-weight: normal; line-height: ${subtitleLineHeight}px; margin: 0; padding: 0; text-transform: uppercase;"><a href="${contentUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedSubtitle}</a></p></td></tr><tr><td class="block" style="width: 100%;"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
+            
+            // Adjust padding based on vertical alignment to ensure text doesn't touch edges
+            let verticalPadding = '20px';
+            if (verticalAlign === 'top') verticalPadding = '40px 20px 20px 20px';
+            if (verticalAlign === 'bottom') verticalPadding = '20px 20px 40px 20px';
+            
+            const logoHtml = `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="left" style="padding:0 0 0 12px;" valign="top"><a href="${logoUrl}" target="_blank"><img alt="Logo" src="${logoImage}" style="border:0;display:block;height:auto;outline:none;text-decoration:none;" width="180"></a></td></tr></table>`;
+            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${verticalPadding} 40px; text-align:${textAlign};" valign="${verticalAlign}"><h1 class="leadbanner-title" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',sans-serif,'Open Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0 0 10px 0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:${subtitleSize}px;font-stretch:condensed;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedSubtitle}</a></p></td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
         }
-
         function refreshPreview() {
             if (state.isLoading || !state.sdk) return;
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                if (typeof state.sdk.setData === 'function') {
-                    state.sdk.setData({ ...state.blockData, content: html });
-                }
-            } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
+            try { const html = generateTemplate(); state.sdk.setContent(html); if (typeof state.sdk.setData === 'function') { state.sdk.setData({ ...state.blockData, content: html }); } } 
+            catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
-
-        function validateUrlInput(input, errorElement) {
-            const value = input.value.trim();
-            const isValid = !value || utils.isValidUrl(value);
-            input.classList.toggle('error', !isValid);
-            if (errorElement) errorElement.style.display = isValid ? 'none' : 'block';
-            return isValid;
-        }
-
+        function validateUrlInput(input, errorElement) { const value = input.value.trim(); const isValid = !value || utils.isValidUrl(value); input.classList.toggle('error', !isValid); if (errorElement) errorElement.style.display = isValid ? 'none' : 'block'; return isValid; }
         function initializeEventHandlers() {
-            state.eventListeners = []; // Clear previous listeners
-            
+            state.eventListeners = [];
             function setupUrlInput(inputEl, errorEl, dataKey) {
-                const handler = (e) => {
-                    if (validateUrlInput(inputEl, errorEl)) {
-                        debouncedUpdateData(dataKey, e.target.value.trim());
-                    }
-                };
+                const handler = (e) => { if (validateUrlInput(inputEl, errorEl)) { debouncedUpdateData(dataKey, e.target.value.trim()); } };
                 inputEl.addEventListener('input', handler);
                 inputEl.addEventListener('blur', () => validateUrlInput(inputEl, errorEl));
                 state.eventListeners.push({ element: inputEl, event: 'input', handler });
             }
             setupUrlInput(elements.backgroundImage, elements.backgroundImageError, 'backgroundImage');
             setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
-
-            // --- ROBUST NUMBER INPUT HANDLER ---
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
                 const correctValueOnBlur = (e) => {
                     const input = e.target;
                     let value = parseInt(input.value, 10);
-                    const min = parseInt(input.min, 10);
-                    const max = parseInt(input.max, 10);
+                    const min = parseInt(input.min, 10), max = parseInt(input.max, 10);
                     if (isNaN(value)) value = moduleConfig.fields[dataKey].defaultValue;
                     value = Math.max(min, Math.min(value, max));
                     const correctedValue = Math.round(value / step) * step;
                     input.value = correctedValue;
                     updateData(dataKey, correctedValue);
                 };
-                const liveUpdateOnInput = (e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value)) debouncedUpdateData(dataKey, value);
-                };
-                inputElement.addEventListener('input', liveUpdateOnInput);
                 inputElement.addEventListener('blur', correctValueOnBlur);
-                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.subtitleFontSize, 'subtitleFontSize');
+            
+            function setupOptionSelector(el, key) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); }; opt.addEventListener('click', handler); state.eventListeners.push({ element: opt, event: 'click', handler }); }); }
+            setupOptionSelector(elements.verticalAlignSelector, 'verticalAlign');
+            setupOptionSelector(elements.textAlignSelector, 'textAlign');
         }
-
         function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') return utils.showError('SDK not available');
             setLoadingState(true);
             state.sdk.getData((data) => {
                 try {
-                    state.blockData = {}; // Reset block data
+                    state.blockData = {};
                     const fields = moduleConfig.fields;
-                    Object.keys(fields).forEach(key => {
-                        state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : fields[key].defaultValue;
-                        if (fields[key].type === 'richtext') {
-                            state.blockData[key] = utils.sanitizeHtml(state.blockData[key]);
-                        }
-                    });
-
-                    // Update UI from data
-                    if (elements.backgroundImage) elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
-                    if (elements.contentUrl) elements.contentUrl.value = utils.getFieldValue('contentUrl');
-                    if (state.editors.title) state.editors.title.root.innerHTML = utils.getFieldValue('title');
-                    if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
-                    if (state.editors.subtitle) state.editors.subtitle.root.innerHTML = utils.getFieldValue('subtitle');
-                    if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+                    Object.keys(fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : fields[key].defaultValue; if (fields[key].type === 'richtext') { state.blockData[key] = utils.sanitizeHtml(state.blockData[key]); } });
+                    
+                    elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
+                    elements.contentUrl.value = utils.getFieldValue('contentUrl');
+                    state.editors.title.root.innerHTML = utils.getFieldValue('title');
+                    elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
+                    state.editors.subtitle.root.innerHTML = utils.getFieldValue('subtitle');
+                    elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+                    
+                    function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
+                    setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
+                    setSelectorState(elements.textAlignSelector, 'textAlign');
                     
                     refreshPreview();
-                    state.retryCount = 0;
-                } catch (error) {
-                    utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
-                    refreshPreview();
-                } finally {
-                    setLoadingState(false);
-                }
+                } catch (error) { utils.showError(`Failed to load data: ${error.message}`); Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); refreshPreview(); } 
+                finally { setLoadingState(false); }
             });
         }
-
-        function cleanup() {
-            Object.values(state.editors).forEach(editor => editor && editor.off('text-change'));
-            state.eventListeners.forEach(({ element, event, handler }) => {
-                if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler);
-            });
-            state.eventListeners = [];
-        }
-
+        function cleanup() { Object.values(state.editors).forEach(editor => editor && editor.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler); }); state.eventListeners = []; }
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
-                
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
-                
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
-                
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
-                if (state.retryCount < moduleConfig.maxRetries) {
-                    state.retryCount++;
-                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
-                } else {
-                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
-                }
+                if (state.retryCount < moduleConfig.maxRetries) { state.retryCount++; setTimeout(() => initializeWithRetry(), 1000 * state.retryCount); } 
+                else { utils.showError('Failed to initialize after multiple attempts. Please refresh.', true); }
                 setLoadingState(false);
             }
         }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeWithRetry);
-        } else {
-            initializeWithRetry();
-        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
     </script>
 </body>
 </html>
