@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Full Width Story Block</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.3/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-editor{min-height:40px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.3/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
@@ -106,15 +106,64 @@
             maxRetries: 3
         };
 
-        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const state = { 
+            sdk: null, 
+            editors: {}, 
+            blockData: {}, 
+            isLoading: false, 
+            isInitialized: false, 
+            eventListeners: [], 
+            retryCount: 0 
+        };
         const elements = {};
 
         const utils = {
-            debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
-            sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
-            showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
-            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
+            debounce(func, wait) { 
+                let timeout; 
+                return function(...args) { 
+                    const later = () => { 
+                        clearTimeout(timeout); 
+                        func.apply(this, args); 
+                    }; 
+                    clearTimeout(timeout); 
+                    timeout = setTimeout(later, wait); 
+                }; 
+            },
+            isValidUrl(s) { 
+                if (!s || s.trim() === '') return true; 
+                try { 
+                    const u = new URL(s); 
+                    return u.protocol === 'http:' || u.protocol === 'https:'; 
+                } catch (_) { 
+                    return false; 
+                } 
+            },
+            sanitizeHtml(h) { 
+                if (!h) return ''; 
+                const t = document.createElement('div'); 
+                t.innerHTML = h; 
+                t.querySelectorAll('script, style').forEach(e => e.remove()); 
+                const a = t.getElementsByTagName('*'); 
+                for (let e of a) { 
+                    for (let r of e.attributes) { 
+                        if (r.name.startsWith('on')) e.removeAttribute(r.name); 
+                    } 
+                } 
+                return t.innerHTML; 
+            },
+            showError(m, p = false) { 
+                if (elements.errorBanner) { 
+                    elements.errorBanner.textContent = m; 
+                    elements.errorBanner.classList.add('show'); 
+                    if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); 
+                } 
+                console.error(`${moduleConfig.name} Error:`, m); 
+            },
+            getFieldValue(f) { 
+                const v = state.blockData[f]; 
+                const c = moduleConfig.fields[f]; 
+                return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; 
+            }
         };
 
         function cacheElements() {
@@ -148,17 +197,58 @@
 
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
+            
             function createEditor(selector, fieldName, placeholder, formats, toolbarOptions) {
-                state.editors[fieldName] = new Quill(selector, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats: formats, placeholder: placeholder });
-                const debouncedUpdate = utils.debounce((d, o, source) => { if (source === 'user') updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML)); }, moduleConfig.debounceDelay);
+                // Quill 2.0 uses a different configuration structure
+                const quillOptions = {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: toolbarOptions,
+                        clipboard: {
+                            matchVisual: false
+                        }
+                    },
+                    formats: formats,
+                    placeholder: placeholder
+                };
+                
+                state.editors[fieldName] = new Quill(selector, quillOptions);
+                
+                // Text change events work the same way in Quill 2.0
+                const debouncedUpdate = utils.debounce((delta, oldDelta, source) => { 
+                    if (source === 'user') {
+                        // Use getSemanticHTML() for Quill 2.0
+                        const content = state.editors[fieldName].getSemanticHTML ? 
+                            state.editors[fieldName].getSemanticHTML() : 
+                            state.editors[fieldName].root.innerHTML;
+                        updateData(fieldName, utils.sanitizeHtml(content)); 
+                    }
+                }, moduleConfig.debounceDelay);
+                
                 state.editors[fieldName].on('text-change', debouncedUpdate);
-                state.editors[fieldName].on('text-change', () => { const text = state.editors[fieldName].getText(); const maxLength = moduleConfig.fields[fieldName].maxLength; if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length); });
+                
+                // Length limiting using new API
+                state.editors[fieldName].on('text-change', () => { 
+                    const text = state.editors[fieldName].getText(); 
+                    const maxLength = moduleConfig.fields[fieldName].maxLength; 
+                    if (text.length > maxLength) {
+                        const range = state.editors[fieldName].getSelection();
+                        state.editors[fieldName].deleteText(maxLength, text.length - maxLength);
+                        if (range) {
+                            state.editors[fieldName].setSelection(Math.min(range.index, maxLength));
+                        }
+                    }
+                });
             }
+            
             try {
+                // Updated toolbar configurations for Quill 2.0
                 createEditor('#titleEditor', 'title', 'Enter title...', ['script', 'link'], [[{ 'script': 'super' }], ['link']]);
                 createEditor('#bodyEditor', 'bodyText', 'Enter body text...', ['bold', 'italic', 'script', 'link'], [['bold', 'italic', { 'script': 'super' }], ['link']]);
                 createEditor('#buttonTextEditor', 'buttonText', 'Enter button text...', ['script'], [[{ 'script': 'super' }]]);
-            } catch (error) { throw new Error(`Failed to initialize editors: ${error.message}`); }
+            } catch (error) { 
+                throw new Error(`Failed to initialize editors: ${error.message}`); 
+            }
         }
         
         function processRichText(html) {
@@ -189,7 +279,7 @@
                 const titleSize = utils.getFieldValue('titleFontSize');
                 const titleAlign = utils.getFieldValue('titleAlignment');
                 const titleLineHeight = titleSize + 8;
-                titleHtml = `<tr><td class="mobile-text-left" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
+                titleHtml = `<tr><td class="mobile-text-left" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
             }
 
             const processedBody = processRichText(utils.getFieldValue('bodyText'));
@@ -203,67 +293,168 @@
                 const buttonAlign = utils.getFieldValue('buttonAlignment');
                 const buttonUrl = utils.getFieldValue('buttonUrl');
                 const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
-                const buttonTableStyle = backgroundColor === 'black' ? `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;` : `background-color: #000000; border-radius: 4px !important;`;
-                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
+                const buttonTableStyle = backgroundColor === 'black' ? 
+                    `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;` : 
+                    `background-color: #000000; border-radius: 4px !important;`;
+                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
-            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}${titleHtml}${bodyHtml}${buttonHtml}<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .fw-lead -->`;
+            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}${titleHtml}${bodyHtml}${buttonHtml}<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .fw-lead -->`;
         }
 
         function refreshPreview() {
             if (state.isLoading || !state.sdk) return;
-            try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
+            try { 
+                const html = generateTemplate(); 
+                state.sdk.setContent(html); 
+                if (state.sdk.setData) { 
+                    state.sdk.setData({ ...state.blockData, content: html }); 
+                } 
+            } catch (error) { 
+                utils.showError(`Preview update failed: ${error.message}`); 
+            }
         }
 
         function initializeEventHandlers() {
             state.eventListeners = [];
-            function setupOptionSelector(selectorElement, dataKey) { if (!selectorElement) return; selectorElement.querySelectorAll('.option-button').forEach(option => { const handler = (e) => { const button = e.currentTarget; updateData(dataKey, button.dataset.value); selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); button.classList.add('selected'); }; option.addEventListener('click', handler); state.eventListeners.push({ element: option, event: 'click', handler }); }); }
+            
+            function setupOptionSelector(selectorElement, dataKey) { 
+                if (!selectorElement) return; 
+                selectorElement.querySelectorAll('.option-button').forEach(option => { 
+                    const handler = (e) => { 
+                        const button = e.currentTarget; 
+                        updateData(dataKey, button.dataset.value); 
+                        selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); 
+                        button.classList.add('selected'); 
+                    }; 
+                    option.addEventListener('click', handler); 
+                    state.eventListeners.push({ element: option, event: 'click', handler }); 
+                }); 
+            }
+            
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
             setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment');
 
-            function setupToggle(toggleElement, groupElement, dataKey) { const handler = (e) => { const isChecked = e.target.checked; updateData(dataKey, isChecked); groupElement.classList.toggle('disabled-field', !isChecked); }; toggleElement.addEventListener('change', handler); state.eventListeners.push({ element: toggleElement, event: 'change', handler }); }
+            function setupToggle(toggleElement, groupElement, dataKey) { 
+                const handler = (e) => { 
+                    const isChecked = e.target.checked; 
+                    updateData(dataKey, isChecked); 
+                    groupElement.classList.toggle('disabled-field', !isChecked); 
+                }; 
+                toggleElement.addEventListener('change', handler); 
+                state.eventListeners.push({ element: toggleElement, event: 'change', handler }); 
+            }
+            
             setupToggle(elements.showTitle, elements.titleGroup, 'showTitle');
             setupToggle(elements.showButton, elements.buttonFieldsGroup, 'showButton');
 
-            function setupNumberInput(inputElement, dataKey) { const step = 4; const correctValueOnBlur = (e) => { const input = e.target; let value = parseInt(input.value, 10); const min = parseInt(input.min, 10), max = parseInt(input.max, 10); if (isNaN(value)) { value = moduleConfig.fields[dataKey].defaultValue; } value = Math.max(min, Math.min(value, max)); const correctedValue = Math.round(value / step) * step; input.value = correctedValue; updateData(dataKey, correctedValue); }; const liveUpdateOnInput = (e) => { const value = parseInt(e.target.value, 10); if (!isNaN(value)) { debouncedUpdateData(dataKey, value); } }; inputElement.addEventListener('input', liveUpdateOnInput); inputElement.addEventListener('blur', correctValueOnBlur); state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput }); state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur }); }
+            function setupNumberInput(inputElement, dataKey) { 
+                const step = 4; 
+                const correctValueOnBlur = (e) => { 
+                    const input = e.target; 
+                    let value = parseInt(input.value, 10); 
+                    const min = parseInt(input.min, 10), max = parseInt(input.max, 10); 
+                    if (isNaN(value)) { 
+                        value = moduleConfig.fields[dataKey].defaultValue; 
+                    } 
+                    value = Math.max(min, Math.min(value, max)); 
+                    const correctedValue = Math.round(value / step) * step; 
+                    input.value = correctedValue; 
+                    updateData(dataKey, correctedValue); 
+                }; 
+                const liveUpdateOnInput = (e) => { 
+                    const value = parseInt(e.target.value, 10); 
+                    if (!isNaN(value)) { 
+                        debouncedUpdateData(dataKey, value); 
+                    } 
+                }; 
+                inputElement.addEventListener('input', liveUpdateOnInput); 
+                inputElement.addEventListener('blur', correctValueOnBlur); 
+                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput }); 
+                state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur }); 
+            }
+            
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.bodyFontSize, 'bodyFontSize');
 
-            const urlHandler = (e) => { if (utils.isValidUrl(elements.buttonUrl.value, elements.buttonUrlError)) { debouncedUpdateData('buttonUrl', e.target.value.trim()); } };
+            const urlHandler = (e) => { 
+                if (utils.isValidUrl(elements.buttonUrl.value)) { 
+                    debouncedUpdateData('buttonUrl', e.target.value.trim()); 
+                } 
+            };
             elements.buttonUrl.addEventListener('input', urlHandler);
-            elements.buttonUrl.addEventListener('blur', () => utils.isValidUrl(elements.buttonUrl.value, elements.buttonUrlError));
+            elements.buttonUrl.addEventListener('blur', () => utils.isValidUrl(elements.buttonUrl.value));
             state.eventListeners.push({ element: elements.buttonUrl, event: 'input', handler: urlHandler });
         }
 
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
+            
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
-                    function setSelectorState(selectorElement, dataKey) { const value = utils.getFieldValue(dataKey); if (selectorElement) { selectorElement.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === value)); } }
+                    Object.keys(moduleConfig.fields).forEach(key => { 
+                        state.blockData[key] = (data && data.hasOwnProperty(key)) ? 
+                            (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : 
+                            moduleConfig.fields[key].defaultValue; 
+                    });
+                    
+                    function setSelectorState(selectorElement, dataKey) { 
+                        const value = utils.getFieldValue(dataKey); 
+                        if (selectorElement) { 
+                            selectorElement.querySelectorAll('.option-button').forEach(o => 
+                                o.classList.toggle('selected', o.dataset.value === value)
+                            ); 
+                        } 
+                    }
+                    
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
                     setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
                     setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment');
 
-                    function setToggleState(toggleEl, groupEl, dataKey) { const isChecked = utils.getFieldValue(dataKey); toggleEl.checked = isChecked; groupEl.classList.toggle('disabled-field', !isChecked); }
+                    function setToggleState(toggleEl, groupEl, dataKey) { 
+                        const isChecked = utils.getFieldValue(dataKey); 
+                        toggleEl.checked = isChecked; 
+                        groupEl.classList.toggle('disabled-field', !isChecked); 
+                    }
+                    
                     setToggleState(elements.showTitle, elements.titleGroup, 'showTitle');
                     setToggleState(elements.showButton, elements.buttonFieldsGroup, 'showButton');
                     
                     if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-                    Object.keys(state.editors).forEach(key => { if (state.editors[key]) state.editors[key].root.innerHTML = utils.getFieldValue(key); });
+                    
+                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                    Object.keys(state.editors).forEach(key => { 
+                        if (state.editors[key]) {
+                            const content = utils.getFieldValue(key);
+                            try {
+                                // Clear existing content first
+                                state.editors[key].setContents([]);
+                                // Use the new clipboard API to paste HTML content
+                                if (content && content.trim()) {
+                                    state.editors[key].clipboard.dangerouslyPasteHTML(content);
+                                }
+                            } catch (error) {
+                                // Fallback to root innerHTML for compatibility
+                                console.warn(`Using fallback method for editor ${key}:`, error);
+                                state.editors[key].root.innerHTML = content || '';
+                            }
+                        }
+                    });
                     
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = moduleConfig.fields[key].defaultValue; });
+                    Object.keys(moduleConfig.fields).forEach(key => { 
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue; 
+                    });
                     refreshPreview();
                 } finally {
                     setLoadingState(false);
@@ -271,33 +462,53 @@
             });
         }
 
-        function cleanup() { Object.values(state.editors).forEach(e => e && e.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
+        function cleanup() { 
+            // Updated cleanup for Quill 2.0
+            Object.values(state.editors).forEach(editor => {
+                if (editor && editor.off) {
+                    editor.off('text-change');
+                }
+            }); 
+            state.eventListeners.forEach(({ element, event, handler }) => { 
+                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
+            }); 
+            state.eventListeners = []; 
+        }
 
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
+                
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
+                
                 window.addEventListener('beforeunload', cleanup);
-                document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
+                document.addEventListener('visibilitychange', () => { 
+                    if (!document.hidden && state.isInitialized) loadData(); 
+                });
+                
                 state.isInitialized = true;
             } catch (error) {
-                utils.showError(`Initialization failed: ${error.message}`);
+                utils.showError(`Initialisation failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
                     setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
                 } else {
-                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
+                    utils.showError('Failed to initialise after multiple attempts. Please refresh.', true);
                 }
                 setLoadingState(false);
             }
         }
 
-        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
+        if (document.readyState === 'loading') { 
+            document.addEventListener('DOMContentLoaded', initializeWithRetry); 
+        } else { 
+            initializeWithRetry(); 
+        }
     </script>
 </body>
 </html>
