@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>2 Column Story Block (Quill 2.0)</title>
+    <title>2 Column Story Block (Final & Functional)</title>
     <!-- UPDATED: Quill 2.0 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
@@ -163,6 +163,9 @@
                                     <tr data-element="${key}_content-type-wrapper" data-type="description">
                                         <td data-element="${key}_description-text" class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${defaults.description.fontSize}px;font-weight:normal;line-height:${descriptionLineHeight}px;text-align:${defaults.description.alignment};">${defaults.description.html}</td>
                                     </tr>
+                                    <tr data-element="${key}_checklist-wrapper" data-type="checklist" style="display: none;">
+                                        <td data-element="${key}_checklist-container" style="padding:0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"></table></td>
+                                    </tr>
                                     <tbody data-element="${key}_spacers-container"></tbody>
                                     <tr data-element="${key}_button-wrapper">
                                         <td>
@@ -235,23 +238,22 @@
 
                 const titleText = get('title-text');
                 const titleCell = get('title-cell');
-                if (titleText) state.editors[prefix + 'title'].setHTML(utils.sanitizeHtml(titleText.innerHTML));
+                if (titleText && state.editors[prefix + 'title']) state.editors[prefix + 'title'].root.innerHTML = utils.sanitizeHtml(titleText.innerHTML);
                 if (titleText) elements[prefix + 'titleFontSize'].value = parseInt(titleText.style.fontSize, 10);
                 if (titleCell) setSelectorState(elements[prefix + 'titleAlignmentSelector'], titleCell.style.textAlign);
                 
-                const contentTypeWrapper = get('content-type-wrapper');
-                const contentType = contentTypeWrapper?.dataset.type || 'description';
-                setSelectorState(elements[prefix + 'contentTypeSelector'], contentType);
-                elements[prefix + 'descriptionSection'].style.display = contentType === 'description' ? 'block' : 'none';
-                elements[prefix + 'checklistSection'].style.display = contentType === 'checklist' ? 'block' : 'none';
+                const descWrapper = get('content-type-wrapper');
+                const checkWrapper = get('checklist-wrapper');
+                const isChecklist = checkWrapper && checkWrapper.style.display !== 'none';
+                setSelectorState(elements[prefix + 'contentTypeSelector'], isChecklist ? 'checklist' : 'description');
+                elements[prefix + 'descriptionSection'].style.display = isChecklist ? 'none' : 'block';
+                elements[prefix + 'checklistSection'].style.display = isChecklist ? 'block' : 'none';
                 
-                if (contentType === 'description') {
-                    const descText = get('description-text');
-                    if (descText) {
-                         state.editors[prefix + 'description'].setHTML(utils.sanitizeHtml(descText.innerHTML));
-                         elements[prefix + 'descriptionFontSize'].value = parseInt(descText.style.fontSize, 10);
-                         setSelectorState(elements[prefix + 'descriptionAlignmentSelector'], descText.style.textAlign);
-                    }
+                const descText = get('description-text');
+                if (descText && state.editors[prefix + 'description']) {
+                    state.editors[prefix + 'description'].root.innerHTML = utils.sanitizeHtml(descText.innerHTML);
+                    elements[prefix + 'descriptionFontSize'].value = parseInt(descText.style.fontSize, 10);
+                    setSelectorState(elements[prefix + 'descriptionAlignmentSelector'], descText.style.textAlign);
                 }
                 
                 const buttonWrapper = get('button-wrapper');
@@ -283,12 +285,16 @@
             state.sdk.getContent((content) => {
                 const isNewBlock = !content || !content.includes('<!-- I AM A 2-COL STORY BLOCK -->');
                 if (isNewBlock) {
-                    state.dom = parseToDOM(generateInitialTemplate());
-                    updateBlock();
+                    // CRITICAL FIX: Use the setContent callback for new blocks.
+                    const initialHtml = generateInitialTemplate();
+                    state.sdk.setContent(initialHtml, (processedContent) => {
+                        state.dom = parseToDOM(processedContent);
+                        updateUIFromDOM(); 
+                    });
                 } else {
                     state.dom = parseToDOM(content);
+                    updateUIFromDOM();
                 }
-                updateUIFromDOM();
             });
         }
         
@@ -322,10 +328,9 @@
                         modules: { toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] } 
                     });
                     
-                    // UPDATED: Use 'editor-change' for Quill 2.0
-                    state.editors[editorId].on('editor-change', (eventName, ...args) => {
+                    state.editors[editorId].on('editor-change', (eventName) => {
                         if (eventName === 'text-change') {
-                             if (!state.dom) return;
+                            if (!state.dom) return;
                             const content = state.editors[editorId].root.innerHTML;
                             const targetNode = state.dom.querySelector(`[data-element="${editorId}-text"]`);
                             if (targetNode) {
@@ -352,7 +357,6 @@
                 const prefix = `${key}_`;
                 const get = (el) => state.dom.querySelector(`[data-element="${prefix}${el}"]`);
 
-                // --- Text & URL Inputs ---
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
                     elements[prefix + type].addEventListener('input', utils.debounce((e) => {
                         if (!state.dom) return;
@@ -375,7 +379,6 @@
                     }, 400));
                 });
                 
-                // --- Show/Hide Toggles ---
                 document.getElementById(prefix + 'showSubtitle').addEventListener('change', e => {
                     const contentBody = get('content-body');
                     const titleWrapper = get('title-cell').parentElement;
@@ -411,21 +414,14 @@
                     updateBlock();
                 });
 
-                // --- Content Type Selector ---
                 document.getElementById(prefix + 'contentTypeSelector').addEventListener('click', e => {
                     const btn = e.target.closest('.option-button');
                     if (!btn || !state.dom) return;
                     const newType = btn.dataset.value;
-                    const wrapper = get('content-type-wrapper');
-                    wrapper.dataset.type = newType;
-                    
-                    if (newType === 'description') {
-                        wrapper.style.display = '';
-                        wrapper.nextElementSibling.style.display = 'none'; // Hide checklist container
-                    } else {
-                        wrapper.style.display = 'none';
-                        wrapper.nextElementSibling.style.display = ''; // Show checklist container
-                    }
+                    const descWrapper = get('content-type-wrapper');
+                    const checkWrapper = get('checklist-wrapper');
+                    if(descWrapper) descWrapper.style.display = newType === 'description' ? '' : 'none';
+                    if(checkWrapper) checkWrapper.style.display = newType === 'checklist' ? '' : 'none';
                     updateUIFromDOM();
                     updateBlock();
                 });
