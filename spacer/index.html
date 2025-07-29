@@ -37,167 +37,175 @@
 
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
-    <script>
-        'use strict';
+<script>
+    'use strict';
+    
+    const moduleConfig = {
+        name: 'Spacer',
+        fields: {
+            backgroundColor: { type: 'text', defaultValue: 'black' },
+            spacerHeight: { type: 'number', defaultValue: 40 }
+        },
+        debounceDelay: 200
+    };
 
-        // --- State and Config ---
-        const PRESET_COLORS = {
-            BLACK: '#000000',
-            RED: '#DB021D'
-        };
-        const DEFAULTS = {
-            backgroundColor: PRESET_COLORS.BLACK,
-            spacerHeight: 40
-        };
-        const state = { 
-            sdk: null, 
-            dom: null // The single source of truth: our in-memory DOM element
-        };
-        const elements = {}; // For UI element caching
+    const state = { sdk: null, blockData: {} };
+    const elements = {};
 
-        const utils = {
-            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; }
-        };
+    const utils = {
+        debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
+        getFieldValue(fieldName) { return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue; }
+    };
 
-        // --- DOM and Template Functions ---
+    function cacheElements() {
+        elements.mainContainer = document.getElementById('mainContainer');
+        elements.loadingOverlay = document.getElementById('loadingOverlay');
+        elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+        elements.spacerHeight = document.getElementById('spacerHeight');
+        elements.spacerHeightValue = document.getElementById('spacerHeightValue');
+    }
 
-        /**
-         * Creates the initial HTML for a new block.
-         */
-        function generateInitialTemplate(initialState) {
-            const bgColor = initialState.backgroundColor;
-            const height = `${initialState.spacerHeight}px`;
-            return `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
-                <tr>
-                    <td>
-                        <div style="clear: both; display: block; font-size: ${height}; height: ${height}; line-height: ${height}; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
-                    </td>
-                </tr>
-            </table><!-- END .fw-spacer -->`;
-        }
+    function setLoadingState(loading) {
+        elements.mainContainer.classList.toggle('loading', loading);
+        elements.loadingOverlay.classList.toggle('show', loading);
+    }
 
-        /**
-         * Parses an HTML string into a DOM element.
-         */
-        function parseToDOM(html) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            return doc.body.firstChild;
-        }
+    const updateStateFromUI = utils.debounce(() => {
+        state.blockData.backgroundColor = elements.backgroundColorSelector.querySelector('.selected')?.dataset.value || 'black';
+        state.blockData.spacerHeight = parseInt(elements.spacerHeight.value, 10);
+        refreshPreview();
+    }, moduleConfig.debounceDelay);
 
-        // --- UI and State Sync Functions ---
-
-        /**
-         * Reads the state from the DOM and updates the UI.
-         * This correctly handles the browser's RGB color format.
-         */
-        function updateUIFromDOM() {
-            if (!state.dom) return;
-
-            const table = state.dom;
-            const div = table.querySelector('div');
-
-            // Get the color from the DOM. It will often be in "rgb(r, g, b)" format.
-            const domColor = table.style.backgroundColor;
-
-            // Define the RGB values we expect for our presets.
-            const blackRgb = 'rgb(0, 0, 0)';
-            const redRgb = 'rgb(219, 2, 29)'; // The RGB equivalent of #DB021D
-
-            // Compare the DOM color to our expected RGB values.
-            const isBlack = domColor === blackRgb;
-            const isRed = domColor === redRgb;
-
-            // Update the UI based on the correct comparison.
-            elements.btnBlack.classList.toggle('selected', isBlack);
-            elements.btnRed.classList.toggle('selected', isRed);
-            
-            const currentHeight = parseInt(div.style.height, 10) || DEFAULTS.spacerHeight;
-            elements.spacerHeight.value = currentHeight;
-            elements.spacerHeightValue.textContent = `${currentHeight}px`;
-        }
+    function updateUIFromState() {
+        const bgColor = utils.getFieldValue('backgroundColor');
+        const height = utils.getFieldValue('spacerHeight');
         
-        // --- SDK Interaction ---
+        elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => {
+            o.classList.toggle('selected', o.dataset.value === bgColor);
+        });
+        elements.spacerHeight.value = height;
+        elements.spacerHeightValue.textContent = `${height}px`;
+    }
 
-        /**
-         * Saves the current state by serializing the DOM to HTML and updating the SDK.
-         */
-        function updateBlock() {
-            if (!state.dom) return;
-            
-            const newContent = state.dom.outerHTML;
-            state.sdk.setContent(newContent);
-        }
-        const debouncedUpdateBlock = utils.debounce(updateBlock, 250);
+    function generateTemplate() {
+        const backgroundColorValue = utils.getFieldValue('backgroundColor');
+        const spacerHeightValue = utils.getFieldValue('spacerHeight');
+        
+        const bgColor = backgroundColorValue === 'red' ? '#DB021D' : '#000000';
+        const height = `${spacerHeightValue}px`;
 
-        // --- Initialization ---
+        return `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
+            <tr>
+                <td>
+                    <div style="clear: both; display: block; font-size: ${height}; height: ${height}; line-height: ${height}; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
+                </td>
+            </tr>
+        </table><!-- END .fw-spacer -->`;
+    }
 
-        function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
-            elements.spacerHeight = document.getElementById('spacerHeight');
-            elements.spacerHeightValue = document.getElementById('spacerHeightValue');
-            elements.btnBlack = elements.backgroundColorSelector.querySelector('[data-value="black"]');
-            elements.btnRed = elements.backgroundColorSelector.querySelector('[data-value="red"]');
-        }
+    /**
+     * Parses HTML content to extract state. This keeps the UI in sync with the HTML tab.
+     * @param {string} html The block's HTML content.
+     * @returns {object|null} An object with `backgroundColor` and `spacerHeight` or null if parsing fails.
+     */
+    function parseContentForState(html) {
+        if (!html) return null;
 
-        function initializeEventHandlers() {
-            elements.backgroundColorSelector.addEventListener('click', e => {
-                const button = e.target.closest('.option-button');
-                if (button && state.dom) {
-                    const value = button.dataset.value;
-                    const newColor = (value === 'red') ? PRESET_COLORS.RED : PRESET_COLORS.BLACK;
-                    
-                    state.dom.style.backgroundColor = newColor;
+        const heightMatch = html.match(/height:\s*(\d+)(px)?/);
+        const colorMatch = html.match(/background-color:\s*([^;]+)/);
+        
+        if (!heightMatch || !colorMatch) return null;
 
-                    updateUIFromDOM();
-                    updateBlock();
-                }
+        const spacerHeight = parseInt(heightMatch[1], 10);
+        const bgColorHex = colorMatch[1].trim().toUpperCase();
+
+        const backgroundColor = (bgColorHex === '#DB021D') ? 'red' : 'black';
+        
+        return { backgroundColor, spacerHeight };
+    }
+
+    /**
+     * UPDATED: Now only sets content and data. This is called when the UI is changed by the user.
+     */
+    function refreshPreview() {
+        try {
+            const html = generateTemplate();
+            state.sdk.setContent(html);
+            // CRITICAL: ONLY set the state data, not the content itself.
+            state.sdk.setData({
+                backgroundColor: state.blockData.backgroundColor,
+                spacerHeight: state.blockData.spacerHeight
             });
-            
-            elements.spacerHeight.addEventListener('input', () => {
-                if (state.dom) {
-                    const newHeight = `${elements.spacerHeight.value}px`;
-                    const div = state.dom.querySelector('div');
-
-                    if (div) {
-                        div.style.height = newHeight;
-                        div.style.lineHeight = newHeight;
-                        div.style.fontSize = newHeight;
-                    }
-
-                    elements.spacerHeightValue.textContent = newHeight;
-                    debouncedUpdateBlock();
-                }
-            });
+        } catch (error) {
+            console.error(`Preview update failed: ${error.message}`);
         }
+    }
 
-        function loadData() {
-            state.sdk.getContent((content) => {
-                if (content && content.trim() !== '') {
-                    state.dom = parseToDOM(content);
+    function initializeEventHandlers() {
+        elements.backgroundColorSelector.addEventListener('click', e => {
+            if (e.target.classList.contains('option-button')) {
+                elements.backgroundColorSelector.querySelector('.selected')?.classList.remove('selected');
+                e.target.classList.add('selected');
+                updateStateFromUI();
+            }
+        });
+        
+        elements.spacerHeight.addEventListener('input', () => {
+            elements.spacerHeightValue.textContent = `${elements.spacerHeight.value}px`;
+            updateStateFromUI();
+        });
+    }
+
+    /**
+     * REWRITTEN: The new logic to properly sync state from content.
+     */
+    function loadData() {
+        if (!state.sdk) return console.error('SDK not available');
+        setLoadingState(true);
+
+        // This function now uses sdk.getContent and sdk.getData to create one unified state.
+        state.sdk.getContent((content) => {
+            state.sdk.getData((data) => {
+                // CRITICAL: The HTML content is the source of truth.
+                const parsedState = parseContentForState(content);
+
+                if (parsedState) {
+                    // If HTML is valid, use it to set the state.
+                    state.blockData.backgroundColor = parsedState.backgroundColor;
+                    state.blockData.spacerHeight = parsedState.spacerHeight;
                 } else {
-                    const initialHtml = generateInitialTemplate(DEFAULTS);
-                    state.dom = parseToDOM(initialHtml);
-                    updateBlock(); 
+                    // Fallback to saved data if parsing fails (e.g., new or empty block).
+                    state.blockData.backgroundColor = data.backgroundColor || moduleConfig.fields.backgroundColor.defaultValue;
+                    state.blockData.spacerHeight = data.spacerHeight || moduleConfig.fields.spacerHeight.defaultValue;
+                    
+                    // Since there was no valid content, generate it now. This happens for new blocks.
+                    refreshPreview();
                 }
-                
-                updateUIFromDOM();
-            });
-        }
 
-        function initialize() {
-            cacheElements();
+                updateUIFromState();
+                setLoadingState(false);
+            });
+        });
+    }
+
+    function initialize() {
+        try {
+            if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
             
             state.sdk = new window.sfdc.BlockSDK({
-                tabs: ['stylingblock', 'htmlblock']
+                tabs: ['stylingblock', 'htmlblock'] 
             });
-            
+
+            cacheElements();
             initializeEventHandlers();
             loadData();
+        } catch (error) {
+            console.error(`Initialization failed: ${error.message}`);
+            setLoadingState(false);
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', initialize);
-    </script>
+    document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
+</script>
 </body>
 </html>
