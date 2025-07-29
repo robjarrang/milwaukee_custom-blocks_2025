@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>2 Column Story Block (Corrected UI)</title>
+    <title>2 Column Story Block (with Top Spacer)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -34,7 +34,10 @@
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">2 Column Story</h2>
         <div class="error-banner" id="errorBanner"></div>
-        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;"><div class="section-title">General Settings</div><div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option selected" data-color="black">Black</div><div class="color-option" data-color="red">Red</div></div></div><div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showTopSpacer" checked><span class="toggle-slider"></span></label><label for="showTopSpacer" class="checkbox-label">Show 20px Top Spacer</label></div></div>
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">General Settings</div>
+            <div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option selected" data-color="black">Black</div><div class="color-option" data-color="red">Red</div></div></div>
+        </div>
 
         <div class="column-wrapper">
             <!-- Left Column -->
@@ -88,7 +91,6 @@
             name: '2 Column Story with Top Spacer',
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'black' },
-                showTopSpacer: { type: 'boolean', defaultValue: true },
                 left_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image' },
                 left_imageAlt: { type: 'text', defaultValue: 'Story image' },
                 left_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
@@ -146,7 +148,6 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
-            elements.showTopSpacer = document.getElementById('showTopSpacer');
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.spacerTemplate = document.getElementById('spacerTemplate');
             COLUMN_PREFIXES.forEach(p => {
@@ -222,8 +223,7 @@
         }
         function generateTemplate() {
             const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
-            const showTopSpacer = utils.getFieldValue('showTopSpacer');
-            const topSpacerHtml = showTopSpacer ? `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;"><tr><td><div style="font-size:20px;height:20px;line-height:20px;margin:0px;mso-line-height-rule:exactly;padding:0px;"> </div></td></tr></table><!-- END .fw-spacer -->` : '';
+            const topSpacerHtml = `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;"><tr><td><div style="font-size:20px;height:20px;line-height:20px;margin:0px;mso-line-height-rule:exactly;padding:0px;"> </div></td></tr></table><!-- END .fw-spacer -->`;
             const leftColHtml = generateColumnHtml('left_');
             const rightColHtml = generateColumnHtml('right_');
             const mainContentHtml = `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${bgColor};width:620px;"><tr><td class="side" style="width:20px;"> </td><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr>${leftColHtml}<td class="gap block" style="width:20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width:20px;"> </td></tr></table><!-- END .story-2col -->`;
@@ -267,9 +267,7 @@
             state.eventListeners = []; 
             function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', handler); state.eventListeners.push({ element: opt, event: 'click', handler }); }); }
             function setupNumberInput(el, key) { if (!el) return; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; i.value = Math.max(min, Math.min(max, v)); updateData(key, parseInt(i.value)); }; el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
-            function setupToggle(el, key) { if (!el) return; const handler = (e) => { updateData(key, e.target.checked); }; el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler }); }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
-            setupToggle(elements.showTopSpacer, 'showTopSpacer');
             COLUMN_PREFIXES.forEach(p => {
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type]; if(!el) return; const handler = (e) => { debouncedUpdateData(p + type, e.target.value.trim()); }; el.addEventListener('input', handler); state.eventListeners.push({ element: el, event: 'input', handler }); });
                 ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; const handler = (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler }); });
@@ -318,7 +316,6 @@
                     Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; });
                     COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (state.blockData[p + listType]) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
                     document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
-                    elements.showTopSpacer.checked = utils.getFieldValue('showTopSpacer');
                     function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
                     COLUMN_PREFIXES.forEach(p => {
                         ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
