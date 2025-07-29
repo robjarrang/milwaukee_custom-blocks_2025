@@ -13,14 +13,13 @@
     
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Stats Block Settings</h2>
-        <div class="error-banner" id="errorBanner"></div>
         
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
             <div class="field-group">
                 <label class="field-label">Background Colour</label>
                 <div class="color-selector" id="backgroundColorSelector">
-                    <div class="color-option selected" data-color="red">Red</div>
+                    <div class="color-option" data-color="red">Red</div>
                     <div class="color-option" data-color="black">Black</div>
                 </div>
             </div>
@@ -31,12 +30,10 @@
             <div class="field-group">
                 <label class="field-label">Image URL (300px wide)</label>
                 <input type="url" class="field-input" id="imageUrl" placeholder="https://example.com/image.jpg">
-                <div class="field-error">Please enter a valid image URL.</div>
             </div>
             <div class="field-group">
                 <label class="field-label">Image Link URL</label>
                 <input type="url" class="field-input" id="imageLink" placeholder="https://example.com/link">
-                <div class="field-error">Please enter a valid link URL.</div>
             </div>
             <div class="field-group">
                 <label class="field-label">Image Alt Text</label>
@@ -71,258 +68,222 @@
             </div>
         </div>
     </template>
-
+    
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
-        
-        const moduleConfig = {
-            name: 'Stats Block',
-            fields: {
-                backgroundColor: { type: 'text', defaultValue: 'red' },
-                imageUrl: { type: 'url', defaultValue: 'https://placehold.co/300x300/dddddd/ffffff' },
-                imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
-                imageAlt: { type: 'text', defaultValue: 'Statistics visual' },
-                stats: {
-                    type: 'list',
-                    defaultValue: [
-                        { id: crypto.randomUUID(), value: '800+', label: 'NEW INNOVATIONS' },
-                        { id: crypto.randomUUID(), value: '10', label: 'WORKSTATIONS' },
-                        { id: crypto.randomUUID(), value: '70+', label: 'COUNTRIES' }
-                    ]
-                }
-            },
-            debounceDelay: 400,
-            maxRetries: 3
-        };
 
-        const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0 };
+        // --- Config and State ---
+        const PRESET_COLORS = { RED: '#DB021D', BLACK: '#000000' };
+        const DEFAULTS = {
+            backgroundColor: PRESET_COLORS.RED,
+            imageUrl: 'https://image.s11.sfmc-content.com/lib/fe3011737164047e741c71/m/1/5d8a26c4-275a-4632-9c04-ac0360a7192b.png',
+            imageLink: 'https://www.milwaukeetool.eu/',
+            imageAlt: 'Milwaukee Tool Product',
+            stats: [
+                { value: '800+', label: 'NEW INNOVATIONS' },
+                { value: '10', label: 'WORKSTATIONS' },
+                { value: '70+', label: 'COUNTRIES' }
+            ]
+        };
+        const state = { sdk: null, dom: null };
         const elements = {};
-
         const utils = {
-            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (e) { return false; } },
-            showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
-            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
+            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; }
         };
 
-        function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.errorBanner = document.getElementById('errorBanner');
-            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
-            elements.imageUrl = document.getElementById('imageUrl');
-            elements.imageLink = document.getElementById('imageLink');
-            elements.imageAlt = document.getElementById('imageAlt');
-            elements.statsContainer = document.getElementById('statsContainer');
-            elements.addStatBtn = document.getElementById('addStatBtn');
-            elements.statTemplate = document.getElementById('statTemplate');
+        // --- DOM and Template Generation ---
+        function parseToDOM(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return doc.body.firstChild;
         }
 
-        function setLoadingState(loading) {
-            state.isLoading = loading;
-            elements.mainContainer.classList.toggle('loading', loading);
-            elements.loadingOverlay.classList.toggle('show', loading);
+        function createStatRowTemplate(stat = { value: '', label: '' }) {
+            const spacerRow = '<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>';
+            const statRow = `
+                <tr><td class="mobile-text-center" style="text-align: center;">
+                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 44px; font-weight: bold; line-height: 48px; margin: 0; text-transform: uppercase;">${stat.value}</div>
+                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.label}</div>
+                </td></tr>`;
+            // We return a DocumentFragment to hold both rows if needed
+            const tpl = document.createElement('template');
+            tpl.innerHTML = statRow + spacerRow;
+            return tpl.content;
         }
-
-        function updateDataFromUI() {
-            // General & Image settings
-            const selectedColorEl = elements.backgroundColorSelector.querySelector('.selected');
-            state.blockData.backgroundColor = selectedColorEl ? selectedColorEl.dataset.color : 'red';
-            state.blockData.imageUrl = elements.imageUrl.value;
-            state.blockData.imageLink = elements.imageLink.value;
-            state.blockData.imageAlt = elements.imageAlt.value;
-
-            // Stats list
-            const newStats = Array.from(elements.statsContainer.querySelectorAll('.stat-item')).map(itemEl => ({
-                id: itemEl.dataset.id,
-                value: itemEl.querySelector('[data-field="value"]').value,
-                label: itemEl.querySelector('[data-field="label"]').value
-            }));
-            state.blockData.stats = newStats;
-            
-            refreshPreview();
-        }
-
-        const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
-
-        function generateTemplate() {
-            const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
-            const imageUrl = utils.getFieldValue('imageUrl');
-            const imageLink = utils.getFieldValue('imageLink');
-            const imageAlt = utils.getFieldValue('imageAlt');
-            const stats = utils.getFieldValue('stats');
-
-            const statsHtml = stats.map((stat, index) => `
+        
+        function generateInitialTemplate(d) {
+            const statsHtml = d.stats.map((stat, index) => {
+                const isLast = index === d.stats.length - 1;
+                return `
                 <tr><td class="mobile-text-center" style="text-align: center;">
                     <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 44px; font-weight: bold; line-height: 48px; margin: 0; text-transform: uppercase;">${stat.value}</div>
                     <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.label}</div>
                 </td></tr>
-                ${index < stats.length - 1 ? '<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>' : ''}
-            `).join('');
+                ${!isLast ? '<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>' : ''}`;
+            }).join('');
 
-            return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
-              <tr>
-               <td class="side" style="width: 20px;"> </td>
-               <td align="center" class="content-inner" style="width: 580px;" valign="middle">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                  <tr>
-                   <td class="block" style="width: 290px;" valign="middle">
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                      <tr><td><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="300"></a></td></tr>
-                    </table>
-                   </td>
-                   <td class="block" style="width: 290px;" valign="middle">
-                    <table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">
-                      <tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>
-                      ${statsHtml}
-                      <tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>
-                    </table>
-                   </td>
-                  </tr>
-                </table>
-               </td>
-               <td class="side" style="width: 20px;"> </td>
-              </tr>
-            </table><!-- END .stats-image-block -->`;
+            return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${d.backgroundColor}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td class="block" style="width: 290px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td><a href="${d.imageLink}" target="_blank"><img align="top" alt="${d.imageAlt}" class="fill" src="${d.imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="300"></a></td></tr></table></td><td class="block" style="width: 290px;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${statsHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .stats-image-block -->`;
         }
 
-        function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                if (state.sdk.setData) {
-                    state.sdk.setData({ ...state.blockData, content: html });
-                }
-            } catch (error) {
-                utils.showError(`Preview update failed: ${error.message}`);
-            }
-        }
-
+        // --- UI Sync and Rendering ---
         function renderStatsUI() {
-            const stats = utils.getFieldValue('stats');
+            if (!state.dom) return;
+            const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+            const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
             elements.statsContainer.innerHTML = '';
-            stats.forEach((stat, index) => {
+            
+            statRows.forEach((row, index) => {
+                const value = row.querySelector('div:first-child').textContent.trim();
+                const label = row.querySelector('div:last-child').textContent.trim();
                 const itemFragment = elements.statTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.stat-item');
-                itemEl.dataset.id = stat.id;
+                itemEl.dataset.index = index;
                 itemEl.querySelector('.stat-title').textContent = `Stat ${index + 1}`;
-                itemEl.querySelector('[data-field="value"]').value = stat.value || '';
-                itemEl.querySelector('[data-field="label"]').value = stat.label || '';
-                if(index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
-                if(index === stats.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
+                itemEl.querySelector('[data-field="value"]').value = value;
+                itemEl.querySelector('[data-field="label"]').value = label;
+                itemEl.querySelector('.move-up-btn').disabled = (index === 0);
+                itemEl.querySelector('.move-down-btn').disabled = (index === statRows.length - 1);
                 elements.statsContainer.appendChild(itemFragment);
             });
         }
         
-        function initializeEventHandlers() {
-            elements.backgroundColorSelector.addEventListener('click', e => {
-                if (e.target.classList.contains('color-option')) {
-                    elements.backgroundColorSelector.querySelector('.selected').classList.remove('selected');
-                    e.target.classList.add('selected');
-                    updateDataFromUI();
-                }
-            });
+        function updateUIFromDOM() {
+            if (!state.dom) return;
+            const link = state.dom.querySelector('a');
+            const img = state.dom.querySelector('img');
 
-            ['imageUrl', 'imageLink', 'imageAlt'].forEach(id => {
-                elements[id].addEventListener('input', debouncedUpdateDataFromUI);
-            });
-
-            elements.addStatBtn.addEventListener('click', () => {
-                state.blockData.stats.push({ id: crypto.randomUUID(), value: "100+", label: "NEW STAT" });
-                renderStatsUI();
-                updateDataFromUI();
-            });
-
-            elements.statsContainer.addEventListener('input', debouncedUpdateDataFromUI);
-
-            elements.statsContainer.addEventListener('click', e => {
-                const itemEl = e.target.closest('.stat-item');
-                if (!itemEl) return;
-                
-                const id = itemEl.dataset.id;
-                const stats = state.blockData.stats;
-                const currentIndex = stats.findIndex(stat => stat.id === id);
-                let dataChanged = false;
-
-                if (e.target.closest('.remove-btn')) {
-                    stats.splice(currentIndex, 1);
-                    dataChanged = true;
-                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
-                    [stats[currentIndex], stats[currentIndex - 1]] = [stats[currentIndex - 1], stats[currentIndex]];
-                    dataChanged = true;
-                } else if (e.target.closest('.move-down-btn') && currentIndex < stats.length - 1) {
-                    [stats[currentIndex], stats[currentIndex + 1]] = [stats[currentIndex + 1], stats[currentIndex]];
-                    dataChanged = true;
-                }
-
-                if (dataChanged) {
-                    renderStatsUI();
-                    updateDataFromUI();
-                }
-            });
-        }
-
-        function loadData() {
-            if (!state.sdk) return utils.showError('SDK not available');
-            setLoadingState(true);
+            // General settings
+            const domColor = state.dom.style.backgroundColor;
+            const redRgb = 'rgb(219, 2, 29)';
+            const blackRgb = 'rgb(0, 0, 0)';
+            elements.backgroundColorSelector.querySelector('[data-color="red"]').classList.toggle('selected', domColor === PRESET_COLORS.RED.toLowerCase() || domColor === redRgb);
+            elements.backgroundColorSelector.querySelector('[data-color="black"]').classList.toggle('selected', domColor === PRESET_COLORS.BLACK || domColor === blackRgb);
             
-            state.sdk.getData((data) => {
-                try {
-                    const newBlockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => {
-                        newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
-                    });
-                    
-                    if(newBlockData.stats) {
-                        newBlockData.stats.forEach(stat => { if (!stat.id) stat.id = crypto.randomUUID(); });
-                    }
-                    state.blockData = newBlockData;
-                    
-                    document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
-                    elements.imageUrl.value = state.blockData.imageUrl;
-                    elements.imageLink.value = state.blockData.imageLink;
-                    elements.imageAlt.value = state.blockData.imageAlt;
-                    renderStatsUI();
-                } catch (error) {
-                    utils.showError(`Failed to load data: ${error.message}`);
-                    // Fallback to defaults if data processing fails
-                    Object.keys(moduleConfig.fields).forEach(key => {
-                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
-                    });
-                    renderStatsUI();
-                } finally {
-                    setLoadingState(false);
-                    refreshPreview();
-                }
-            });
+            // Image settings
+            elements.imageUrl.value = img ? img.src : '';
+            elements.imageLink.value = link ? link.href : '';
+            elements.imageAlt.value = img ? img.alt : '';
+
+            // Stats list
+            renderStatsUI();
         }
 
-        function initializeWithRetry() {
-            try {
-                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-                
-                state.sdk = new window.sfdc.BlockSDK();
-                cacheElements();
-                initializeEventHandlers();
-                loadData();
-                
-                state.isInitialized = true;
-            } catch (error) {
-                utils.showError(`Initialization failed: ${error.message}`);
-                if (state.retryCount < moduleConfig.maxRetries) {
-                    state.retryCount++;
-                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
-                } else {
-                    utils.showError('Failed to initialize after multiple attempts.', true);
-                }
-                setLoadingState(false);
+        // --- SDK Interaction ---
+        function updateBlock() {
+            if (!state.dom) return;
+            state.sdk.setContent(state.dom.outerHTML);
+        }
+        const debouncedUpdateBlock = utils.debounce(updateBlock, 500);
+
+        // --- Initialization and Event Handlers ---
+        function cacheElements() {
+            for (const id of ['mainContainer', 'loadingOverlay', 'backgroundColorSelector', 'imageUrl', 'imageLink', 'imageAlt', 'statsContainer', 'addStatBtn', 'statTemplate']) {
+                elements[id] = document.getElementById(id);
             }
         }
+        
+        function initializeEventHandlers() {
+            // General Settings
+            elements.backgroundColorSelector.addEventListener('click', e => {
+                const button = e.target.closest('.color-option');
+                if (button && state.dom) {
+                    state.dom.style.backgroundColor = (button.dataset.color === 'red') ? PRESET_COLORS.RED : PRESET_COLORS.BLACK;
+                    updateUIFromDOM();
+                    updateBlock();
+                }
+            });
 
-        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initializeWithRetry) : initializeWithRetry();
+            // Image Settings
+            elements.imageUrl.addEventListener('input', () => { if (state.dom) state.dom.querySelector('img').src = elements.imageUrl.value; debouncedUpdateBlock(); });
+            elements.imageLink.addEventListener('input', () => { if (state.dom) state.dom.querySelector('a').href = elements.imageLink.value; debouncedUpdateBlock(); });
+            elements.imageAlt.addEventListener('input', () => { if (state.dom) state.dom.querySelector('img').alt = elements.imageAlt.value; debouncedUpdateBlock(); });
+
+            // Add Stat Button
+            elements.addStatBtn.addEventListener('click', () => {
+                if (!state.dom) return;
+                const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                const lastStatRow = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center')).pop();
+                const newStatFragment = createStatRowTemplate({ value: '123', label: 'NEW' });
+                if (lastStatRow) {
+                    lastStatRow.after(...newStatFragment.children); // Use spread to insert both rows
+                } else {
+                    statsTableBody.append(...newStatFragment.children);
+                }
+                updateUIFromDOM();
+                updateBlock();
+            });
+            
+            // Handle Stat Item changes (input, move, remove)
+            elements.statsContainer.addEventListener('input', e => {
+                if (e.target.matches('[data-field]')) {
+                    const itemEl = e.target.closest('.stat-item');
+                    const index = parseInt(itemEl.dataset.index, 10);
+                    const field = e.target.dataset.field; // 'value' or 'label'
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
+                    const targetRow = statRows[index];
+                    if(targetRow) {
+                        const targetDiv = targetRow.querySelector(field === 'value' ? 'div:first-child' : 'div:last-child');
+                        targetDiv.textContent = e.target.value;
+                        debouncedUpdateBlock();
+                    }
+                }
+            });
+            
+            elements.statsContainer.addEventListener('click', e => {
+                const btn = e.target.closest('.stat-control-btn');
+                if (!btn || !state.dom) return;
+
+                const itemEl = btn.closest('.stat-item');
+                const index = parseInt(itemEl.dataset.index, 10);
+                const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                const allRows = Array.from(statsTableBody.children);
+                const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
+                const targetRow = statRows[index];
+                const targetRowIndex = allRows.indexOf(targetRow);
+                const spacerRow = allRows[targetRowIndex + 1];
+
+                if (btn.matches('.remove-btn')) {
+                    targetRow.remove();
+                    if(spacerRow && spacerRow.textContent.trim() === '') spacerRow.remove(); // Remove associated spacer
+                } else if (btn.matches('.move-up-btn') && index > 0) {
+                    const prevRow = statRows[index - 1];
+                    prevRow.before(targetRow);
+                    targetRow.after(spacerRow);
+                } else if (btn.matches('.move-down-btn') && index < statRows.length - 1) {
+                    const nextRow = statRows[index + 1];
+                    const nextSpacer = allRows[allRows.indexOf(nextRow) + 1];
+                    if (nextSpacer) {
+                        nextSpacer.after(targetRow);
+                        targetRow.after(spacerRow);
+                    }
+                }
+                updateUIFromDOM();
+                updateBlock();
+            });
+        }
+        
+        function loadData() {
+            state.sdk.getContent(content => {
+                if (content && content.trim() !== '') {
+                    state.dom = parseToDOM(content);
+                } else {
+                    state.dom = parseToDOM(generateInitialTemplate(DEFAULTS));
+                    updateBlock();
+                }
+                updateUIFromDOM();
+            });
+        }
+
+        function initialize() {
+            cacheElements();
+            state.sdk = new window.sfdc.BlockSDK({ tabs: ['stylingblock', 'htmlblock'] });
+            initializeEventHandlers();
+            loadData();
+        }
+
+        document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 </html>
