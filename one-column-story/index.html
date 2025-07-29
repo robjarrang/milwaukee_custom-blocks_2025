@@ -47,11 +47,9 @@
             <div id="checklistSection"><div class="field-group"><label class="field-label">Checklist Items</label><div id="itemsContainer" class="items-container"></div><button id="addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
         </div>
         <div class="section-divider">
-            <div class="section-title">Button & Spacer Settings</div>
+            <div class="section-title">Button Settings</div>
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
             <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><input type="text" id="buttonText" class="field-input"></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
-            <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showSpacer" checked><span class="toggle-slider"></span></label><label for="showSpacer" class="checkbox-label">Show 40px Bottom Spacer</label></div>
         </div>
     </div>
     <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
@@ -78,8 +76,7 @@
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'text', defaultValue: 'Nulla Ut Erat Enim', maxLength: 40 },
                 buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                buttonAlignment: { type: 'text', defaultValue: 'center' },
-                showSpacer: { type: 'boolean', defaultValue: true }
+                buttonAlignment: { type: 'text', defaultValue: 'center' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -121,7 +118,6 @@
             elements.buttonLink = document.getElementById('buttonLink');
             elements.buttonLinkError = document.getElementById('buttonLinkError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
-            elements.showSpacer = document.getElementById('showSpacer');
         }
         function setLoadingState(loading) {
             state.isLoading = loading;
@@ -177,7 +173,6 @@
             const buttonText = utils.getFieldValue('buttonText');
             const buttonLink = utils.getFieldValue('buttonLink');
             const buttonAlign = utils.getFieldValue('buttonAlignment');
-            const showSpacer = utils.getFieldValue('showSpacer');
             
             const titleLineHeight = titleSize + 8;
             const titleMobileClass = titleAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
@@ -206,10 +201,9 @@
             const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
             const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><!--[if (gte mso 9)|(IE)]><table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top"><![endif]-->${textContentTable}<!--[if (gte mso 9)|(IE)]></td></tr><tr><td height="100%"> </td></tr></table><![endif]--></td>`;
             
-            const spacerHtml = showSpacer ? `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td class="block" style="width: 100%;"><div style="font-size: 40px; height: 40px; line-height: 40px;"> </div></td></tr></table></td></tr></table><!-- END .fw-spacer -->` : '';
             const mainContent = layout === 'right' ? textCell + imageCell : imageCell + textCell;
 
-            return `<!-- START .story-1col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${mainContent}</tr></table></td><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .story-1col -->${spacerHtml}`;
+            return `<!-- START .story-1col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${mainContent}</tr></table></td><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .story-1col -->`;
         }
         function refreshPreview() {
             if (state.isLoading || !state.sdk) return;
@@ -259,7 +253,6 @@
             setupTextInput(elements.buttonText, 'buttonText');
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
-            setupToggle(elements.showSpacer, 'showSpacer');
             elements.addItemBtn.addEventListener('click', () => {
                 const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
                 state.blockData.items.push(newItem);
@@ -295,7 +288,6 @@
                     elements.showButton.checked = showButton;
                     if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
-                    elements.showSpacer.checked = utils.getFieldValue('showSpacer');
                     const contentType = utils.getFieldValue('contentType');
                     setSelectorState(elements.contentTypeSelector, 'contentType');
                     toggleContentTypeView(contentType);
