@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Full Width Button Block</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:40px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
@@ -72,7 +72,15 @@
             maxRetries: 3
         };
 
-        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const state = { 
+            sdk: null, 
+            editors: {}, 
+            blockData: {}, 
+            isLoading: false, 
+            isInitialized: false, 
+            eventListeners: [], 
+            retryCount: 0 
+        };
         const elements = {};
 
         const utils = {
@@ -139,23 +147,44 @@
 
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
+            
             try {
-                state.editors.buttonText = new Quill(elements.buttonTextEditor, {
+                // Quill 2.0 configuration
+                const quillOptions = {
                     theme: 'snow',
-                    modules: { toolbar: [[{ 'script': 'super' }]], clipboard: { matchVisual: false } },
+                    modules: { 
+                        toolbar: [[{ 'script': 'super' }]], 
+                        clipboard: { matchVisual: false } 
+                    },
                     formats: ['script'],
                     placeholder: 'Enter button text...'
-                });
+                };
+                
+                state.editors.buttonText = new Quill(elements.buttonTextEditor, quillOptions);
 
                 const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                    if (source === 'user') updateData('buttonText', utils.sanitizeHtml(state.editors.buttonText.root.innerHTML));
+                    if (source === 'user') {
+                        // Use getSemanticHTML() for Quill 2.0
+                        const content = state.editors.buttonText.getSemanticHTML ? 
+                            state.editors.buttonText.getSemanticHTML() : 
+                            state.editors.buttonText.root.innerHTML;
+                        updateData('buttonText', utils.sanitizeHtml(content));
+                    }
                 }, moduleConfig.debounceDelay);
+                
                 state.editors.buttonText.on('text-change', debouncedUpdate);
 
+                // Length limiting using Quill 2.0 API
                 state.editors.buttonText.on('text-change', () => {
                     const text = state.editors.buttonText.getText();
                     const maxLength = moduleConfig.fields.buttonText.maxLength;
-                    if (text.length > maxLength) state.editors.buttonText.deleteText(maxLength, text.length);
+                    if (text.length > maxLength) {
+                        const range = state.editors.buttonText.getSelection();
+                        state.editors.buttonText.deleteText(maxLength, text.length - maxLength);
+                        if (range) {
+                            state.editors.buttonText.setSelection(Math.min(range.index, maxLength));
+                        }
+                    }
                 });
             } catch(error) {
                 throw new Error(`Failed to initialize editor: ${error.message}`);
@@ -200,7 +229,7 @@
 
             return `<!-- START .fw-button --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
                 <tr>
-                    <td class="side" style="width: 20px;"> </td>
+                    <td class="side" style="width: 20px;"> </td>
                     <td align="center" class="content-inner" style="width: 580px;">
                         <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
                             <tr>
@@ -208,7 +237,7 @@
                                     <table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">
                                         <tr>
                                             <td>
-                                                <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
+                                                <div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -230,7 +259,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
+                                                <div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div>
                                             </td>
                                         </tr>
                                     </table>
@@ -238,7 +267,7 @@
                             </tr>
                         </table>
                     </td>
-                    <td class="side" style="width: 20px;"> </td>
+                    <td class="side" style="width: 20px;"> </td>
                 </tr>
             </table><!-- END .fw-button -->`;
         }
@@ -270,8 +299,11 @@
         }
 
         function initializeEventHandlers() {
+            state.eventListeners = [];
+            
             // Option selectors
             function setupOptionSelector(selectorElement, dataKey) {
+                if (!selectorElement) return;
                 selectorElement.querySelectorAll('.option-button').forEach(option => {
                     const handler = (e) => {
                         const selectedValue = e.target.dataset.value;
@@ -327,13 +359,31 @@
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
                     
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-                    if (state.editors.buttonText) state.editors.buttonText.root.innerHTML = utils.getFieldValue('buttonText');
+                    
+                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                    if (state.editors.buttonText) {
+                        const content = utils.getFieldValue('buttonText');
+                        try {
+                            // Clear existing content first
+                            state.editors.buttonText.setContents([]);
+                            // Use the new clipboard API to paste HTML content
+                            if (content && content.trim()) {
+                                state.editors.buttonText.clipboard.dangerouslyPasteHTML(content);
+                            }
+                        } catch (error) {
+                            // Fallback to root innerHTML for compatibility
+                            console.warn(`Using fallback method for buttonText editor:`, error);
+                            state.editors.buttonText.root.innerHTML = content || '';
+                        }
+                    }
                     
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = moduleConfig.fields[key].defaultValue; });
+                    Object.keys(moduleConfig.fields).forEach(key => { 
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue; 
+                    });
                     refreshPreview();
                 } finally {
                     setLoadingState(false);
@@ -342,7 +392,12 @@
         }
 
         function cleanup() {
-            Object.values(state.editors).forEach(editor => editor && editor.off('text-change'));
+            // Updated cleanup for Quill 2.0
+            Object.values(state.editors).forEach(editor => {
+                if (editor && editor.off) {
+                    editor.off('text-change');
+                }
+            });
             state.eventListeners.forEach(({ element, event, handler }) => {
                 if (element && element.removeEventListener) element.removeEventListener(event, handler);
             });
@@ -367,12 +422,12 @@
                 
                 state.isInitialized = true;
             } catch (error) {
-                utils.showError(`Initialization failed: ${error.message}`);
+                utils.showError(`Initialisation failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
                     setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
                 } else {
-                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
+                    utils.showError('Failed to initialise after multiple attempts. Please refresh.', true);
                 }
                 setLoadingState(false);
             }
