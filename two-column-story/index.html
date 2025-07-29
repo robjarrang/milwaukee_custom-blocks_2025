@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>2 Column Story Block (with Top Spacer)</title>
+    <title>2 Column Story Block (Corrected)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -36,7 +36,14 @@
         <div class="error-banner" id="errorBanner"></div>
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
-            <div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option selected" data-color="black">Black</div><div class="color-option" data-color="red">Red</div></div></div>
+            <div class="field-group">
+                <label class="field-label">Background Colour</label>
+                <div class="option-selector" id="backgroundColorSelector">
+                    <!-- FIX: Changed "color-option" to "option-button" to match the JS selector -->
+                    <div class="option-button selected" data-value="black">Black</div>
+                    <div class="option-button" data-value="red">Red</div>
+                </div>
+            </div>
         </div>
 
         <div class="column-wrapper">
@@ -315,7 +322,7 @@
                     state.blockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; });
                     COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (state.blockData[p + listType]) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
-                    document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
+                    document.querySelectorAll('#backgroundColorSelector .option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === utils.getFieldValue('backgroundColor')));
                     function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
                     COLUMN_PREFIXES.forEach(p => {
                         ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
