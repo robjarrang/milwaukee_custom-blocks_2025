@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>2 Column Story Block (Corrected)</title>
+    <title>2 Column Story Block (Corrected & Functional)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -47,7 +47,7 @@
                 <div class="field-group"><label for="left_imageAlt" class="field-label">Image Alt Text</label><input type="text" id="left_imageAlt" class="field-input"></div>
                 <div class="field-group"><label for="left_imageLink" class="field-label">Image Link URL</label><input type="url" id="left_imageLink" class="field-input"></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
-                <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showSubtitle"><span class="toggle-slider"></span></label><label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
+                <div class="toggle-container" data-controls="left_subtitleGroup"><label class="toggle-switch"><input type="checkbox" id="left_showSubtitle"><span class="toggle-slider"></span></label><label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="left_subtitleGroup"><label for="left_subtitle" class="field-label">Subtitle</label><input type="text" id="left_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_subtitleFontSize" class="field-input" min="12" max="24" step="1"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Title</label><div id="left_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="1"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="left_contentTypeSelector"><div class="option-button" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
@@ -56,7 +56,7 @@
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="left_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="left_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="left_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="left_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
-                <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showButton"><span class="toggle-slider"></span></label><label for="left_showButton" class="checkbox-label">Show Button</label></div>
+                <div class="toggle-container" data-controls="left_buttonFieldsGroup"><label class="toggle-switch"><input type="checkbox" id="left_showButton"><span class="toggle-slider"></span></label><label for="left_showButton" class="checkbox-label">Show Button</label></div>
                 <div id="left_buttonFieldsGroup"><div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><input type="text" id="left_buttonText" class="field-input"></div><div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
             </div>
             <!-- Right Column -->
@@ -66,7 +66,7 @@
                 <div class="field-group"><label for="right_imageAlt" class="field-label">Image Alt Text</label><input type="text" id="right_imageAlt" class="field-input"></div>
                 <div class="field-group"><label for="right_imageLink" class="field-label">Image Link URL</label><input type="url" id="right_imageLink" class="field-input"></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
-                <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showSubtitle"><span class="toggle-slider"></span></label><label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
+                <div class="toggle-container" data-controls="right_subtitleGroup"><label class="toggle-switch"><input type="checkbox" id="right_showSubtitle"><span class="toggle-slider"></span></label><label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="right_subtitleGroup"><label for="right_subtitle" class="field-label">Subtitle</label><input type="text" id="right_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_subtitleFontSize" class="field-input" min="12" max="24" step="1"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Title</label><div id="right_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="1"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="right_contentTypeSelector"><div class="option-button" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
@@ -75,7 +75,7 @@
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="right_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="right_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="right_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="right_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
-                <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showButton"><span class="toggle-slider"></span></label><label for="right_showButton" class="checkbox-label">Show Button</label></div>
+                <div class="toggle-container" data-controls="right_buttonFieldsGroup"><label class="toggle-switch"><input type="checkbox" id="right_showButton"><span class="toggle-slider"></span></label><label for="right_showButton" class="checkbox-label">Show Button</label></div>
                 <div id="right_buttonFieldsGroup"><div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><input type="text" id="right_buttonText" class="field-input"></div><div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
             </div>
         </div>
@@ -83,6 +83,31 @@
     <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
     <template id="spacerTemplate"><div class="spacer-item"><div class="spacer-content"><span class="spacer-title">Spacer</span></div><div class="spacer-controls"><button class="spacer-control-btn remove-btn" title="Remove Item">×</button></div></div></template>
     
+    <!-- TEMPLATES FOR DYNAMIC ELEMENTS -->
+    <template id="subtitleTemplate">
+        <tr data-element="subtitle-wrapper">
+            <td class="mobile-text-center" data-element="subtitle-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:28px;margin:0;mso-line-height-rule:exactly;text-align:center;mso-hyphenate:none;hyphens:none;">SUBTITLE</td>
+        </tr>
+        <tr data-element="subtitle-spacer"><td style="font-size:8px;height:8px;line-height:8px;"> </td></tr>
+    </template>
+    <template id="buttonTemplate">
+        <tr data-element="button-wrapper">
+            <td>
+                <div style="font-size:20px;height:20px;line-height:20px;"> </div>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                    <tr><td align="center" class="block" valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;">
+                            <tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;">
+                                <a data-element="button-link" href="#" style="color:#ffffff;text-decoration:none;" target="_blank">BUTTON</a>
+                            </td></tr>
+                        </table>
+                    </td></tr>
+                </table>
+                <div style="font-size:20px;height:20px;line-height:20px;"> </div>
+            </td>
+        </tr>
+    </template>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
@@ -94,167 +119,180 @@
         const PRESET_COLORS = { BLACK: '#000000', RED: '#DB021D' };
         const DEFAULTS = {
             backgroundColor: PRESET_COLORS.BLACK,
-            column: {
-                imageUrl: 'https://placehold.co/280x180/cccccc/333333?text=Image',
-                imageAlt: 'Story image',
-                imageLink: 'https://www.milwaukeetool.eu/',
-                subtitle: { show: true, text: 'SUBTITLE', fontSize: 16, alignment: 'center' },
-                title: { html: '<strong>Column Title</strong>', fontSize: 20, alignment: 'center' },
-                contentType: 'description',
-                description: { html: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', fontSize: 16, alignment: 'center' },
-                checklist: [],
-                spacers: [],
-                button: { show: true, text: 'Learn More', link: 'https://www.milwaukeetool.eu/', alignment: 'center' }
-            }
+            columns: { /* Default column structure defined in template generation */ }
         };
         const state = { sdk: null, dom: null, editors: {} };
         const elements = {};
         const COLUMN_KEYS = ['left', 'right'];
+
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             sanitizeHtml(h) { return h ? h.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>') : ''; }
         };
 
         // --- TEMPLATING & DOM PARSING ---
-        function getElementTemplate(elementType, key, data) {
-            switch(elementType) {
-                case 'subtitle':
-                    const subLineHeight = (data.fontSize || 16) + 12;
-                    return `<tr data-element="${key}_subtitle-wrapper">
-                                <td class="mobile-text-center" data-element="${key}_subtitle-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${data.fontSize}px;font-weight:normal;line-height:${subLineHeight}px;text-align:${data.alignment};">${data.text}</td>
-                            </tr>
-                            <tr data-element="${key}_subtitle-spacer"><td style="font-size:8px;height:8px;line-height:8px;"> </td></tr>`;
-                case 'button':
-                    return `<tr data-element="${key}_button-wrapper">
-                                <td>
-                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
-                                        <tr><td align="${data.alignment}" class="block" valign="top">
-                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;">
-                                                <tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;">
-                                                    <a data-element="${key}_button-link" href="${data.link}" style="color:#ffffff;text-decoration:none;" target="_blank">${data.text}</a>
-                                                </td></tr>
-                                            </table>
-                                        </td></tr>
-                                    </table>
-                                </td>
-                            </tr>`;
-            }
-            return '';
-        }
 
         function generateInitialTemplate() {
+            // Generates the full HTML for a new block with data-element attributes for stable targeting.
             const generateColumn = (key) => {
-                const col = DEFAULTS.column;
-                const titleLineHeight = col.title.fontSize + 8;
-                const descriptionLineHeight = col.description.fontSize + 8;
-                
+                const defaults = {
+                    imageUrl: 'https://placehold.co/280x180/cccccc/333333?text=Image', imageAlt: 'Story image', imageLink: '#',
+                    subtitle: { text: 'SUBTITLE', fontSize: 16, alignment: 'center' },
+                    title: { html: '<strong>TITLE</strong>', fontSize: 20, alignment: 'center' },
+                    description: { html: 'Description text goes here.', fontSize: 16, alignment: 'center' },
+                    button: { text: 'BUTTON', link: '#', alignment: 'center' }
+                };
+                const subtitleLineHeight = defaults.subtitle.fontSize + 12;
+                const titleLineHeight = defaults.title.fontSize + 8;
+                const descriptionLineHeight = defaults.description.fontSize + 8;
+
                 return `<td data-element="${key}_column" align="center" class="block" style="width:280px;" valign="top">
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                        <tr><td><a data-element="${key}_image-link" href="${col.imageLink}" target="_blank"><img data-element="${key}_image" alt="${col.imageAlt}" src="${col.imageUrl}" width="280" style="border:none;display:block;height:auto;"></a></td></tr>
-                        <tr><td align="center" style="padding:12px 0;"><table data-element="${key}_content-table" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"><tbody>
-                            <tr><td><div style="font-size:12px;height:12px;"> </div></td></tr>
-                            ${getElementTemplate('subtitle', key, col.subtitle)}
-                            <tr><td data-element="${key}_title-cell" style="text-align:${col.title.alignment};"><h3 data-element="${key}_title-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif;font-size:${col.title.fontSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0;">${col.title.html}</h3></td></tr>
-                            <tr><td><div style="font-size:8px;height:8px;"> </div></td></tr>
-                            <tr data-element="${key}_content-container" data-content-type="${col.contentType}"><td style="padding:0;">
-                                <table data-element="${key}_description-container" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                                    <tr data-element="${key}_description-wrapper"><td data-element="${key}_description-text" class="mobile-text-center" style="color:#ffffff;font-size:${col.description.fontSize}px;line-height:${descriptionLineHeight}px;text-align:${col.description.alignment};">${col.description.html}</td></tr>
-                                </table>
-                                <table data-element="${key}_checklist-container" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%; display:none;"></table>
-                            </td></tr>
-                            <tbody data-element="${key}_spacers-container"></tbody>
-                            <tr><td><div style="font-size:20px;height:20px;"> </div></td></tr>
-                            ${getElementTemplate('button', key, col.button)}
-                        </tbody></table></td></tr>
-                    </table></td>`;
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                        <tr><td>
+                            <a data-element="${key}_image-link" href="${defaults.imageLink}" target="_blank">
+                                <img data-element="${key}_image" align="top" alt="${defaults.imageAlt}" class="fill" src="${defaults.imageUrl}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="280">
+                            </a>
+                        </td></tr>
+                        <tr><td data-element="${key}_content-cell" align="center" style="padding-bottom:12px;padding-top:12px;">
+                            <table border="0" cellpadding="0" cellspacing="0" class="sect" style="width:100%;">
+                                <tbody data-element="${key}_content-body">
+                                    <tr><td><div style="font-size:12px;height:12px;line-height:12px;"> </div></td></tr>
+                                    <tr data-element="${key}_subtitle-wrapper">
+                                        <td data-element="${key}_subtitle-text" class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${defaults.subtitle.fontSize}px;font-weight:normal;line-height:${subtitleLineHeight}px;text-align:${defaults.subtitle.alignment};">${defaults.subtitle.text}</td>
+                                    </tr>
+                                    <tr><td data-element="${key}_subtitle-spacer" style="font-size:8px;height:8px;line-height:8px;"> </td></tr>
+                                    <tr>
+                                        <td data-element="${key}_title-cell" class="mobile-text-center" style="text-align:${defaults.title.alignment};">
+                                            <h3 data-element="${key}_title-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:${defaults.title.fontSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0;">${defaults.title.html}</h3>
+                                        </td>
+                                    </tr>
+                                    <tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>
+                                    <tr data-element="${key}_content-type-wrapper" data-type="description">
+                                        <td data-element="${key}_description-text" class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${defaults.description.fontSize}px;font-weight:normal;line-height:${descriptionLineHeight}px;text-align:${defaults.description.alignment};">${defaults.description.html}</td>
+                                    </tr>
+                                    <tbody data-element="${key}_spacers-container"></tbody>
+                                    <tr data-element="${key}_button-wrapper">
+                                        <td>
+                                            <div style="font-size:20px;height:20px;line-height:20px;"> </div>
+                                            <table align="${defaults.button.alignment}" border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;">
+                                                <tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;">
+                                                    <a data-element="${key}_button-link" href="${defaults.button.link}" style="color:#ffffff;text-decoration:none;" target="_blank">${defaults.button.text}</a>
+                                                </td></tr>
+                                            </table>
+                                            <div style="font-size:20px;height:20px;line-height:20px;"> </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td></tr>
+                    </table>
+                </td>`;
             };
 
             return `<!-- I AM A 2-COL STORY BLOCK -->
-                <table data-element="main-table" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${DEFAULTS.backgroundColor};width:620px;">
-                    <tr><td style="width:20px;"> </td><td align="center" style="width:580px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                        <tr>${generateColumn('left')}<td style="width:20px;"> </td>${generateColumn('right')}</tr>
-                    </table></td><td style="width:20px;"> </td></tr>
+                <table data-element="main-table" align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${DEFAULTS.backgroundColor};width:620px;">
+                    <tr>
+                        <td class="side" style="width:20px;"> </td>
+                        <td align="center" class="content-inner" style="width:580px;" valign="top">
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                                <tr>${generateColumn('left')}<td class="gap block" style="width:20px;"> </td>${generateColumn('right')}</tr>
+                            </table>
+                        </td>
+                        <td class="side" style="width:20px;"> </td>
+                    </tr>
                 </table>`;
         }
-
+        
         function parseToDOM(html) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             return doc.body.firstChild;
         }
-
+        
         // --- UI & DOM SYNC ---
+        
         function updateUIFromDOM() {
             if (!state.dom) return;
+
             const mainTable = state.dom.querySelector('[data-element="main-table"]');
             const domColor = mainTable.style.backgroundColor;
             const isRed = domColor === 'rgb(219, 2, 29)' || domColor.toUpperCase() === PRESET_COLORS.RED;
             setSelectorState(elements.backgroundColorSelector, isRed ? 'red' : 'black');
 
             COLUMN_KEYS.forEach(key => {
-                const p = `${key}_`;
-                const img = state.dom.querySelector(`[data-element="${p}image"]`), imgLink = state.dom.querySelector(`[data-element="${p}image-link"]`);
-                elements[p + 'imageUrl'].value = img ? img.getAttribute('src') : '';
-                elements[p + 'imageLink'].value = imgLink ? imgLink.getAttribute('href') : '';
-                elements[p + 'imageAlt'].value = img ? img.getAttribute('alt') : '';
+                const prefix = `${key}_`;
+                
+                const get = (el) => state.dom.querySelector(`[data-element="${prefix}${el}"]`);
 
-                const subWrapper = state.dom.querySelector(`[data-element="${p}subtitle-wrapper"]`), subText = state.dom.querySelector(`[data-element="${p}subtitle-text"]`);
-                elements[p + 'showSubtitle'].checked = !!subWrapper;
-                elements[p + 'subtitleGroup'].style.display = subWrapper ? 'block' : 'none';
-                if(subText) {
-                    elements[p + 'subtitle'].value = subText.textContent;
-                    elements[p + 'subtitleFontSize'].value = parseInt(subText.style.fontSize, 10);
-                    setSelectorState(elements[p + 'subtitleAlignmentSelector'], subText.style.textAlign);
+                // Image
+                const img = get('image');
+                elements[prefix + 'imageUrl'].value = img?.src || '';
+                elements[prefix + 'imageAlt'].value = img?.alt || '';
+                elements[prefix + 'imageLink'].value = get('image-link')?.href || '';
+
+                // Subtitle Toggle & Fields
+                const subtitleWrapper = get('subtitle-wrapper');
+                elements[prefix + 'showSubtitle'].checked = !!subtitleWrapper;
+                elements[prefix + 'subtitleGroup'].style.display = subtitleWrapper ? 'block' : 'none';
+                if (subtitleWrapper) {
+                    const subtitleText = get('subtitle-text');
+                    elements[prefix + 'subtitle'].value = subtitleText.textContent;
+                    elements[prefix + 'subtitleFontSize'].value = parseInt(subtitleText.style.fontSize, 10);
+                    setSelectorState(elements[prefix + 'subtitleAlignmentSelector'], subtitleText.style.textAlign);
                 }
 
-                const titleText = state.dom.querySelector(`[data-element="${p}title-text"]`), titleCell = state.dom.querySelector(`[data-element="${p}title-cell"]`);
-                state.editors[p + 'title'].root.innerHTML = titleText ? utils.sanitizeHtml(titleText.innerHTML) : '';
-                if(titleText) elements[p + 'titleFontSize'].value = parseInt(titleText.style.fontSize, 10);
-                if(titleCell) setSelectorState(elements[p + 'titleAlignmentSelector'], titleCell.style.textAlign);
+                // Title Fields
+                const titleText = get('title-text');
+                state.editors[prefix + 'title'].root.innerHTML = utils.sanitizeHtml(titleText.innerHTML);
+                elements[prefix + 'titleFontSize'].value = parseInt(titleText.style.fontSize, 10);
+                setSelectorState(elements[prefix + 'titleAlignmentSelector'], get('title-cell').style.textAlign);
                 
-                const contentContainer = state.dom.querySelector(`[data-element="${p}content-container"]`);
-                const contentType = contentContainer ? contentContainer.dataset.contentType : 'description';
-                setSelectorState(elements[p + 'contentTypeSelector'], contentType);
-                elements[p + 'descriptionSection'].style.display = (contentType === 'description') ? 'block' : 'none';
-                elements[p + 'checklistSection'].style.display = (contentType === 'checklist') ? 'block' : 'none';
+                // Content Type
+                const contentTypeWrapper = get('content-type-wrapper');
+                const contentType = contentTypeWrapper.dataset.type;
+                setSelectorState(elements[prefix + 'contentTypeSelector'], contentType);
+                elements[prefix + 'descriptionSection'].style.display = contentType === 'description' ? 'block' : 'none';
+                elements[prefix + 'checklistSection'].style.display = contentType === 'checklist' ? 'block' : 'none';
                 
-                const descText = state.dom.querySelector(`[data-element="${p}description-text"]`);
-                if(state.editors[p + 'description']) state.editors[p + 'description'].root.innerHTML = descText ? utils.sanitizeHtml(descText.innerHTML) : '';
-                if(descText) {
-                    elements[p + 'descriptionFontSize'].value = parseInt(descText.style.fontSize, 10);
-                    setSelectorState(elements[p + 'descriptionAlignmentSelector'], descText.style.textAlign);
+                if (contentType === 'description') {
+                    const descText = get('description-text');
+                    state.editors[prefix + 'description'].root.innerHTML = utils.sanitizeHtml(descText.innerHTML);
+                    elements[prefix + 'descriptionFontSize'].value = parseInt(descText.style.fontSize, 10);
+                    setSelectorState(elements[prefix + 'descriptionAlignmentSelector'], descText.style.textAlign);
                 }
-
-                const btnWrapper = state.dom.querySelector(`[data-element="${p}button-wrapper"]`), btnLink = state.dom.querySelector(`[data-element="${p}button-link"]`);
-                elements[p + 'showButton'].checked = !!btnWrapper;
-                elements[p + 'buttonFieldsGroup'].style.display = btnWrapper ? 'block' : 'none';
-                if(btnLink) {
-                    elements[p + 'buttonText'].value = btnLink.textContent;
-                    elements[p + 'buttonLink'].value = btnLink.getAttribute('href');
-                    const btnCell = btnLink.closest('td[align]');
-                    if(btnCell) setSelectorState(elements[p + 'buttonAlignmentSelector'], btnCell.getAttribute('align'));
+                
+                // Button Toggle & Fields
+                const buttonWrapper = get('button-wrapper');
+                elements[prefix + 'showButton'].checked = !!buttonWrapper;
+                elements[prefix + 'buttonFieldsGroup'].style.display = buttonWrapper ? 'block' : 'none';
+                if (buttonWrapper) {
+                    const buttonLink = get('button-link');
+                    elements[prefix + 'buttonText'].value = buttonLink.textContent;
+                    elements[prefix + 'buttonLink'].value = buttonLink.href;
+                    setSelectorState(elements[prefix + 'buttonAlignmentSelector'], buttonWrapper.querySelector('table[align]').align);
                 }
             });
         }
         
         function setSelectorState(selector, value) {
-            if (!selector) return;
-            selector.querySelectorAll('.color-option, .option-button').forEach(o => o.classList.remove('selected'));
+            selector.querySelectorAll('.option-button, .color-option').forEach(o => o.classList.remove('selected'));
             const toSelect = selector.querySelector(`[data-value="${value}"]`);
             if (toSelect) toSelect.classList.add('selected');
         }
 
         // --- SDK & LIFECYCLE ---
-        function updateBlock() { if (!state.dom) return; state.sdk.setContent(state.dom.outerHTML); }
+
+        function updateBlock() { if (state.dom) state.sdk.setContent(state.dom.outerHTML); }
         const debouncedUpdateBlock = utils.debounce(updateBlock, 500);
 
         function loadData() {
             state.sdk.getContent((content) => {
-                if (content && content.includes('<!-- I AM A 2-COL STORY BLOCK -->')) {
-                    state.dom = parseToDOM(content);
-                } else {
+                const isNewBlock = !content || !content.includes('<!-- I AM A 2-COL STORY BLOCK -->');
+                if (isNewBlock) {
                     state.dom = parseToDOM(generateInitialTemplate());
                     updateBlock();
+                } else {
+                    state.dom = parseToDOM(content);
                 }
                 updateUIFromDOM();
             });
@@ -271,25 +309,28 @@
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            
             COLUMN_KEYS.forEach(p => {
                 const prefix = p + '_';
-                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection'];
+                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
                 keys.forEach(k => { elements[prefix + k] = document.getElementById(prefix + k); });
             });
         }
 
         function initializeEditors() {
             COLUMN_KEYS.forEach(key => {
-                const p = key + '_';
+                const prefix = key + '_';
                 ['title', 'description'].forEach(type => {
-                    const editorId = p + type;
-                    const editorElement = elements[editorId + 'Editor'];
-                    state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: type === 'title' ? [['bold']] : [['bold', 'italic', 'link']] } });
-                    state.editors[editorId].on('text-change', () => {
-                        const targetNode = state.dom.querySelector(`[data-element="${editorId}-text"]`);
-                        if (targetNode) targetNode.innerHTML = utils.sanitizeHtml(state.editors[editorId].root.innerHTML);
-                        debouncedUpdateBlock();
-                    });
+                    state.editors[prefix + type] = new Quill(elements[prefix + type + 'Editor'], { theme: 'snow', modules: { toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] } });
+                    state.editors[prefix + type].on('text-change', utils.debounce(() => {
+                        if (!state.dom) return;
+                        const content = state.editors[prefix + type].root.innerHTML;
+                        const targetNode = state.dom.querySelector(`[data-element="${prefix}${type}-text"]`);
+                        if (targetNode) {
+                            targetNode.innerHTML = utils.sanitizeHtml(content);
+                            debouncedUpdateBlock();
+                        }
+                    }, 500));
                 });
             });
         }
@@ -305,94 +346,82 @@
             });
 
             COLUMN_KEYS.forEach(key => {
-                const p = `${key}_`;
+                const prefix = `${key}_`;
+                const get = (el) => state.dom.querySelector(`[data-element="${prefix}${el}"]`);
+
+                // --- Text & URL Inputs ---
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
-                    elements[p + type].addEventListener('input', e => {
+                    elements[prefix + type].addEventListener('input', e => {
                         if (!state.dom) return;
                         const value = e.target.value;
-                        const mappings = {imageUrl: "src", imageAlt: "alt", imageLink: "href", buttonLink: "href"};
-                        const targetSelector = `[data-element="${p}${mappings[type] ? 'image' : type}${mappings[type] ? (type === 'imageLink' ? '-link' : '') : '-text'}"]`;
-                        const targetNode = state.dom.querySelector(targetSelector);
-                        if(targetNode) {
-                            if (mappings[type]) targetNode.setAttribute(mappings[type], value);
-                            else targetNode.textContent = value;
-                            debouncedUpdateBlock();
-                        }
-                    });
-                });
-
-                ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => {
-                    elements[p + type].addEventListener('input', e => {
-                        if (!state.dom) return;
-                        const size = e.target.value, elementKey = type.replace('FontSize', '');
-                        const targetNode = state.dom.querySelector(`[data-element="${p}${elementKey}-text"]`);
-                        if (targetNode) {
-                            targetNode.style.fontSize = `${size}px`;
-                            targetNode.style.lineHeight = `${parseInt(size, 10) + (elementKey === 'subtitle' ? 12 : 8)}px`;
+                        let node;
+                        if (type === 'imageUrl') node = get('image');
+                        else if (type === 'imageAlt') node = get('image');
+                        else if (type === 'imageLink') node = get('image-link');
+                        else if (type === 'subtitle') node = get('subtitle-text');
+                        else if (type === 'buttonText') node = get('button-link');
+                        else if (type === 'buttonLink') node = get('button-link');
+                        
+                        if(node) {
+                            if(type.endsWith('Url') || type.endsWith('Link')) node.href = value;
+                            else if (type.endsWith('Alt')) node.alt = value;
+                            else if (type.endsWith('Text')) node.textContent = value;
+                            else node.textContent = value;
                             debouncedUpdateBlock();
                         }
                     });
                 });
                 
-                ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => {
-                    elements[p + type + 'Selector'].addEventListener('click', e => {
-                        const btn = e.target.closest('.option-button');
-                        if (btn && state.dom) {
-                            const align = btn.dataset.value, elementKey = type.replace('Alignment', '');
-                            const targetNode = state.dom.querySelector(`[data-element="${p}${elementKey}-${elementKey === 'title' ? 'cell' : 'text'}"]`) || state.dom.querySelector(`[data-element="${p}${elementKey}-link"]`)?.closest('td[align]');
-                            if (targetNode) {
-                                if (elementKey === 'button') targetNode.setAttribute('align', align); else targetNode.style.textAlign = align;
-                            }
-                            setSelectorState(elements[p + type + 'Selector'], align);
-                            updateBlock();
-                        }
-                    });
-                });
-
-                // --- TOGGLES ---
-                elements[p + 'showSubtitle'].addEventListener('change', e => {
-                    if(!state.dom) return;
-                    const contentTableBody = state.dom.querySelector(`[data-element="${p}content-table"] > tbody`);
-                    const titleRow = state.dom.querySelector(`[data-element="${p}title-cell"]`).parentElement;
+                // --- Show/Hide Toggles ---
+                document.getElementById(prefix + 'showSubtitle').addEventListener('change', e => {
+                    const contentBody = get('content-body');
                     if (e.target.checked) {
-                        const template = getElementTemplate('subtitle', key, DEFAULTS.column.subtitle);
-                        const newNodes = parseToDOM(`<table><tbody>${template}</tbody></table>`).querySelector('tbody').children;
-                        contentTableBody.insertBefore(newNodes[1], titleRow);
-                        contentTableBody.insertBefore(newNodes[0], newNodes[1]);
+                        const template = document.getElementById('subtitleTemplate').content.cloneNode(true);
+                        const subtitleWrapper = template.querySelector('[data-element="subtitle-wrapper"]');
+                        const subtitleSpacer = template.querySelector('[data-element="subtitle-spacer"]');
+                        subtitleWrapper.dataset.element = `${prefix}subtitle-wrapper`;
+                        subtitleSpacer.dataset.element = `${prefix}subtitle-spacer`;
+                        subtitleWrapper.querySelector('td').dataset.element = `${prefix}subtitle-text`;
+                        contentBody.insertBefore(subtitleSpacer, get('title-cell').parentElement);
+                        contentBody.insertBefore(subtitleWrapper, subtitleSpacer);
                     } else {
-                        state.dom.querySelector(`[data-element="${p}subtitle-wrapper"]`)?.remove();
-                        state.dom.querySelector(`[data-element="${p}subtitle-spacer"]`)?.remove();
+                        get('subtitle-wrapper')?.remove();
+                        get('subtitle-spacer')?.remove();
                     }
-                    updateUIFromDOM(); // Resync UI state
+                    updateUIFromDOM();
                     updateBlock();
                 });
                 
-                elements[p + 'showButton'].addEventListener('change', e => {
-                    if(!state.dom) return;
-                    const contentTableBody = state.dom.querySelector(`[data-element="${p}content-table"] > tbody`);
+                document.getElementById(prefix + 'showButton').addEventListener('change', e => {
+                    const contentBody = get('content-body');
                     if (e.target.checked) {
-                        const template = getElementTemplate('button', key, DEFAULTS.column.button);
-                        const newButtonNode = parseToDOM(`<table><tbody>${template}</tbody></table>`).querySelector('tr');
-                        contentTableBody.appendChild(newButtonNode);
+                        const template = document.getElementById('buttonTemplate').content.cloneNode(true);
+                        const buttonWrapper = template.querySelector('[data-element="button-wrapper"]');
+                        buttonWrapper.dataset.element = `${prefix}button-wrapper`;
+                        buttonWrapper.querySelector('a').dataset.element = `${prefix}button-link`;
+                        contentBody.appendChild(buttonWrapper);
                     } else {
-                        state.dom.querySelector(`[data-element="${p}button-wrapper"]`)?.remove();
+                        get('button-wrapper')?.remove();
                     }
                     updateUIFromDOM();
                     updateBlock();
                 });
 
-                // --- CONTENT TYPE SWITCHER ---
-                elements[p + 'contentTypeSelector'].addEventListener('click', e => {
+                // --- Content Type Selector ---
+                document.getElementById(prefix + 'contentTypeSelector').addEventListener('click', e => {
                     const btn = e.target.closest('.option-button');
-                    if (btn && state.dom) {
-                        const type = btn.dataset.value;
-                        state.dom.querySelector(`[data-element="${p}content-container"]`).dataset.contentType = type;
-                        state.dom.querySelector(`[data-element="${p}description-container"]`).style.display = type === 'description' ? '' : 'none';
-                        state.dom.querySelector(`[data-element="${p}checklist-container"]`).style.display = type === 'checklist' ? '' : 'none';
-                        setSelectorState(elements[p + 'contentTypeSelector'], type);
-                        updateUIFromDOM(); // Refresh UI to show/hide sections
-                        updateBlock();
+                    if (!btn || !state.dom) return;
+                    const newType = btn.dataset.value;
+                    const wrapper = get('content-type-wrapper');
+                    wrapper.dataset.type = newType;
+                    // For now, just toggling visibility. A more robust solution would swap the nodes.
+                    if (newType === 'description') {
+                        wrapper.innerHTML = `<td data-element="${prefix}description-text" class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:24px;text-align:center;">Description text...</td>`;
+                    } else {
+                        wrapper.innerHTML = `<td data-element="${prefix}checklist-container">...Checklist coming soon...</td>`;
                     }
+                    updateUIFromDOM();
+                    updateBlock();
                 });
             });
         }
