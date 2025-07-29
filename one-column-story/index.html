@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>1 Column Story Block (with Checklist)</title>
+    <title>1 Column Story Block (Corrected)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -12,7 +12,6 @@
         .style-control-group .field-label { margin-bottom: 5px; }
         .style-control-group .field-input { width: 80px; padding: 6px 8px; }
         .style-control-group .option-selector { width: 110px; }
-        /* Checklist Styles */
         .items-container{display:flex;flex-direction:column;gap:15px}
         .item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}
         .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -22,7 +21,7 @@
         .item-control-btn:hover{color:#0074d9}
         .item-control-btn:disabled{color:#ccc;cursor:not-allowed}
         .btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}
-        #checklistSection { display: none; } /* Hide checklist by default */
+        #checklistSection { display: none; }
     </style>
 </head>
 <body>
@@ -30,83 +29,37 @@
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">1 Column Story</h2>
         <div class="error-banner" id="errorBanner"></div>
-        
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
             <div class="field-group"><label class="field-label">Layout</label><div class="option-selector" id="layoutSelector"><div class="option-button selected" data-value="left" title="Image on Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 18h6V6H4v12zm8 0h8V6h-8v12zM4 4h16v2H4V4z"/></svg></div><div class="option-button" data-value="right" title="Image on Right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M14 18h6V6h-6v12zM4 18h8V6H4v12zM4 4h16v2H4V4z"/></svg></div></div></div>
         </div>
-        
         <div class="section-divider">
             <div class="section-title">Image Settings</div>
             <div class="field-group"><label for="imageUrl" class="field-label">Image URL</label><input type="url" id="imageUrl" class="field-input"><div class="field-error" id="imageUrlError">Please enter a valid URL.</div></div>
             <div class="field-group"><label for="imageAlt" class="field-label">Image Alt Text</label><input type="text" id="imageAlt" class="field-input"></div>
             <div class="field-group"><label for="imageLink" class="field-label">Image Link URL</label><input type="url" id="imageLink" class="field-input"><div class="field-error" id="imageLinkError">Please enter a valid URL.</div></div>
         </div>
-
         <div class="section-divider">
             <div class="section-title">Content Settings</div>
-            <div class="field-group">
-                <label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div>
-                <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div>
-            </div>
-            
-            <div class="field-group">
-                <label class="field-label">Content Type</label>
-                <div class="option-selector" id="contentTypeSelector">
-                    <div class="option-button selected" data-value="description">Body Copy</div>
-                    <div class="option-button" data-value="checklist">Checklist</div>
-                </div>
-            </div>
-
-            <div id="descriptionSection">
-                <div class="field-group">
-                    <label class="field-label">Description</label><div id="descriptionEditor" class="quill-container"></div>
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div>
-                </div>
-            </div>
-
-            <div id="checklistSection">
-                <div class="field-group">
-                    <label class="field-label">Checklist Items</label>
-                    <div id="itemsContainer" class="items-container"></div>
-                    <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
-                </div>
-            </div>
+            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
+            <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
+            <div id="descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div></div>
+            <div id="checklistSection"><div class="field-group"><label class="field-label">Checklist Items</label><div id="itemsContainer" class="items-container"></div><button id="addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
         </div>
-        
         <div class="section-divider">
             <div class="section-title">Button & Spacer Settings</div>
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
-            <div id="buttonFieldsGroup">
-                <div class="field-group"><label for="buttonText" class="field-label">Button Text</label><input type="text" id="buttonText" class="field-input"></div>
-                <div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div>
-                <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div>
-            </div>
+            <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><input type="text" id="buttonText" class="field-input"></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
             <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showSpacer" checked><span class="toggle-slider"></span></label><label for="showSpacer" class="checkbox-label">Show 40px Bottom Spacer</label></div>
         </div>
     </div>
-
-    <template id="itemTemplate">
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">Item</h3>
-                <div class="item-controls">
-                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
-                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
-                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
-                </div>
-            </div>
-            <div class="quill-container limited-toolbar"></div>
-        </div>
-    </template>
-
+    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
-        
         const moduleConfig = {
             name: '1 Column Story with Checklist',
             fields: {
@@ -131,10 +84,8 @@
             debounceDelay: 300,
             maxRetries: 3
         };
-
         const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
         const elements = {};
-
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
@@ -142,7 +93,6 @@
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
         };
-
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
@@ -173,12 +123,10 @@
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
             elements.showSpacer = document.getElementById('showSpacer');
         }
-
         function setLoadingState(loading) {
             state.isLoading = loading;
             if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
         }
-
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
@@ -192,21 +140,18 @@
                 createEditor('description', '#descriptionEditor', [['bold', 'italic'], ['link']], ['bold', 'italic', 'link'], 'Enter description...');
             } catch (error) { throw new Error(`Failed to initialize editors: ${error.message}`); }
         }
-
         function processRichText(html) {
             if (!html) return '';
             const temp = document.createElement('div');
             temp.innerHTML = utils.sanitizeHtml(html);
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
-
         function updateData(field, value) {
             if (state.blockData[field] != value) {
                 state.blockData[field] = value;
                 refreshPreview();
             }
         }
-
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
         const debouncedChecklistUpdate = utils.debounce(() => {
             const newItems = [];
@@ -217,7 +162,7 @@
             });
             updateData('items', newItems);
         }, moduleConfig.debounceDelay + 100);
-
+        
         function generateTemplate() {
             const layout = utils.getFieldValue('layout');
             const bgColor = '#DB021D';
@@ -256,32 +201,25 @@
                 contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             }
 
-            // --- GHOST TABLE FIX ---
-            // The content of each primary cell is wrapped in its own table.
-            // This insulates it from SFMC's editor scripts, which manipulate the outer <td>.
-            const imageContent = `<div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div>`;
-            const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td>${imageContent}</td></tr></table></td>`;
+            const textContentTable = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
 
-            const textContent = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" valign="top"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
-            const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td>${textContent}</td></tr></table></td>`;
+            const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
+            const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><!--[if (gte mso 9)|(IE)]><table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top"><![endif]-->${textContentTable}<!--[if (gte mso 9)|(IE)]></td></tr><tr><td height="100%"> </td></tr></table><![endif]--></td>`;
             
             const spacerHtml = showSpacer ? `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td class="block" style="width: 100%;"><div style="font-size: 40px; height: 40px; line-height: 40px;"> </div></td></tr></table></td></tr></table><!-- END .fw-spacer -->` : '';
-            const mainContent = imageCell + textCell;
+            const mainContent = layout === 'right' ? textCell + imageCell : imageCell + textCell;
 
-            return `<!-- START .story-1col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" ${layout === 'right' ? 'dir="rtl"' : ''}><tr>${mainContent}</tr></table></td><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .story-1col -->${spacerHtml}`;
+            return `<!-- START .story-1col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${mainContent}</tr></table></td><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .story-1col -->${spacerHtml}`;
         }
-
         function refreshPreview() {
             if (state.isLoading || !state.sdk) return;
             try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
-
         function renderItemsUI() {
             const items = utils.getFieldValue('items');
             elements.itemsContainer.innerHTML = '';
             const currentIds = new Set(items.map(i => i.id));
             Object.keys(state.editors).forEach(id => { if (!currentIds.has(id) && id !== 'title' && id !== 'description') delete state.editors[id]; });
-
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.item');
@@ -291,27 +229,23 @@
                 itemEl.querySelector('.move-up-btn').disabled = index === 0;
                 itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
                 elements.itemsContainer.appendChild(itemFragment);
-
                 const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', { 'script': 'super' }], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'script', 'link'], placeholder: 'Enter item text...' });
                 editor.root.innerHTML = item.text || '';
                 editor.on('text-change', debouncedChecklistUpdate);
                 state.editors[item.id] = editor;
             });
         }
-
         function toggleContentTypeView(type) {
             elements.descriptionSection.style.display = type === 'description' ? 'block' : 'none';
             elements.checklistSection.style.display = type === 'checklist' ? 'block' : 'none';
             if (type === 'checklist') renderItemsUI();
         }
-
         function initializeEventHandlers() {
             state.eventListeners = []; 
             function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const h = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', h); state.eventListeners.push({ element: opt, event: 'click', handler: h }); }); }
             function setupNumberInput(el, key) { if (!el) return; const step = 4; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min, 10), max = parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); const cv = Math.round(v / step) * step; i.value = cv; updateData(key, cv); }; const inputHandler = (e) => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }; el.addEventListener('input', inputHandler); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'input', handler: inputHandler }); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
             function setupTextInput(el, key, isUrl = false, errEl = null) { if (!el) return; const h = (e) => { let v = e.target.value; if (isUrl && !utils.isValidUrl(v)) return; if (moduleConfig.fields[key].maxLength) v = v.substring(0, moduleConfig.fields[key].maxLength); e.target.value = v; debouncedUpdateData(key, v.trim()); }; el.addEventListener('input', h); state.eventListeners.push({ element: el, event: 'input', handler: h }); if(isUrl) { const b = () => utils.isValidUrl(el.value, errEl); el.addEventListener('blur', b); state.eventListeners.push({ element: el, event: 'blur', handler: b }); } }
             function setupToggle(el, key, groupEl) { if (!el) return; const h = (e) => { updateData(key, e.target.checked); if (groupEl) groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', h); state.eventListeners.push({ element: el, event: 'change', handler: h }); }
-
             setupOptionSelector(elements.layoutSelector, 'layout');
             setupTextInput(elements.imageUrl, 'imageUrl', true, elements.imageUrlError);
             setupTextInput(elements.imageAlt, 'imageAlt');
@@ -326,7 +260,6 @@
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             setupToggle(elements.showSpacer, 'showSpacer');
-
             elements.addItemBtn.addEventListener('click', () => {
                 const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
                 state.blockData.items.push(newItem);
@@ -343,7 +276,6 @@
                 renderItemsUI(); debouncedChecklistUpdate();
             });
         }
-
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
@@ -352,39 +284,26 @@
                     state.blockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
                     if(state.blockData.items) state.blockData.items.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
-                    
                     function setSelectorState(el, key) { const v = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === v)); }
-                    
                     setSelectorState(elements.layoutSelector, 'layout');
                     ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'].forEach(key => { if (elements[key]) elements[key].value = utils.getFieldValue(key); });
                     if (state.editors.title) state.editors.title.root.innerHTML = utils.getFieldValue('title');
                     if (state.editors.description) state.editors.description.root.innerHTML = utils.getFieldValue('description');
                     setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
                     setSelectorState(elements.descriptionAlignmentSelector, 'descriptionAlignment');
-                    
                     const showButton = utils.getFieldValue('showButton');
                     elements.showButton.checked = showButton;
                     if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
                     elements.showSpacer.checked = utils.getFieldValue('showSpacer');
-
                     const contentType = utils.getFieldValue('contentType');
                     setSelectorState(elements.contentTypeSelector, 'contentType');
                     toggleContentTypeView(contentType);
-                    
                     refreshPreview();
-                } catch (error) {
-                    utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
-                    refreshPreview();
-                } finally {
-                    setLoadingState(false);
-                }
+                } catch (error) { utils.showError(`Failed to load data: ${error.message}`); Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); refreshPreview(); } finally { setLoadingState(false); }
             });
         }
-
         function cleanup() { Object.values(state.editors).forEach(e => e && e.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
-
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
@@ -400,16 +319,11 @@
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
                 let retryCount = state.retryCount || 0;
-                if (retryCount < moduleConfig.maxRetries) {
-                    state.retryCount = retryCount + 1;
-                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
-                } else {
-                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
-                }
+                if (retryCount < moduleConfig.maxRetries) { state.retryCount = retryCount + 1; setTimeout(() => initializeWithRetry(), 1000 * state.retryCount); } 
+                else { utils.showError('Failed to initialize after multiple attempts. Please refresh.', true); }
                 setLoadingState(false);
             }
         }
-
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
     </script>
 </body>
