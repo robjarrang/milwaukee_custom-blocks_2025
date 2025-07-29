@@ -36,7 +36,7 @@
         <div class="error-banner" id="errorBanner"></div>
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
-            <div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option selected" data-value="black">Black</div><div class="color-option" data-value="red">Red</div></div></div>
+            <div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option" data-value="black">Black</div><div class="color-option" data-value="red">Red</div></div></div>
         </div>
 
         <div class="column-wrapper">
@@ -94,128 +94,86 @@
         const PRESET_COLORS = { BLACK: '#000000', RED: '#DB021D' };
         const DEFAULTS = {
             backgroundColor: PRESET_COLORS.BLACK,
-            columns: {
-                left: {
-                    imageUrl: 'https://placehold.co/280x180/cccccc/333333?text=Image',
-                    imageAlt: 'Story image',
-                    imageLink: 'https://www.milwaukeetool.eu/',
-                    subtitle: { show: true, text: 'SUBTITLE', fontSize: 16, alignment: 'center' },
-                    title: { html: '<strong>Left Column Title</strong>', fontSize: 20, alignment: 'center' },
-                    contentType: 'description',
-                    description: { html: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', fontSize: 16, alignment: 'center' },
-                    checklist: [],
-                    spacers: [],
-                    button: { show: true, text: 'Learn More', link: 'https://www.milwaukeetool.eu/', alignment: 'center' }
-                },
-                right: {
-                    imageUrl: 'https://placehold.co/280x180/cccccc/333333?text=Image',
-                    imageAlt: 'Story image',
-                    imageLink: 'https://www.milwaukeetool.eu/',
-                    subtitle: { show: true, text: 'SUBTITLE', fontSize: 16, alignment: 'center' },
-                    title: { html: '<strong>Right Column Title</strong>', fontSize: 20, alignment: 'center' },
-                    contentType: 'description',
-                    description: { html: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', fontSize: 16, alignment: 'center' },
-                    checklist: [],
-                    spacers: [],
-                    button: { show: true, text: 'Find Out More', link: 'https://www.milwaukeetool.eu/', alignment: 'center' }
-                }
+            column: {
+                imageUrl: 'https://placehold.co/280x180/cccccc/333333?text=Image',
+                imageAlt: 'Story image',
+                imageLink: 'https://www.milwaukeetool.eu/',
+                subtitle: { show: true, text: 'SUBTITLE', fontSize: 16, alignment: 'center' },
+                title: { html: '<strong>Column Title</strong>', fontSize: 20, alignment: 'center' },
+                contentType: 'description',
+                description: { html: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', fontSize: 16, alignment: 'center' },
+                checklist: [],
+                spacers: [],
+                button: { show: true, text: 'Learn More', link: 'https://www.milwaukeetool.eu/', alignment: 'center' }
             }
         };
         const state = { sdk: null, dom: null, editors: {} };
         const elements = {};
         const COLUMN_KEYS = ['left', 'right'];
-
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             sanitizeHtml(h) { return h ? h.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>') : ''; }
         };
 
         // --- TEMPLATING & DOM PARSING ---
+        function getElementTemplate(elementType, key, data) {
+            switch(elementType) {
+                case 'subtitle':
+                    const subLineHeight = (data.fontSize || 16) + 12;
+                    return `<tr data-element="${key}_subtitle-wrapper">
+                                <td class="mobile-text-center" data-element="${key}_subtitle-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${data.fontSize}px;font-weight:normal;line-height:${subLineHeight}px;text-align:${data.alignment};">${data.text}</td>
+                            </tr>
+                            <tr data-element="${key}_subtitle-spacer"><td style="font-size:8px;height:8px;line-height:8px;"> </td></tr>`;
+                case 'button':
+                    return `<tr data-element="${key}_button-wrapper">
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                                        <tr><td align="${data.alignment}" class="block" valign="top">
+                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;">
+                                                <tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;">
+                                                    <a data-element="${key}_button-link" href="${data.link}" style="color:#ffffff;text-decoration:none;" target="_blank">${data.text}</a>
+                                                </td></tr>
+                                            </table>
+                                        </td></tr>
+                                    </table>
+                                </td>
+                            </tr>`;
+            }
+            return '';
+        }
 
         function generateInitialTemplate() {
-            // This function creates the HTML for a brand new block.
-            // It's heavily annotated with data-element attributes for stable JS targeting.
             const generateColumn = (key) => {
-                const col = DEFAULTS.columns[key];
-                const subtitleLineHeight = col.subtitle.fontSize + 12;
+                const col = DEFAULTS.column;
                 const titleLineHeight = col.title.fontSize + 8;
                 const descriptionLineHeight = col.description.fontSize + 8;
-
-                // Note: The visibility of sections is controlled by adding/removing the whole element in the DOM, not just display:none
-                const subtitleHtml = `<tr data-element="${key}_subtitle-wrapper">
-                    <td class="mobile-text-center" data-element="${key}_subtitle-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${col.subtitle.fontSize}px;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${col.subtitle.alignment};mso-hyphenate:none;hyphens:none;">${col.subtitle.text}</td>
-                </tr>
-                <tr data-element="${key}_subtitle-spacer"><td style="font-size:8px;height:8px;line-height:8px;"> </td></tr>`;
-
-                const descriptionHtml = `<tr data-element="${key}_description-wrapper">
-                    <td data-element="${key}_description-text" class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${col.description.fontSize}px;font-weight:normal;line-height:${descriptionLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${col.description.alignment};mso-hyphenate:none;hyphens:none;">${col.description.html}</td>
-                </tr>`;
-
-                const buttonHtml = `<tr data-element="${key}_button-wrapper">
-                    <td>
-                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
-                            <tr><td align="${col.button.alignment}" class="block" valign="top">
-                                <table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;">
-                                    <tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;">
-                                        <a data-element="${key}_button-link" href="${col.button.link}" style="color:#ffffff;text-decoration:none;" target="_blank">${col.button.text}</a>
-                                    </td></tr>
-                                </table>
-                            </td></tr>
-                        </table>
-                    </td>
-                </tr>`;
-
+                
                 return `<td data-element="${key}_column" align="center" class="block" style="width:280px;" valign="top">
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
-                        <tr><td>
-                            <div data-element="${key}_image-wrapper">
-                                <a data-element="${key}_image-link" href="${col.imageLink}" target="_blank">
-                                    <img data-element="${key}_image" align="top" alt="${col.imageAlt}" class="fill" src="${col.imageUrl}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="280">
-                                </a>
-                            </div>
-                        </td></tr>
-                        <tr><td align="center" style="padding-bottom:12px;padding-top:12px;">
-                            <table data-element="${key}_content-table" border="0" cellpadding="0" cellspacing="0" class="sect" style="width:100%;">
-                                <tbody>
-                                    <tr><td><div style="font-size:12px;height:12px;line-height:12px;"> </div></td></tr>
-                                    ${subtitleHtml}
-                                    <tr>
-                                        <td data-element="${key}_title-cell" class="mobile-text-center" style="text-align:${col.title.alignment};">
-                                            <h3 data-element="${key}_title-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:${col.title.fontSize}px;font-stretch:condensed;font-weight:bold;line-height:${titleLineHeight}px;margin:0;text-transform:uppercase;">${col.title.html}</h3>
-                                        </td>
-                                    </tr>
-                                    <tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>
-                                    <tr data-element="${key}_content-container" data-content-type="${col.contentType}">
-                                        <td style="padding:0;">
-                                            <table data-element="${key}_description-container" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${descriptionHtml}</table>
-                                            <table data-element="${key}_checklist-container" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%; display:none;"></table>
-                                        </td>
-                                    </tr>
-                                    <tbody data-element="${key}_spacers-container"></tbody>
-                                    <tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>
-                                    ${buttonHtml}
-                                </tbody>
-                            </table>
-                        </td></tr>
-                    </table>
-                </td>`;
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                        <tr><td><a data-element="${key}_image-link" href="${col.imageLink}" target="_blank"><img data-element="${key}_image" alt="${col.imageAlt}" src="${col.imageUrl}" width="280" style="border:none;display:block;height:auto;"></a></td></tr>
+                        <tr><td align="center" style="padding:12px 0;"><table data-element="${key}_content-table" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"><tbody>
+                            <tr><td><div style="font-size:12px;height:12px;"> </div></td></tr>
+                            ${getElementTemplate('subtitle', key, col.subtitle)}
+                            <tr><td data-element="${key}_title-cell" style="text-align:${col.title.alignment};"><h3 data-element="${key}_title-text" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif;font-size:${col.title.fontSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0;">${col.title.html}</h3></td></tr>
+                            <tr><td><div style="font-size:8px;height:8px;"> </div></td></tr>
+                            <tr data-element="${key}_content-container" data-content-type="${col.contentType}"><td style="padding:0;">
+                                <table data-element="${key}_description-container" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                                    <tr data-element="${key}_description-wrapper"><td data-element="${key}_description-text" class="mobile-text-center" style="color:#ffffff;font-size:${col.description.fontSize}px;line-height:${descriptionLineHeight}px;text-align:${col.description.alignment};">${col.description.html}</td></tr>
+                                </table>
+                                <table data-element="${key}_checklist-container" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%; display:none;"></table>
+                            </td></tr>
+                            <tbody data-element="${key}_spacers-container"></tbody>
+                            <tr><td><div style="font-size:20px;height:20px;"> </div></td></tr>
+                            ${getElementTemplate('button', key, col.button)}
+                        </tbody></table></td></tr>
+                    </table></td>`;
             };
 
             return `<!-- I AM A 2-COL STORY BLOCK -->
-                <table data-element="main-table" align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${DEFAULTS.backgroundColor};width:620px;">
-                    <tr>
-                        <td class="side" style="width:20px;"> </td>
-                        <td align="center" class="content-inner" style="width:580px;" valign="top">
-                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
-                                <tr>
-                                    ${generateColumn('left')}
-                                    <td class="gap block" style="width:20px;"> </td>
-                                    ${generateColumn('right')}
-                                </tr>
-                            </table>
-                        </td>
-                        <td class="side" style="width:20px;"> </td>
-                    </tr>
+                <table data-element="main-table" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${DEFAULTS.backgroundColor};width:620px;">
+                    <tr><td style="width:20px;"> </td><td align="center" style="width:580px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                        <tr>${generateColumn('left')}<td style="width:20px;"> </td>${generateColumn('right')}</tr>
+                    </table></td><td style="width:20px;"> </td></tr>
                 </table>`;
         }
 
@@ -226,98 +184,77 @@
         }
 
         // --- UI & DOM SYNC ---
-
         function updateUIFromDOM() {
             if (!state.dom) return;
-
-            // Global settings
             const mainTable = state.dom.querySelector('[data-element="main-table"]');
-            const domColor = mainTable ? mainTable.style.backgroundColor : DEFAULTS.backgroundColor;
+            const domColor = mainTable.style.backgroundColor;
             const isRed = domColor === 'rgb(219, 2, 29)' || domColor.toUpperCase() === PRESET_COLORS.RED;
-            elements.backgroundColorSelector.querySelector('[data-value="red"]').classList.toggle('selected', isRed);
-            elements.backgroundColorSelector.querySelector('[data-value="black"]').classList.toggle('selected', !isRed);
+            setSelectorState(elements.backgroundColorSelector, isRed ? 'red' : 'black');
 
             COLUMN_KEYS.forEach(key => {
-                const prefix = `${key}_`;
+                const p = `${key}_`;
+                const img = state.dom.querySelector(`[data-element="${p}image"]`), imgLink = state.dom.querySelector(`[data-element="${p}image-link"]`);
+                elements[p + 'imageUrl'].value = img ? img.getAttribute('src') : '';
+                elements[p + 'imageLink'].value = imgLink ? imgLink.getAttribute('href') : '';
+                elements[p + 'imageAlt'].value = img ? img.getAttribute('alt') : '';
 
-                // Image
-                const img = state.dom.querySelector(`[data-element="${prefix}image"]`);
-                const imgLink = state.dom.querySelector(`[data-element="${prefix}image-link"]`);
-                elements[prefix + 'imageUrl'].value = img ? img.getAttribute('src') : '';
-                elements[prefix + 'imageLink'].value = imgLink ? imgLink.getAttribute('href') : '';
-                elements[prefix + 'imageAlt'].value = img ? img.getAttribute('alt') : '';
-
-                // Subtitle
-                const subtitleWrapper = state.dom.querySelector(`[data-element="${prefix}subtitle-wrapper"]`);
-                const subtitleText = state.dom.querySelector(`[data-element="${prefix}subtitle-text"]`);
-                elements[prefix + 'showSubtitle'].checked = !!subtitleWrapper;
-                elements[prefix + 'subtitleGroup'].classList.toggle('disabled-field', !subtitleWrapper);
-                if (subtitleText) {
-                    elements[prefix + 'subtitle'].value = subtitleText.textContent;
-                    elements[prefix + 'subtitleFontSize'].value = parseInt(subtitleText.style.fontSize, 10);
-                    setSelectorState(elements[prefix + 'subtitleAlignmentSelector'], subtitleText.style.textAlign);
+                const subWrapper = state.dom.querySelector(`[data-element="${p}subtitle-wrapper"]`), subText = state.dom.querySelector(`[data-element="${p}subtitle-text"]`);
+                elements[p + 'showSubtitle'].checked = !!subWrapper;
+                elements[p + 'subtitleGroup'].style.display = subWrapper ? 'block' : 'none';
+                if(subText) {
+                    elements[p + 'subtitle'].value = subText.textContent;
+                    elements[p + 'subtitleFontSize'].value = parseInt(subText.style.fontSize, 10);
+                    setSelectorState(elements[p + 'subtitleAlignmentSelector'], subText.style.textAlign);
                 }
 
-                // Title
-                const titleText = state.dom.querySelector(`[data-element="${prefix}title-text"]`);
-                const titleCell = state.dom.querySelector(`[data-element="${prefix}title-cell"]`);
-                state.editors[prefix + 'title'].root.innerHTML = titleText ? utils.sanitizeHtml(titleText.innerHTML) : '';
-                if(titleText) elements[prefix + 'titleFontSize'].value = parseInt(titleText.style.fontSize, 10);
-                if(titleCell) setSelectorState(elements[prefix + 'titleAlignmentSelector'], titleCell.style.textAlign);
+                const titleText = state.dom.querySelector(`[data-element="${p}title-text"]`), titleCell = state.dom.querySelector(`[data-element="${p}title-cell"]`);
+                state.editors[p + 'title'].root.innerHTML = titleText ? utils.sanitizeHtml(titleText.innerHTML) : '';
+                if(titleText) elements[p + 'titleFontSize'].value = parseInt(titleText.style.fontSize, 10);
+                if(titleCell) setSelectorState(elements[p + 'titleAlignmentSelector'], titleCell.style.textAlign);
                 
-                // Content Type & Sections
-                const contentContainer = state.dom.querySelector(`[data-element="${prefix}content-container"]`);
+                const contentContainer = state.dom.querySelector(`[data-element="${p}content-container"]`);
                 const contentType = contentContainer ? contentContainer.dataset.contentType : 'description';
-                setSelectorState(elements[prefix + 'contentTypeSelector'], contentType);
-                elements[prefix + 'descriptionSection'].style.display = (contentType === 'description') ? 'block' : 'none';
-                elements[prefix + 'checklistSection'].style.display = (contentType === 'checklist') ? 'block' : 'none';
+                setSelectorState(elements[p + 'contentTypeSelector'], contentType);
+                elements[p + 'descriptionSection'].style.display = (contentType === 'description') ? 'block' : 'none';
+                elements[p + 'checklistSection'].style.display = (contentType === 'checklist') ? 'block' : 'none';
                 
-                // Description
-                const descText = state.dom.querySelector(`[data-element="${prefix}description-text"]`);
-                state.editors[prefix + 'description'].root.innerHTML = descText ? utils.sanitizeHtml(descText.innerHTML) : '';
+                const descText = state.dom.querySelector(`[data-element="${p}description-text"]`);
+                if(state.editors[p + 'description']) state.editors[p + 'description'].root.innerHTML = descText ? utils.sanitizeHtml(descText.innerHTML) : '';
                 if(descText) {
-                    elements[prefix + 'descriptionFontSize'].value = parseInt(descText.style.fontSize, 10);
-                    setSelectorState(elements[prefix + 'descriptionAlignmentSelector'], descText.style.textAlign);
+                    elements[p + 'descriptionFontSize'].value = parseInt(descText.style.fontSize, 10);
+                    setSelectorState(elements[p + 'descriptionAlignmentSelector'], descText.style.textAlign);
                 }
 
-                // Button
-                const buttonWrapper = state.dom.querySelector(`[data-element="${prefix}button-wrapper"]`);
-                const buttonLink = state.dom.querySelector(`[data-element="${prefix}button-link"]`);
-                elements[prefix + 'showButton'].checked = !!buttonWrapper;
-                elements[prefix + 'buttonFieldsGroup'].classList.toggle('disabled-field', !buttonWrapper);
-                if (buttonLink) {
-                    elements[prefix + 'buttonText'].value = buttonLink.textContent;
-                    elements[prefix + 'buttonLink'].value = buttonLink.getAttribute('href');
-                    const buttonCell = buttonLink.closest('td[align]');
-                    if(buttonCell) setSelectorState(elements[prefix + 'buttonAlignmentSelector'], buttonCell.getAttribute('align'));
+                const btnWrapper = state.dom.querySelector(`[data-element="${p}button-wrapper"]`), btnLink = state.dom.querySelector(`[data-element="${p}button-link"]`);
+                elements[p + 'showButton'].checked = !!btnWrapper;
+                elements[p + 'buttonFieldsGroup'].style.display = btnWrapper ? 'block' : 'none';
+                if(btnLink) {
+                    elements[p + 'buttonText'].value = btnLink.textContent;
+                    elements[p + 'buttonLink'].value = btnLink.getAttribute('href');
+                    const btnCell = btnLink.closest('td[align]');
+                    if(btnCell) setSelectorState(elements[p + 'buttonAlignmentSelector'], btnCell.getAttribute('align'));
                 }
             });
         }
         
         function setSelectorState(selector, value) {
             if (!selector) return;
-            selector.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
+            selector.querySelectorAll('.color-option, .option-button').forEach(o => o.classList.remove('selected'));
             const toSelect = selector.querySelector(`[data-value="${value}"]`);
             if (toSelect) toSelect.classList.add('selected');
         }
 
         // --- SDK & LIFECYCLE ---
-
-        function updateBlock() {
-            if (!state.dom) return;
-            state.sdk.setContent(state.dom.outerHTML);
-        }
-        const debouncedUpdateBlock = utils.debounce(updateBlock, 400);
+        function updateBlock() { if (!state.dom) return; state.sdk.setContent(state.dom.outerHTML); }
+        const debouncedUpdateBlock = utils.debounce(updateBlock, 500);
 
         function loadData() {
             state.sdk.getContent((content) => {
-                const isNewBlock = !content || !content.includes('<!-- I AM A 2-COL STORY BLOCK -->');
-                if (isNewBlock) {
-                    const initialHtml = generateInitialTemplate();
-                    state.dom = parseToDOM(initialHtml);
-                    updateBlock();
-                } else {
+                if (content && content.includes('<!-- I AM A 2-COL STORY BLOCK -->')) {
                     state.dom = parseToDOM(content);
+                } else {
+                    state.dom = parseToDOM(generateInitialTemplate());
+                    updateBlock();
                 }
                 updateUIFromDOM();
             });
@@ -333,112 +270,129 @@
 
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
-            elements.itemTemplate = document.getElementById('itemTemplate');
-            elements.spacerTemplate = document.getElementById('spacerTemplate');
-            
             COLUMN_KEYS.forEach(p => {
                 const prefix = p + '_';
-                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
+                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection'];
                 keys.forEach(k => { elements[prefix + k] = document.getElementById(prefix + k); });
             });
         }
 
         function initializeEditors() {
             COLUMN_KEYS.forEach(key => {
-                const prefix = key + '_';
+                const p = key + '_';
                 ['title', 'description'].forEach(type => {
-                    const editorId = prefix + type;
+                    const editorId = p + type;
                     const editorElement = elements[editorId + 'Editor'];
                     state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: type === 'title' ? [['bold']] : [['bold', 'italic', 'link']] } });
-                    
-                    // Event listener for Quill editors
-                    state.editors[editorId].on('text-change', utils.debounce(() => {
-                        if (!state.dom) return;
-                        const content = state.editors[editorId].root.innerHTML;
+                    state.editors[editorId].on('text-change', () => {
                         const targetNode = state.dom.querySelector(`[data-element="${editorId}-text"]`);
-                        if (targetNode) {
-                            targetNode.innerHTML = utils.sanitizeHtml(content);
-                            updateBlock();
-                        }
-                    }, 500));
+                        if (targetNode) targetNode.innerHTML = utils.sanitizeHtml(state.editors[editorId].root.innerHTML);
+                        debouncedUpdateBlock();
+                    });
                 });
             });
         }
 
         function initializeEventHandlers() {
-            // Background Color
             elements.backgroundColorSelector.addEventListener('click', e => {
                 const btn = e.target.closest('.color-option');
                 if (btn && state.dom) {
-                    const mainTable = state.dom.querySelector('[data-element="main-table"]');
-                    if (mainTable) mainTable.style.backgroundColor = btn.dataset.value === 'red' ? PRESET_COLORS.RED : PRESET_COLORS.BLACK;
+                    state.dom.style.backgroundColor = btn.dataset.value === 'red' ? PRESET_COLORS.RED : PRESET_COLORS.BLACK;
                     setSelectorState(elements.backgroundColorSelector, btn.dataset.value);
                     updateBlock();
                 }
             });
 
-            // Loop through columns for other event handlers
             COLUMN_KEYS.forEach(key => {
-                const prefix = `${key}_`;
-
-                // Text and URL Inputs
+                const p = `${key}_`;
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => {
-                    elements[prefix + type].addEventListener('input', e => {
+                    elements[p + type].addEventListener('input', e => {
                         if (!state.dom) return;
                         const value = e.target.value;
-                        let targetNode;
-                        switch(type) {
-                            case 'imageUrl': targetNode = state.dom.querySelector(`[data-element="${prefix}image"]`); if(targetNode) targetNode.src = value; break;
-                            case 'imageAlt': targetNode = state.dom.querySelector(`[data-element="${prefix}image"]`); if(targetNode) targetNode.alt = value; break;
-                            case 'imageLink': targetNode = state.dom.querySelector(`[data-element="${prefix}image-link"]`); if(targetNode) targetNode.href = value; break;
-                            case 'subtitle': targetNode = state.dom.querySelector(`[data-element="${prefix}subtitle-text"]`); if(targetNode) targetNode.textContent = value; break;
-                            case 'buttonText': targetNode = state.dom.querySelector(`[data-element="${prefix}button-link"]`); if(targetNode) targetNode.textContent = value; break;
-                            case 'buttonLink': targetNode = state.dom.querySelector(`[data-element="${prefix}button-link"]`); if(targetNode) targetNode.href = value; break;
+                        const mappings = {imageUrl: "src", imageAlt: "alt", imageLink: "href", buttonLink: "href"};
+                        const targetSelector = `[data-element="${p}${mappings[type] ? 'image' : type}${mappings[type] ? (type === 'imageLink' ? '-link' : '') : '-text'}"]`;
+                        const targetNode = state.dom.querySelector(targetSelector);
+                        if(targetNode) {
+                            if (mappings[type]) targetNode.setAttribute(mappings[type], value);
+                            else targetNode.textContent = value;
+                            debouncedUpdateBlock();
                         }
-                        debouncedUpdateBlock();
                     });
                 });
 
-                // Number Inputs (Font Size)
                 ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => {
-                    elements[prefix + type].addEventListener('input', e => {
+                    elements[p + type].addEventListener('input', e => {
                         if (!state.dom) return;
-                        const size = e.target.value;
-                        const elementKey = type.replace('FontSize', ''); // subtitle, title, description
-                        const targetNode = state.dom.querySelector(`[data-element="${prefix}${elementKey}-text"]`);
+                        const size = e.target.value, elementKey = type.replace('FontSize', '');
+                        const targetNode = state.dom.querySelector(`[data-element="${p}${elementKey}-text"]`);
                         if (targetNode) {
                             targetNode.style.fontSize = `${size}px`;
-                            const lineHeight = parseInt(size, 10) + (elementKey === 'subtitle' ? 12 : 8);
-                            targetNode.style.lineHeight = `${lineHeight}px`;
+                            targetNode.style.lineHeight = `${parseInt(size, 10) + (elementKey === 'subtitle' ? 12 : 8)}px`;
+                            debouncedUpdateBlock();
                         }
-                        debouncedUpdateBlock();
                     });
                 });
                 
-                // Alignment Selectors
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => {
-                    elements[prefix + type + 'Selector'].addEventListener('click', e => {
+                    elements[p + type + 'Selector'].addEventListener('click', e => {
                         const btn = e.target.closest('.option-button');
                         if (btn && state.dom) {
-                            const align = btn.dataset.value;
-                            const elementKey = type.replace('Alignment', '');
-                            let targetNode;
-                             switch(elementKey) {
-                                case 'subtitle': targetNode = state.dom.querySelector(`[data-element="${prefix}subtitle-text"]`); break;
-                                case 'title': targetNode = state.dom.querySelector(`[data-element="${prefix}title-cell"]`); break;
-                                case 'description': targetNode = state.dom.querySelector(`[data-element="${prefix}description-text"]`); break;
-                                case 'button': targetNode = state.dom.querySelector(`[data-element="${prefix}button-link"]`)?.closest('td[align]'); break;
-                            }
+                            const align = btn.dataset.value, elementKey = type.replace('Alignment', '');
+                            const targetNode = state.dom.querySelector(`[data-element="${p}${elementKey}-${elementKey === 'title' ? 'cell' : 'text'}"]`) || state.dom.querySelector(`[data-element="${p}${elementKey}-link"]`)?.closest('td[align]');
                             if (targetNode) {
-                                if(elementKey === 'button') targetNode.setAttribute('align', align); else targetNode.style.textAlign = align;
+                                if (elementKey === 'button') targetNode.setAttribute('align', align); else targetNode.style.textAlign = align;
                             }
-                            setSelectorState(elements[prefix + type + 'Selector'], align);
+                            setSelectorState(elements[p + type + 'Selector'], align);
                             updateBlock();
                         }
                     });
+                });
+
+                // --- TOGGLES ---
+                elements[p + 'showSubtitle'].addEventListener('change', e => {
+                    if(!state.dom) return;
+                    const contentTableBody = state.dom.querySelector(`[data-element="${p}content-table"] > tbody`);
+                    const titleRow = state.dom.querySelector(`[data-element="${p}title-cell"]`).parentElement;
+                    if (e.target.checked) {
+                        const template = getElementTemplate('subtitle', key, DEFAULTS.column.subtitle);
+                        const newNodes = parseToDOM(`<table><tbody>${template}</tbody></table>`).querySelector('tbody').children;
+                        contentTableBody.insertBefore(newNodes[1], titleRow);
+                        contentTableBody.insertBefore(newNodes[0], newNodes[1]);
+                    } else {
+                        state.dom.querySelector(`[data-element="${p}subtitle-wrapper"]`)?.remove();
+                        state.dom.querySelector(`[data-element="${p}subtitle-spacer"]`)?.remove();
+                    }
+                    updateUIFromDOM(); // Resync UI state
+                    updateBlock();
+                });
+                
+                elements[p + 'showButton'].addEventListener('change', e => {
+                    if(!state.dom) return;
+                    const contentTableBody = state.dom.querySelector(`[data-element="${p}content-table"] > tbody`);
+                    if (e.target.checked) {
+                        const template = getElementTemplate('button', key, DEFAULTS.column.button);
+                        const newButtonNode = parseToDOM(`<table><tbody>${template}</tbody></table>`).querySelector('tr');
+                        contentTableBody.appendChild(newButtonNode);
+                    } else {
+                        state.dom.querySelector(`[data-element="${p}button-wrapper"]`)?.remove();
+                    }
+                    updateUIFromDOM();
+                    updateBlock();
+                });
+
+                // --- CONTENT TYPE SWITCHER ---
+                elements[p + 'contentTypeSelector'].addEventListener('click', e => {
+                    const btn = e.target.closest('.option-button');
+                    if (btn && state.dom) {
+                        const type = btn.dataset.value;
+                        state.dom.querySelector(`[data-element="${p}content-container"]`).dataset.contentType = type;
+                        state.dom.querySelector(`[data-element="${p}description-container"]`).style.display = type === 'description' ? '' : 'none';
+                        state.dom.querySelector(`[data-element="${p}checklist-container"]`).style.display = type === 'checklist' ? '' : 'none';
+                        setSelectorState(elements[p + 'contentTypeSelector'], type);
+                        updateUIFromDOM(); // Refresh UI to show/hide sections
+                        updateBlock();
+                    }
                 });
             });
         }
