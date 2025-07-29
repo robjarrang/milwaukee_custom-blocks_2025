@@ -194,9 +194,9 @@
                 const items = utils.getFieldValue('items');
                 const itemRowsHtml = items.map(item => `
                     <tr>
-                       <td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
-                       <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
-                       <td class="story-intro mobile-text-left" valign="top" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">${item.text}</td>
+                       <td valign="middle" style="padding-bottom: 8px; width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
+                       <td valign="middle" style="width: 12px; padding-bottom: 8px;"> </td>
+                       <td class="story-intro mobile-text-left" valign="middle" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">${item.text}</td>
                     </tr>`).join('');
                 contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             }
