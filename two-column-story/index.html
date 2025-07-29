@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>2 Column Story</title>
+    <title>2 Column Story Block (with Checklist & Spacers)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -12,8 +12,8 @@
         .style-control-group .field-label {margin-bottom:5px;}
         .style-control-group .field-input {width:80px;padding:6px 8px;}
         .style-control-group .option-selector {width:140px;}
-        /* Checklist Styles */
         .items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fdfdfd;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:15px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.checklist-section{display:none}
+        .spacer-controls { display: flex; gap: 10px; align-items: flex-end; } .spacer-controls .field-group { flex: 1; margin-bottom: 0; }
     </style>
 </head>
 <body>
@@ -32,9 +32,9 @@
             <!-- Left Column -->
             <div class="column">
                 <div class="section-title" style="margin-top:0;">Left Column</div>
-                <div class="field-group"><label for="left_imageUrl" class="field-label">Image URL</label><input type="url" id="left_imageUrl" class="field-input"><div class="field-error" id="left_imageUrlError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="left_imageUrl" class="field-label">Image URL</label><input type="url" id="left_imageUrl" class="field-input"><div class="field-error" id="left_imageUrlError"></div></div>
                 <div class="field-group"><label for="left_imageAlt" class="field-label">Image Alt Text</label><input type="text" id="left_imageAlt" class="field-input"></div>
-                <div class="field-group"><label for="left_imageLink" class="field-label">Image Link URL</label><input type="url" id="left_imageLink" class="field-input"><div class="field-error" id="left_imageLinkError">Please enter a valid URL.</div></div>
+                <div class="field-group"><label for="left_imageLink" class="field-label">Image Link URL</label><input type="url" id="left_imageLink" class="field-input"><div class="field-error" id="left_imageLinkError"></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showSubtitle" checked><span class="toggle-slider"></span></label><label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="left_subtitleGroup">
@@ -45,19 +45,26 @@
                     <label class="field-label">Title</label><div id="left_titleEditor" class="quill-container limited-toolbar"></div>
                     <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
                 </div>
-                <!-- Content Type Switcher -->
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="left_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <!-- Description Section -->
                 <div id="left_descriptionSection">
                     <div class="field-group"><label class="field-label">Description</label><div id="left_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 </div>
-                <!-- Checklist Section -->
                 <div id="left_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="left_itemsContainer" class="items-container"></div><button id="left_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
+                
+                <!-- NEW: Manual Spacing -->
+                <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
+                <div class="section-title">Manual Spacing</div>
+                <div class="spacer-controls">
+                    <div class="field-group"><label for="left_spacers_standard" class="field-label">Standard</label><input type="number" id="left_spacers_standard" class="field-input" min="0" max="10" step="1"></div>
+                    <div class="field-group"><label for="left_spacers_outlook" class="field-label">Outlook Only</label><input type="number" id="left_spacers_outlook" class="field-input" min="0" max="10" step="1"></div>
+                    <div class="field-group"><label for="left_spacers_non_outlook" class="field-label">Non-Outlook</label><input type="number" id="left_spacers_non_outlook" class="field-input" min="0" max="10" step="1"></div>
+                </div>
+
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showButton" checked><span class="toggle-slider"></span></label><label for="left_showButton" class="checkbox-label">Show Button</label></div>
                 <div id="left_buttonFieldsGroup">
                     <div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><input type="text" id="left_buttonText" class="field-input"></div>
-                    <div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"><div class="field-error" id="left_buttonLinkError">Please enter a valid URL.</div></div>
+                    <div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"><div class="field-error" id="left_buttonLinkError"></div></div>
                     <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
                 </div>
             </div>
@@ -65,9 +72,9 @@
             <!-- Right Column -->
             <div class="column">
                 <div class="section-title" style="margin-top:0;">Right Column</div>
-                <div class="field-group"><label for="right_imageUrl" class="field-label">Image URL</label><input type="url" id="right_imageUrl" class="field-input"><div class="field-error" id="right_imageUrlError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="right_imageUrl" class="field-label">Image URL</label><input type="url" id="right_imageUrl" class="field-input"><div class="field-error" id="right_imageUrlError"></div></div>
                 <div class="field-group"><label for="right_imageAlt" class="field-label">Image Alt Text</label><input type="text" id="right_imageAlt" class="field-input"></div>
-                <div class="field-group"><label for="right_imageLink" class="field-label">Image Link URL</label><input type="url" id="right_imageLink" class="field-input"><div class="field-error" id="right_imageLinkError">Please enter a valid URL.</div></div>
+                <div class="field-group"><label for="right_imageLink" class="field-label">Image Link URL</label><input type="url" id="right_imageLink" class="field-input"><div class="field-error" id="right_imageLinkError"></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showSubtitle" checked><span class="toggle-slider"></span></label><label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="right_subtitleGroup">
@@ -78,38 +85,33 @@
                     <label class="field-label">Title</label><div id="right_titleEditor" class="quill-container limited-toolbar"></div>
                     <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
                 </div>
-                <!-- Content Type Switcher -->
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="right_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <!-- Description Section -->
                 <div id="right_descriptionSection">
                     <div class="field-group"><label class="field-label">Description</label><div id="right_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 </div>
-                <!-- Checklist Section -->
                 <div id="right_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="right_itemsContainer" class="items-container"></div><button id="right_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
+
+                <!-- NEW: Manual Spacing -->
+                <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
+                <div class="section-title">Manual Spacing</div>
+                <div class="spacer-controls">
+                    <div class="field-group"><label for="right_spacers_standard" class="field-label">Standard</label><input type="number" id="right_spacers_standard" class="field-input" min="0" max="10" step="1"></div>
+                    <div class="field-group"><label for="right_spacers_outlook" class="field-label">Outlook Only</label><input type="number" id="right_spacers_outlook" class="field-input" min="0" max="10" step="1"></div>
+                    <div class="field-group"><label for="right_spacers_non_outlook" class="field-label">Non-Outlook</label><input type="number" id="right_spacers_non_outlook" class="field-input" min="0" max="10" step="1"></div>
+                </div>
+
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showButton" checked><span class="toggle-slider"></span></label><label for="right_showButton" class="checkbox-label">Show Button</label></div>
                 <div id="right_buttonFieldsGroup">
                     <div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><input type="text" id="right_buttonText" class="field-input"></div>
-                    <div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"><div class="field-error" id="right_buttonLinkError">Please enter a valid URL.</div></div>
+                    <div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"><div class="field-error" id="right_buttonLinkError"></div></div>
                     <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
                 </div>
             </div>
         </div>
     </div>
     
-    <template id="itemTemplate">
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">Item</h3>
-                <div class="item-controls">
-                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
-                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
-                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
-                </div>
-            </div>
-            <div class="quill-container limited-toolbar"></div>
-        </div>
-    </template>
+    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
@@ -118,10 +120,9 @@
         'use strict';
         
         const moduleConfig = {
-            name: '2 Column Story with Checklist',
+            name: '2 Column Story with Checklist & Spacers',
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'black' },
-                // Left Column Fields
                 left_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
                 left_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
                 left_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -137,11 +138,13 @@
                 left_descriptionFontSize: { type: 'number', defaultValue: 16 },
                 left_descriptionAlignment: { type: 'text', defaultValue: 'center' },
                 left_items: { type: 'list', defaultValue: [{ id: crypto.randomUUID(), text: 'Left item 1' }] },
+                left_spacers_standard: { type: 'number', defaultValue: 0 },
+                left_spacers_outlook: { type: 'number', defaultValue: 0 },
+                left_spacers_non_outlook: { type: 'number', defaultValue: 0 },
                 left_showButton: { type: 'boolean', defaultValue: true },
                 left_buttonText: { type: 'text', defaultValue: 'Learn More', maxLength: 40 },
                 left_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 left_buttonAlignment: { type: 'text', defaultValue: 'center' },
-                // Right Column Fields
                 right_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
                 right_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
                 right_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -157,6 +160,9 @@
                 right_descriptionFontSize: { type: 'number', defaultValue: 16 },
                 right_descriptionAlignment: { type: 'text', defaultValue: 'center' },
                 right_items: { type: 'list', defaultValue: [{ id: crypto.randomUUID(), text: 'Right item 1' }] },
+                right_spacers_standard: { type: 'number', defaultValue: 0 },
+                right_spacers_outlook: { type: 'number', defaultValue: 0 },
+                right_spacers_non_outlook: { type: 'number', defaultValue: 0 },
                 right_showButton: { type: 'boolean', defaultValue: true },
                 right_buttonText: { type: 'text', defaultValue: 'Find Out More', maxLength: 40 },
                 right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -185,26 +191,21 @@
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.itemTemplate = document.getElementById('itemTemplate');
             COLUMN_PREFIXES.forEach(p => {
-                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'imageUrlError', 'imageLinkError', 'buttonLinkError', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn'];
+                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'imageUrlError', 'imageLinkError', 'buttonLinkError', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacers_standard', 'spacers_outlook', 'spacers_non_outlook'];
                 keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
             });
         }
 
-        function setLoadingState(loading) {
-            state.isLoading = loading;
-            if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
-        }
+        function setLoadingState(loading) { setLoadingState(loading); if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); } }
 
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             COLUMN_PREFIXES.forEach(p => {
                 try {
                     ['title', 'description'].forEach(type => {
-                        const editorId = p + type;
-                        const editorElement = elements[p + type + 'Editor'];
+                        const editorId = p + type, editorElement = elements[p + type + 'Editor'];
                         const toolbarOptions = type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']];
                         const formats = type === 'title' ? ['bold'] : ['bold', 'italic', 'link'];
-                        
                         state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats, placeholder: `Enter ${type}...` });
                         const debouncedUpdate = utils.debounce((d, o, source) => { if (source === 'user') updateData(editorId, utils.sanitizeHtml(state.editors[editorId].root.innerHTML)); }, moduleConfig.debounceDelay);
                         state.editors[editorId].on('text-change', debouncedUpdate);
@@ -222,9 +223,7 @@
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
 
-        function updateData(field, value) {
-            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); }
-        }
+        function updateData(field, value) { if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); } }
         
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
@@ -238,55 +237,49 @@
             const subtitleAlign = utils.getFieldValue(prefix + 'subtitleAlignment'), titleAlign = utils.getFieldValue(prefix + 'titleAlignment'), buttonAlign = utils.getFieldValue(prefix + 'buttonAlignment');
             const subtitleLineHeight = subtitleSize + 12, titleLineHeight = titleSize + 8;
             
+            // Generate content
             let contentHtml;
             if (contentType === 'checklist') {
                 const items = utils.getFieldValue(prefix + 'items');
-                const itemRowsHtml = items.map(item => `
-                    <tr>
-                       <td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
-                       <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
-                       <td class="mobile-text-left" valign="top" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">${processRichText(item.text, true)}</td>
-                    </tr>`).join('');
-                contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
-            } else { // description
-                const description = processRichText(utils.getFieldValue(prefix + 'description'), true);
-                const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize');
-                const descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment');
-                const descriptionLineHeight = descriptionSize + 8;
-                contentHtml = `<tr><td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${descriptionAlign}; mso-hyphenate: none; hyphens: none;">${description}</td></tr>`;
+                const itemRowsHtml = items.map(item => `<tr><td valign="top" style="padding-bottom:8px;width:20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" width="20" style="display:block;"></td><td valign="top" style="width:12px;padding-bottom:8px;"> </td><td class="mobile-text-left" valign="top" style="color:#ffffff;font-family:'Helvetica-Neue',sans-serif,'Open-Sans';font-size:16px;line-height:24px;text-align:left;padding-bottom:8px;">${processRichText(item.text, true)}</td></tr>`).join('');
+                contentHtml = `<tr><td style="padding:0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
+            } else {
+                const description = processRichText(utils.getFieldValue(prefix + 'description'), true), descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize'), descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment'), descriptionLineHeight = descriptionSize + 8;
+                contentHtml = `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${descriptionSize}px;line-height:${descriptionLineHeight}px;text-align:${descriptionAlign};">${description}</td></tr>`;
             }
 
-            const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${subtitleSize}px; font-weight: normal; line-height: ${subtitleLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${subtitleAlign}; mso-hyphenate: none; hyphens: none;">${subtitle}</td></tr><tr><td><div style="font-size: 8px; height: 8px; line-height: 8px;"> </div></td></tr>` : '';
-            const buttonHtml = showButton ? `<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>` : '';
-            const topSpacer = `<div style="font-size: 12px; height: 12px; line-height: 12px;"> </div>`;
+            // Generate spacers
+            const standardSpacers = utils.getFieldValue(prefix + 'spacers_standard'), outlookSpacers = utils.getFieldValue(prefix + 'spacers_outlook'), nonOutlookSpacers = utils.getFieldValue(prefix + 'spacers_non_outlook');
+            const spacerHtml = ('<br> ').repeat(standardSpacers) + ('<!--[if mso]><br> <![endif]-->').repeat(outlookSpacers) + ('<!--[if !mso]><!--><br> <!--<![endif]-->').repeat(nonOutlookSpacers);
+            const spacerRowHtml = (standardSpacers > 0 || outlookSpacers > 0 || nonOutlookSpacers > 0) ? `<tr><td style="font-size:1px; line-height:1px;">${spacerHtml}</td></tr>` : '';
+
+            // Generate other HTML parts
+            const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${subtitleSize}px;line-height:${subtitleLineHeight}px;text-align:${subtitleAlign};">${subtitle}</td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>` : '';
+            const buttonHtml = showButton ? `<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"><tr><td align="${buttonAlign}" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="border:2px solid #ffffff;border-radius:4px !important;"><tr><td align="center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;"><a href="${buttonLink}" style="color:#ffffff;text-decoration:none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>` : '';
+            const topSpacer = `<div style="font-size:12px;height:12px;line-height:12px;"> </div>`;
             
-            return `<td align="center" class="block" style="width: 280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="280"></a></div></td></tr><tr><td align="center" style="padding-bottom: 12px; padding-top: 12px;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-stretch: condensed; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 8px; height: 8px; line-height: 8px;"> </div></td></tr>${contentHtml}${!showButton ? '<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
+            return `<td align="center" class="block" style="width:280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"><tr><td><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" width="280" style="border:none;display:block;"></a></td></tr><tr><td align="center" style="padding:12px 0;"><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align:${titleAlign};"><h3 style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0;text-transform:uppercase;">${title}</h3></td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>${contentHtml}${spacerRowHtml}${!showButton ? '<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
         }
         
         function generateTemplate() {
             const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
-            const leftColHtml = generateColumnHtml('left_');
-            const rightColHtml = generateColumnHtml('right_');
-            return `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${leftColHtml}<td class="gap block" style="width: 20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .story-2col -->`;
+            const leftColHtml = generateColumnHtml('left_'), rightColHtml = generateColumnHtml('right_');
+            return `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${bgColor};width:620px;"><tr><td class="side" style="width:20px;"> </td><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"><tr>${leftColHtml}<td class="gap block" style="width:20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width:20px;"> </td></tr></table><!-- END .story-2col -->`;
         }
 
         function refreshPreview() { if (state.isLoading || !state.sdk) return; try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); } }
         
         function renderItemsUI(prefix) {
-            const container = elements[prefix + 'itemsContainer'];
-            const items = utils.getFieldValue(prefix + 'items');
+            const container = elements[prefix + 'itemsContainer'], items = utils.getFieldValue(prefix + 'items');
             container.innerHTML = '';
-            
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
-                const itemEl = itemFragment.querySelector('.item');
-                const editorDiv = itemFragment.querySelector('.quill-container');
+                const itemEl = itemFragment.querySelector('.item'), editorDiv = itemFragment.querySelector('.quill-container');
                 itemEl.dataset.id = item.id;
                 itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
                 itemEl.querySelector('.move-up-btn').disabled = index === 0;
                 itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
                 container.appendChild(itemFragment);
-
                 const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
                 editor.root.innerHTML = item.text || '';
                 state.editors[item.id] = editor;
@@ -304,16 +297,17 @@
         function initializeEventHandlers() {
             state.eventListeners = []; 
             function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', handler); state.eventListeners.push({ element: opt, event: 'click', handler }); }); }
-            function setupNumberInput(el, key) { if (!el) return; const step = 4; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min, 10), max = parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); const cv = Math.round(v / step) * step; i.value = cv; updateData(key, cv); }; const inputHandler = (e) => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }; el.addEventListener('input', inputHandler); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'input', handler: inputHandler }); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
+            function setupFontInput(el, key) { if (!el) return; const step = 4; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min, 10), max = parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); const cv = Math.round(v / step) * step; i.value = cv; updateData(key, cv); }; const inputHandler = (e) => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }; el.addEventListener('input', inputHandler); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'input', handler: inputHandler }); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
+            function setupSpacerInput(el, key) { if(!el) return; el.addEventListener('input', (e) => { const val = parseInt(e.target.value, 10) || 0; updateData(key, Math.max(0, val)); }); }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             
             COLUMN_PREFIXES.forEach(p => {
                 ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type], errEl = elements[p + type + 'Error'], fieldName = p + type, config = moduleConfig.fields[fieldName]; if(!el) return; const handler = (e) => { let value = e.target.value; if (config.validator === 'url' && !utils.isValidUrl(value)) return; if (config.maxLength) value = value.substring(0, config.maxLength); e.target.value = value; debouncedUpdateData(fieldName, value.trim()); }; el.addEventListener('input', handler); state.eventListeners.push({ element: el, event: 'input', handler }); if(config.validator === 'url') { const blurHandler = () => utils.isValidUrl(el.value, errEl); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); } });
                 ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], fieldName = p + type, groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; const handler = (e) => { updateData(fieldName, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler }); });
-                ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => setupNumberInput(elements[p + type], p + type));
+                ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => setupFontInput(elements[p + type], p + type));
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
-                // Checklist handlers
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
+                ['spacers_standard', 'spacers_outlook', 'spacers_non_outlook'].forEach(type => setupSpacerInput(elements[p + type], p + type));
                 elements[p + 'addItemBtn'].addEventListener('click', () => { const items = utils.getFieldValue(p + 'items'); items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); renderItemsUI(p); });
                 elements[p + 'itemsContainer'].addEventListener('click', (e) => { const itemEl = e.target.closest('.item'); if (!itemEl) return; const id = itemEl.dataset.id; const items = Array.from(utils.getFieldValue(p + 'items')); const idx = items.findIndex(i => i.id === id); let changed = false; if (e.target.closest('.remove-btn')) { items.splice(idx, 1); changed = true; } else if (e.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; changed = true; } else if (e.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; changed = true; } if(changed) { updateData(p + 'items', items); renderItemsUI(p); } });
             });
@@ -327,12 +321,10 @@
                     state.blockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
                     COLUMN_PREFIXES.forEach(p => { if (state.blockData[p + 'items']) state.blockData[p + 'items'].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); });
-
                     document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
                     function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
-                    
                     COLUMN_PREFIXES.forEach(p => {
-                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
+                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize', 'spacers_standard', 'spacers_outlook', 'spacers_non_outlook'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
                         ['title', 'description'].forEach(type => { if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); });
                         ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
                         ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment', 'contentType'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
