@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Product Feature Block</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}.preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
@@ -123,7 +123,15 @@
             maxRetries: 3
         };
 
-        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const state = { 
+            sdk: null, 
+            editors: {}, 
+            blockData: {}, 
+            isLoading: false, 
+            isInitialized: false, 
+            eventListeners: [], 
+            retryCount: 0 
+        };
         const elements = {};
 
         const utils = {
@@ -148,7 +156,11 @@
                 temp.innerHTML = html;
                 temp.querySelectorAll('script, style').forEach(el => el.remove());
                 const allElements = temp.getElementsByTagName('*');
-                for (let el of allElements) { for (let attr of el.attributes) { if (attr.name.startsWith('on')) el.removeAttribute(attr.name); } }
+                for (let el of allElements) { 
+                    for (let attr of el.attributes) { 
+                        if (attr.name.startsWith('on')) el.removeAttribute(attr.name); 
+                    } 
+                }
                 return temp.innerHTML;
             },
             showError(message, permanent = false) {
@@ -202,24 +214,47 @@
 
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
+            
             try {
-                state.editors.productTitle = new Quill(elements.productTitleEditor, {
+                // Quill 2.0 configuration
+                const quillOptions = {
                     theme: 'snow',
-                    modules: { toolbar: [ ['bold'], [{ 'script': 'super' }] ], clipboard: { matchVisual: false } },
+                    modules: { 
+                        toolbar: [ ['bold'], [{ 'script': 'super' }] ], 
+                        clipboard: { matchVisual: false } 
+                    },
                     formats: ['bold', 'script'],
                     placeholder: 'Enter product title...'
-                });
-                const debouncedTitleUpdate = utils.debounce((d, o, source) => {
-                    if (source === 'user') updateData('productTitle', utils.sanitizeHtml(state.editors.productTitle.root.innerHTML));
+                };
+                
+                state.editors.productTitle = new Quill(elements.productTitleEditor, quillOptions);
+                
+                const debouncedTitleUpdate = utils.debounce((delta, oldDelta, source) => {
+                    if (source === 'user') {
+                        // Use getSemanticHTML() for Quill 2.0
+                        const content = state.editors.productTitle.getSemanticHTML ? 
+                            state.editors.productTitle.getSemanticHTML() : 
+                            state.editors.productTitle.root.innerHTML;
+                        updateData('productTitle', utils.sanitizeHtml(content));
+                    }
                 }, moduleConfig.debounceDelay);
+                
                 state.editors.productTitle.on('text-change', debouncedTitleUpdate);
+                
+                // Length limiting using Quill 2.0 API
                 state.editors.productTitle.on('text-change', () => {
                     const text = state.editors.productTitle.getText();
                     if (text.length > moduleConfig.fields.productTitle.maxLength) {
-                        state.editors.productTitle.deleteText(moduleConfig.fields.productTitle.maxLength, text.length);
+                        const range = state.editors.productTitle.getSelection();
+                        state.editors.productTitle.deleteText(moduleConfig.fields.productTitle.maxLength, text.length - moduleConfig.fields.productTitle.maxLength);
+                        if (range) {
+                            state.editors.productTitle.setSelection(Math.min(range.index, moduleConfig.fields.productTitle.maxLength));
+                        }
                     }
                 });
-            } catch (error) { throw new Error(`Failed to initialize editors: ${error.message}`); }
+            } catch (error) { 
+                throw new Error(`Failed to initialize editors: ${error.message}`); 
+            }
         }
 
         function processRichText(html) {
@@ -256,9 +291,9 @@
             const subtitleHtml = showSubtitle ? `<!-- Subtitle --><p class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; margin: 0; text-align: center; font-size: ${subtitleSize}px; line-height: ${subtitleLineHeight}px; mso-hyphenate: none; hyphens: none;">${subtitle}</p>` : '';
             const titleMargin = showSubtitle ? '0' : (showButton ? '0 0 20px 0' : '0');
             const buttonHtml = showButton ? `<!-- Button --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="center" class="block" style="padding: 0; width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table>` : '';
-            const bottomSpacing = showButton ? `<div style="font-size: 20px; line-height: 20px;"> </div>` : '';
+            const bottomSpacing = showButton ? `<div style="font-size: 20px; line-height: 20px;"> </div>` : '';
 
-            return `<!-- START .product-feature --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" bgcolor="#000000" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="background-color: #000000; padding: 10px; width: 100%;" width="100%"><tr><td class="block"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="background-color: #000000; width: 100%;" width="100%"><tr><td class="block" style="padding: 0;"><!-- Product Image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%"><tr><td><div><a href="${productUrl}" target="_blank"><img align="top" alt="${productImageAlt}" class="fill" src="${productImage}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="580"></a></div></td></tr></table><!-- Product Info --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="padding: 15px 20px 30px; width: 100%;" width="100%"><tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td align="center" class="block mobile-text-center" style="color: #ffffff; padding: 0 20px; text-align: center;">${subtitleHtml}<!-- Product Title --><h2 class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', sans-serif, 'Open-Sans'; text-align: center; font-size: ${titleSize}px; line-height: ${titleLineHeight}px; margin: ${titleMargin}; mso-hyphenate: none; hyphens: none;">${processedTitle}</h2>${buttonHtml}${bottomSpacing}</td></tr></table></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .product-feature -->`;
+            return `<!-- START .product-feature --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" bgcolor="#000000" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="background-color: #000000; padding: 10px; width: 100%;" width="100%"><tr><td class="block"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="background-color: #000000; width: 100%;" width="100%"><tr><td class="block" style="padding: 0;"><!-- Product Image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%"><tr><td><div><a href="${productUrl}" target="_blank"><img align="top" alt="${productImageAlt}" class="fill" src="${productImage}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="580"></a></div></td></tr></table><!-- Product Info --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="padding: 15px 20px 30px; width: 100%;" width="100%"><tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td align="center" class="block mobile-text-center" style="color: #ffffff; padding: 0 20px; text-align: center;">${subtitleHtml}<!-- Product Title --><h2 class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', sans-serif, 'Open-Sans'; text-align: center; font-size: ${titleSize}px; line-height: ${titleLineHeight}px; margin: ${titleMargin}; mso-hyphenate: none; hyphens: none;">${processedTitle}</h2>${buttonHtml}${bottomSpacing}</td></tr></table></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .product-feature -->`;
         }
 
         function refreshPreview() {
@@ -269,7 +304,9 @@
                 if (typeof state.sdk.setData === 'function') {
                     state.sdk.setData({ ...state.blockData, content: html });
                 }
-            } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
+            } catch (error) { 
+                utils.showError(`Preview update failed: ${error.message}`); 
+            }
         }
 
         function validateUrlInput(input, errorElement) {
@@ -292,9 +329,11 @@
                     if (isUrl && !validateUrlInput(element, errorElement)) return;
                     debouncedUpdateData(dataKey, value.trim());
                 };
+                const blurHandler = isUrl ? () => validateUrlInput(element, errorElement) : null;
                 element.addEventListener('input', handler);
-                if(isUrl) element.addEventListener('blur', () => validateUrlInput(element, errorElement));
+                if(isUrl && blurHandler) element.addEventListener('blur', blurHandler);
                 state.eventListeners.push({ element, event: 'input', handler });
+                if(blurHandler) state.eventListeners.push({ element, event: 'blur', handler: blurHandler });
             }
 
             setupInputHandler(elements.productImage, 'productImage', null, true, elements.productImageError);
@@ -341,6 +380,7 @@
                 state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
+            
             setupNumberInput(elements.subtitleFontSize, 'subtitleFontSize');
             setupNumberInput(elements.productTitleFontSize, 'productTitleFontSize');
             // --- END: ROBUST NUMBER INPUT HANDLER ---
@@ -351,6 +391,7 @@
                 return utils.showError('SDK not available');
             }
             setLoadingState(true);
+            
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {}; // Reset block data
@@ -369,10 +410,26 @@
                     if (elements.productUrl) elements.productUrl.value = utils.getFieldValue('productUrl');
                     if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
                     if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize'); // NEW
-                    if (state.editors.productTitle) state.editors.productTitle.root.innerHTML = utils.getFieldValue('productTitle');
                     if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
                     if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
+                    
+                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                    if (state.editors.productTitle) {
+                        const content = utils.getFieldValue('productTitle');
+                        try {
+                            // Clear existing content first
+                            state.editors.productTitle.setContents([]);
+                            // Use the new clipboard API to paste HTML content
+                            if (content && content.trim()) {
+                                state.editors.productTitle.clipboard.dangerouslyPasteHTML(content);
+                            }
+                        } catch (error) {
+                            // Fallback to root innerHTML for compatibility
+                            console.warn(`Using fallback method for productTitle editor:`, error);
+                            state.editors.productTitle.root.innerHTML = content || '';
+                        }
+                    }
                     
                     const showSubtitle = utils.getFieldValue('showSubtitle');
                     if (elements.showSubtitle) elements.showSubtitle.checked = showSubtitle;
@@ -395,7 +452,10 @@
         }
 
         function cleanup() {
-            if (state.editors.productTitle) state.editors.productTitle.off('text-change');
+            // Updated cleanup for Quill 2.0
+            if (state.editors.productTitle && state.editors.productTitle.off) {
+                state.editors.productTitle.off('text-change');
+            }
             state.eventListeners.forEach(({ element, event, handler }) => {
                 if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler);
             });
@@ -414,16 +474,18 @@
                 loadData();
                 
                 window.addEventListener('beforeunload', cleanup);
-                document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
+                document.addEventListener('visibilitychange', () => { 
+                    if (!document.hidden && state.isInitialized) loadData(); 
+                });
                 
                 state.isInitialized = true;
             } catch (error) {
-                utils.showError(`Initialization failed: ${error.message}`);
+                utils.showError(`Initialisation failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
                     setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
                 } else {
-                    utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
+                    utils.showError('Failed to initialise after multiple attempts. Please refresh.', true);
                 }
                 setLoadingState(false);
             }
