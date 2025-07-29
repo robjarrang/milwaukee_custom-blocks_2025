@@ -169,18 +169,25 @@
                     const editorId = p + type;
                     const editorElement = elements[p + type + 'Editor'];
                     const toolbarOptions = type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']];
-                    const quillOptions = {
-                        theme: 'snow',
-                        modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } },
-                        formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'],
-                        placeholder: `Enter ${type}...`
-                    };
-                    state.editors[editorId] = new Quill(editorElement, quillOptions);
+                    const formats = type === 'title' ? ['bold'] : ['bold', 'italic', 'link'];
                     
-                    // UPDATED: Use getSemanticHTML for Quill 2.0
-                    const debouncedUpdate = utils.debounce(() => {
-                        const html = state.editors[editorId].getSemanticHTML ? state.editors[editorId].getSemanticHTML() : state.editors[editorId].root.innerHTML;
-                        updateData(editorId, utils.sanitizeHtml(html));
+                    state.editors[editorId] = new Quill(editorElement, { 
+                        theme: 'snow', 
+                        modules: { 
+                            toolbar: toolbarOptions, 
+                            clipboard: { matchVisual: false } 
+                        }, 
+                        formats: formats, 
+                        placeholder: `Enter ${type}...` 
+                    });
+
+                    // UPDATED: Use Quill 2.0 event handling
+                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                        if (source === 'user') {
+                            const editor = state.editors[editorId];
+                            const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                            updateData(editorId, utils.sanitizeHtml(content));
+                        }
                     }, moduleConfig.debounceDelay);
                     state.editors[editorId].on('text-change', debouncedUpdate);
                 });
@@ -264,33 +271,31 @@
                 container.appendChild(itemFragment);
                 if (hasQuill) {
                     const editorDiv = itemEl.querySelector('.quill-container');
-                    const quillOptions = { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' };
-                    const editor = new Quill(editorDiv, quillOptions);
+                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
                     
-                    // UPDATED: Set initial content with dangerouslyPasteHTML for Quill 2.0
-                    try {
-                        editor.setContents([]);
-                        if (item.text && item.text.trim()) {
-                            editor.clipboard.dangerouslyPasteHTML(item.text);
-                        }
-                    } catch (error) {
-                        console.warn(`Using fallback method for dynamic editor ${item.id}:`, error);
-                        editor.root.innerHTML = item.text || '';
+                    // UPDATED: Use Quill 2.0 API to set content
+                    const content = item.text || '';
+                    editor.setContents([]);
+                    if (content && content.trim()) {
+                        editor.clipboard.dangerouslyPasteHTML(content);
                     }
-
+                    
                     state.editors[item.id] = editor;
                     
-                    // UPDATED: Use getSemanticHTML for Quill 2.0
-                    const debouncedUpdate = utils.debounce(() => { 
-                        const newItems = []; 
-                        container.querySelectorAll('.item').forEach(el => { 
-                            const id = el.dataset.id; 
-                            if (state.editors[id]) {
-                                const html = state.editors[id].getSemanticHTML ? state.editors[id].getSemanticHTML() : state.editors[id].root.innerHTML;
-                                newItems.push({ id: id, text: utils.sanitizeHtml(html) });
-                            }
-                        }); 
-                        updateData(prefix + 'items', newItems); 
+                    // UPDATED: Use Quill 2.0 event handling
+                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                        if (source === 'user') {
+                            const newItems = []; 
+                            container.querySelectorAll('.item').forEach(el => { 
+                                const id = el.dataset.id; 
+                                const itemEditor = state.editors[id];
+                                if (itemEditor) {
+                                    const itemContent = itemEditor.getSemanticHTML ? itemEditor.getSemanticHTML() : itemEditor.root.innerHTML;
+                                    newItems.push({ id, text: utils.sanitizeHtml(itemContent) }); 
+                                }
+                            }); 
+                            updateData(prefix + 'items', newItems); 
+                        }
                     }, moduleConfig.debounceDelay + 100);
                     editor.on('text-change', debouncedUpdate);
                 }
@@ -358,7 +363,7 @@
                     COLUMN_PREFIXES.forEach(p => {
                         ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
                         
-                        // UPDATED: Use dangerouslyPasteHTML to set editor content for Quill 2.0
+                        // UPDATED: Use Quill 2.0 API to set content
                         ['title', 'description'].forEach(type => {
                             const editor = state.editors[p + type];
                             if (editor) {
@@ -377,8 +382,10 @@
 
                         ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
                         ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
+                        
+                        const contentType = utils.getFieldValue(p + 'contentType');
                         setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
-                        toggleContentTypeView(p, utils.getFieldValue(p + 'contentType'));
+                        toggleContentTypeView(p, contentType);
                         renderList(p, 'spacers', 'spacerTemplate', false);
                     });
                     refreshPreview();
