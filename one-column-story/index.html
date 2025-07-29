@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>1 Column Story Block</title>
+    <title>1 Column Story Block (with Checklist)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -12,6 +12,17 @@
         .style-control-group .field-label { margin-bottom: 5px; }
         .style-control-group .field-input { width: 80px; padding: 6px 8px; }
         .style-control-group .option-selector { width: 110px; }
+        /* Checklist Styles */
+        .items-container{display:flex;flex-direction:column;gap:15px}
+        .item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}
+        .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .item-title{font-weight:bold;font-size:16px;margin:0}
+        .item-controls{display:flex;gap:8px}
+        .item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}
+        .item-control-btn:hover{color:#0074d9}
+        .item-control-btn:disabled{color:#ccc;cursor:not-allowed}
+        .btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}
+        #checklistSection { display: none; } /* Hide checklist by default */
     </style>
 </head>
 <body>
@@ -23,6 +34,7 @@
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
             <div class="field-group"><label class="field-label">Layout</label><div class="option-selector" id="layoutSelector"><div class="option-button selected" data-value="left" title="Image on Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 18h6V6H4v12zm8 0h8V6h-8v12zM4 4h16v2H4V4z"/></svg></div><div class="option-button" data-value="right" title="Image on Right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M14 18h6V6h-6v12zM4 18h8V6H4v12zM4 4h16v2H4V4z"/></svg></div></div></div>
+             <div class="field-group"><label class="field-label">Background Colour</label><div class="option-selector" id="moduleBackgroundColorSelector"><div class="option-button selected" data-value="red">Red</div><div class="option-button" data-value="black">Black</div></div></div>
         </div>
         
         <div class="section-divider">
@@ -38,9 +50,31 @@
                 <label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div>
                 <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div>
             </div>
+            
+            <!-- NEW: Content Type Switcher -->
             <div class="field-group">
-                <label class="field-label">Description</label><div id="descriptionEditor" class="quill-container"></div>
-                <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div>
+                <label class="field-label">Content Type</label>
+                <div class="option-selector" id="contentTypeSelector">
+                    <div class="option-button selected" data-value="description">Body Copy</div>
+                    <div class="option-button" data-value="checklist">Checklist</div>
+                </div>
+            </div>
+
+            <!-- Description Section (conditionally shown) -->
+            <div id="descriptionSection">
+                <div class="field-group">
+                    <label class="field-label">Description</label><div id="descriptionEditor" class="quill-container"></div>
+                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div>
+                </div>
+            </div>
+
+            <!-- Checklist Section (conditionally shown) -->
+            <div id="checklistSection">
+                <div class="field-group">
+                    <label class="field-label">Checklist Items</label>
+                    <div id="itemsContainer" class="items-container"></div>
+                    <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
+                </div>
             </div>
         </div>
         
@@ -57,6 +91,21 @@
         </div>
     </div>
 
+    <!-- Template for Checklist Items -->
+    <template id="itemTemplate">
+        <div class="item">
+            <div class="item-header">
+                <h3 class="item-title">Item</h3>
+                <div class="item-controls">
+                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+                </div>
+            </div>
+            <div class="quill-container limited-toolbar"></div>
+        </div>
+    </template>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
@@ -64,18 +113,21 @@
         'use strict';
         
         const moduleConfig = {
-            name: '1 Column Story',
+            name: '1 Column Story with Checklist',
             fields: {
                 layout: { type: 'text', defaultValue: 'left' },
+                moduleBackgroundColor: { type: 'text', defaultValue: 'red' },
                 imageUrl: { type: 'url', defaultValue: 'https://placehold.co/290x290', validator: 'url' },
                 imageAlt: { type: 'text', defaultValue: 'Story Image', maxLength: 150 },
                 imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 title: { type: 'richtext', defaultValue: 'Tempus Euismod Phasellus', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 20 },
                 titleAlignment: { type: 'text', defaultValue: 'center' },
+                contentType: { type: 'text', defaultValue: 'description' },
                 description: { type: 'richtext', defaultValue: 'Vestibulum condimentum tempus euismod. Phasellus ligula nibh, ornare at ligula a.', maxLength: 250 },
                 descriptionFontSize: { type: 'number', defaultValue: 16 },
                 descriptionAlignment: { type: 'text', defaultValue: 'center' },
+                items: { type: 'list', defaultValue: [{ id: crypto.randomUUID(), text: '<strong>Lorem ipsum odor amet</strong>' }, { id: crypto.randomUUID(), text: '<strong>Consectetur adipiscing elit</strong>' }] },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'text', defaultValue: 'Nulla Ut Erat Enim', maxLength: 40 },
                 buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -92,7 +144,7 @@
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
-            sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
+            sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); t.querySelectorAll('a').forEach(l => { if (!l.style.color) l.style.color = '#ffffff'; if (!l.style.textDecoration) l.style.textDecoration = 'underline'; if (!l.getAttribute('href')) l.setAttribute('href', '#'); }); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
         };
@@ -102,6 +154,7 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.layoutSelector = document.getElementById('layoutSelector');
+            elements.moduleBackgroundColorSelector = document.getElementById('moduleBackgroundColorSelector');
             elements.imageUrl = document.getElementById('imageUrl');
             elements.imageUrlError = document.getElementById('imageUrlError');
             elements.imageAlt = document.getElementById('imageAlt');
@@ -110,9 +163,15 @@
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
+            elements.contentTypeSelector = document.getElementById('contentTypeSelector');
+            elements.descriptionSection = document.getElementById('descriptionSection');
             elements.descriptionEditor = document.getElementById('descriptionEditor');
             elements.descriptionFontSize = document.getElementById('descriptionFontSize');
             elements.descriptionAlignmentSelector = document.getElementById('descriptionAlignmentSelector');
+            elements.checklistSection = document.getElementById('checklistSection');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonText = document.getElementById('buttonText');
@@ -133,7 +192,7 @@
                 state.editors[fieldName] = new Quill(element, { theme: 'snow', modules: { toolbar, clipboard: { matchVisual: false } }, formats, placeholder });
                 const debouncedUpdate = utils.debounce((d, o, source) => { if (source === 'user') updateData(fieldName, utils.sanitizeHtml(state.editors[fieldName].root.innerHTML)); }, moduleConfig.debounceDelay);
                 state.editors[fieldName].on('text-change', debouncedUpdate);
-                state.editors[fieldName].on('text-change', () => { const text = state.editors[fieldName].getText(); const maxLength = moduleConfig.fields[fieldName].maxLength; if (text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length); });
+                state.editors[fieldName].on('text-change', () => { const text = state.editors[fieldName].getText(); const maxLength = moduleConfig.fields[fieldName].maxLength; if (maxLength && text.length > maxLength) state.editors[fieldName].deleteText(maxLength, text.length); });
             };
             try {
                 createEditor('title', '#titleEditor', [['bold']], ['bold'], 'Enter title...');
@@ -156,19 +215,26 @@
         }
 
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+        const debouncedChecklistUpdate = utils.debounce(() => {
+            const newItems = [];
+            document.querySelectorAll('#itemsContainer .item').forEach(itemEl => {
+                const id = itemEl.dataset.id;
+                const editor = state.editors[id];
+                if (editor) newItems.push({ id, text: utils.sanitizeHtml(editor.root.innerHTML) });
+            });
+            updateData('items', newItems);
+        }, moduleConfig.debounceDelay + 100);
 
         function generateTemplate() {
             const layout = utils.getFieldValue('layout');
-            const bgColor = '#DB021D';
+            const bgColor = utils.getFieldValue('moduleBackgroundColor') === 'red' ? '#DB021D' : '#000000';
             const imageUrl = utils.getFieldValue('imageUrl');
             const imageAlt = utils.getFieldValue('imageAlt');
             const imageLink = utils.getFieldValue('imageLink');
             const title = processRichText(utils.getFieldValue('title'));
             const titleSize = utils.getFieldValue('titleFontSize');
             const titleAlign = utils.getFieldValue('titleAlignment');
-            const description = processRichText(utils.getFieldValue('description'));
-            const descriptionSize = utils.getFieldValue('descriptionFontSize');
-            const descriptionAlign = utils.getFieldValue('descriptionAlignment');
+            const contentType = utils.getFieldValue('contentType');
             const showButton = utils.getFieldValue('showButton');
             const buttonText = utils.getFieldValue('buttonText');
             const buttonLink = utils.getFieldValue('buttonLink');
@@ -176,17 +242,30 @@
             const showSpacer = utils.getFieldValue('showSpacer');
             
             const titleLineHeight = titleSize + 8;
-            const descriptionLineHeight = descriptionSize + 12;
-
-            // --- NEW: Dynamic mobile alignment classes ---
             const titleMobileClass = titleAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
-            const descriptionMobileClass = descriptionAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
+
+            let contentHtml = '';
+            if (contentType === 'description') {
+                const description = processRichText(utils.getFieldValue('description'));
+                const descriptionSize = utils.getFieldValue('descriptionFontSize');
+                const descriptionAlign = utils.getFieldValue('descriptionAlignment');
+                const descriptionLineHeight = descriptionSize + 12;
+                const descriptionMobileClass = descriptionAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
+                contentHtml = `<tr><td class="story-intro ${descriptionMobileClass}" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; text-align: ${descriptionAlign};">${description}</td></tr>`;
+            } else { // Checklist
+                const items = utils.getFieldValue('items');
+                const itemRowsHtml = items.map(item => `
+                    <tr>
+                       <td valign="top" style="padding-bottom: 8px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
+                       <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
+                       <td class="story-intro mobile-text-left" valign="top" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">${item.text}</td>
+                    </tr>`).join('');
+                contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
+            }
 
             const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px;" valign="top"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
-            const textCell = `<td class="block" dir="ltr" style="width: 290px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" valign="middle"><tr><td style="padding: 20px;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr><tr><td class="story-intro ${descriptionMobileClass}" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; text-align: ${descriptionAlign};">${description}</td></tr><tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table></td>`;
-
+            const textCell = `<td class="block" dir="ltr" style="width: 290px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" valign="middle"><tr><td style="padding: 20px;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table></td>`;
             const spacerHtml = showSpacer ? `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td class="block" style="width: 100%;"><div style="font-size: 40px; height: 40px; line-height: 40px;"> </div></td></tr></table></td></tr></table><!-- END .fw-spacer -->` : '';
-            
             const mainContent = imageCell + textCell;
 
             return `<!-- START .story-1col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" ${layout === 'right' ? 'dir="rtl"' : ''}><tr>${mainContent}</tr></table></td><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .story-1col -->${spacerHtml}`;
@@ -197,19 +276,50 @@
             try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
         }
 
+        function renderItemsUI() {
+            const items = utils.getFieldValue('items');
+            elements.itemsContainer.innerHTML = '';
+            const currentIds = new Set(items.map(i => i.id));
+            Object.keys(state.editors).forEach(id => { if (!currentIds.has(id) && id !== 'title' && id !== 'description') delete state.editors[id]; });
+
+            items.forEach((item, index) => {
+                const itemFragment = elements.itemTemplate.content.cloneNode(true);
+                const itemEl = itemFragment.querySelector('.item');
+                const editorDiv = itemFragment.querySelector('.quill-container');
+                itemEl.dataset.id = item.id;
+                itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
+                itemEl.querySelector('.move-up-btn').disabled = index === 0;
+                itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
+                elements.itemsContainer.appendChild(itemFragment);
+
+                const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', { 'script': 'super' }], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'script', 'link'], placeholder: 'Enter item text...' });
+                editor.root.innerHTML = item.text || '';
+                editor.on('text-change', debouncedChecklistUpdate);
+                state.editors[item.id] = editor;
+            });
+        }
+
+        function toggleContentTypeView(type) {
+            elements.descriptionSection.style.display = type === 'description' ? 'block' : 'none';
+            elements.checklistSection.style.display = type === 'checklist' ? 'block' : 'none';
+            if (type === 'checklist') renderItemsUI();
+        }
+
         function initializeEventHandlers() {
             state.eventListeners = []; 
-            function setupOptionSelector(el, key) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const h = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); }; opt.addEventListener('click', h); state.eventListeners.push({ element: opt, event: 'click', handler: h }); }); }
+            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const h = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', h); state.eventListeners.push({ element: opt, event: 'click', handler: h }); }); }
             function setupNumberInput(el, key) { if (!el) return; const step = 4; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min, 10), max = parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); const cv = Math.round(v / step) * step; i.value = cv; updateData(key, cv); }; const inputHandler = (e) => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }; el.addEventListener('input', inputHandler); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'input', handler: inputHandler }); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
             function setupTextInput(el, key, isUrl = false, errEl = null) { if (!el) return; const h = (e) => { let v = e.target.value; if (isUrl && !utils.isValidUrl(v)) return; if (moduleConfig.fields[key].maxLength) v = v.substring(0, moduleConfig.fields[key].maxLength); e.target.value = v; debouncedUpdateData(key, v.trim()); }; el.addEventListener('input', h); state.eventListeners.push({ element: el, event: 'input', handler: h }); if(isUrl) { const b = () => utils.isValidUrl(el.value, errEl); el.addEventListener('blur', b); state.eventListeners.push({ element: el, event: 'blur', handler: b }); } }
             function setupToggle(el, key, groupEl) { if (!el) return; const h = (e) => { updateData(key, e.target.checked); if (groupEl) groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', h); state.eventListeners.push({ element: el, event: 'change', handler: h }); }
 
             setupOptionSelector(elements.layoutSelector, 'layout');
+            setupOptionSelector(elements.moduleBackgroundColorSelector, 'moduleBackgroundColor');
             setupTextInput(elements.imageUrl, 'imageUrl', true, elements.imageUrlError);
             setupTextInput(elements.imageAlt, 'imageAlt');
             setupTextInput(elements.imageLink, 'imageLink', true, elements.imageLinkError);
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
+            setupOptionSelector(elements.contentTypeSelector, 'contentType', toggleContentTypeView);
             setupNumberInput(elements.descriptionFontSize, 'descriptionFontSize');
             setupOptionSelector(elements.descriptionAlignmentSelector, 'descriptionAlignment');
             setupToggle(elements.showButton, 'showButton', elements.buttonFieldsGroup);
@@ -217,6 +327,22 @@
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             setupToggle(elements.showSpacer, 'showSpacer');
+
+            elements.addItemBtn.addEventListener('click', () => {
+                const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
+                state.blockData.items.push(newItem);
+                renderItemsUI();
+                debouncedChecklistUpdate();
+            });
+            elements.itemsContainer.addEventListener('click', (e) => {
+                const itemEl = e.target.closest('.item'); if (!itemEl) return;
+                const id = itemEl.dataset.id; const items = state.blockData.items; const idx = items.findIndex(i => i.id === id);
+                if (e.target.closest('.remove-btn')) { items.splice(idx, 1); delete state.editors[id]; } 
+                else if (e.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; }
+                else if (e.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; }
+                else return;
+                renderItemsUI(); debouncedChecklistUpdate();
+            });
         }
 
         function loadData() {
@@ -226,19 +352,27 @@
                 try {
                     state.blockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
+                    if(state.blockData.items) state.blockData.items.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
+                    
                     function setSelectorState(el, key) { const v = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === v)); }
                     
                     setSelectorState(elements.layoutSelector, 'layout');
+                    setSelectorState(elements.moduleBackgroundColorSelector, 'moduleBackgroundColor');
                     ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'].forEach(key => { if (elements[key]) elements[key].value = utils.getFieldValue(key); });
                     if (state.editors.title) state.editors.title.root.innerHTML = utils.getFieldValue('title');
                     if (state.editors.description) state.editors.description.root.innerHTML = utils.getFieldValue('description');
                     setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
                     setSelectorState(elements.descriptionAlignmentSelector, 'descriptionAlignment');
+                    
                     const showButton = utils.getFieldValue('showButton');
                     elements.showButton.checked = showButton;
                     if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
                     elements.showSpacer.checked = utils.getFieldValue('showSpacer');
+
+                    const contentType = utils.getFieldValue('contentType');
+                    setSelectorState(elements.contentTypeSelector, 'contentType');
+                    toggleContentTypeView(contentType);
                     
                     refreshPreview();
                 } catch (error) {
