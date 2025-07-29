@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Checklist Block</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:2em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.items-container{display:flex;flex-direction:column;gap:15px}
@@ -59,7 +59,7 @@
         </div>
     </template>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
@@ -147,7 +147,11 @@
                 const id = itemEl.dataset.id;
                 const editor = state.editors[id];
                 if (editor) {
-                    newItems.push({ id: id, text: utils.sanitizeHtml(editor.root.innerHTML) });
+                    // Use Quill 2.0 API for getting content
+                    const content = editor.getSemanticHTML ? 
+                        editor.getSemanticHTML() : 
+                        editor.root.innerHTML;
+                    newItems.push({ id: id, text: utils.sanitizeHtml(content) });
                 }
             });
             state.blockData.items = newItems;
@@ -165,7 +169,7 @@
                 <tr>
                    <td valign="top" style="padding-bottom: 8px;">
                     <img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
-                   <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
+                   <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
                    <td class="story-intro mobile-text-left" valign="top" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">
                     ${item.text}
                    </td>
@@ -174,21 +178,21 @@
 
             return `<!-- START .checklist --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
               <tr>
-               <td class="side" style="width: 20px;"> </td>
+               <td class="side" style="width: 20px;"> </td>
                <td align="center" class="content-inner" style="width: 580px;">
                 <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
                   <tr>
                    <td align="left" class="block" style="width: 100%;">
                     <table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                      <tr><td colspan="3"><div style="font-size: 28px; height: 28px; line-height: 28px;"> </div></td></tr>
+                      <tr><td colspan="3"><div style="font-size: 28px; height: 28px; line-height: 28px;"> </div></td></tr>
                       ${itemRowsHtml}
-                      <tr><td colspan="3"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>
+                      <tr><td colspan="3"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>
                     </table>
                    </td>
                   </tr>
                 </table>
                </td>
-               <td class="side" style="width: 20px;"> </td>
+               <td class="side" style="width: 20px;"> </td>
               </tr>
             </table><!-- END .checklist -->`;
         }
@@ -212,6 +216,10 @@
             const currentIds = new Set(items.map(i => i.id));
             for (const id in state.editors) {
                 if (!currentIds.has(id)) {
+                    // Clean up Quill 2.0 event listeners
+                    if (state.editors[id] && state.editors[id].off) {
+                        state.editors[id].off('text-change');
+                    }
                     delete state.editors[id];
                 }
             }
@@ -229,7 +237,7 @@
 
                 elements.itemsContainer.appendChild(itemFragment);
 
-                // Initialize Quill with updated toolbar and formats
+                // Initialize Quill 2.0 with updated configuration
                 const editor = new Quill(editorDiv, {
                     theme: 'snow',
                     modules: { 
@@ -240,7 +248,12 @@
                     placeholder: 'Enter item text...'
                 });
 
-                editor.root.innerHTML = item.text;
+                // Set initial content using Quill 2.0 API
+                if (item.text && item.text.trim()) {
+                    editor.setContents([]);
+                    editor.clipboard.dangerouslyPasteHTML(item.text);
+                }
+                
                 editor.on('text-change', debouncedUpdateDataFromUI);
                 state.editors[item.id] = editor;
             });
@@ -273,6 +286,10 @@
 
                 if (e.target.closest('.remove-btn')) {
                     items.splice(currentIndex, 1);
+                    // Clean up Quill 2.0 editor
+                    if (state.editors[id] && state.editors[id].off) {
+                        state.editors[id].off('text-change');
+                    }
                     delete state.editors[id];
                     dataChanged = true;
                 } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
@@ -313,6 +330,15 @@
             });
         }
 
+        // Cleanup function for Quill 2.0
+        function cleanup() {
+            Object.values(state.editors).forEach(editor => {
+                if (editor && editor.off) {
+                    editor.off('text-change');
+                }
+            });
+        }
+
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
@@ -322,6 +348,9 @@
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
+                
+                // Add cleanup on page unload
+                window.addEventListener('beforeunload', cleanup);
                 
                 state.isInitialized = true;
             } catch (error) {

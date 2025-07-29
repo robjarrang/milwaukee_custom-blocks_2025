@@ -4,12 +4,13 @@
     <meta charset="utf-8">
     <title>Interactive Accordion Block (Milwaukee Style)</title>
     <!-- Quill.js CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <!-- Basic styling for the editor UI -->
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Quill-specific styles */
         .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
+        .field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}
     </style>
 </head>
 <body>
@@ -47,7 +48,7 @@
     </template>
 
     <!-- Quill.js script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
@@ -109,11 +110,16 @@
             itemElements.forEach(el => {
                 const id = el.dataset.id;
                 const editor = state.editors[id];
-                newItems.push({
-                    id: id,
-                    title: el.querySelector('[data-field="title"]').value,
-                    content: editor ? utils.sanitizeHtml(editor.root.innerHTML) : ''
-                });
+                if (editor) {
+                    const content = editor.getSemanticHTML ? 
+                        editor.getSemanticHTML() : 
+                        editor.root.innerHTML;
+                    newItems.push({
+                        id: id,
+                        title: el.querySelector('[data-field="title"]').value,
+                        content: utils.sanitizeHtml(content)
+                    });
+                }
             });
             state.blockData.accordionItems = newItems;
             refreshPreview();
@@ -124,7 +130,15 @@
             elements.itemsContainer.innerHTML = '';
             
             const currentIds = new Set(items.map(i => i.id));
-            for (const id in state.editors) { if (!currentIds.has(id)) delete state.editors[id]; }
+            for (const id in state.editors) { 
+                if (!currentIds.has(id)) {
+                    // Clean up Quill 2.0 event listeners
+                    if (state.editors[id] && state.editors[id].off) {
+                        state.editors[id].off('text-change');
+                    }
+                    delete state.editors[id];
+                }
+            }
 
             items.forEach((item, index) => {
                 const fragment = elements.itemTemplate.content.cloneNode(true);
@@ -140,6 +154,7 @@
                 
                 elements.itemsContainer.appendChild(fragment);
 
+                // Quill 2.0 configuration
                 const editor = new Quill(editorDiv, {
                     theme: 'snow',
                     modules: { 
@@ -150,7 +165,12 @@
                     placeholder: 'Enter content here...'
                 });
 
-                editor.root.innerHTML = item.content || '';
+                // Set initial content using Quill 2.0 API
+                if (item.content && item.content.trim()) {
+                    editor.setContents([]);
+                    editor.clipboard.dangerouslyPasteHTML(item.content);
+                }
+                
                 editor.on('text-change', updateDataFromUI);
                 state.editors[item.id] = editor;
             });
@@ -179,6 +199,10 @@
 
                 if (e.target.closest('.remove-btn')) {
                     items.splice(currentIndex, 1);
+                    // Clean up Quill 2.0 editor
+                    if (state.editors[id] && state.editors[id].off) {
+                        state.editors[id].off('text-change');
+                    }
                     delete state.editors[id];
                     dataChanged = true;
                 } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
@@ -262,7 +286,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 </style>
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
   <tr>
-    <td class="side" style="width: 20px;"> </td>
+    <td class="side" style="width: 20px;"> </td>
     <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
       <!--[if !mso]><!-->
       <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
@@ -275,7 +299,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         </table>
       </div>
     </td>
-    <td class="side" style="width: 20px;"> </td>
+    <td class="side" style="width: 20px;"> </td>
   </tr>
 </table>`;
         }
@@ -288,6 +312,15 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
             } catch (error) {
                 console.error(`Preview update failed: ${error.message}`);
             }
+        }
+
+        // Cleanup function for Quill 2.0
+        function cleanup() {
+            Object.values(state.editors).forEach(editor => {
+                if (editor && editor.off) {
+                    editor.off('text-change');
+                }
+            });
         }
 
         function initialize() {
@@ -307,6 +340,9 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                     refreshPreview();
                     setLoadingState(false);
                 });
+                
+                // Add cleanup on page unload
+                window.addEventListener('beforeunload', cleanup);
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);
