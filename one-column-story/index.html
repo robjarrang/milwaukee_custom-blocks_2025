@@ -34,7 +34,6 @@
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
             <div class="field-group"><label class="field-label">Layout</label><div class="option-selector" id="layoutSelector"><div class="option-button selected" data-value="left" title="Image on Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 18h6V6H4v12zm8 0h8V6h-8v12zM4 4h16v2H4V4z"/></svg></div><div class="option-button" data-value="right" title="Image on Right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M14 18h6V6h-6v12zM4 18h8V6H4v12zM4 4h16v2H4V4z"/></svg></div></div></div>
-             <div class="field-group"><label class="field-label">Background Colour</label><div class="option-selector" id="moduleBackgroundColorSelector"><div class="option-button selected" data-value="red">Red</div><div class="option-button" data-value="black">Black</div></div></div>
         </div>
         
         <div class="section-divider">
@@ -112,7 +111,6 @@
             name: '1 Column Story with Checklist',
             fields: {
                 layout: { type: 'text', defaultValue: 'left' },
-                moduleBackgroundColor: { type: 'text', defaultValue: 'red' },
                 imageUrl: { type: 'url', defaultValue: 'https://placehold.co/290x290', validator: 'url' },
                 imageAlt: { type: 'text', defaultValue: 'Story Image', maxLength: 150 },
                 imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -150,7 +148,6 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.layoutSelector = document.getElementById('layoutSelector');
-            elements.moduleBackgroundColorSelector = document.getElementById('moduleBackgroundColorSelector');
             elements.imageUrl = document.getElementById('imageUrl');
             elements.imageUrlError = document.getElementById('imageUrlError');
             elements.imageAlt = document.getElementById('imageAlt');
@@ -223,7 +220,7 @@
 
         function generateTemplate() {
             const layout = utils.getFieldValue('layout');
-            const bgColor = utils.getFieldValue('moduleBackgroundColor') === 'red' ? '#DB021D' : '#000000';
+            const bgColor = '#DB021D'; // Hardcoded to red
             const imageUrl = utils.getFieldValue('imageUrl');
             const imageAlt = utils.getFieldValue('imageAlt');
             const imageLink = utils.getFieldValue('imageLink');
@@ -262,7 +259,6 @@
 
             const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px;" valign="top"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
             
-            // --- FIX: The valign attributes on the container tables are changed from "middle" to "top" ---
             const textCell = `<td class="block" dir="ltr" style="width: 290px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" valign="top"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table></td>`;
 
             const spacerHtml = showSpacer ? `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td class="block" style="width: 100%;"><div style="font-size: 40px; height: 40px; line-height: 40px;"> </div></td></tr></table></td></tr></table><!-- END .fw-spacer -->` : '';
@@ -313,7 +309,6 @@
             function setupToggle(el, key, groupEl) { if (!el) return; const h = (e) => { updateData(key, e.target.checked); if (groupEl) groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', h); state.eventListeners.push({ element: el, event: 'change', handler: h }); }
 
             setupOptionSelector(elements.layoutSelector, 'layout');
-            setupOptionSelector(elements.moduleBackgroundColorSelector, 'moduleBackgroundColor');
             setupTextInput(elements.imageUrl, 'imageUrl', true, elements.imageUrlError);
             setupTextInput(elements.imageAlt, 'imageAlt');
             setupTextInput(elements.imageLink, 'imageLink', true, elements.imageLinkError);
@@ -357,7 +352,6 @@
                     function setSelectorState(el, key) { const v = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === v)); }
                     
                     setSelectorState(elements.layoutSelector, 'layout');
-                    setSelectorState(elements.moduleBackgroundColorSelector, 'moduleBackgroundColor');
                     ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'].forEach(key => { if (elements[key]) elements[key].value = utils.getFieldValue(key); });
                     if (state.editors.title) state.editors.title.root.innerHTML = utils.getFieldValue('title');
                     if (state.editors.description) state.editors.description.root.innerHTML = utils.getFieldValue('description');
