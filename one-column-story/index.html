@@ -192,12 +192,22 @@
                 contentHtml = `<tr><td class="story-intro ${descriptionMobileClass}" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; text-align: ${descriptionAlign};">${description}</td></tr>`;
             } else { // Checklist
                 const items = utils.getFieldValue('items');
-                const itemRowsHtml = items.map(item => `
-                    <tr>
-                       <td valign="middle" style="padding-bottom: 8px; width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
-                       <td valign="middle" style="width: 12px; padding-bottom: 8px;"> </td>
-                       <td class="story-intro mobile-text-left" valign="middle" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">${item.text}</td>
-                    </tr>`).join('');
+                const itemRowsHtml = items.map((item, index) => {
+                    // A two-column row for the checkmark and text
+                    const itemRow = `
+                        <tr>
+                           <td valign="middle" style="width: 32px; padding-right: 12px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
+                           <td class="story-intro mobile-text-left" valign="middle" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left;">${item.text}</td>
+                        </tr>`;
+
+                    // Add a small spacer row after each item, except the last one, for consistent spacing.
+                    const spacerRow = (index < items.length - 1) 
+                        ? `<tr><td colspan="2" style="font-size: 4px; line-height: 4px;"> </td></tr>`
+                        : '';
+                    
+                    return itemRow + spacerRow;
+                }).join('');
+
                 contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             }
 
