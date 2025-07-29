@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>2 Column Story Block (with Spacers)</title>
+    <title>2 Column Story Block (with Dynamic Spacers)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -12,9 +12,20 @@
         .style-control-group .field-label {margin-bottom:5px;}
         .style-control-group .field-input {width:80px;padding:6px 8px;}
         .style-control-group .option-selector {width:140px;}
-        /* Checklist Styles */
-        .items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fdfdfd;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:15px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.checklist-section{display:none}
-        .spacer-type-selector { width: 220px !important; } /* Wider selector for spacer types */
+        /* List Item Styles (Checklist & Spacers) */
+        .items-container, .spacers-container {display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+        .item, .spacer-item {display:flex;align-items:center;background-color:#fdfdfd;padding:10px;border:1px solid #ddd;border-radius:6px;position:relative;}
+        .item-content, .spacer-content {flex-grow:1;}
+        .item-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+        .item-title {font-weight:bold;font-size:15px;margin:0;}
+        .spacer-title {font-weight:normal;font-size:14px;color:#333;}
+        .item-controls, .spacer-controls {display:flex;gap:8px;margin-left:15px;}
+        .item-control-btn, .spacer-control-btn {background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}
+        .item-control-btn:hover, .spacer-control-btn:hover {color:#0074d9}
+        .item-control-btn:disabled, .spacer-control-btn:disabled {color:#ccc;cursor:not-allowed}
+        .btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.checklist-section{display:none}
+        .add-spacer-controls { display: flex; gap: 10px; margin-top: 10px; }
+        .add-spacer-btn { flex: 1; font-size: 12px; padding: 6px 4px; }
     </style>
 </head>
 <body>
@@ -23,100 +34,53 @@
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">2 Column Story</h2>
         <div class="error-banner" id="errorBanner"></div>
-        
-        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
-            <div class="section-title">General Settings</div>
-            <div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option selected" data-color="black">Black</div><div class="color-option" data-color="red">Red</div></div></div>
-        </div>
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;"><div class="section-title">General Settings</div><div class="field-group"><label class="field-label">Background Colour</label><div class="color-selector" id="backgroundColorSelector"><div class="color-option selected" data-color="black">Black</div><div class="color-option" data-color="red">Red</div></div></div></div>
 
         <div class="column-wrapper">
             <!-- Left Column -->
             <div class="column">
                 <div class="section-title" style="margin-top:0;">Left Column</div>
-                <div class="field-group"><label for="left_imageUrl" class="field-label">Image URL</label><input type="url" id="left_imageUrl" class="field-input"><div class="field-error" id="left_imageUrlError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="left_imageUrl" class="field-label">Image URL</label><input type="url" id="left_imageUrl" class="field-input"></div>
                 <div class="field-group"><label for="left_imageAlt" class="field-label">Image Alt Text</label><input type="text" id="left_imageAlt" class="field-input"></div>
-                <div class="field-group"><label for="left_imageLink" class="field-label">Image Link URL</label><input type="url" id="left_imageLink" class="field-input"><div class="field-error" id="left_imageLinkError">Please enter a valid URL.</div></div>
+                <div class="field-group"><label for="left_imageLink" class="field-label">Image Link URL</label><input type="url" id="left_imageLink" class="field-input"></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showSubtitle" checked><span class="toggle-slider"></span></label><label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
-                <div class="field-group" id="left_subtitleGroup">
-                    <label for="left_subtitle" class="field-label">Subtitle</label><input type="text" id="left_subtitle" class="field-input">
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">Title</label><div id="left_titleEditor" class="quill-container limited-toolbar"></div>
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
-                </div>
+                <div class="field-group" id="left_subtitleGroup"><label for="left_subtitle" class="field-label">Subtitle</label><input type="text" id="left_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div class="field-group"><label class="field-label">Title</label><div id="left_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="left_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <div id="left_descriptionSection">
-                    <div class="field-group"><label class="field-label">Description</label><div id="left_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
-                </div>
+                <div id="left_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="left_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
                 <div id="left_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="left_itemsContainer" class="items-container"></div><button id="left_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
-                
-                <!-- NEW: Vertical Spacer Controls -->
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
-                <div class="field-group" style="margin-top:20px;">
-                    <label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacer (for Button Alignment)</label>
-                    <div class="style-controls-wrapper">
-                        <div class="style-control-group"><label for="left_spacerCount" class="field-label"># of Spacers</label><input type="number" id="left_spacerCount" class="field-input" min="0" max="10" step="1"></div>
-                        <div class="style-control-group"><label class="field-label">Spacer Type</label><div class="option-selector spacer-type-selector" id="left_spacerTypeSelector"><div class="option-button selected" data-value="all">All</div><div class="option-button" data-value="mso">Outlook</div><div class="option-button" data-value="not_mso">Non-Outlook</div></div></div>
-                    </div>
-                </div>
-
+                <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="left_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="left_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="left_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="left_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showButton" checked><span class="toggle-slider"></span></label><label for="left_showButton" class="checkbox-label">Show Button</label></div>
-                <div id="left_buttonFieldsGroup">
-                    <div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><input type="text" id="left_buttonText" class="field-input"></div>
-                    <div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"><div class="field-error" id="left_buttonLinkError">Please enter a valid URL.</div></div>
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
-                </div>
+                <div id="left_buttonFieldsGroup"><div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><input type="text" id="left_buttonText" class="field-input"></div><div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
             </div>
 
             <!-- Right Column -->
             <div class="column">
                 <div class="section-title" style="margin-top:0;">Right Column</div>
-                <div class="field-group"><label for="right_imageUrl" class="field-label">Image URL</label><input type="url" id="right_imageUrl" class="field-input"><div class="field-error" id="right_imageUrlError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="right_imageUrl" class="field-label">Image URL</label><input type="url" id="right_imageUrl" class="field-input"></div>
                 <div class="field-group"><label for="right_imageAlt" class="field-label">Image Alt Text</label><input type="text" id="right_imageAlt" class="field-input"></div>
-                <div class="field-group"><label for="right_imageLink" class="field-label">Image Link URL</label><input type="url" id="right_imageLink" class="field-input"><div class="field-error" id="right_imageLinkError">Please enter a valid URL.</div></div>
+                <div class="field-group"><label for="right_imageLink" class="field-label">Image Link URL</label><input type="url" id="right_imageLink" class="field-input"></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showSubtitle" checked><span class="toggle-slider"></span></label><label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
-                <div class="field-group" id="right_subtitleGroup">
-                    <label for="right_subtitle" class="field-label">Subtitle</label><input type="text" id="right_subtitle" class="field-input">
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">Title</label><div id="right_titleEditor" class="quill-container limited-toolbar"></div>
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
-                </div>
+                <div class="field-group" id="right_subtitleGroup"><label for="right_subtitle" class="field-label">Subtitle</label><input type="text" id="right_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div class="field-group"><label class="field-label">Title</label><div id="right_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="right_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <div id="right_descriptionSection">
-                    <div class="field-group"><label class="field-label">Description</label><div id="right_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
-                </div>
+                <div id="right_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="right_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
                 <div id="right_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="right_itemsContainer" class="items-container"></div><button id="right_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
-                
-                <!-- NEW: Vertical Spacer Controls -->
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
-                <div class="field-group" style="margin-top:20px;">
-                    <label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacer (for Button Alignment)</label>
-                    <div class="style-controls-wrapper">
-                        <div class="style-control-group"><label for="right_spacerCount" class="field-label"># of Spacers</label><input type="number" id="right_spacerCount" class="field-input" min="0" max="10" step="1"></div>
-                        <div class="style-control-group"><label class="field-label">Spacer Type</label><div class="option-selector spacer-type-selector" id="right_spacerTypeSelector"><div class="option-button selected" data-value="all">All</div><div class="option-button" data-value="mso">Outlook</div><div class="option-button" data-value="not_mso">Non-Outlook</div></div></div>
-                    </div>
-                </div>
-
+                <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="right_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="right_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="right_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="right_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showButton" checked><span class="toggle-slider"></span></label><label for="right_showButton" class="checkbox-label">Show Button</label></div>
-                <div id="right_buttonFieldsGroup">
-                    <div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><input type="text" id="right_buttonText" class="field-input"></div>
-                    <div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"><div class="field-error" id="right_buttonLinkError">Please enter a valid URL.</div></div>
-                    <div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div>
-                </div>
+                <div id="right_buttonFieldsGroup"><div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><input type="text" id="right_buttonText" class="field-input"></div><div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
             </div>
         </div>
     </div>
     
-    <template id="itemTemplate">
-        <div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div>
-    </template>
+    <template id="itemTemplate"><div class="item"><div class="item-content"><div class="item-header"><h3 class="item-title">Item</h3></div><div class="quill-container limited-toolbar"></div></div><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div></template>
+    <template id="spacerTemplate"><div class="spacer-item"><div class="spacer-content"><span class="spacer-title">Spacer</span></div><div class="spacer-controls"><button class="spacer-control-btn move-up-btn" title="Move Up">▲</button><button class="spacer-control-btn move-down-btn" title="Move Down">▼</button><button class="spacer-control-btn remove-btn" title="Remove Item">×</button></div></div></template>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
@@ -124,61 +88,57 @@
     <script>
         'use strict';
         const moduleConfig = {
-            name: '2 Column Story with Checklist',
+            name: '2 Column Story with Dynamic Spacers',
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'black' },
-                left_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
-                left_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
-                left_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                left_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image' },
+                left_imageAlt: { type: 'text', defaultValue: 'Story image' },
+                left_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 left_showSubtitle: { type: 'boolean', defaultValue: true },
-                left_subtitle: { type: 'text', defaultValue: 'M12 FHAC16-502X', maxLength: 80 },
+                left_subtitle: { type: 'text', defaultValue: 'M12 FHAC16-502X' },
                 left_subtitleFontSize: { type: 'number', defaultValue: 16 },
                 left_subtitleAlignment: { type: 'text', defaultValue: 'center' },
-                left_title: { type: 'richtext', defaultValue: 'Left Column Title', maxLength: 100 },
+                left_title: { type: 'richtext', defaultValue: 'Left Column Title' },
                 left_titleFontSize: { type: 'number', defaultValue: 20 },
                 left_titleAlignment: { type: 'text', defaultValue: 'center' },
                 left_contentType: { type: 'text', defaultValue: 'description' },
-                left_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', maxLength: 250 },
+                left_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.' },
                 left_descriptionFontSize: { type: 'number', defaultValue: 16 },
                 left_descriptionAlignment: { type: 'text', defaultValue: 'center' },
-                left_items: { type: 'list', defaultValue: [{ id: crypto.randomUUID(), text: 'Left item 1' }] },
-                left_spacerCount: { type: 'number', defaultValue: 0 },
-                left_spacerType: { type: 'text', defaultValue: 'all' },
+                left_items: { type: 'list', defaultValue: [] },
+                left_spacers: { type: 'list', defaultValue: [] },
                 left_showButton: { type: 'boolean', defaultValue: true },
-                left_buttonText: { type: 'text', defaultValue: 'Learn More', maxLength: 40 },
-                left_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                left_buttonText: { type: 'text', defaultValue: 'Learn More' },
+                left_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 left_buttonAlignment: { type: 'text', defaultValue: 'center' },
-                right_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image', validator: 'url' },
-                right_imageAlt: { type: 'text', defaultValue: 'Story image', maxLength: 150 },
-                right_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                right_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image' },
+                right_imageAlt: { type: 'text', defaultValue: 'Story image' },
+                right_imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 right_showSubtitle: { type: 'boolean', defaultValue: true },
-                right_subtitle: { type: 'text', defaultValue: 'M12 SIM-0', maxLength: 80 },
+                right_subtitle: { type: 'text', defaultValue: 'M12 SIM-0' },
                 right_subtitleFontSize: { type: 'number', defaultValue: 16 },
                 right_subtitleAlignment: { type: 'text', defaultValue: 'center' },
-                right_title: { type: 'richtext', defaultValue: 'Right Column Title', maxLength: 100 },
+                right_title: { type: 'richtext', defaultValue: 'Right Column Title' },
                 right_titleFontSize: { type: 'number', defaultValue: 20 },
                 right_titleAlignment: { type: 'text', defaultValue: 'center' },
                 right_contentType: { type: 'text', defaultValue: 'description' },
-                right_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.', maxLength: 250 },
+                right_description: { type: 'richtext', defaultValue: 'Sed vitae aliquet neque. Integer arcu nulla, dictum id ipsum quis, varius tempor dolor.' },
                 right_descriptionFontSize: { type: 'number', defaultValue: 16 },
                 right_descriptionAlignment: { type: 'text', defaultValue: 'center' },
-                right_items: { type: 'list', defaultValue: [{ id: crypto.randomUUID(), text: 'Right item 1' }] },
-                right_spacerCount: { type: 'number', defaultValue: 0 },
-                right_spacerType: { type: 'text', defaultValue: 'all' },
+                right_items: { type: 'list', defaultValue: [] },
+                right_spacers: { type: 'list', defaultValue: [] },
                 right_showButton: { type: 'boolean', defaultValue: true },
-                right_buttonText: { type: 'text', defaultValue: 'Find Out More', maxLength: 40 },
-                right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                right_buttonText: { type: 'text', defaultValue: 'Find Out More' },
+                right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 right_buttonAlignment: { type: 'text', defaultValue: 'center' }
             },
-            debounceDelay: 300,
-            maxRetries: 3
+            debounceDelay: 300, maxRetries: 3
         };
         const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
         const elements = {};
         const COLUMN_PREFIXES = ['left_', 'right_'];
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
             sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
@@ -189,8 +149,9 @@
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.itemTemplate = document.getElementById('itemTemplate');
+            elements.spacerTemplate = document.getElementById('spacerTemplate');
             COLUMN_PREFIXES.forEach(p => {
-                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'imageUrlError', 'imageLinkError', 'buttonLinkError', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacerCount', 'spacerTypeSelector'];
+                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
                 keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
             });
         }
@@ -201,18 +162,14 @@
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             COLUMN_PREFIXES.forEach(p => {
-                try {
-                    ['title', 'description'].forEach(type => {
-                        const editorId = p + type;
-                        const editorElement = elements[p + type + 'Editor'];
-                        const toolbarOptions = type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']];
-                        const formats = type === 'title' ? ['bold'] : ['bold', 'italic', 'link'];
-                        state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats, placeholder: `Enter ${type}...` });
-                        const debouncedUpdate = utils.debounce((d, o, source) => { if (source === 'user') updateData(editorId, utils.sanitizeHtml(state.editors[editorId].root.innerHTML)); }, moduleConfig.debounceDelay);
-                        state.editors[editorId].on('text-change', debouncedUpdate);
-                        state.editors[editorId].on('text-change', () => { const text = state.editors[editorId].getText(); const maxLength = moduleConfig.fields[editorId].maxLength; if (text.length > maxLength) state.editors[editorId].deleteText(maxLength, text.length); });
-                    });
-                } catch(error) { throw new Error(`Failed to initialize ${p} editors: ${error.message}`); }
+                ['title', 'description'].forEach(type => {
+                    const editorId = p + type;
+                    const editorElement = elements[p + type + 'Editor'];
+                    const toolbarOptions = type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']];
+                    state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'], placeholder: `Enter ${type}...` });
+                    const debouncedUpdate = utils.debounce(() => updateData(editorId, utils.sanitizeHtml(state.editors[editorId].root.innerHTML)), moduleConfig.debounceDelay);
+                    state.editors[editorId].on('text-change', debouncedUpdate);
+                });
             });
         }
         function processRichText(html, isDescription = false) {
@@ -239,8 +196,7 @@
             let contentHtml;
             if (contentType === 'checklist') {
                 const items = utils.getFieldValue(prefix + 'items');
-                const itemRowsHtml = items.map(item => `
-                    <tr><td valign="top" style="padding-bottom:8px;width:20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display:block;height:auto;outline:none;text-decoration:none;" width="20"></td><td valign="top" style="width:12px;padding-bottom:8px;"> </td><td class="mobile-text-left" valign="top" style="color:#ffffff;font-family:'Helvetica-Neue',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:24px;margin:0;mso-line-height-rule:exactly;text-align:left;padding-bottom:8px;">${processRichText(item.text,true)}</td></tr>`).join('');
+                const itemRowsHtml = items.map(item => `<tr><td valign="top" style="padding-bottom:8px;width:20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display:block;height:auto;outline:none;text-decoration:none;" width="20"></td><td valign="top" style="width:12px;padding-bottom:8px;"> </td><td class="mobile-text-left" valign="top" style="color:#ffffff;font-family:'Helvetica-Neue',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:24px;margin:0;mso-line-height-rule:exactly;text-align:left;padding-bottom:8px;">${processRichText(item.text,true)}</td></tr>`).join('');
                 contentHtml = `<tr><td style="padding:0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             } else {
                 const description = processRichText(utils.getFieldValue(prefix + 'description'), true);
@@ -250,21 +206,19 @@
                 contentHtml = `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${descriptionSize}px;font-weight:normal;line-height:${descriptionLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${descriptionAlign};mso-hyphenate:none;hyphens:none;">${description}</td></tr>`;
             }
             
-            let spacersHtml = '';
-            const spacerCount = utils.getFieldValue(prefix + 'spacerCount');
-            if (spacerCount > 0) {
-                const spacerType = utils.getFieldValue(prefix + 'spacerType');
-                let singleSpacer = '<br> ';
-                if (spacerType === 'mso') singleSpacer = '<!--[if mso]><br> <![endif]-->';
-                else if (spacerType === 'not_mso') singleSpacer = '<!--[if !mso]><!--><br> <!--<![endif]-->';
-                spacersHtml = Array(spacerCount).fill(singleSpacer).join('');
-            }
+            const spacers = utils.getFieldValue(prefix + 'spacers');
+            const spacersHtml = spacers.map(spacer => {
+                switch(spacer.type) {
+                    case 'mso': return '<!--[if mso]><br> <![endif]-->';
+                    case 'not_mso': return '<!--[if !mso]><!--><br> <!--<![endif]-->';
+                    default: return '<br> ';
+                }
+            }).join('');
             const spacerRowHtml = spacersHtml ? `<tr><td style="font-size:16px;line-height:16px;">${spacersHtml}</td></tr>` : '';
 
             const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${subtitleSize}px;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${subtitleAlign};mso-hyphenate:none;hyphens:none;">${subtitle}</td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>` : '';
             const buttonHtml = showButton ? `<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="${buttonAlign}" class="block" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;"><tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;"><a href="${buttonLink}" style="color:#ffffff;text-decoration:none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>` : '';
             const topSpacer = `<div style="font-size:12px;height:12px;line-height:12px;"> </div>`;
-            
             return `<td align="center" class="block" style="width:280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="280"></a></div></td></tr><tr><td align="center" style="padding-bottom:12px;padding-top:12px;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width:100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align:${titleAlign};"><h3 style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:${titleSize}px;font-stretch:condensed;font-weight:bold;line-height:${titleLineHeight}px;margin:0;text-transform:uppercase;">${title}</h3></td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>${contentHtml}${spacerRowHtml}${!showButton ? '<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
         }
         function generateTemplate() {
@@ -274,65 +228,101 @@
             return `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${bgColor};width:620px;"><tr><td class="side" style="width:20px;"> </td><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr>${leftColHtml}<td class="gap block" style="width:20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width:20px;"> </td></tr></table><!-- END .story-2col -->`;
         }
         function refreshPreview() { if (state.isLoading || !state.sdk) return; try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); } }
-        function renderItemsUI(prefix) {
-            const container = elements[prefix + 'itemsContainer'];
-            const items = utils.getFieldValue(prefix + 'items');
+        
+        function renderList(prefix, listType, templateId, renderQuill = false) {
+            const container = elements[prefix + listType + 'Container'];
+            const items = utils.getFieldValue(prefix + listType);
+            const template = elements[templateId];
             container.innerHTML = '';
+            
+            const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook Only' };
+
             items.forEach((item, index) => {
-                const itemFragment = elements.itemTemplate.content.cloneNode(true);
-                const itemEl = itemFragment.querySelector('.item');
-                const editorDiv = itemFragment.querySelector('.quill-container');
+                const itemFragment = template.content.cloneNode(true);
+                const itemEl = itemFragment.firstElementChild;
                 itemEl.dataset.id = item.id;
-                itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
+                
+                const titleEl = itemEl.querySelector('.item-title, .spacer-title');
+                if (listType === 'items') {
+                    titleEl.textContent = `Item ${index + 1}`;
+                } else { // spacers
+                    titleEl.textContent = `Spacer: ${typeLabels[item.type]}`;
+                }
+
                 itemEl.querySelector('.move-up-btn').disabled = index === 0;
                 itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
                 container.appendChild(itemFragment);
-                const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
-                editor.root.innerHTML = item.text || '';
-                state.editors[item.id] = editor;
-                const debouncedChecklistUpdate = utils.debounce(() => { const newItems = []; container.querySelectorAll('.item').forEach(el => { const id = el.dataset.id; if (state.editors[id]) newItems.push({ id, text: utils.sanitizeHtml(state.editors[id].root.innerHTML) }); }); updateData(prefix + 'items', newItems); }, moduleConfig.debounceDelay + 100);
-                editor.on('text-change', debouncedChecklistUpdate);
+
+                if (renderQuill) {
+                    const editorDiv = itemEl.querySelector('.quill-container');
+                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
+                    editor.root.innerHTML = item.text || '';
+                    state.editors[item.id] = editor;
+                    const debouncedUpdate = utils.debounce(() => { const newItems = []; container.querySelectorAll('.item').forEach(el => { const id = el.dataset.id; if (state.editors[id]) newItems.push({ id, text: utils.sanitizeHtml(state.editors[id].root.innerHTML) }); }); updateData(prefix + 'items', newItems); }, moduleConfig.debounceDelay + 100);
+                    editor.on('text-change', debouncedUpdate);
+                }
             });
         }
         function toggleContentTypeView(prefix, type) {
             elements[prefix + 'descriptionSection'].style.display = type === 'description' ? 'block' : 'none';
             elements[prefix + 'checklistSection'].style.display = type === 'checklist' ? 'block' : 'none';
-            if (type === 'checklist') renderItemsUI(prefix);
+            if (type === 'checklist') renderList(prefix, 'items', 'itemTemplate', true);
         }
         function initializeEventHandlers() {
             state.eventListeners = []; 
             function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', handler); state.eventListeners.push({ element: opt, event: 'click', handler }); }); }
-            function setupNumberInput(el, key, isFloat = false, step) { if (!el) return; const blurHandler = (e) => { const i = e.target; let v = isFloat ? parseFloat(i.value) : parseInt(i.value, 10); const min = isFloat ? parseFloat(i.min) : parseInt(i.min, 10); const max = isFloat ? parseFloat(i.max) : parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(max, v)); const corrected = step ? Math.round(v / step) * step : v; i.value = corrected; updateData(key, corrected); }; el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
+            function setupNumberInput(el, key) { if (!el) return; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; i.value = Math.max(min, Math.min(max, v)); updateData(key, parseInt(i.value)); }; el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             COLUMN_PREFIXES.forEach(p => {
-                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type], errEl = elements[p + type + 'Error'], fieldName = p + type, config = moduleConfig.fields[fieldName]; if(!el) return; const handler = (e) => { let value = e.target.value; if (config.validator === 'url' && !utils.isValidUrl(value)) return; if (config.maxLength) value = value.substring(0, config.maxLength); e.target.value = value; debouncedUpdateData(fieldName, value.trim()); }; el.addEventListener('input', handler); state.eventListeners.push({ element: el, event: 'input', handler }); if(config.validator === 'url') { const blurHandler = () => utils.isValidUrl(el.value, errEl); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); } });
-                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], fieldName = p + type, groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; const handler = (e) => { updateData(fieldName, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler }); });
-                setupNumberInput(elements[p + 'subtitleFontSize'], p + 'subtitleFontSize', false, 4);
-                setupNumberInput(elements[p + 'titleFontSize'], p + 'titleFontSize', false, 4);
-                setupNumberInput(elements[p + 'descriptionFontSize'], p + 'descriptionFontSize', false, 4);
-                setupNumberInput(elements[p + 'spacerCount'], p + 'spacerCount', false, 1);
-                ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment', 'spacerType'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type]; if(!el) return; const handler = (e) => { debouncedUpdateData(p + type, e.target.value.trim()); }; el.addEventListener('input', handler); state.eventListeners.push({ element: el, event: 'input', handler }); });
+                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; const handler = (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler }); });
+                ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => setupNumberInput(elements[p + type], p + type));
+                ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
-                elements[p + 'addItemBtn'].addEventListener('click', () => { const items = utils.getFieldValue(p + 'items'); items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); renderItemsUI(p); });
-                elements[p + 'itemsContainer'].addEventListener('click', (e) => { const itemEl = e.target.closest('.item'); if (!itemEl) return; const id = itemEl.dataset.id; const items = Array.from(utils.getFieldValue(p + 'items')); const idx = items.findIndex(i => i.id === id); let changed = false; if (e.target.closest('.remove-btn')) { items.splice(idx, 1); changed = true; } else if (e.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; changed = true; } else if (e.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; changed = true; } if(changed) { updateData(p + 'items', items); renderItemsUI(p); } });
+                elements[p + 'addItemBtn'].addEventListener('click', () => { const items = utils.getFieldValue(p + 'items'); items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); renderList(p, 'items', 'itemTemplate', true); });
+                elements[p + 'itemsContainer'].addEventListener('click', (e) => { handleListActions(e, p, 'items', 'itemTemplate', true); });
+                
+                // Spacer Handlers
+                elements[p + 'addSpacerAllBtn'].addEventListener('click', () => addSpacer(p, 'all'));
+                elements[p + 'addSpacerMsoBtn'].addEventListener('click', () => addSpacer(p, 'mso'));
+                elements[p + 'addSpacerNotMsoBtn'].addEventListener('click', () => addSpacer(p, 'not_mso'));
+                elements[p + 'spacersContainer'].addEventListener('click', (e) => { handleListActions(e, p, 'spacers', 'spacerTemplate', false); });
             });
         }
+        function addSpacer(prefix, type) {
+            const spacers = utils.getFieldValue(prefix + 'spacers');
+            spacers.push({ id: crypto.randomUUID(), type: type });
+            updateData(prefix + 'spacers', spacers);
+            renderList(prefix, 'spacers', 'spacerTemplate');
+        }
+        function handleListActions(event, prefix, listType, templateId, hasQuill) {
+            const itemEl = event.target.closest('.item, .spacer-item'); if (!itemEl) return;
+            const id = itemEl.dataset.id;
+            const items = Array.from(utils.getFieldValue(prefix + listType));
+            const idx = items.findIndex(i => i.id === id);
+            let changed = false;
+            if (event.target.closest('.remove-btn')) { items.splice(idx, 1); if(hasQuill) delete state.editors[id]; changed = true; } 
+            else if (event.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; changed = true; } 
+            else if (event.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; changed = true; }
+            if (changed) { updateData(prefix + listType, items); renderList(prefix, listType, templateId, hasQuill); }
+        }
         function loadData() {
-            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
+            if (!state.sdk) return;
             setLoadingState(true);
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
-                    COLUMN_PREFIXES.forEach(p => { if (state.blockData[p + 'items']) state.blockData[p + 'items'].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); });
+                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; });
+                    COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (state.blockData[p + listType]) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
                     document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
                     function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
                     COLUMN_PREFIXES.forEach(p => {
-                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize', 'spacerCount'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
+                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
                         ['title', 'description'].forEach(type => { if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); });
                         ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
-                        ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment', 'contentType', 'spacerType'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
+                        ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
                         toggleContentTypeView(p, utils.getFieldValue(p + 'contentType'));
+                        renderList(p, 'spacers', 'spacerTemplate');
                     });
                     refreshPreview();
                 } catch (error) { utils.showError(`Failed to load data: ${error.message}`); Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); refreshPreview(); } 
