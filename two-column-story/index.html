@@ -183,17 +183,33 @@
             if (!window.Quill) throw new Error('Quill library not loaded');
             COLUMN_PREFIXES.forEach(p => {
                 ['title', 'description'].forEach(type => {
-                    const editorId = p + type;
-                    const editorElement = elements[editorId];
+                    // *** FIX IS HERE ***
+                    const dataFieldKey = p + type; // e.g. 'left_title' (for data handling)
+                    const elementId = p + type + 'Editor'; // e.g. 'left_titleEditor' (for DOM lookup)
+                    
+                    const editorElement = elements[elementId]; // Use the correct key to find the DOM element
+                    // *** END FIX ***
+
+                    if (!editorElement) {
+                        throw new Error(`Invalid Quill container: #${elementId} not found.`);
+                    }
+
                     const quillOptions = {
                         theme: 'snow',
                         modules: { ...sharedEditorModules, toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] },
                         formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'],
                         placeholder: `Enter ${type}...`
                     };
+
                     const editor = new Quill(editorElement, quillOptions);
-                    state.editors.set(editorId, editor);
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => { if (source === 'user') { const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML; updateData(editorId, utils.sanitizeHtml(content)); } }, CONFIG.debounceDelay);
+                    state.editors.set(dataFieldKey, editor); // Store the editor instance with the data key
+
+                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                        if (source === 'user') {
+                            const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                            updateData(dataFieldKey, utils.sanitizeHtml(content)); // Update data with the data key
+                        }
+                    }, CONFIG.debounceDelay);
                     editor.on('text-change', debouncedUpdate);
                 });
             });
@@ -267,7 +283,7 @@
                 if (moveDownBtn) moveDownBtn.disabled = index === items.length - 1;
                 
                 if (hasQuill) {
-                    const editorDiv = itemEl.querySelector('.quill-container > div'); // CORRECTED SELECTOR
+                    const editorDiv = itemEl.querySelector('.quill-container > div');
                     const editor = new Quill(editorDiv, { theme: 'snow', modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
                     if (item.text && item.text.trim()) { editor.setContents([]); editor.clipboard.dangerouslyPasteHTML(item.text); }
                     state.editors.set(item.id, editor);
