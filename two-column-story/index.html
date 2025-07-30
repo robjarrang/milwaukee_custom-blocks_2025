@@ -3,17 +3,17 @@
 <head>
     <meta charset="utf-8">
     <title>2 Column Story Block (with Top Spacer)</title>
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease;contain:layout style}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.color-selector,.option-selector{display:flex;gap:10px}.color-option,.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover,.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected,.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px;contain:layout style paint size}.ql-toolbar{border:none !important;border-bottom:1px solid #ddd !important;border-radius:4px 4px 0 0;display:block !important;visibility:visible !important;}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px;display:block !important;visibility:visible !important;}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.limited-toolbar .ql-toolbar .ql-formats{margin-right:8px;}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.column-wrapper{display:flex;gap:20px;flex-wrap:wrap}.column{flex:1;min-width:300px;background-color:#fafafa;padding:15px;border-radius:6px;border:1px solid #eee}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.color-selector,.option-selector{display:flex;gap:10px}.color-option,.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover,.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected,.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.column-wrapper{display:flex;gap:20px;flex-wrap:wrap}.column{flex:1;min-width:300px;background-color:#fafafa;padding:15px;border-radius:6px;border:1px solid #eee}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
         .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
         .style-controls-wrapper {display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:15px;}
         .style-control-group .field-label {margin-bottom:5px;}
         .style-control-group .field-input {width:80px;padding:6px 8px;}
         .style-control-group .option-selector {width:140px;}
-        .items-container, .spacers-container {display:flex;flex-direction:column;gap:10px;margin-top:10px;contain:layout;}
-        .item {background-color:#fdfdfd;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative;contain:layout style paint;}
+        .items-container, .spacers-container {display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+        .item {background-color:#fdfdfd;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative;}
         .spacer-item {display:flex;align-items:center;background-color:#fdfdfd;padding:10px;border:1px solid #ddd;border-radius:6px;position:relative;}
         .spacer-content {flex-grow:1;}
         .item-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -26,12 +26,10 @@
         .btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.checklist-section{display:none}
         .add-spacer-controls { display: flex; gap: 10px; margin-top: 10px; }
         .add-spacer-btn { flex: 1; font-size: 12px; padding: 6px 4px; }
-        .save-indicator{position:fixed;top:10px;right:10px;background:#4CAF50;color:white;padding:5px 10px;border-radius:4px;font-size:12px;opacity:0;transition:opacity 0.3s; z-index: 10000;}.save-indicator.show{opacity:1}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-    <div class="save-indicator" id="saveIndicator">Saved</div>
     
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">2 Column Story</h2>
@@ -51,9 +49,9 @@
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showSubtitle" checked><span class="toggle-slider"></span></label><label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="left_subtitleGroup"><label for="left_subtitle" class="field-label">Subtitle</label><input type="text" id="left_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
-                <div class="field-group"><label class="field-label">Title</label><div class="quill-container limited-toolbar"><div id="left_titleEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div class="field-group"><label class="field-label">Title</label><div id="left_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="left_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <div id="left_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div class="quill-container"><div id="left_descriptionEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
+                <div id="left_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="left_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
                 <div id="left_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="left_itemsContainer" class="items-container"></div><button id="left_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="left_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="left_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="left_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="left_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
@@ -70,9 +68,9 @@
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showSubtitle" checked><span class="toggle-slider"></span></label><label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="right_subtitleGroup"><label for="right_subtitle" class="field-label">Subtitle</label><input type="text" id="right_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
-                <div class="field-group"><label class="field-label">Title</label><div class="quill-container limited-toolbar"><div id="right_titleEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div class="field-group"><label class="field-label">Title</label><div id="right_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="right_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <div id="right_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div class="quill-container"><div id="right_descriptionEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
+                <div id="right_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="right_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
                 <div id="right_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="right_itemsContainer" class="items-container"></div><button id="right_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="right_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="right_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="right_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="right_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
@@ -82,24 +80,15 @@
             </div>
         </div>
     </div>
-    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn duplicate-btn" title="Duplicate">📋</button><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"><div></div></div></div></template>
+    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
     <template id="spacerTemplate"><div class="spacer-item"><div class="spacer-content"><span class="spacer-title">Spacer</span></div><div class="spacer-controls"><button class="spacer-control-btn remove-btn" title="Remove Item">×</button></div></div></template>
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
-        
-        const CONFIG = Object.freeze({
-            name: '2 Column Story with Top Spacer',
-            debounceDelay: 300,
-            maxRetries: 3,
-            colors: Object.freeze({ red: '#DB021D', black: '#000000' }),
-            checkmarkUrl: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png'
-        });
-        
         const moduleConfig = {
-            name: CONFIG.name,
+            name: '2 Column Story with Top Spacer',
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'black' },
                 left_imageUrl: { type: 'url', defaultValue: 'https://placehold.co/280x180/cccccc/333333?text=Image' },
@@ -143,259 +132,46 @@
                 right_buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 right_buttonAlignment: { type: 'text', defaultValue: 'center' }
             },
-            debounceDelay: CONFIG.debounceDelay,
-            maxRetries: CONFIG.maxRetries
+            debounceDelay: 300, maxRetries: 3
         };
-        
-        const state = { sdk: null, editors: new Map(), blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
         const elements = {};
-        const COLUMN_PREFIXES = Object.freeze(['left_', 'right_']);
-        let rafId = null;
-        
+        const COLUMN_PREFIXES = ['left_', 'right_'];
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
             sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
-            showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${CONFIG.name} Error:`, m); },
-            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
-            showSaveIndicator(text = 'Saved') { const indicator = elements.saveIndicator; if (indicator) { indicator.textContent = text; indicator.classList.add('show'); setTimeout(() => indicator.classList.remove('show'), 1500); } },
-            safeExecute(fn, fallback = null) { try { return fn(); } catch (error) { utils.showError(`Operation failed: ${error.message}`); return fallback; } }
+            showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
         };
-        
         function cacheElements() {
-            console.log('🗂️ Starting element caching...');
-            
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
-            elements.saveIndicator = document.getElementById('saveIndicator');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.spacerTemplate = document.getElementById('spacerTemplate');
-            
-            console.log('📦 Core elements cached:', {
-                mainContainer: !!elements.mainContainer,
-                loadingOverlay: !!elements.loadingOverlay,
-                errorBanner: !!elements.errorBanner,
-                saveIndicator: !!elements.saveIndicator,
-                backgroundColorSelector: !!elements.backgroundColorSelector,
-                itemTemplate: !!elements.itemTemplate,
-                spacerTemplate: !!elements.spacerTemplate
-            });
-            
             COLUMN_PREFIXES.forEach(p => {
-                console.log(`\n🔄 Caching elements for prefix: ${p}`);
                 const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
-                
-                const prefixElements = {};
-                keys.forEach(k => { 
-                    const elementId = p + k;
-                    const element = document.getElementById(elementId);
-                    elements[elementId] = element;
-                    prefixElements[k] = !!element;
-                    
-                    if (!element) {
-                        console.warn(`⚠️ Element not found: ${elementId}`);
-                    }
-                });
-                
-                console.log(`📋 ${p} elements:`, prefixElements);
-                
-                // Special check for editor elements
-                const titleEditorKey = p + 'titleEditor';
-                const descriptionEditorKey = p + 'descriptionEditor';
-                console.log(`🎨 Editor elements check:`);
-                console.log(`  ${titleEditorKey}: ${!!elements[titleEditorKey]} (DOM: ${!!document.getElementById(titleEditorKey)})`);
-                console.log(`  ${descriptionEditorKey}: ${!!elements[descriptionEditorKey]} (DOM: ${!!document.getElementById(descriptionEditorKey)})`);
+                keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
             });
-            
-            console.log('✅ Element caching complete!');
-            console.log('📊 Total cached elements:', Object.keys(elements).length);
         }
-        
-        function setLoadingState(loading) { state.isLoading = loading; if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); } }
-        
-        const sharedEditorModules = { clipboard: { matchVisual: false } };
-        
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
+        }
         function initializeEditors() {
-            console.log('🎯 Starting editor initialization...');
-            console.log('✅ Quill available:', !!window.Quill);
-            
-            if (!window.Quill) {
-                console.error('❌ Quill library not loaded');
-                throw new Error('Quill library not loaded');
-            }
-            
-            console.log('📝 Column prefixes:', COLUMN_PREFIXES);
-            console.log('🗂️ Available elements keys:', Object.keys(elements));
-            
+            if (!window.Quill) throw new Error('Quill library not loaded');
             COLUMN_PREFIXES.forEach(p => {
-                console.log(`\n🔄 Processing column prefix: ${p}`);
                 ['title', 'description'].forEach(type => {
-                    const dataFieldKey = p + type; // e.g. 'left_title' (for data handling)
-                    const elementKey = p + type + 'Editor'; // e.g. 'left_titleEditor' (for elements object lookup)
-                    
-                    console.log(`  📌 Creating editor for type: ${type}`);
-                    console.log(`  🔑 Data field key: ${dataFieldKey}`);
-                    console.log(`  🎨 Element key: ${elementKey}`);
-                    
-                    const editorElement = elements[elementKey]; // Use the correct key to find the DOM element
-                    console.log(`  🎯 Found element:`, !!editorElement, editorElement);
-
-                    if (!editorElement) {
-                        console.error(`❌ Editor element not found for key: ${elementKey}`);
-                        console.error(`❌ Available element keys:`, Object.keys(elements));
-                        throw new Error(`Invalid Quill container: #${elementKey} not found.`);
-                    }
-
-                    // Check if Quill is already initialized on this element
-                    if (editorElement.__quill) {
-                        console.warn(`⚠️ Quill already initialized on ${elementKey}, destroying existing instance`);
-                        editorElement.__quill = null;
-                        // Clear the element content to reset it
-                        editorElement.innerHTML = '';
-                        editorElement.className = editorElement.className.replace(/ql-\S+/g, '').trim();
-                    }
-
-                    // Check element classes and structure BEFORE initialization
-                    console.log(`  🔍 Element classes before init: "${editorElement.className}"`);
-                    console.log(`  🔍 Element innerHTML before init: "${editorElement.innerHTML}"`);
-                    console.log(`  🔍 Element parent: ${editorElement.parentElement?.tagName}.${editorElement.parentElement?.className}`);
-                    
-                    // Check if element is visible
-                    const computedStyle = window.getComputedStyle(editorElement);
-                    console.log(`  👁️ Element visibility: display=${computedStyle.display}, visibility=${computedStyle.visibility}, opacity=${computedStyle.opacity}`);
-                    console.log(`  📐 Element dimensions: ${editorElement.offsetWidth}x${editorElement.offsetHeight}`);
-                    console.log(`  📍 Element position: ${editorElement.offsetTop}, ${editorElement.offsetLeft}`);
-
-                    // Determine if this is a limited toolbar (title editors)
-                    const isLimitedToolbar = editorElement.parentElement?.classList.contains('limited-toolbar');
-                    console.log(`  🎛️ Is limited toolbar: ${isLimitedToolbar}`);
-
-                    const quillOptions = {
-                        theme: 'snow',
-                        modules: { 
-                            ...sharedEditorModules, 
-                            toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']]
-                        },
-                        formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'],
-                        placeholder: `Enter ${type}...`
-                    };
-                    
-                    console.log(`  ⚙️ Quill options:`, quillOptions);
-
-                    try {
-                        // Ensure the element has minimum height for proper initialization
-                        if (editorElement.offsetHeight === 0) {
-                            console.log(`  📏 Setting minimum height for initialization`);
-                            editorElement.style.minHeight = '60px';
-                        }
-
-                        const editor = new Quill(editorElement, quillOptions);
-                        console.log(`  ✅ Successfully created Quill editor for ${elementKey}`);
-                        console.log(`  🔍 Editor root element:`, editor.root);
-                        console.log(`  🔍 Editor container:`, editor.container);
-                        
-                        // Force toolbar creation if missing
-                        let toolbar = editorElement.querySelector('.ql-toolbar');
-                        if (!toolbar) {
-                            console.log(`  🔧 Toolbar not found, attempting to create manually`);
-                            // Try to get the toolbar from Quill's module
-                            const toolbarModule = editor.getModule('toolbar');
-                            if (toolbarModule && toolbarModule.container) {
-                                toolbar = toolbarModule.container;
-                                console.log(`  🔧 Found toolbar via module:`, toolbar);
-                            }
-                        }
-                        
-                        // Check post-initialization state
-                        console.log(`  🔍 Element classes after init: "${editorElement.className}"`);
-                        console.log(`  🔍 Element innerHTML after init: "${editorElement.innerHTML.substring(0, 150)}..."`);
-                        
-                        // Check if the toolbar and editor are visible
-                        toolbar = editorElement.querySelector('.ql-toolbar');
-                        const editorDiv = editorElement.querySelector('.ql-editor');
-                        console.log(`  🔧 Toolbar found: ${!!toolbar}, visible: ${toolbar ? window.getComputedStyle(toolbar).display !== 'none' : false}`);
-                        console.log(`  ✏️ Editor div found: ${!!editorDiv}, visible: ${editorDiv ? window.getComputedStyle(editorDiv).display !== 'none' : false}`);
-                        
-                        // If toolbar is still missing, try to recreate the editor
-                        if (!toolbar) {
-                            console.log(`  🔄 Toolbar still missing, attempting recreation with explicit container setup`);
-                            // Clear and recreate
-                            editorElement.innerHTML = '';
-                            const newEditor = new Quill(editorElement, {
-                                ...quillOptions,
-                                debug: 'warn' // Enable debug mode
-                            });
-                            
-                            // Check again
-                            toolbar = editorElement.querySelector('.ql-toolbar');
-                            console.log(`  🔧 After recreation - Toolbar found: ${!!toolbar}`);
-                            
-                            state.editors.set(dataFieldKey, newEditor);
-                        } else {
-                            state.editors.set(dataFieldKey, editor);
-                        }
-                        
-                        console.log(`  💾 Stored editor with key: ${dataFieldKey}`);
-
-                        const finalEditor = state.editors.get(dataFieldKey);
-                        const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                            if (source === 'user') {
-                                console.log(`  📝 Text change detected in ${dataFieldKey}`);
-                                const content = finalEditor.getSemanticHTML ? finalEditor.getSemanticHTML() : finalEditor.root.innerHTML;
-                                updateData(dataFieldKey, utils.sanitizeHtml(content)); // Update data with the data key
-                            }
-                        }, CONFIG.debounceDelay);
-                        finalEditor.on('text-change', debouncedUpdate);
-                        console.log(`  🔗 Event listener attached for ${dataFieldKey}`);
-                        
-                        // Force a repaint to ensure visibility
-                        setTimeout(() => {
-                            console.log(`  🔄 Forcing repaint for ${elementKey}`);
-                            const currentDisplay = editorElement.style.display;
-                            editorElement.style.display = 'none';
-                            editorElement.offsetHeight; // Force reflow
-                            editorElement.style.display = currentDisplay || '';
-                            
-                            // Double-check visibility after timeout
-                            const newStyle = window.getComputedStyle(editorElement);
-                            console.log(`  🔄 After repaint - display: ${newStyle.display}, visibility: ${newStyle.visibility}, height: ${editorElement.offsetHeight}px`);
-                            
-                            // Final toolbar check
-                            const finalToolbar = editorElement.querySelector('.ql-toolbar');
-                            console.log(`  🔧 Final toolbar check: ${!!finalToolbar}`);
-                        }, 100);
-                        
-                    } catch (error) {
-                        console.error(`❌ Failed to create Quill editor for ${elementKey}:`, error);
-                        throw error;
-                    }
+                    const editorId = p + type;
+                    const editorElement = elements[p + type + 'Editor'];
+                    const toolbarOptions = type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']];
+                    state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'], placeholder: `Enter ${type}...` });
+                    const debouncedUpdate = utils.debounce(() => updateData(editorId, utils.sanitizeHtml(state.editors[editorId].root.innerHTML)), moduleConfig.debounceDelay);
+                    state.editors[editorId].on('text-change', debouncedUpdate);
                 });
             });
-            
-            console.log(`\n✅ Editor initialization complete! Created ${state.editors.size} editors.`);
-            console.log('📊 Editor state map:', Array.from(state.editors.keys()));
-            
-            // Final visibility check for all editors
-            setTimeout(() => {
-                console.log('\n🔍 Final editor visibility check:');
-                COLUMN_PREFIXES.forEach(p => {
-                    ['title', 'description'].forEach(type => {
-                        const elementKey = p + type + 'Editor';
-                        const element = elements[elementKey];
-                        if (element) {
-                            const style = window.getComputedStyle(element);
-                            const toolbar = element.querySelector('.ql-toolbar');
-                            const editor = element.querySelector('.ql-editor');
-                            console.log(`  ${elementKey}: display=${style.display}, height=${element.offsetHeight}px, toolbar=${!!toolbar}, editor=${!!editor}`);
-                            if (toolbar) console.log(`    toolbar display=${window.getComputedStyle(toolbar).display}, height=${toolbar.offsetHeight}px`);
-                            if (editor) console.log(`    editor display=${window.getComputedStyle(editor).display}, height=${editor.offsetHeight}px`);
-                        }
-                    });
-                });
-            }, 200);
         }
-        
         function processRichText(html, isDescription = false) {
             if (!html) return '';
             const temp = document.createElement('div');
@@ -403,10 +179,10 @@
             if (isDescription) { temp.querySelectorAll('a').forEach(link => { if (!link.style.color) link.style.color = '#ffffff'; link.style.textDecoration = 'underline'; if (!link.getAttribute('href')) link.setAttribute('href', '#'); }); }
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
-        
-        function updateData(field, value) { if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); } }
-        const debouncedUpdateData = utils.debounce(updateData, CONFIG.debounceDelay);
-        
+        function updateData(field, value) {
+            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); }
+        }
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
         function generateColumnHtml(prefix) {
             const imageUrl = utils.getFieldValue(prefix + 'imageUrl'), imageAlt = utils.getFieldValue(prefix + 'imageAlt'), imageLink = utils.getFieldValue(prefix + 'imageLink');
             const showSubtitle = utils.getFieldValue(prefix + 'showSubtitle'), subtitle = utils.getFieldValue(prefix + 'subtitle');
@@ -416,225 +192,164 @@
             const subtitleSize = utils.getFieldValue(prefix + 'subtitleFontSize'), titleSize = utils.getFieldValue(prefix + 'titleFontSize');
             const subtitleAlign = utils.getFieldValue(prefix + 'subtitleAlignment'), titleAlign = utils.getFieldValue(prefix + 'titleAlignment'), buttonAlign = utils.getFieldValue(prefix + 'buttonAlignment');
             const subtitleLineHeight = subtitleSize + 12, titleLineHeight = titleSize + 8;
+            
             const spacers = utils.getFieldValue(prefix + 'spacers');
-            const spacersHtml = spacers.map(spacer => { const spacerContent = '<br class="mobile-hide"> '; switch(spacer.type) { case 'mso': return `<!--[if mso]>${spacerContent}<![endif]-->`; case 'not_mso': return `<!--[if !mso]><!-->${spacerContent}<!--<![endif]-->`; default: return spacerContent; } }).join('');
+            const spacersHtml = spacers.map(spacer => {
+                const spacerContent = '<br class="mobile-hide"> ';
+                switch(spacer.type) {
+                    case 'mso': return `<!--[if mso]>${spacerContent}<![endif]-->`;
+                    case 'not_mso': return `<!--[if !mso]><!-->${spacerContent}<!--<![endif]-->`;
+                    default: return spacerContent;
+                }
+            }).join('');
+
             let contentHtml;
             if (contentType === 'checklist') {
                 const items = utils.getFieldValue(prefix + 'items');
-                const itemRowsHtml = items.map(item => `<tr><td valign="top" style="padding-bottom:8px;width:20px;"><img alt="Checkmark" src="${CONFIG.checkmarkUrl}" style="display:block;height:auto;outline:none;text-decoration:none;" width="20"></td><td valign="top" style="width:12px;padding-bottom:8px;"> </td><td class="mobile-text-left" valign="top" style="color:#ffffff;font-family:'Helvetica-Neue',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:24px;margin:0;mso-line-height-rule:exactly;text-align:left;padding-bottom:8px;">${processRichText(item.text,true)}</td></tr>`).join('');
+                const itemRowsHtml = items.map(item => `<tr><td valign="top" style="padding-bottom:8px;width:20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display:block;height:auto;outline:none;text-decoration:none;" width="20"></td><td valign="top" style="width:12px;padding-bottom:8px;"> </td><td class="mobile-text-left" valign="top" style="color:#ffffff;font-family:'Helvetica-Neue',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:24px;margin:0;mso-line-height-rule:exactly;text-align:left;padding-bottom:8px;">${processRichText(item.text,true)}</td></tr>`).join('');
                 contentHtml = `<tr><td style="padding:0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table>${spacersHtml}</td></tr>`;
             } else {
                 const description = processRichText(utils.getFieldValue(prefix + 'description'), true);
-                const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize'), descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment'), descriptionLineHeight = descriptionSize + 8;
+                const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize');
+                const descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment');
+                const descriptionLineHeight = descriptionSize + 8;
                 contentHtml = `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${descriptionSize}px;font-weight:normal;line-height:${descriptionLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${descriptionAlign};mso-hyphenate:none;hyphens:none;">${description}${spacersHtml}</td></tr>`;
             }
+
             const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${subtitleSize}px;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${subtitleAlign};mso-hyphenate:none;hyphens:none;">${subtitle}</td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>` : '';
             const buttonHtml = showButton ? `<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="${buttonAlign}" class="block" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;"><tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;"><a href="${buttonLink}" style="color:#ffffff;text-decoration:none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>` : '';
             const topSpacer = `<div style="font-size:12px;height:12px;line-height:12px;"> </div>`;
             return `<td align="center" class="block" style="width:280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="280"></a></div></td></tr><tr><td align="center" style="padding-bottom:12px;padding-top:12px;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width:100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align:${titleAlign};"><h3 style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:${titleSize}px;font-stretch:condensed;font-weight:bold;line-height:${titleLineHeight}px;margin:0;text-transform:uppercase;">${title}</h3></td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>${contentHtml}${!showButton ? '<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
         }
-        
         function generateTemplate() {
-            const backgroundColor = utils.getFieldValue('backgroundColor');
-            const bgColor = CONFIG.colors[backgroundColor] || CONFIG.colors.black;
+            const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
             const topSpacerHtml = `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;"><tr><td><div style="font-size:20px;height:20px;line-height:20px;margin:0px;mso-line-height-rule:exactly;padding:0px;"> </div></td></tr></table><!-- END .fw-spacer -->`;
             const leftColHtml = generateColumnHtml('left_');
             const rightColHtml = generateColumnHtml('right_');
             const mainContentHtml = `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${bgColor};width:620px;"><tr><td class="side" style="width:20px;"> </td><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr>${leftColHtml}<td class="gap block" style="width:20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width:20px;"> </td></tr></table><!-- END .story-2col -->`;
             return topSpacerHtml + mainContentHtml;
         }
-
-        function refreshPreview() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(() => { if (state.isLoading || !state.sdk) return; utils.safeExecute(() => { utils.showSaveIndicator('Saving...'); const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } setTimeout(() => utils.showSaveIndicator('Saved'), 250); }); }); }
-        
+        function refreshPreview() { if (state.isLoading || !state.sdk) return; try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); } }
         function renderList(prefix, listType, templateId, hasQuill) {
             const container = elements[prefix + listType + 'Container'];
             const items = utils.getFieldValue(prefix + listType);
             const template = elements[templateId];
-            const fragment = document.createDocumentFragment();
+            container.innerHTML = '';
             const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook' };
             items.forEach((item, index) => {
                 const itemFragment = template.content.cloneNode(true);
                 const itemEl = itemFragment.firstElementChild;
                 itemEl.dataset.id = item.id;
                 const titleEl = itemEl.querySelector('.item-title, .spacer-title');
-                if (listType === 'items') { titleEl.textContent = `Item ${index + 1}`; } else { titleEl.textContent = `Spacer: ${typeLabels[item.type]}`; }
+                if (listType === 'items') { titleEl.textContent = `Item ${index + 1}`; } 
+                else { titleEl.textContent = `Spacer: ${typeLabels[item.type]}`; }
                 const moveUpBtn = itemEl.querySelector('.move-up-btn');
                 if (moveUpBtn) moveUpBtn.disabled = index === 0;
                 const moveDownBtn = itemEl.querySelector('.move-down-btn');
                 if (moveDownBtn) moveDownBtn.disabled = index === items.length - 1;
-                
+                container.appendChild(itemFragment);
                 if (hasQuill) {
-                    const editorDiv = itemEl.querySelector('.quill-container > div');
-                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
-                    if (item.text && item.text.trim()) { editor.setContents([]); editor.clipboard.dangerouslyPasteHTML(item.text); }
-                    state.editors.set(item.id, editor);
-                    const debouncedUpdate = utils.debounce(() => {
-                        const newItems = Array.from(container.querySelectorAll('.item')).map(el => {
-                            const id = el.dataset.id;
-                            const currentEditor = state.editors.get(id);
-                            return currentEditor ? { id, text: utils.sanitizeHtml(currentEditor.getSemanticHTML ? currentEditor.getSemanticHTML() : currentEditor.root.innerHTML) } : null;
-                        }).filter(Boolean);
-                        updateData(prefix + 'items', newItems);
-                    }, CONFIG.debounceDelay + 100);
+                    const editorDiv = itemEl.querySelector('.quill-container');
+                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
+                    editor.root.innerHTML = item.text || '';
+                    state.editors[item.id] = editor;
+                    const debouncedUpdate = utils.debounce(() => { const newItems = []; container.querySelectorAll('.item').forEach(el => { const id = el.dataset.id; if (state.editors[id]) newItems.push({ id, text: utils.sanitizeHtml(state.editors[id].root.innerHTML) }); }); updateData(prefix + 'items', newItems); }, moduleConfig.debounceDelay + 100);
                     editor.on('text-change', debouncedUpdate);
                 }
-                fragment.appendChild(itemEl);
             });
-            container.replaceChildren(fragment);
         }
-        
         function toggleContentTypeView(prefix, type) {
             elements[prefix + 'descriptionSection'].style.display = type === 'description' ? 'block' : 'none';
             elements[prefix + 'checklistSection'].style.display = type === 'checklist' ? 'block' : 'none';
-            if (type === 'checklist') { if(utils.getFieldValue(prefix + 'items').length === 0) { updateData(prefix + 'items', [{id: crypto.randomUUID(), text: 'New Item'}]); } renderList(prefix, 'items', 'itemTemplate', true); }
+            if (type === 'checklist') renderList(prefix, 'items', 'itemTemplate', true);
         }
-        
-        const itemActions = {
-            '.remove-btn': (items, idx, id) => { items.splice(idx, 1); const editor = state.editors.get(id); if (editor && editor.off) editor.off('text-change'); state.editors.delete(id); return true; },
-            '.move-up-btn': (items, idx) => { if (idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; return true; } return false; },
-            '.move-down-btn': (items, idx) => { if (idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; return true; } return false; },
-            '.duplicate-btn': (items, idx) => { const currentItem = items[idx]; const editor = state.editors.get(currentItem.id); const currentText = editor ? utils.sanitizeHtml(editor.getSemanticHTML()) : currentItem.text; items.splice(idx + 1, 0, { id: crypto.randomUUID(), text: currentText }); return true; }
-        };
-        
         function initializeEventHandlers() {
             state.eventListeners = []; 
-            const addListener = (el, evt, handler) => { el.addEventListener(evt, handler); state.eventListeners.push({ element: el, event: evt, handler }); };
-            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button, .color-option').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; const value = btn.dataset.value || btn.dataset.color; updateData(key, value); el.querySelectorAll('.option-button, .color-option').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(value); }; addListener(opt, 'click', handler); }); }
-            function setupNumberInput(el, key) { if (!el) return; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; i.value = Math.max(min, Math.min(max, v)); updateData(key, parseInt(i.value)); }; addListener(el, 'blur', blurHandler); }
+            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', handler); state.eventListeners.push({ element: opt, event: 'click', handler }); }); }
+            function setupNumberInput(el, key) { if (!el) return; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; i.value = Math.max(min, Math.min(max, v)); updateData(key, parseInt(i.value)); }; el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             COLUMN_PREFIXES.forEach(p => {
-                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type]; if(!el) return; addListener(el, 'input', (e) => debouncedUpdateData(p + type, e.target.value.trim())); });
-                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; addListener(el, 'change', (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }); });
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type]; if(!el) return; const handler = (e) => { debouncedUpdateData(p + type, e.target.value.trim()); }; el.addEventListener('input', handler); state.eventListeners.push({ element: el, event: 'input', handler }); });
+                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; const handler = (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', handler); state.eventListeners.push({ element: el, event: 'change', handler }); });
                 ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => setupNumberInput(elements[p + type], p + type));
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
-                addListener(elements[p + 'addItemBtn'], 'click', () => { handleListActions({ target: { closest: () => true } }, p, 'items', true, 'add'); });
-                addListener(elements[p + 'itemsContainer'], 'click', (e) => { handleListActions(e, p, 'items', true); });
-                addListener(elements[p + 'addSpacerAllBtn'], 'click', () => addSpacer(p, 'all'));
-                addListener(elements[p + 'addSpacerMsoBtn'], 'click', () => addSpacer(p, 'mso'));
-                addListener(elements[p + 'addSpacerNotMsoBtn'], 'click', () => addSpacer(p, 'not_mso'));
-                addListener(elements[p + 'spacersContainer'], 'click', (e) => { handleListActions(e, p, 'spacers', false); });
+                elements[p + 'addItemBtn'].addEventListener('click', () => { handleListActions({ target: { closest: () => true } }, p, 'items', 'itemTemplate', true, 'add'); });
+                elements[p + 'itemsContainer'].addEventListener('click', (e) => { handleListActions(e, p, 'items', 'itemTemplate', true); });
+                elements[p + 'addSpacerAllBtn'].addEventListener('click', () => addSpacer(p, 'all'));
+                elements[p + 'addSpacerMsoBtn'].addEventListener('click', () => addSpacer(p, 'mso'));
+                elements[p + 'addSpacerNotMsoBtn'].addEventListener('click', () => addSpacer(p, 'not_mso'));
+                elements[p + 'spacersContainer'].addEventListener('click', (e) => { handleListActions(e, p, 'spacers', 'spacerTemplate', false); });
             });
         }
-        
-        function addSpacer(prefix, type) { const currentSpacers = utils.getFieldValue(prefix + 'spacers'); const newSpacers = [...currentSpacers, { id: crypto.randomUUID(), type: type }]; updateData(prefix + 'spacers', newSpacers); renderList(prefix, 'spacers', 'spacerTemplate', false); }
-
-        function handleListActions(event, prefix, listType, hasQuill, forceAction) {
-            const listKey = prefix + listType;
-            const currentItems = [...utils.getFieldValue(listKey)];
-            const containerSelector = listType === 'items' ? '.item' : '.spacer-item';
-            const templateId = listType === 'items' ? 'itemTemplate' : 'spacerTemplate';
-            let changed = false;
-            if (forceAction === 'add') { currentItems.push({ id: crypto.randomUUID(), text: 'New Item' }); changed = true;
-            } else {
-                const itemEl = event.target.closest(containerSelector); if (!itemEl) return;
-                const id = itemEl.dataset.id;
-                const idx = currentItems.findIndex(i => i.id === id); if (idx === -1) return;
-                if (listType === 'items') { for (const [selector, action] of Object.entries(itemActions)) { if (event.target.closest(selector)) { changed = action(currentItems, idx, id); break; } }
-                } else if (event.target.closest('.remove-btn')) { currentItems.splice(idx, 1); changed = true; }
-            }
-            if (changed) { updateData(listKey, currentItems); renderList(prefix, listType, templateId, hasQuill); }
+        function addSpacer(prefix, type) {
+            const currentSpacers = utils.getFieldValue(prefix + 'spacers');
+            const newSpacers = [...currentSpacers, { id: crypto.randomUUID(), type: type }];
+            updateData(prefix + 'spacers', newSpacers);
+            renderList(prefix, 'spacers', 'spacerTemplate');
         }
-        
+        function handleListActions(event, prefix, listType, templateId, hasQuill, action) {
+            const currentItems = utils.getFieldValue(prefix + listType);
+            let newItems = [...currentItems];
+            if (action === 'add') {
+                newItems.push({ id: crypto.randomUUID(), text: 'New Item' });
+                updateData(prefix + listType, newItems);
+                renderList(prefix, listType, templateId, hasQuill);
+                return;
+            }
+            const itemEl = event.target.closest('.item, .spacer-item'); if (!itemEl) return;
+            const id = itemEl.dataset.id;
+            const idx = newItems.findIndex(i => i.id === id);
+            if (event.target.closest('.remove-btn')) { newItems.splice(idx, 1); if(hasQuill) delete state.editors[id]; } 
+            else if (event.target.closest('.move-up-btn') && idx > 0) { [newItems[idx], newItems[idx - 1]] = [newItems[idx - 1], newItems[idx]]; } 
+            else if (event.target.closest('.move-down-btn') && idx < newItems.length - 1) { [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]]; }
+            else { return; }
+            updateData(prefix + listType, newItems);
+            renderList(prefix, listType, templateId, hasQuill);
+        }
         function loadData() {
             if (!state.sdk) return;
             setLoadingState(true);
             state.sdk.getData((data) => {
-                utils.safeExecute(() => {
+                try {
                     state.blockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => { let value = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; if (moduleConfig.fields[key].type === 'richtext') value = utils.sanitizeHtml(value); state.blockData[key] = value; });
-                    COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (Array.isArray(state.blockData[p + listType])) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
+                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; });
+                    COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (state.blockData[p + listType]) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
                     document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
                     function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
                     COLUMN_PREFIXES.forEach(p => {
                         ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
-                        ['title', 'description'].forEach(type => { const editor = state.editors.get(p + type); if (editor) { const content = utils.getFieldValue(p + type); editor.setContents([]); if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content); } });
+                        ['title', 'description'].forEach(type => { if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); });
                         ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
                         ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
-                        setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
                         toggleContentTypeView(p, utils.getFieldValue(p + 'contentType'));
                         renderList(p, 'spacers', 'spacerTemplate', false);
                     });
                     refreshPreview();
-                });
-                setLoadingState(false); 
+                } catch (error) { utils.showError(`Failed to load data: ${error.message}`); Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); refreshPreview(); } 
+                finally { setLoadingState(false); }
             });
         }
-        
-        function cleanup() { if(rafId) cancelAnimationFrame(rafId); state.editors.forEach(editor => editor && editor.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
-
+        function cleanup() { Object.values(state.editors).forEach(e => e && e.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
         function initializeWithRetry() {
-            console.log('🚀 Starting initialization attempt...', state.retryCount + 1);
-            
             try {
-                console.log('🔍 Checking dependencies...');
-                if (!window.sfdc || !window.sfdc.BlockSDK) {
-                    console.error('❌ BlockSDK not loaded');
-                    throw new Error('BlockSDK not loaded');
-                }
-                console.log('✅ BlockSDK available');
-                
-                if (!window.Quill) {
-                    console.error('❌ Quill not loaded');
-                    throw new Error('Quill not loaded');
-                }
-                console.log('✅ Quill available');
-                
-                console.log('🏗️ Creating BlockSDK instance...');
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                if (!window.Quill) throw new Error('Quill not loaded');
                 state.sdk = new window.sfdc.BlockSDK();
-                console.log('✅ BlockSDK instance created');
-                
-                console.log('🗂️ Caching elements...');
                 cacheElements();
-                
-                console.log('🎨 Initializing editors...');
                 initializeEditors();
-                
-                console.log('🔗 Setting up event handlers...');
                 initializeEventHandlers();
-                
-                console.log('📊 Loading data...');
                 loadData();
-                
-                console.log('🧹 Setting up cleanup...');
                 window.addEventListener('beforeunload', cleanup);
-                
                 state.isInitialized = true;
-                console.log('🎉 Initialization completed successfully!');
-                
             } catch (error) {
-                console.error('💥 Initialization failed:', error);
-                console.error('📍 Error stack:', error.stack);
-                
-                utils.showError(`Initialization failed: ${error.message}`, true);
-                if (state.retryCount < CONFIG.maxRetries) { 
-                    state.retryCount++;
-                    console.log(`🔄 Retrying initialization in ${state.retryCount} seconds... (attempt ${state.retryCount}/${CONFIG.maxRetries})`);
-                    setTimeout(initializeWithRetry, 1000 * state.retryCount); 
-                } else {
-                    console.error('❌ Max retries reached. Initialization failed permanently.');
-                }
+                utils.showError(`Initialization failed: ${error.message}`);
+                if (state.retryCount < moduleConfig.maxRetries) { state.retryCount++; setTimeout(initializeWithRetry, 1000 * state.retryCount); } 
+                else { utils.showError('Failed to initialize after multiple attempts. Please refresh.', true); }
                 setLoadingState(false);
             }
         }
-        
-        console.log('📜 Script loaded. Document state:', document.readyState);
-        console.log('🌐 Available globals:', {
-            sfdc: !!window.sfdc,
-            BlockSDK: !!(window.sfdc && window.sfdc.BlockSDK),
-            Quill: !!window.Quill
-        });
-        
-        if (document.readyState === 'loading') { 
-            console.log('⏳ Document still loading, waiting for DOMContentLoaded...');
-            document.addEventListener('DOMContentLoaded', () => {
-                console.log('📄 DOMContentLoaded fired, starting initialization...');
-                initializeWithRetry();
-            }); 
-        } else { 
-            console.log('📄 Document already ready, starting initialization immediately...');
-            initializeWithRetry(); 
-        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
     </script>
 </body>
 </html>
