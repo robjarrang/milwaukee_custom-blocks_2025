@@ -162,6 +162,8 @@
         };
         
         function cacheElements() {
+            console.log('🗂️ Starting element caching...');
+            
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
@@ -169,10 +171,45 @@
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.spacerTemplate = document.getElementById('spacerTemplate');
-            COLUMN_PREFIXES.forEach(p => {
-                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
-                keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
+            
+            console.log('📦 Core elements cached:', {
+                mainContainer: !!elements.mainContainer,
+                loadingOverlay: !!elements.loadingOverlay,
+                errorBanner: !!elements.errorBanner,
+                saveIndicator: !!elements.saveIndicator,
+                backgroundColorSelector: !!elements.backgroundColorSelector,
+                itemTemplate: !!elements.itemTemplate,
+                spacerTemplate: !!elements.spacerTemplate
             });
+            
+            COLUMN_PREFIXES.forEach(p => {
+                console.log(`\n🔄 Caching elements for prefix: ${p}`);
+                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
+                
+                const prefixElements = {};
+                keys.forEach(k => { 
+                    const elementId = p + k;
+                    const element = document.getElementById(elementId);
+                    elements[elementId] = element;
+                    prefixElements[k] = !!element;
+                    
+                    if (!element) {
+                        console.warn(`⚠️ Element not found: ${elementId}`);
+                    }
+                });
+                
+                console.log(`📋 ${p} elements:`, prefixElements);
+                
+                // Special check for editor elements
+                const titleEditorKey = p + 'titleEditor';
+                const descriptionEditorKey = p + 'descriptionEditor';
+                console.log(`🎨 Editor elements check:`);
+                console.log(`  ${titleEditorKey}: ${!!elements[titleEditorKey]} (DOM: ${!!document.getElementById(titleEditorKey)})`);
+                console.log(`  ${descriptionEditorKey}: ${!!elements[descriptionEditorKey]} (DOM: ${!!document.getElementById(descriptionEditorKey)})`);
+            });
+            
+            console.log('✅ Element caching complete!');
+            console.log('📊 Total cached elements:', Object.keys(elements).length);
         }
         
         function setLoadingState(loading) { state.isLoading = loading; if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); } }
@@ -180,16 +217,33 @@
         const sharedEditorModules = { clipboard: { matchVisual: false } };
         
         function initializeEditors() {
-            if (!window.Quill) throw new Error('Quill library not loaded');
+            console.log('🎯 Starting editor initialization...');
+            console.log('✅ Quill available:', !!window.Quill);
+            
+            if (!window.Quill) {
+                console.error('❌ Quill library not loaded');
+                throw new Error('Quill library not loaded');
+            }
+            
+            console.log('📝 Column prefixes:', COLUMN_PREFIXES);
+            console.log('🗂️ Available elements keys:', Object.keys(elements));
+            
             COLUMN_PREFIXES.forEach(p => {
+                console.log(`\n🔄 Processing column prefix: ${p}`);
                 ['title', 'description'].forEach(type => {
                     const dataFieldKey = p + type; // e.g. 'left_title' (for data handling)
                     const elementKey = p + type + 'Editor'; // e.g. 'left_titleEditor' (for elements object lookup)
                     
+                    console.log(`  📌 Creating editor for type: ${type}`);
+                    console.log(`  🔑 Data field key: ${dataFieldKey}`);
+                    console.log(`  🎨 Element key: ${elementKey}`);
+                    
                     const editorElement = elements[elementKey]; // Use the correct key to find the DOM element
+                    console.log(`  🎯 Found element:`, !!editorElement, editorElement);
 
                     if (!editorElement) {
-                        console.error(`Editor element not found for key: ${elementKey}`);
+                        console.error(`❌ Editor element not found for key: ${elementKey}`);
+                        console.error(`❌ Available element keys:`, Object.keys(elements));
                         throw new Error(`Invalid Quill container: #${elementKey} not found.`);
                     }
 
@@ -199,19 +253,35 @@
                         formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'],
                         placeholder: `Enter ${type}...`
                     };
+                    
+                    console.log(`  ⚙️ Quill options:`, quillOptions);
 
-                    const editor = new Quill(editorElement, quillOptions);
-                    state.editors.set(dataFieldKey, editor); // Store the editor instance with the data key
+                    try {
+                        const editor = new Quill(editorElement, quillOptions);
+                        console.log(`  ✅ Successfully created Quill editor for ${elementKey}`);
+                        
+                        state.editors.set(dataFieldKey, editor); // Store the editor instance with the data key
+                        console.log(`  💾 Stored editor with key: ${dataFieldKey}`);
 
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                        if (source === 'user') {
-                            const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
-                            updateData(dataFieldKey, utils.sanitizeHtml(content)); // Update data with the data key
-                        }
-                    }, CONFIG.debounceDelay);
-                    editor.on('text-change', debouncedUpdate);
+                        const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                            if (source === 'user') {
+                                console.log(`  📝 Text change detected in ${dataFieldKey}`);
+                                const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                                updateData(dataFieldKey, utils.sanitizeHtml(content)); // Update data with the data key
+                            }
+                        }, CONFIG.debounceDelay);
+                        editor.on('text-change', debouncedUpdate);
+                        console.log(`  🔗 Event listener attached for ${dataFieldKey}`);
+                        
+                    } catch (error) {
+                        console.error(`❌ Failed to create Quill editor for ${elementKey}:`, error);
+                        throw error;
+                    }
                 });
             });
+            
+            console.log(`\n✅ Editor initialization complete! Created ${state.editors.size} editors.`);
+            console.log('📊 Editor state map:', Array.from(state.editors.keys()));
         }
         
         function processRichText(html, isDescription = false) {
@@ -382,24 +452,77 @@
         function cleanup() { if(rafId) cancelAnimationFrame(rafId); state.editors.forEach(editor => editor && editor.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
 
         function initializeWithRetry() {
+            console.log('🚀 Starting initialization attempt...', state.retryCount + 1);
+            
             try {
-                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-                if (!window.Quill) throw new Error('Quill not loaded');
+                console.log('🔍 Checking dependencies...');
+                if (!window.sfdc || !window.sfdc.BlockSDK) {
+                    console.error('❌ BlockSDK not loaded');
+                    throw new Error('BlockSDK not loaded');
+                }
+                console.log('✅ BlockSDK available');
+                
+                if (!window.Quill) {
+                    console.error('❌ Quill not loaded');
+                    throw new Error('Quill not loaded');
+                }
+                console.log('✅ Quill available');
+                
+                console.log('🏗️ Creating BlockSDK instance...');
                 state.sdk = new window.sfdc.BlockSDK();
+                console.log('✅ BlockSDK instance created');
+                
+                console.log('🗂️ Caching elements...');
                 cacheElements();
+                
+                console.log('🎨 Initializing editors...');
                 initializeEditors();
+                
+                console.log('🔗 Setting up event handlers...');
                 initializeEventHandlers();
+                
+                console.log('📊 Loading data...');
                 loadData();
+                
+                console.log('🧹 Setting up cleanup...');
                 window.addEventListener('beforeunload', cleanup);
+                
                 state.isInitialized = true;
+                console.log('🎉 Initialization completed successfully!');
+                
             } catch (error) {
+                console.error('💥 Initialization failed:', error);
+                console.error('📍 Error stack:', error.stack);
+                
                 utils.showError(`Initialization failed: ${error.message}`, true);
-                if (state.retryCount < CONFIG.maxRetries) { state.retryCount++; setTimeout(initializeWithRetry, 1000 * state.retryCount); } 
+                if (state.retryCount < CONFIG.maxRetries) { 
+                    state.retryCount++;
+                    console.log(`🔄 Retrying initialization in ${state.retryCount} seconds... (attempt ${state.retryCount}/${CONFIG.maxRetries})`);
+                    setTimeout(initializeWithRetry, 1000 * state.retryCount); 
+                } else {
+                    console.error('❌ Max retries reached. Initialization failed permanently.');
+                }
                 setLoadingState(false);
             }
         }
         
-        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
+        console.log('📜 Script loaded. Document state:', document.readyState);
+        console.log('🌐 Available globals:', {
+            sfdc: !!window.sfdc,
+            BlockSDK: !!(window.sfdc && window.sfdc.BlockSDK),
+            Quill: !!window.Quill
+        });
+        
+        if (document.readyState === 'loading') { 
+            console.log('⏳ Document still loading, waiting for DOMContentLoaded...');
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('📄 DOMContentLoaded fired, starting initialization...');
+                initializeWithRetry();
+            }); 
+        } else { 
+            console.log('📄 Document already ready, starting initialization immediately...');
+            initializeWithRetry(); 
+        }
     </script>
 </body>
 </html>
