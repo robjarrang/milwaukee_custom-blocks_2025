@@ -247,12 +247,15 @@
 
         function refreshPreview() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(() => { if (state.isLoading || !state.sdk) return; utils.safeExecute(() => { utils.showSaveIndicator('Saving...'); const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } utils.showSaveIndicator('Saved'); }); }); }
         
-        function renderList(prefix, listType, templateId, hasQuill) {
+        function renderList(prefix, listType) {
             const container = elements[prefix + listType + 'Container'];
             const items = utils.getFieldValue(prefix + listType);
+            const templateId = listType === 'items' ? 'itemTemplate' : 'spacerTemplate';
             const template = elements[templateId];
+            
             const fragment = document.createDocumentFragment();
             const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook' };
+
             items.forEach((item, index) => {
                 const itemFragment = template.content.cloneNode(true);
                 const itemEl = itemFragment.firstElementChild;
@@ -264,32 +267,51 @@
                 const moveDownBtn = itemEl.querySelector('.move-down-btn');
                 if (moveDownBtn) moveDownBtn.disabled = index === items.length - 1;
                 fragment.appendChild(itemFragment);
-                if (hasQuill) {
-                    const editorDiv = itemEl.querySelector('.quill-container');
-                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
-                    state.editors.set(item.id, editor);
-                    editor.setContents([]);
-                    if (item.text && item.text.trim()) { editor.clipboard.dangerouslyPasteHTML(item.text); }
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                        if (source === 'user') {
-                            const newItems = Array.from(container.querySelectorAll('.item')).map(el => {
-                                const id = el.dataset.id;
-                                const editorInstance = state.editors.get(id);
-                                return editorInstance ? { id, text: utils.sanitizeHtml(editorInstance.getSemanticHTML ? editorInstance.getSemanticHTML() : editorInstance.root.innerHTML) } : null;
-                            }).filter(Boolean);
-                            updateData(prefix + 'items', newItems);
-                        }
-                    }, CONFIG.debounceDelay + 100);
-                    editor.on('text-change', debouncedUpdate);
-                }
             });
             container.replaceChildren(fragment);
+        }
+
+        function initializeChecklistEditors(prefix) {
+            const container = elements[prefix + 'itemsContainer'];
+            const items = utils.getFieldValue(prefix + 'items');
+
+            // Clean up old Quill instances for this list
+            items.forEach(item => { if (state.editors.has(item.id)) state.editors.delete(item.id); });
+
+            container.querySelectorAll('.item').forEach(itemEl => {
+                const id = itemEl.dataset.id;
+                const itemData = items.find(i => i.id === id);
+                if (!itemData) return;
+
+                const editorDiv = itemEl.querySelector('.quill-container');
+                const editor = new Quill(editorDiv, { theme: 'snow', modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
+                state.editors.set(id, editor);
+                
+                if (itemData.text && itemData.text.trim()) {
+                    editor.clipboard.dangerouslyPasteHTML(itemData.text);
+                }
+                
+                const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                    if (source === 'user') {
+                        const newItems = Array.from(container.querySelectorAll('.item')).map(el => {
+                            const currentId = el.dataset.id;
+                            const editorInstance = state.editors.get(currentId);
+                            return editorInstance ? { id: currentId, text: utils.sanitizeHtml(editorInstance.getSemanticHTML ? editorInstance.getSemanticHTML() : editorInstance.root.innerHTML) } : null;
+                        }).filter(Boolean);
+                        updateData(prefix + 'items', newItems);
+                    }
+                }, CONFIG.debounceDelay + 100);
+                editor.on('text-change', debouncedUpdate);
+            });
         }
         
         function toggleContentTypeView(prefix, type) {
             elements[prefix + 'descriptionSection'].style.display = type === 'description' ? 'block' : 'none';
             elements[prefix + 'checklistSection'].style.display = type === 'checklist' ? 'block' : 'none';
-            if (type === 'checklist') renderList(prefix, 'items', 'itemTemplate', true);
+            if (type === 'checklist') {
+                renderList(prefix, 'items');
+                initializeChecklistEditors(prefix);
+            }
         }
         
         const itemActions = {
@@ -324,14 +346,14 @@
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
                 
-                addListener(elements[p + 'addItemBtn'], 'click', () => { const items = [...utils.getFieldValue(p + 'items')]; items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); renderList(p, 'items', 'itemTemplate', true); });
-                addListener(elements[p + 'itemsContainer'], 'click', (e) => { for (const [selector, action] of Object.entries(itemActions)) { if (e.target.closest(selector)) { const itemEl = e.target.closest('.item'); if (!itemEl) return; const id = itemEl.dataset.id; const items = [...utils.getFieldValue(p + 'items')]; const idx = items.findIndex(i => i.id === id); if (idx === -1) return; if (action(items, idx, id, true)) { updateData(p + 'items', items); renderList(p, 'items', 'itemTemplate', true); } break; } } });
+                addListener(elements[p + 'addItemBtn'], 'click', () => { const items = [...utils.getFieldValue(p + 'items')]; items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); toggleContentTypeView(p, 'checklist'); });
+                addListener(elements[p + 'itemsContainer'], 'click', (e) => { for (const [selector, action] of Object.entries(itemActions)) { if (e.target.closest(selector)) { const itemEl = e.target.closest('.item'); if (!itemEl) return; const id = itemEl.dataset.id; const items = [...utils.getFieldValue(p + 'items')]; const idx = items.findIndex(i => i.id === id); if (idx === -1) return; if (action(items, idx, id, true)) { updateData(p + 'items', items); toggleContentTypeView(p, 'checklist'); } break; } } });
                 
-                const addSpacer = (type) => { const spacers = [...utils.getFieldValue(p + 'spacers')]; spacers.push({ id: crypto.randomUUID(), type }); updateData(p + 'spacers', spacers); renderList(p, 'spacers', 'spacerTemplate', false); };
+                const addSpacer = (type) => { const spacers = [...utils.getFieldValue(p + 'spacers')]; spacers.push({ id: crypto.randomUUID(), type }); updateData(p + 'spacers', spacers); renderList(p, 'spacers'); };
                 addListener(elements[p + 'addSpacerAllBtn'], 'click', () => addSpacer('all'));
                 addListener(elements[p + 'addSpacerMsoBtn'], 'click', () => addSpacer('mso'));
                 addListener(elements[p + 'addSpacerNotMsoBtn'], 'click', () => addSpacer('not_mso'));
-                addListener(elements[p + 'spacersContainer'], 'click', (e) => { if (e.target.closest('.remove-btn')) { const itemEl = e.target.closest('.spacer-item'); if (!itemEl) return; const id = itemEl.dataset.id; const spacers = utils.getFieldValue(p + 'spacers').filter(s => s.id !== id); updateData(p + 'spacers', spacers); renderList(p, 'spacers', 'spacerTemplate', false); } });
+                addListener(elements[p + 'spacersContainer'], 'click', (e) => { if (e.target.closest('.remove-btn')) { const itemEl = e.target.closest('.spacer-item'); if (!itemEl) return; const id = itemEl.dataset.id; const spacers = utils.getFieldValue(p + 'spacers').filter(s => s.id !== id); updateData(p + 'spacers', spacers); renderList(p, 'spacers'); } });
             });
         }
 
@@ -348,7 +370,7 @@
                 const contentType = utils.getFieldValue(p + 'contentType');
                 setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
                 toggleContentTypeView(p, contentType);
-                renderList(p, 'spacers', 'spacerTemplate', false);
+                renderList(p, 'spacers');
             });
         }
         
@@ -387,7 +409,7 @@
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
-                loadData(); // This now contains the event handler and UI setup logic in its callback
+                loadData();
                 window.addEventListener('beforeunload', cleanup);
                 state.isInitialized = true;
             } catch (error) {
