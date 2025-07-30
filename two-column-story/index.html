@@ -94,10 +94,7 @@
             name: '2 Column Story with Top Spacer',
             debounceDelay: 300,
             maxRetries: 3,
-            colors: Object.freeze({
-                red: '#DB021D',
-                black: '#000000'
-            }),
+            colors: Object.freeze({ red: '#DB021D', black: '#000000' }),
             checkmarkUrl: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png'
         });
         
@@ -184,6 +181,7 @@
         }
         
         const sharedEditorModules = { clipboard: { matchVisual: false } };
+        
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             COLUMN_PREFIXES.forEach(p => {
@@ -193,8 +191,6 @@
                     const quillOptions = { theme: 'snow', modules: { ...sharedEditorModules, toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] }, formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'], placeholder: `Enter ${type}...` };
                     const editor = new Quill(editorElement, quillOptions);
                     state.editors.set(editorId, editor);
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => { if (source === 'user') { const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML; updateData(editorId, utils.sanitizeHtml(content)); } }, CONFIG.debounceDelay);
-                    editor.on('text-change', debouncedUpdate);
                 });
             });
         }
@@ -208,8 +204,18 @@
         }
         
         function updateData(field, value) { if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); } }
+        
         const debouncedUpdateData = utils.debounce(updateData, CONFIG.debounceDelay);
         
+        function generateTemplate() {
+            const bgColor = CONFIG.colors[utils.getFieldValue('backgroundColor')] || CONFIG.colors.black;
+            const topSpacerHtml = `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;"><tr><td><div style="font-size:20px;height:20px;line-height:20px;margin:0px;mso-line-height-rule:exactly;padding:0px;"> </div></td></tr></table><!-- END .fw-spacer -->`;
+            const leftColHtml = generateColumnHtml('left_');
+            const rightColHtml = generateColumnHtml('right_');
+            const mainContentHtml = `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${bgColor};width:620px;"><tr><td class="side" style="width:20px;"> </td><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr>${leftColHtml}<td class="gap block" style="width:20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width:20px;"> </td></tr></table><!-- END .story-2col -->`;
+            return topSpacerHtml + mainContentHtml;
+        }
+
         function generateColumnHtml(prefix) {
             const imageUrl = utils.getFieldValue(prefix + 'imageUrl'), imageAlt = utils.getFieldValue(prefix + 'imageAlt'), imageLink = utils.getFieldValue(prefix + 'imageLink');
             const showSubtitle = utils.getFieldValue(prefix + 'showSubtitle'), subtitle = utils.getFieldValue(prefix + 'subtitle');
@@ -238,15 +244,6 @@
             const topSpacer = `<div style="font-size:12px;height:12px;line-height:12px;"> </div>`;
             return `<td align="center" class="block" style="width:280px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="280"></a></div></td></tr><tr><td align="center" style="padding-bottom:12px;padding-top:12px;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width:100%;"><tr><td>${topSpacer}</td></tr>${subtitleHtml}<tr><td class="mobile-text-center" style="text-align:${titleAlign};"><h3 style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:${titleSize}px;font-stretch:condensed;font-weight:bold;line-height:${titleLineHeight}px;margin:0;text-transform:uppercase;">${title}</h3></td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>${contentHtml}${!showButton ? '<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>' : ''}${buttonHtml}</table></td></tr></table></td>`;
         }
-        
-        function generateTemplate() {
-            const bgColor = CONFIG.colors[utils.getFieldValue('backgroundColor')] || CONFIG.colors.black;
-            const topSpacerHtml = `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;"><tr><td><div style="font-size:20px;height:20px;line-height:20px;margin:0px;mso-line-height-rule:exactly;padding:0px;"> </div></td></tr></table><!-- END .fw-spacer -->`;
-            const leftColHtml = generateColumnHtml('left_');
-            const rightColHtml = generateColumnHtml('right_');
-            const mainContentHtml = `<!-- START .story-2col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${bgColor};width:620px;"><tr><td class="side" style="width:20px;"> </td><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr>${leftColHtml}<td class="gap block" style="width:20px;"> </td>${rightColHtml}</tr></table></td><td class="side" style="width:20px;"> </td></tr></table><!-- END .story-2col -->`;
-            return topSpacerHtml + mainContentHtml;
-        }
 
         function refreshPreview() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(() => { if (state.isLoading || !state.sdk) return; utils.safeExecute(() => { utils.showSaveIndicator('Saving...'); const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } utils.showSaveIndicator('Saved'); }); }); }
         
@@ -270,9 +267,9 @@
                 if (hasQuill) {
                     const editorDiv = itemEl.querySelector('.quill-container');
                     const editor = new Quill(editorDiv, { theme: 'snow', modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
+                    state.editors.set(item.id, editor);
                     editor.setContents([]);
                     if (item.text && item.text.trim()) { editor.clipboard.dangerouslyPasteHTML(item.text); }
-                    state.editors.set(item.id, editor);
                     const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
                         if (source === 'user') {
                             const newItems = Array.from(container.querySelectorAll('.item')).map(el => {
@@ -305,30 +302,24 @@
         };
 
         function initializeEventHandlers() {
+            state.eventListeners.forEach(({ element, event, handler }) => element.removeEventListener(event, handler));
             state.eventListeners = [];
             const addListener = (el, event, handler) => { el.addEventListener(event, handler); state.eventListeners.push({ element: el, event: event, handler: handler }); };
             
-            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button, .color-option').forEach(opt => { addListener(opt, 'click', (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value || btn.dataset.color); el.querySelectorAll('.selected').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }); }); }
+            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button, .color-option').forEach(opt => { addListener(opt, 'click', (e) => { const btn = e.currentTarget; const value = btn.dataset.value || btn.dataset.color; updateData(key, value); el.querySelectorAll('.selected').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(value); }); }); }
             function setupInput(el, key, isNumber = false) { if (!el) return; addListener(el, 'input', (e) => debouncedUpdateData(key, e.target.value.trim())); if (isNumber) { addListener(el, 'blur', (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min, 10), max = parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; i.value = Math.max(min, Math.min(max, v)); updateData(key, parseInt(i.value)); }); } }
             
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             
             COLUMN_PREFIXES.forEach(p => {
-                setupInput(elements[p + 'imageUrl'], p + 'imageUrl');
-                setupInput(elements[p + 'imageAlt'], p + 'imageAlt');
-                setupInput(elements[p + 'imageLink'], p + 'imageLink');
-                setupInput(elements[p + 'subtitle'], p + 'subtitle');
-                setupInput(elements[p + 'buttonText'], p + 'buttonText');
-                setupInput(elements[p + 'buttonLink'], p + 'buttonLink');
-                setupInput(elements[p + 'subtitleFontSize'], p + 'subtitleFontSize', true);
-                setupInput(elements[p + 'titleFontSize'], p + 'titleFontSize', true);
-                setupInput(elements[p + 'descriptionFontSize'], p + 'descriptionFontSize', true);
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(key => setupInput(elements[p + key], p + key));
+                ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(key => setupInput(elements[p + key], p + key, true));
                 
-                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(el) addListener(el, 'change', (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }); });
+                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(el && groupEl) addListener(el, 'change', (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }); });
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
                 
-                addListener(elements[p + 'addItemBtn'], 'click', () => { const items = utils.getFieldValue(p + 'items'); items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); renderList(p, 'items', 'itemTemplate', true); });
+                addListener(elements[p + 'addItemBtn'], 'click', () => { const items = [...utils.getFieldValue(p + 'items')]; items.push({ id: crypto.randomUUID(), text: 'New Item' }); updateData(p + 'items', items); renderList(p, 'items', 'itemTemplate', true); });
                 addListener(elements[p + 'itemsContainer'], 'click', (e) => { for (const [selector, action] of Object.entries(itemActions)) { if (e.target.closest(selector)) { const itemEl = e.target.closest('.item'); if (!itemEl) return; const id = itemEl.dataset.id; const items = [...utils.getFieldValue(p + 'items')]; const idx = items.findIndex(i => i.id === id); if (idx === -1) return; if (action(items, idx, id, true)) { updateData(p + 'items', items); renderList(p, 'items', 'itemTemplate', true); } break; } } });
                 
                 const addSpacer = (type) => { const spacers = [...utils.getFieldValue(p + 'spacers')]; spacers.push({ id: crypto.randomUUID(), type }); updateData(p + 'spacers', spacers); renderList(p, 'spacers', 'spacerTemplate', false); };
@@ -336,34 +327,61 @@
                 addListener(elements[p + 'addSpacerMsoBtn'], 'click', () => addSpacer('mso'));
                 addListener(elements[p + 'addSpacerNotMsoBtn'], 'click', () => addSpacer('not_mso'));
                 addListener(elements[p + 'spacersContainer'], 'click', (e) => { if (e.target.closest('.remove-btn')) { const itemEl = e.target.closest('.spacer-item'); if (!itemEl) return; const id = itemEl.dataset.id; const spacers = utils.getFieldValue(p + 'spacers').filter(s => s.id !== id); updateData(p + 'spacers', spacers); renderList(p, 'spacers', 'spacerTemplate', false); } });
+                
+                // Add listeners to main Quill editors
+                ['title', 'description'].forEach(type => {
+                    const editor = state.editors.get(p + type);
+                    if (editor) {
+                        const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                            if (source === 'user') {
+                                const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                                updateData(p + type, utils.sanitizeHtml(content));
+                            }
+                        }, CONFIG.debounceDelay);
+                        editor.on('text-change', debouncedUpdate);
+                    }
+                });
             });
         }
 
+        function updateUIFromData() {
+            document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
+            const setSelectorState = (el, key) => { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === String(val))); };
+            
+            COLUMN_PREFIXES.forEach(p => {
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
+                ['title', 'description'].forEach(type => { const editor = state.editors.get(p + type); if (editor) { const content = utils.getFieldValue(p + type); editor.setContents([]); if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content); } });
+                ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); if (elements[p + type]) { elements[p + type].checked = isChecked; } if (elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]) { elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); } });
+                ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
+                
+                const contentType = utils.getFieldValue(p + 'contentType');
+                setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
+                toggleContentTypeView(p, contentType);
+                renderList(p, 'items', 'itemTemplate', true);
+                renderList(p, 'spacers', 'spacerTemplate', false);
+            });
+        }
+        
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
-            state.sdk.getData((data) => utils.safeExecute(() => {
-                state.blockData = {};
-                Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; if(Array.isArray(state.blockData[key])) state.blockData[key].forEach(item => item.id = item.id || crypto.randomUUID()); });
-                
-                document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
-                function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
-                
-                COLUMN_PREFIXES.forEach(p => {
-                    ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
-                    ['title', 'description'].forEach(type => { const editor = state.editors.get(p + type); if (editor) { const content = utils.getFieldValue(p + type); editor.setContents([]); if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content); } });
-                    ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
-                    ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
+            state.sdk.getData((data) => {
+                utils.safeExecute(() => {
+                    state.blockData = {};
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        let value = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue;
+                        if (Array.isArray(value)) {
+                            value = value.map(item => ({ ...item, id: item.id || crypto.randomUUID() }));
+                        }
+                        state.blockData[key] = value;
+                    });
                     
-                    const contentType = utils.getFieldValue(p + 'contentType');
-                    setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
-                    toggleContentTypeView(p, contentType);
-                    renderList(p, 'spacers', 'spacerTemplate', false);
+                    initializeEventHandlers();
+                    updateUIFromData();
+                    refreshPreview();
                 });
-                
-                refreshPreview();
                 setLoadingState(false);
-            }));
+            });
         }
 
         function cleanup() {
@@ -381,7 +399,6 @@
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
-                initializeEventHandlers();
                 loadData();
                 window.addEventListener('beforeunload', cleanup);
                 state.isInitialized = true;
