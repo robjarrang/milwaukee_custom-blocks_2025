@@ -85,6 +85,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
         const moduleConfig = {
@@ -159,44 +160,47 @@
             state.isLoading = loading;
             if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
         }
-        function initializeEditors() {
-            if (!window.Quill) throw new Error('Quill library not loaded');
-            COLUMN_PREFIXES.forEach(p => {
-                ['title', 'description'].forEach(type => {
-                    const editorId = p + type;
-                    const editorElement = elements[p + type + 'Editor'];
-                    const toolbarOptions = type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']];
-                    state.editors[editorId] = new Quill(editorElement, { theme: 'snow', modules: { toolbar: toolbarOptions, clipboard: { matchVisual: false } }, formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'], placeholder: `Enter ${type}...` });
-                    const debouncedUpdate = utils.debounce(() => updateData(editorId, utils.sanitizeHtml(state.editors[editorId].root.innerHTML)), moduleConfig.debounceDelay);
-                    state.editors[editorId].on('text-change', debouncedUpdate);
+        async function initializeEditors() {
+            try {
+                const editorConfigs = [];
+                
+                COLUMN_PREFIXES.forEach(prefix => {
+                    ['title', 'description'].forEach(type => {
+                        const editorId = `${prefix}${type}`;
+                        const element = elements[`${prefix}${type}Editor`];
+                        if (element) {
+                            editorConfigs.push({
+                                id: editorId,
+                                element,
+                                type: type === 'title' ? 'title' : 'description',
+                                options: {
+                                    placeholder: `Enter ${type}...`,
+                                    maxLength: type === 'title' ? 100 : 500
+                                }
+                            });
+                        }
+                    });
                 });
-            });
+
+                // Initialize all editors at once
+                state.editors = await QuillConfigManager.initializeMultipleEditors(editorConfigs);
+
+                // Set up change handlers
+                Object.keys(state.editors).forEach(editorId => {
+                    const editor = state.editors[editorId];
+                    const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                        const content = QuillConfigManager.getCleanContent(editor, true);
+                        updateData(editorId, content);
+                    }, moduleConfig.debounceDelay);
+                    
+                    editor.on('text-change', updateHandler);
+                });
+            } catch (error) {
+                throw new Error(`Failed to initialize editors: ${error.message}`);
+            }
         }
         function processRichText(html, isDescription = false) {
-            if (!html) return '';
-            const temp = document.createElement('div');
-            temp.innerHTML = utils.sanitizeHtml(html);
-            
-            // Clean up links for descriptions
-            if (isDescription) { 
-                temp.querySelectorAll('a').forEach(link => { 
-                    if (!link.style.color) link.style.color = '#ffffff'; 
-                    link.style.textDecoration = 'underline'; 
-                    if (!link.getAttribute('href')) link.setAttribute('href', '#'); 
-                }); 
-            }
-            
-            // Remove all block-level elements that could break email layout
-            const result = temp.innerHTML
-                .replace(/<p>/g, '')
-                .replace(/<\/p>/g, '')
-                .replace(/<br\s*\/?>/g, '')
-                .replace(/<div[^>]*>/g, '')
-                .replace(/<\/div>/g, '')
-                .replace(/\s{2,}/g, ' ')
-                .trim();
-            
-            return result;
+            return QuillConfigManager.sanitizeForEmail(html || '');
         }
         function updateData(field, value) {
             if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); }
@@ -349,7 +353,13 @@
                 finally { setLoadingState(false); }
             });
         }
-        function cleanup() { Object.values(state.editors).forEach(e => e && e.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
+        function cleanup() { 
+            QuillConfigManager.cleanup(Object.values(state.editors)); 
+            state.eventListeners.forEach(({ element, event, handler }) => { 
+                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
+            }); 
+            state.eventListeners = []; 
+        }
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');

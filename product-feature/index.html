@@ -100,6 +100,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
         
@@ -212,56 +213,30 @@
             }
         }
 
-        function initializeEditors() {
-            if (!window.Quill) throw new Error('Quill library not loaded');
-            
+        async function initializeEditors() {
             try {
-                // Quill 2.0 configuration
-                const quillOptions = {
-                    theme: 'snow',
-                    modules: { 
-                        toolbar: [ ['bold'], [{ 'script': 'super' }] ], 
-                        clipboard: { matchVisual: false } 
-                    },
-                    formats: ['bold', 'script'],
-                    placeholder: 'Enter product title...'
-                };
-                
-                state.editors.productTitle = new Quill(elements.productTitleEditor, quillOptions);
-                
-                const debouncedTitleUpdate = utils.debounce((delta, oldDelta, source) => {
-                    if (source === 'user') {
-                        // Use getSemanticHTML() for Quill 2.0
-                        const content = state.editors.productTitle.getSemanticHTML ? 
-                            state.editors.productTitle.getSemanticHTML() : 
-                            state.editors.productTitle.root.innerHTML;
-                        updateData('productTitle', utils.sanitizeHtml(content));
+                state.editors.productTitle = await QuillConfigManager.initializeEditor(
+                    elements.productTitleEditor, 
+                    'title', 
+                    {
+                        placeholder: 'Enter product title...',
+                        maxLength: moduleConfig.fields.productTitle.maxLength
                     }
+                );
+                
+                const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                    const content = QuillConfigManager.getCleanContent(state.editors.productTitle, true);
+                    updateData('productTitle', content);
                 }, moduleConfig.debounceDelay);
                 
-                state.editors.productTitle.on('text-change', debouncedTitleUpdate);
-                
-                // Length limiting using Quill 2.0 API
-                state.editors.productTitle.on('text-change', () => {
-                    const text = state.editors.productTitle.getText();
-                    if (text.length > moduleConfig.fields.productTitle.maxLength) {
-                        const range = state.editors.productTitle.getSelection();
-                        state.editors.productTitle.deleteText(moduleConfig.fields.productTitle.maxLength, text.length - moduleConfig.fields.productTitle.maxLength);
-                        if (range) {
-                            state.editors.productTitle.setSelection(Math.min(range.index, moduleConfig.fields.productTitle.maxLength));
-                        }
-                    }
-                });
+                state.editors.productTitle.on('text-change', updateHandler);
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
             }
         }
 
         function processRichText(html) {
-            if (!html) return '';
-            const temp = document.createElement('div');
-            temp.innerHTML = utils.sanitizeHtml(html);
-            return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
+            return QuillConfigManager.sanitizeForEmail(html || '');
         }
 
         function updateData(field, value) {
