@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>1 Column Story</title>
+    <title>1 Column Story Block (Corrected)</title>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
@@ -41,9 +41,27 @@
         </div>
         <div class="section-divider">
             <div class="section-title">Content Settings</div>
-            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
+            <div class="field-group">
+                <label class="field-label">Title</label>
+                <!-- FIX: Added data-lpignore -->
+                <div id="titleEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
+                <div class="style-controls-wrapper">
+                    <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div>
+                    <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                </div>
+            </div>
             <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-            <div id="descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div></div>
+            <div id="descriptionSection">
+                <div class="field-group">
+                    <label class="field-label">Description</label>
+                    <!-- FIX: Added data-lpignore -->
+                    <div id="descriptionEditor" class="quill-container" data-lpignore="true"></div>
+                    <div class="style-controls-wrapper">
+                        <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div>
+                        <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                    </div>
+                </div>
+            </div>
             <div id="checklistSection"><div class="field-group"><label class="field-label">Checklist Items</label><div id="itemsContainer" class="items-container"></div><button id="addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
         </div>
         <div class="section-divider">
@@ -52,7 +70,7 @@
             <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><input type="text" id="buttonText" class="field-input"></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
         </div>
     </div>
-    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
+    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar" data-lpignore="true"></div></div></template>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
@@ -92,7 +110,7 @@
             sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); t.querySelectorAll('a').forEach(l => { if (!l.style.color) l.style.color = '#ffffff'; if (!l.style.textDecoration) l.style.textDecoration = 'underline'; if (!l.getAttribute('href')) l.setAttribute('href', '#'); }); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
-            safeExecute(fn, fallback = null) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); return fallback; } }
+            safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } }
         };
 
         function cacheElements() {
@@ -137,10 +155,18 @@
                 const editor = new Quill(element, quillOptions);
                 state.editors.set(fieldName, editor);
                 
+                const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                    if (source === 'user') {
+                        const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                        updateData(fieldName, utils.sanitizeHtml(content));
+                    }
+                }, moduleConfig.debounceDelay);
+                editor.on('text-change', debouncedUpdate);
+
                 editor.on('text-change', () => { 
                     const text = editor.getText();
                     const maxLength = moduleConfig.fields[fieldName].maxLength;
-                    if (maxLength && text.length > maxLength) {
+                    if (maxLength && text.length > maxLength + 1) { // Allow one extra char for newline
                         const range = editor.getSelection();
                         editor.deleteText(maxLength, text.length - maxLength);
                         if (range) { editor.setSelection(Math.min(range.index, maxLength)); }
@@ -196,10 +222,8 @@
             const buttonText = utils.getFieldValue('buttonText');
             const buttonLink = utils.getFieldValue('buttonLink');
             const buttonAlign = utils.getFieldValue('buttonAlignment');
-            
             const titleLineHeight = titleSize + 8;
             const titleMobileClass = titleAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
-
             let contentHtml = '';
             if (contentType === 'description') {
                 const description = processRichText(utils.getFieldValue('description'));
@@ -208,17 +232,11 @@
                 const descriptionLineHeight = descriptionSize + 12;
                 const descriptionMobileClass = descriptionAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
                 contentHtml = `<tr><td class="story-intro ${descriptionMobileClass}" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; text-align: ${descriptionAlign};">${description}</td></tr>`;
-            } else { // Checklist
+            } else {
                 const items = utils.getFieldValue('items');
-                const itemRowsHtml = items.map(item => `
-                    <tr>
-                       <td valign="middle" style="width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
-                       <td valign="middle" style="width: 12px;"> </td>
-                       <td class="story-intro mobile-text-left" valign="middle" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 18px; margin: 0; mso-line-height-rule: exactly; text-align: left;">${processRichText(item.text)}</td>
-                    </tr>`).join('');
+                const itemRowsHtml = items.map(item => `<tr><td valign="middle" style="width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td><td valign="middle" style="width: 12px;"> </td><td class="story-intro mobile-text-left" valign="middle" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 18px; margin: 0; mso-line-height-rule: exactly; text-align: left;">${processRichText(item.text)}</td></tr>`).join('');
                 contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             }
-
             const textContentTable = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
             const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
             const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><!--[if (gte mso 9)|(IE)]><table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top"><![endif]-->${textContentTable}<!--[if (gte mso 9)|(IE)]></td></tr><tr><td height="100%"> </td></tr></table><![endif]--></td>`;
@@ -265,7 +283,7 @@
             const addListener = (el, event, handler) => { if (el) { el.addEventListener(event, handler); state.eventListeners.push({ element: el, event, handler }); }};
             
             const setupOptionSelector = (el, key, callback) => el.querySelectorAll('.option-button').forEach(opt => addListener(opt, 'click', e => { const btn = e.currentTarget; const value = btn.dataset.value; updateData(key, value); el.querySelectorAll('.selected').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(value); }));
-            const setupNumberInput = (el, key) => { addListener(el, 'input', e => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }); addListener(el, 'blur', e => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max), step = 4; if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); i.value = Math.round(v / step) * step; updateData(key, i.value); }); };
+            const setupNumberInput = (el, key) => { addListener(el, 'input', e => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }); addListener(el, 'blur', e => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max), step = 4; if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); i.value = Math.round(v / step) * step; updateData(key, Number(i.value)); }); };
             const setupTextInput = (el, key, isUrl, errEl) => { addListener(el, 'input', e => { let v = e.target.value; if(moduleConfig.fields[key].maxLength) v = v.substring(0, moduleConfig.fields[key].maxLength); e.target.value = v; if(isUrl && !utils.isValidUrl(v)) { if(errEl) errEl.style.display = 'block'; return; } if(errEl) errEl.style.display = 'none'; debouncedUpdateData(key, v.trim()); }); if(isUrl) addListener(el, 'blur', () => { if(!utils.isValidUrl(el.value)) { if(errEl) errEl.style.display = 'block'; } else { if(errEl) errEl.style.display = 'none'; } }); };
             const setupToggle = (el, key, groupEl) => addListener(el, 'change', e => { updateData(key, e.target.checked); if (groupEl) groupEl.classList.toggle('disabled-field', !e.target.checked); });
             
@@ -283,8 +301,6 @@
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             
-            ['title', 'description'].forEach(fieldName => { const editor = state.editors.get(fieldName); if(editor) editor.on('text-change', (delta, old, source) => { if(source === 'user') { const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML; debouncedUpdateData(fieldName, utils.sanitizeHtml(content)); } }); });
-            
             addListener(elements.addItemBtn, 'click', () => { const items = [...utils.getFieldValue('items')]; items.push({ id: crypto.randomUUID(), text: '<strong>New Item</strong>' }); updateData('items', items); renderItemsUI(); });
             addListener(elements.itemsContainer, 'click', e => {
                 const itemEl = e.target.closest('.item'); if (!itemEl) return;
@@ -298,7 +314,7 @@
         }
         
         function updateUIFromData() {
-            const setSelectorState = (el, key) => { const v = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === v)); };
+            const setSelectorState = (el, key) => { const v = utils.getFieldValue(key); if (el) { el.querySelectorAll('.selected').forEach(o => o.classList.remove('selected')); const newSel = el.querySelector(`[data-value="${v}"]`); if (newSel) newSel.classList.add('selected'); }};
             setSelectorState(elements.layoutSelector, 'layout');
             ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'].forEach(key => { if (elements[key]) elements[key].value = utils.getFieldValue(key); });
             
