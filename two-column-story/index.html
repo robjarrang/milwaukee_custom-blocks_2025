@@ -51,9 +51,9 @@
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showSubtitle" checked><span class="toggle-slider"></span></label><label for="left_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="left_subtitleGroup"><label for="left_subtitle" class="field-label">Subtitle</label><input type="text" id="left_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
-                <div class="field-group"><label class="field-label">Title</label><div id="left_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div class="field-group"><label class="field-label">Title</label><div class="quill-container limited-toolbar"><div id="left_titleEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="left_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <div id="left_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="left_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
+                <div id="left_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div class="quill-container"><div id="left_descriptionEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="left_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="left_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
                 <div id="left_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="left_itemsContainer" class="items-container"></div><button id="left_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="left_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="left_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="left_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="left_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
@@ -70,9 +70,9 @@
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showSubtitle" checked><span class="toggle-slider"></span></label><label for="right_showSubtitle" class="checkbox-label">Show Subtitle</label></div>
                 <div class="field-group" id="right_subtitleGroup"><label for="right_subtitle" class="field-label">Subtitle</label><input type="text" id="right_subtitle" class="field-input"><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_subtitleFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_subtitleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
-                <div class="field-group"><label class="field-label">Title</label><div id="right_titleEditor" class="quill-container limited-toolbar"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div class="field-group"><label class="field-label">Title</label><div class="quill-container limited-toolbar"><div id="right_titleEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_titleFontSize" class="field-input" min="16" max="32" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
                 <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="right_contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
-                <div id="right_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div id="right_descriptionEditor" class="quill-container"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
+                <div id="right_descriptionSection"><div class="field-group"><label class="field-label">Description</label><div class="quill-container"><div id="right_descriptionEditor"></div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="right_descriptionFontSize" class="field-input" min="12" max="24" step="4"></div><div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="right_descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div></div>
                 <div id="right_checklistSection" class="checklist-section"><div class="field-group"><label class="field-label">Checklist Items</label><div id="right_itemsContainer" class="items-container"></div><button id="right_addItemBtn" class="btn add-item-btn">Add New Item</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding: 0; border-color: #e0e0e0;"></div>
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="right_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="right_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="right_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="right_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
@@ -82,7 +82,7 @@
             </div>
         </div>
     </div>
-    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn duplicate-btn" title="Duplicate">📋</button><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"></div></div></template>
+    <template id="itemTemplate"><div class="item"><div class="item-header"><h3 class="item-title">Item</h3><div class="item-controls"><button class="item-control-btn duplicate-btn" title="Duplicate">📋</button><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar"><div></div></div></div></template>
     <template id="spacerTemplate"><div class="spacer-item"><div class="spacer-content"><span class="spacer-title">Spacer</span></div><div class="spacer-controls"><button class="spacer-control-btn remove-btn" title="Remove Item">×</button></div></div></template>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
@@ -90,15 +90,11 @@
     <script>
         'use strict';
         
-        // Frozen configuration object
         const CONFIG = Object.freeze({
             name: '2 Column Story with Top Spacer',
             debounceDelay: 300,
             maxRetries: 3,
-            colors: Object.freeze({
-                red: '#DB021D',
-                black: '#000000'
-            }),
+            colors: Object.freeze({ red: '#DB021D', black: '#000000' }),
             checkmarkUrl: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png'
         });
         
@@ -157,52 +153,12 @@
         let rafId = null;
         
         const utils = {
-            debounce(func, wait) { 
-                let timeout; 
-                return function(...args) { 
-                    const later = () => { clearTimeout(timeout); func.apply(this, args); }; 
-                    clearTimeout(timeout); 
-                    timeout = setTimeout(later, wait); 
-                }; 
-            },
-            sanitizeHtml(h) { 
-                if (!h) return ''; 
-                const t = document.createElement('div'); 
-                t.innerHTML = h; 
-                t.querySelectorAll('script, style').forEach(e => e.remove()); 
-                const a = t.getElementsByTagName('*'); 
-                for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } 
-                return t.innerHTML; 
-            },
-            showError(m, p = false) { 
-                if (elements.errorBanner) { 
-                    elements.errorBanner.textContent = m; 
-                    elements.errorBanner.classList.add('show'); 
-                    if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); 
-                } 
-                console.error(`${CONFIG.name} Error:`, m); 
-            },
-            getFieldValue(f) { 
-                const v = state.blockData[f]; 
-                const c = moduleConfig.fields[f]; 
-                return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; 
-            },
-            showSaveIndicator(text = 'Saved') {
-                const indicator = elements.saveIndicator;
-                if (indicator) {
-                    indicator.textContent = text;
-                    indicator.classList.add('show');
-                    setTimeout(() => indicator.classList.remove('show'), 1500);
-                }
-            },
-            safeExecute(fn, fallback = null) {
-                try {
-                    return fn();
-                } catch (error) {
-                    utils.showError(`Operation failed: ${error.message}`);
-                    return fallback;
-                }
-            }
+            debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
+            sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
+            showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${CONFIG.name} Error:`, m); },
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
+            showSaveIndicator(text = 'Saved') { const indicator = elements.saveIndicator; if (indicator) { indicator.textContent = text; indicator.classList.add('show'); setTimeout(() => indicator.classList.remove('show'), 1500); } },
+            safeExecute(fn, fallback = null) { try { return fn(); } catch (error) { utils.showError(`Operation failed: ${error.message}`); return fallback; } }
         };
         
         function cacheElements() {
@@ -213,20 +169,13 @@
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.spacerTemplate = document.getElementById('spacerTemplate');
-            
             COLUMN_PREFIXES.forEach(p => {
                 const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
                 keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
             });
         }
         
-        function setLoadingState(loading) {
-            state.isLoading = loading;
-            if (elements.mainContainer && elements.loadingOverlay) { 
-                elements.mainContainer.classList.toggle('loading', loading); 
-                elements.loadingOverlay.classList.toggle('show', loading); 
-            }
-        }
+        function setLoadingState(loading) { state.isLoading = loading; if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); } }
         
         const sharedEditorModules = { clipboard: { matchVisual: false } };
         
@@ -235,7 +184,7 @@
             COLUMN_PREFIXES.forEach(p => {
                 ['title', 'description'].forEach(type => {
                     const editorId = p + type;
-                    const editorElement = elements[p + type + 'Editor'];
+                    const editorElement = elements[editorId];
                     const quillOptions = {
                         theme: 'snow',
                         modules: { ...sharedEditorModules, toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] },
@@ -244,13 +193,7 @@
                     };
                     const editor = new Quill(editorElement, quillOptions);
                     state.editors.set(editorId, editor);
-                    
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                        if (source === 'user') {
-                            const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
-                            updateData(editorId, utils.sanitizeHtml(content));
-                        }
-                    }, CONFIG.debounceDelay);
+                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => { if (source === 'user') { const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML; updateData(editorId, utils.sanitizeHtml(content)); } }, CONFIG.debounceDelay);
                     editor.on('text-change', debouncedUpdate);
                 });
             });
@@ -260,23 +203,11 @@
             if (!html) return '';
             const temp = document.createElement('div');
             temp.innerHTML = utils.sanitizeHtml(html);
-            if (isDescription) { 
-                temp.querySelectorAll('a').forEach(link => { 
-                    if (!link.style.color) link.style.color = '#ffffff'; 
-                    link.style.textDecoration = 'underline'; 
-                    if (!link.getAttribute('href')) link.setAttribute('href', '#'); 
-                }); 
-            }
+            if (isDescription) { temp.querySelectorAll('a').forEach(link => { if (!link.style.color) link.style.color = '#ffffff'; link.style.textDecoration = 'underline'; if (!link.getAttribute('href')) link.setAttribute('href', '#'); }); }
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
         
-        function updateData(field, value) {
-            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { 
-                state.blockData[field] = value; 
-                refreshPreview(); 
-            }
-        }
-        
+        function updateData(field, value) { if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); } }
         const debouncedUpdateData = utils.debounce(updateData, CONFIG.debounceDelay);
         
         function generateColumnHtml(prefix) {
@@ -288,17 +219,8 @@
             const subtitleSize = utils.getFieldValue(prefix + 'subtitleFontSize'), titleSize = utils.getFieldValue(prefix + 'titleFontSize');
             const subtitleAlign = utils.getFieldValue(prefix + 'subtitleAlignment'), titleAlign = utils.getFieldValue(prefix + 'titleAlignment'), buttonAlign = utils.getFieldValue(prefix + 'buttonAlignment');
             const subtitleLineHeight = subtitleSize + 12, titleLineHeight = titleSize + 8;
-            
             const spacers = utils.getFieldValue(prefix + 'spacers');
-            const spacersHtml = spacers.map(spacer => {
-                const spacerContent = '<br class="mobile-hide"> ';
-                switch(spacer.type) {
-                    case 'mso': return `<!--[if mso]>${spacerContent}<![endif]-->`;
-                    case 'not_mso': return `<!--[if !mso]><!-->${spacerContent}<!--<![endif]-->`;
-                    default: return spacerContent;
-                }
-            }).join('');
-
+            const spacersHtml = spacers.map(spacer => { const spacerContent = '<br class="mobile-hide"> '; switch(spacer.type) { case 'mso': return `<!--[if mso]>${spacerContent}<![endif]-->`; case 'not_mso': return `<!--[if !mso]><!-->${spacerContent}<!--<![endif]-->`; default: return spacerContent; } }).join('');
             let contentHtml;
             if (contentType === 'checklist') {
                 const items = utils.getFieldValue(prefix + 'items');
@@ -306,12 +228,9 @@
                 contentHtml = `<tr><td style="padding:0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table>${spacersHtml}</td></tr>`;
             } else {
                 const description = processRichText(utils.getFieldValue(prefix + 'description'), true);
-                const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize');
-                const descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment');
-                const descriptionLineHeight = descriptionSize + 8;
+                const descriptionSize = utils.getFieldValue(prefix + 'descriptionFontSize'), descriptionAlign = utils.getFieldValue(prefix + 'descriptionAlignment'), descriptionLineHeight = descriptionSize + 8;
                 contentHtml = `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${descriptionSize}px;font-weight:normal;line-height:${descriptionLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${descriptionAlign};mso-hyphenate:none;hyphens:none;">${description}${spacersHtml}</td></tr>`;
             }
-
             const subtitleHtml = showSubtitle ? `<tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:${subtitleSize}px;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;mso-line-height-rule:exactly;text-align:${subtitleAlign};mso-hyphenate:none;hyphens:none;">${subtitle}</td></tr><tr><td><div style="font-size:8px;height:8px;line-height:8px;"> </div></td></tr>` : '';
             const buttonHtml = showButton ? `<tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="${buttonAlign}" class="block" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;"><tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;padding:12px 20px;text-transform:uppercase;"><a href="${buttonLink}" style="color:#ffffff;text-decoration:none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr><tr><td><div style="font-size:20px;height:20px;line-height:20px;"> </div></td></tr>` : '';
             const topSpacer = `<div style="font-size:12px;height:12px;line-height:12px;"> </div>`;
@@ -328,61 +247,30 @@
             return topSpacerHtml + mainContentHtml;
         }
 
-        function refreshPreview() { 
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => {
-                if (state.isLoading || !state.sdk) return;
-                utils.safeExecute(() => {
-                    utils.showSaveIndicator('Saving...');
-                    const html = generateTemplate();
-                    state.sdk.setContent(html);
-                    if (state.sdk.setData) {
-                        state.sdk.setData({ ...state.blockData, content: html });
-                    }
-                    setTimeout(() => utils.showSaveIndicator('Saved'), 250);
-                });
-            });
-        }
+        function refreshPreview() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(() => { if (state.isLoading || !state.sdk) return; utils.safeExecute(() => { utils.showSaveIndicator('Saving...'); const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } setTimeout(() => utils.showSaveIndicator('Saved'), 250); }); }); }
         
         function renderList(prefix, listType, templateId, hasQuill) {
             const container = elements[prefix + listType + 'Container'];
             const items = utils.getFieldValue(prefix + listType);
             const template = elements[templateId];
-            
             const fragment = document.createDocumentFragment();
             const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook' };
-            
             items.forEach((item, index) => {
                 const itemFragment = template.content.cloneNode(true);
                 const itemEl = itemFragment.firstElementChild;
                 itemEl.dataset.id = item.id;
                 const titleEl = itemEl.querySelector('.item-title, .spacer-title');
-                if (listType === 'items') { 
-                    titleEl.textContent = `Item ${index + 1}`; 
-                } else { 
-                    titleEl.textContent = `Spacer: ${typeLabels[item.type]}`; 
-                }
+                if (listType === 'items') { titleEl.textContent = `Item ${index + 1}`; } else { titleEl.textContent = `Spacer: ${typeLabels[item.type]}`; }
                 const moveUpBtn = itemEl.querySelector('.move-up-btn');
                 if (moveUpBtn) moveUpBtn.disabled = index === 0;
                 const moveDownBtn = itemEl.querySelector('.move-down-btn');
                 if (moveDownBtn) moveDownBtn.disabled = index === items.length - 1;
-                fragment.appendChild(itemEl);
                 
                 if (hasQuill) {
-                    const editorDiv = itemEl.querySelector('.quill-container');
-                    const editor = new Quill(editorDiv, {
-                        theme: 'snow',
-                        modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] },
-                        formats: ['bold', 'italic', 'link'],
-                        placeholder: 'Enter item text...'
-                    });
-                    
-                    if (item.text && item.text.trim()) {
-                        editor.setContents([]);
-                        editor.clipboard.dangerouslyPasteHTML(item.text);
-                    }
+                    const editorDiv = itemEl.querySelector('.quill-container > div'); // CORRECTED SELECTOR
+                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { ...sharedEditorModules, toolbar: [['bold', 'italic'], ['link']] }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
+                    if (item.text && item.text.trim()) { editor.setContents([]); editor.clipboard.dangerouslyPasteHTML(item.text); }
                     state.editors.set(item.id, editor);
-                    
                     const debouncedUpdate = utils.debounce(() => {
                         const newItems = Array.from(container.querySelectorAll('.item')).map(el => {
                             const id = el.dataset.id;
@@ -393,6 +281,7 @@
                     }, CONFIG.debounceDelay + 100);
                     editor.on('text-change', debouncedUpdate);
                 }
+                fragment.appendChild(itemEl);
             });
             container.replaceChildren(fragment);
         }
@@ -400,93 +289,30 @@
         function toggleContentTypeView(prefix, type) {
             elements[prefix + 'descriptionSection'].style.display = type === 'description' ? 'block' : 'none';
             elements[prefix + 'checklistSection'].style.display = type === 'checklist' ? 'block' : 'none';
-            if (type === 'checklist') {
-                if(utils.getFieldValue(prefix + 'items').length === 0) {
-                     updateData(prefix + 'items', [{id: crypto.randomUUID(), text: 'New Item'}]);
-                }
-                renderList(prefix, 'items', 'itemTemplate', true);
-            }
+            if (type === 'checklist') { if(utils.getFieldValue(prefix + 'items').length === 0) { updateData(prefix + 'items', [{id: crypto.randomUUID(), text: 'New Item'}]); } renderList(prefix, 'items', 'itemTemplate', true); }
         }
         
         const itemActions = {
-            '.remove-btn': (items, idx, id) => {
-                items.splice(idx, 1);
-                const editor = state.editors.get(id);
-                if (editor && editor.off) editor.off('text-change');
-                state.editors.delete(id);
-                return true;
-            },
-            '.move-up-btn': (items, idx) => {
-                if (idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; return true; }
-                return false;
-            },
-            '.move-down-btn': (items, idx) => {
-                if (idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; return true; }
-                return false;
-            },
-            '.duplicate-btn': (items, idx) => {
-                const currentItem = items[idx];
-                const editor = state.editors.get(currentItem.id);
-                const currentText = editor ? utils.sanitizeHtml(editor.getSemanticHTML()) : currentItem.text;
-                items.splice(idx + 1, 0, { id: crypto.randomUUID(), text: currentText });
-                return true;
-            }
+            '.remove-btn': (items, idx, id) => { items.splice(idx, 1); const editor = state.editors.get(id); if (editor && editor.off) editor.off('text-change'); state.editors.delete(id); return true; },
+            '.move-up-btn': (items, idx) => { if (idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; return true; } return false; },
+            '.move-down-btn': (items, idx) => { if (idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; return true; } return false; },
+            '.duplicate-btn': (items, idx) => { const currentItem = items[idx]; const editor = state.editors.get(currentItem.id); const currentText = editor ? utils.sanitizeHtml(editor.getSemanticHTML()) : currentItem.text; items.splice(idx + 1, 0, { id: crypto.randomUUID(), text: currentText }); return true; }
         };
         
         function initializeEventHandlers() {
             state.eventListeners = []; 
-            const addListener = (el, evt, handler) => {
-                el.addEventListener(evt, handler);
-                state.eventListeners.push({ element: el, event: evt, handler });
-            };
-
-            function setupOptionSelector(el, key, callback) { 
-                if (!el) return; 
-                el.querySelectorAll('.option-button, .color-option').forEach(opt => { 
-                    const handler = (e) => { 
-                        const btn = e.currentTarget;
-                        const value = btn.dataset.value || btn.dataset.color;
-                        updateData(key, value); 
-                        el.querySelectorAll('.option-button, .color-option').forEach(o => o.classList.remove('selected')); 
-                        btn.classList.add('selected'); 
-                        if(callback) callback(value); 
-                    }; 
-                    addListener(opt, 'click', handler);
-                }); 
-            }
-            
-            function setupNumberInput(el, key) { 
-                if (!el) return; 
-                const blurHandler = (e) => { 
-                    const i = e.target; let v = parseInt(i.value, 10); 
-                    const min = parseInt(i.min), max = parseInt(i.max); 
-                    if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; 
-                    i.value = Math.max(min, Math.min(max, v)); 
-                    updateData(key, parseInt(i.value)); 
-                }; 
-                addListener(el, 'blur', blurHandler);
-            }
-            
+            const addListener = (el, evt, handler) => { el.addEventListener(evt, handler); state.eventListeners.push({ element: el, event: evt, handler }); };
+            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button, .color-option').forEach(opt => { const handler = (e) => { const btn = e.currentTarget; const value = btn.dataset.value || btn.dataset.color; updateData(key, value); el.querySelectorAll('.option-button, .color-option').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(value); }; addListener(opt, 'click', handler); }); }
+            function setupNumberInput(el, key) { if (!el) return; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; i.value = Math.max(min, Math.min(max, v)); updateData(key, parseInt(i.value)); }; addListener(el, 'blur', blurHandler); }
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
-            
             COLUMN_PREFIXES.forEach(p => {
-                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { 
-                    const el = elements[p + type]; if(!el) return; 
-                    addListener(el, 'input', (e) => debouncedUpdateData(p + type, e.target.value.trim()));
-                });
-                
-                ['showSubtitle', 'showButton'].forEach(type => { 
-                    const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; 
-                    addListener(el, 'change', (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); });
-                });
-                
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink'].forEach(type => { const el = elements[p + type]; if(!el) return; addListener(el, 'input', (e) => debouncedUpdateData(p + type, e.target.value.trim())); });
+                ['showSubtitle', 'showButton'].forEach(type => { const el = elements[p + type], groupEl = elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')]; if(!el) return; addListener(el, 'change', (e) => { updateData(p + type, e.target.checked); groupEl.classList.toggle('disabled-field', !e.target.checked); }); });
                 ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => setupNumberInput(elements[p + type], p + type));
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
-                
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
                 addListener(elements[p + 'addItemBtn'], 'click', () => { handleListActions({ target: { closest: () => true } }, p, 'items', true, 'add'); });
                 addListener(elements[p + 'itemsContainer'], 'click', (e) => { handleListActions(e, p, 'items', true); });
-
                 addListener(elements[p + 'addSpacerAllBtn'], 'click', () => addSpacer(p, 'all'));
                 addListener(elements[p + 'addSpacerMsoBtn'], 'click', () => addSpacer(p, 'mso'));
                 addListener(elements[p + 'addSpacerNotMsoBtn'], 'click', () => addSpacer(p, 'not_mso'));
@@ -494,12 +320,7 @@
             });
         }
         
-        function addSpacer(prefix, type) {
-            const currentSpacers = utils.getFieldValue(prefix + 'spacers');
-            const newSpacers = [...currentSpacers, { id: crypto.randomUUID(), type: type }];
-            updateData(prefix + 'spacers', newSpacers);
-            renderList(prefix, 'spacers', 'spacerTemplate', false);
-        }
+        function addSpacer(prefix, type) { const currentSpacers = utils.getFieldValue(prefix + 'spacers'); const newSpacers = [...currentSpacers, { id: crypto.randomUUID(), type: type }]; updateData(prefix + 'spacers', newSpacers); renderList(prefix, 'spacers', 'spacerTemplate', false); }
 
         function handleListActions(event, prefix, listType, hasQuill, forceAction) {
             const listKey = prefix + listType;
@@ -507,32 +328,15 @@
             const containerSelector = listType === 'items' ? '.item' : '.spacer-item';
             const templateId = listType === 'items' ? 'itemTemplate' : 'spacerTemplate';
             let changed = false;
-
-            if (forceAction === 'add') {
-                currentItems.push({ id: crypto.randomUUID(), text: 'New Item' });
-                changed = true;
+            if (forceAction === 'add') { currentItems.push({ id: crypto.randomUUID(), text: 'New Item' }); changed = true;
             } else {
                 const itemEl = event.target.closest(containerSelector); if (!itemEl) return;
                 const id = itemEl.dataset.id;
-                const idx = currentItems.findIndex(i => i.id === id);
-                if (idx === -1) return;
-
-                if (listType === 'items') {
-                    for (const [selector, action] of Object.entries(itemActions)) {
-                        if (event.target.closest(selector)) {
-                            changed = action(currentItems, idx, id);
-                            break;
-                        }
-                    }
-                } else if (event.target.closest('.remove-btn')) { // Spacers only have remove
-                    currentItems.splice(idx, 1);
-                    changed = true;
-                }
+                const idx = currentItems.findIndex(i => i.id === id); if (idx === -1) return;
+                if (listType === 'items') { for (const [selector, action] of Object.entries(itemActions)) { if (event.target.closest(selector)) { changed = action(currentItems, idx, id); break; } }
+                } else if (event.target.closest('.remove-btn')) { currentItems.splice(idx, 1); changed = true; }
             }
-            if (changed) {
-                updateData(listKey, currentItems);
-                renderList(prefix, listType, templateId, hasQuill);
-            }
+            if (changed) { updateData(listKey, currentItems); renderList(prefix, listType, templateId, hasQuill); }
         }
         
         function loadData() {
@@ -541,39 +345,16 @@
             state.sdk.getData((data) => {
                 utils.safeExecute(() => {
                     state.blockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => { 
-                        let value = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue;
-                        if (moduleConfig.fields[key].type === 'richtext') value = utils.sanitizeHtml(value);
-                        state.blockData[key] = value;
-                    });
-                    
+                    Object.keys(moduleConfig.fields).forEach(key => { let value = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; if (moduleConfig.fields[key].type === 'richtext') value = utils.sanitizeHtml(value); state.blockData[key] = value; });
                     COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (Array.isArray(state.blockData[p + listType])) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
-                    
                     document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
-                    
                     function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
-                    
                     COLUMN_PREFIXES.forEach(p => {
                         ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
-                        
-                        ['title', 'description'].forEach(type => { 
-                            const editor = state.editors.get(p + type);
-                            if (editor) {
-                                const content = utils.getFieldValue(p + type);
-                                editor.setContents([]);
-                                if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content);
-                            }
-                        });
-
-                        ['showSubtitle', 'showButton'].forEach(type => { 
-                            const isChecked = utils.getFieldValue(p + type); 
-                            elements[p + type].checked = isChecked; 
-                            elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); 
-                        });
-                        
+                        ['title', 'description'].forEach(type => { const editor = state.editors.get(p + type); if (editor) { const content = utils.getFieldValue(p + type); editor.setContents([]); if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content); } });
+                        ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
                         ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
                         setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
-
                         toggleContentTypeView(p, utils.getFieldValue(p + 'contentType'));
                         renderList(p, 'spacers', 'spacerTemplate', false);
                     });
@@ -583,12 +364,7 @@
             });
         }
         
-        function cleanup() { 
-            if(rafId) cancelAnimationFrame(rafId);
-            state.editors.forEach(editor => editor && editor.off('text-change')); 
-            state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); 
-            state.eventListeners = []; 
-        }
+        function cleanup() { if(rafId) cancelAnimationFrame(rafId); state.editors.forEach(editor => editor && editor.off('text-change')); state.eventListeners.forEach(({ element, event, handler }) => { if (element && element.removeEventListener) element.removeEventListener(event, handler); }); state.eventListeners = []; }
 
         function initializeWithRetry() {
             try {
@@ -603,10 +379,7 @@
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`, true);
-                if (state.retryCount < CONFIG.maxRetries) { 
-                    state.retryCount++; 
-                    setTimeout(initializeWithRetry, 1000 * state.retryCount); 
-                } 
+                if (state.retryCount < CONFIG.maxRetries) { state.retryCount++; setTimeout(initializeWithRetry, 1000 * state.retryCount); } 
                 setLoadingState(false);
             }
         }
