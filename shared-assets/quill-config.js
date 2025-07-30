@@ -33,10 +33,41 @@ class QuillConfigManager {
                 matchVisual: false,
                 // Strip formatting that doesn't work well in email
                 matchers: [
+                    // Convert non-breaking spaces to regular spaces
+                    [Node.TEXT_NODE, function(node, delta) {
+                        if (typeof node.data === 'string') {
+                            // Replace all non-breaking spaces with regular spaces
+                            const text = node.data.replace(/\u00A0/g, ' ').replace(/&nbsp;/g, ' ');
+                            return new (window.Quill.import('delta'))().insert(text);
+                        }
+                        return delta;
+                    }],
+                    // Remove problematic paragraph formatting
                     ['P', function(node, delta) {
                         return delta.compose(new (window.Quill.import('delta'))().retain(delta.length(), { 'block-format': null }));
+                    }],
+                    // Clean up any remaining non-breaking spaces from HTML
+                    ['*', function(node, delta) {
+                        if (node.innerHTML) {
+                            node.innerHTML = node.innerHTML.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
+                        }
+                        return delta;
                     }]
                 ]
+            },
+            // Configure keyboard module to prevent non-breaking spaces
+            keyboard: {
+                bindings: {
+                    // Override space key to insert regular space
+                    space: {
+                        key: ' ',
+                        handler: function(range, context) {
+                            this.quill.insertText(range.index, ' ', 'user');
+                            this.quill.setSelection(range.index + 1, 0, 'user');
+                            return false;
+                        }
+                    }
+                }
             }
         }
     };
@@ -98,6 +129,9 @@ class QuillConfigManager {
 
             // Add email-specific formatting cleanup
             this.addEmailFormatting(editor);
+
+            // Add non-breaking space cleanup monitor
+            this.addSpaceCleanupMonitor(editor);
 
             return editor;
         } catch (error) {
@@ -170,6 +204,31 @@ class QuillConfigManager {
                 }
             }
         });
+
+        // Clean up non-breaking spaces on text changes
+        editor.on('text-change', (delta, oldDelta, source) => {
+            if (source === 'user') {
+                const text = editor.getText();
+                if (text.includes('\u00A0')) {
+                    // Replace non-breaking spaces with regular spaces
+                    const cleanText = text.replace(/\u00A0/g, ' ');
+                    const currentSelection = editor.getSelection();
+                    editor.setText(cleanText);
+                    if (currentSelection) {
+                        editor.setSelection(currentSelection.index, currentSelection.length);
+                    }
+                }
+            }
+        });
+
+        // Override paste behavior to clean up non-breaking spaces
+        editor.clipboard.addMatcher(Node.TEXT_NODE, function(node, delta) {
+            if (typeof node.data === 'string') {
+                const cleanText = node.data.replace(/\u00A0/g, ' ').replace(/&nbsp;/g, ' ');
+                return new (window.Quill.import('delta'))().insert(cleanText);
+            }
+            return delta;
+        });
     }
 
     /**
@@ -202,6 +261,9 @@ class QuillConfigManager {
             editor.getSemanticHTML() : 
             editor.root.innerHTML;
 
+        // Always clean up non-breaking spaces
+        content = this.cleanSpaces(content);
+
         if (emailOptimized) {
             content = this.sanitizeForEmail(content);
         }
@@ -233,14 +295,16 @@ class QuillConfigManager {
             }
         }
 
-        // Clean up email-incompatible formatting
+        // Clean up email-incompatible formatting and non-breaking spaces
         return temp.innerHTML
             .replace(/<p>/g, '')
             .replace(/<\/p>/g, '')
             .replace(/<br\s*\/?>/g, '')
             .replace(/<div[^>]*>/g, '')
             .replace(/<\/div>/g, '')
-            .replace(/\s{2,}/g, ' ')
+            .replace(/&nbsp;/g, ' ')           // Replace HTML non-breaking spaces
+            .replace(/\u00A0/g, ' ')          // Replace Unicode non-breaking spaces
+            .replace(/\s{2,}/g, ' ')          // Replace multiple spaces with single space
             .trim();
     }
 
@@ -253,15 +317,27 @@ class QuillConfigManager {
         if (!editor || !content) return;
 
         try {
+            // Clean content before setting
+            const cleanContent = content
+                .replace(/&nbsp;/g, ' ')
+                .replace(/\u00A0/g, ' ');
+
             // Clear existing content first
             editor.setText('');
             
             // Use clipboard.dangerouslyPasteHTML for Quill 2.0
             if (editor.clipboard && editor.clipboard.dangerouslyPasteHTML) {
-                editor.clipboard.dangerouslyPasteHTML(content);
+                editor.clipboard.dangerouslyPasteHTML(cleanContent);
             } else {
                 // Fallback for older versions
-                editor.root.innerHTML = content;
+                editor.root.innerHTML = cleanContent;
+            }
+
+            // Additional cleanup after setting content
+            const text = editor.getText();
+            if (text.includes('\u00A0')) {
+                const cleanText = text.replace(/\u00A0/g, ' ');
+                editor.setText(cleanText);
             }
         } catch (error) {
             console.warn('Failed to set editor content:', error);
@@ -313,6 +389,58 @@ class QuillConfigManager {
 
         await Promise.all(initPromises);
         return editors;
+    }
+
+    /**
+     * Cleans up non-breaking spaces from text content
+     * @param {string} text - Text content to clean
+     * @returns {string} Cleaned text with regular spaces
+     */
+    static cleanSpaces(text) {
+        if (!text) return '';
+        return text
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\u00A0/g, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+    }
+
+    /**
+     * Monitors and cleans up non-breaking spaces in real-time
+     * @param {Object} editor - Quill instance to monitor
+     */
+    static addSpaceCleanupMonitor(editor) {
+        let isCleaningSpaces = false;
+
+        const cleanupSpaces = () => {
+            if (isCleaningSpaces) return;
+            
+            const text = editor.getText();
+            if (text.includes('\u00A0')) {
+                isCleaningSpaces = true;
+                const selection = editor.getSelection();
+                const cleanText = this.cleanSpaces(text);
+                
+                editor.setText(cleanText);
+                
+                if (selection) {
+                    // Restore cursor position
+                    const newIndex = Math.min(selection.index, cleanText.length);
+                    editor.setSelection(newIndex, 0);
+                }
+                isCleaningSpaces = false;
+            }
+        };
+
+        // Monitor for non-breaking spaces on text changes
+        editor.on('text-change', (delta, oldDelta, source) => {
+            if (source === 'user') {
+                setTimeout(cleanupSpaces, 10); // Small delay to let Quill finish processing
+            }
+        });
+
+        // Also clean on focus loss
+        editor.root.addEventListener('blur', cleanupSpaces);
     }
 }
 
