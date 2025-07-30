@@ -58,13 +58,14 @@
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
+        
         const moduleConfig = {
             name: '1 Column Story with Checklist',
             fields: {
                 layout: { type: 'text', defaultValue: 'left' },
-                imageUrl: { type: 'url', defaultValue: 'https://placehold.co/290x290', validator: 'url' },
+                imageUrl: { type: 'url', defaultValue: 'https://placehold.co/290x290' },
                 imageAlt: { type: 'text', defaultValue: 'Story Image', maxLength: 150 },
-                imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 title: { type: 'richtext', defaultValue: 'Tempus Euismod Phasellus', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 20 },
                 titleAlignment: { type: 'text', defaultValue: 'center' },
@@ -72,178 +73,28 @@
                 description: { type: 'richtext', defaultValue: 'Vestibulum condimentum tempus euismod. Phasellus ligula nibh, ornare at ligula a.', maxLength: 250 },
                 descriptionFontSize: { type: 'number', defaultValue: 16 },
                 descriptionAlignment: { type: 'text', defaultValue: 'center' },
-                items: { type: 'list', defaultValue: [{ id: crypto.randomUUID(), text: '<strong>Lorem ipsum odor amet</strong>' }, { id: crypto.randomUUID(), text: '<strong>Consectetur adipiscing elit</strong>' }] },
+                items: { type: 'list', defaultValue: [{ id: 'item1', text: '<strong>Lorem ipsum odor amet</strong>' }, { id: 'item2', text: '<strong>Consectetur adipiscing elit</strong>' }] },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'text', defaultValue: 'Nulla Ut Erat Enim', maxLength: 40 },
-                buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 buttonAlignment: { type: 'text', defaultValue: 'center' }
-            }
-        function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            try { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); } } catch (error) { utils.showError(`Preview update failed: ${error.message}`); }
-        }
-        function renderItemsUI() {
-            const items = utils.getFieldValue('items');
-            elements.itemsContainer.innerHTML = '';
-            const currentIds = new Set(items.map(i => i.id));
-            Object.keys(state.editors).forEach(id => { if (!currentIds.has(id) && id !== 'title' && id !== 'description') delete state.editors[id]; });
-            items.forEach((item, index) => {
-                const itemFragment = elements.itemTemplate.content.cloneNode(true);
-                const itemEl = itemFragment.querySelector('.item');
-                const editorDiv = itemFragment.querySelector('.quill-container');
-                itemEl.dataset.id = item.id;
-                itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
-                itemEl.querySelector('.move-up-btn').disabled = index === 0;
-                itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
-                elements.itemsContainer.appendChild(itemFragment);
-                
-                // Quill 2.0 configuration for list items
-                const editor = new Quill(editorDiv, { 
-                    theme: 'snow', 
-                    modules: { 
-                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false } 
-                    }, 
-                    formats: ['bold', 'script', 'link'], 
-                    placeholder: 'Enter item text...' 
-                });
-                
-                // Set initial content using Quill 2.0 API
-                if (item.text && item.text.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(item.text);
-                }
-                
-                editor.on('text-change', debouncedChecklistUpdate);
-                state.editors[item.id] = editor;
-            });
-        }
-        function toggleContentTypeView(type) {
-            elements.descriptionSection.style.display = type === 'description' ? 'block' : 'none';
-            elements.checklistSection.style.display = type === 'checklist' ? 'block' : 'none';
-            if (type === 'checklist') renderItemsUI();
-        }
-        function initializeEventHandlers() {
-            state.eventListeners = []; 
-            function setupOptionSelector(el, key, callback) { if (!el) return; el.querySelectorAll('.option-button').forEach(opt => { const h = (e) => { const btn = e.currentTarget; updateData(key, btn.dataset.value); el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(btn.dataset.value); }; opt.addEventListener('click', h); state.eventListeners.push({ element: opt, event: 'click', handler: h }); }); }
-            function setupNumberInput(el, key) { if (!el) return; const step = 4; const blurHandler = (e) => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min, 10), max = parseInt(i.max, 10); if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); const cv = Math.round(v / step) * step; i.value = cv; updateData(key, cv); }; const inputHandler = (e) => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }; el.addEventListener('input', inputHandler); el.addEventListener('blur', blurHandler); state.eventListeners.push({ element: el, event: 'input', handler: inputHandler }); state.eventListeners.push({ element: el, event: 'blur', handler: blurHandler }); }
-            function setupTextInput(el, key, isUrl = false, errEl = null) { if (!el) return; const h = (e) => { let v = e.target.value; if (isUrl && !utils.isValidUrl(v)) return; if (moduleConfig.fields[key].maxLength) v = v.substring(0, moduleConfig.fields[key].maxLength); e.target.value = v; debouncedUpdateData(key, v.trim()); }; el.addEventListener('input', h); state.eventListeners.push({ element: el, event: 'input', handler: h }); if(isUrl) { const b = () => utils.isValidUrl(el.value, errEl); el.addEventListener('blur', b); state.eventListeners.push({ element: el, event: 'blur', handler: b }); } }
-            function setupToggle(el, key, groupEl) { if (!el) return; const h = (e) => { updateData(key, e.target.checked); if (groupEl) groupEl.classList.toggle('disabled-field', !e.target.checked); }; el.addEventListener('change', h); state.eventListeners.push({ element: el, event: 'change', handler: h }); }
-            setupOptionSelector(elements.layoutSelector, 'layout');
-            setupTextInput(elements.imageUrl, 'imageUrl', true, elements.imageUrlError);
-            setupTextInput(elements.imageAlt, 'imageAlt');
-            setupTextInput(elements.imageLink, 'imageLink', true, elements.imageLinkError);
-            setupNumberInput(elements.titleFontSize, 'titleFontSize');
-            setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
-            setupOptionSelector(elements.contentTypeSelector, 'contentType', toggleContentTypeView);
-            setupNumberInput(elements.descriptionFontSize, 'descriptionFontSize');
-            setupOptionSelector(elements.descriptionAlignmentSelector, 'descriptionAlignment');
-            setupToggle(elements.showButton, 'showButton', elements.buttonFieldsGroup);
-            setupTextInput(elements.buttonText, 'buttonText');
-            setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
-            setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
-            elements.addItemBtn.addEventListener('click', () => {
-                const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
-                state.blockData.items.push(newItem);
-                renderItemsUI();
-                debouncedChecklistUpdate();
-            });
-            elements.itemsContainer.addEventListener('click', (e) => {
-                const itemEl = e.target.closest('.item'); if (!itemEl) return;
-                const id = itemEl.dataset.id; const items = state.blockData.items; const idx = items.findIndex(i => i.id === id);
-                if (e.target.closest('.remove-btn')) { items.splice(idx, 1); delete state.editors[id]; } 
-                else if (e.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; }
-                else if (e.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; }
-                else return;
-                renderItemsUI(); debouncedChecklistUpdate();
-            });
-        }
-        function loadData() {
-            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
-            setLoadingState(true);
-            state.sdk.getData((data) => {
-                try {
-                    state.blockData = {};
-                    Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? (moduleConfig.fields[key].type === 'richtext' ? utils.sanitizeHtml(data[key]) : data[key]) : moduleConfig.fields[key].defaultValue; });
-                    if(state.blockData.items) state.blockData.items.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
-                    function setSelectorState(el, key) { const v = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === v)); }
-                    setSelectorState(elements.layoutSelector, 'layout');
-                    ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'].forEach(key => { if (elements[key]) elements[key].value = utils.getFieldValue(key); });
-                    
-                    // Updated for Quill 2.0 - use clipboard API for setting content
-                    if (state.editors.title) {
-                        const titleContent = utils.getFieldValue('title');
-                        state.editors.title.setContents([]);
-                        if (titleContent && titleContent.trim()) {
-                            state.editors.title.clipboard.dangerouslyPasteHTML(titleContent);
-                        }
-                    }
-                    if (state.editors.description) {
-                        const descContent = utils.getFieldValue('description');
-                        state.editors.description.setContents([]);
-                        if (descContent && descContent.trim()) {
-                            state.editors.description.clipboard.dangerouslyPasteHTML(descContent);
-                        }
-                    }
-                    
-                    setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
-                    setSelectorState(elements.descriptionAlignmentSelector, 'descriptionAlignment');
-                    const showButton = utils.getFieldValue('showButton');
-                    elements.showButton.checked = showButton;
-                    if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
-                    setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
-                    const contentType = utils.getFieldValue('contentType');
-                    setSelectorState(elements.contentTypeSelector, 'contentType');
-                    toggleContentTypeView(contentType);
-                    refreshPreview();
-                } catch (error) { utils.showError(`Failed to load data: ${error.message}`); Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); refreshPreview(); } finally { setLoadingState(false); }
-            });
-        }
-        function cleanup() { 
-            // Updated cleanup for Quill 2.0
-            Object.values(state.editors).forEach(e => {
-                if (e && e.off) {
-                    e.off('text-change');
-                }
-            }); 
-            state.eventListeners.forEach(({ element, event, handler }) => { 
-                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
-            }); 
-            state.eventListeners = []; 
-        }
-        function initializeWithRetry() {
-            try {
-                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-                if (!window.Quill) throw new Error('Quill not loaded');
-                state.sdk = new window.sfdc.BlockSDK();
-                cacheElements();
-                initializeEditors();
-                initializeEventHandlers();
-                loadData();
-                window.addEventListener('beforeunload', cleanup);
-                document.addEventListener('visibilitychange', () => { if (!document.hidden && state.isInitialized) loadData(); });
-                state.isInitialized = true;
-            } catch (error) {
-                utils.showError(`Initialization failed: ${error.message}`);
-                let retryCount = state.retryCount || 0;
-                if (retryCount < moduleConfig.maxRetries) { state.retryCount = retryCount + 1; setTimeout(() => initializeWithRetry(), 1000 * state.retryCount); } 
-                else { utils.showError('Failed to initialize after multiple attempts. Please refresh.', true); }
-                setLoadingState(false);
-            }
-        }
-        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); },
+            },
             debounceDelay: 300,
             maxRetries: 3
         };
-        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
+
+        const state = { sdk: null, editors: new Map(), blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
         const elements = {};
+        
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
             sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); t.querySelectorAll('a').forEach(l => { if (!l.style.color) l.style.color = '#ffffff'; if (!l.style.textDecoration) l.style.textDecoration = 'underline'; if (!l.getAttribute('href')) l.setAttribute('href', '#'); }); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
-            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
+            safeExecute(fn, fallback = null) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); return fallback; } }
         };
+
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
@@ -273,46 +124,26 @@
             elements.buttonLinkError = document.getElementById('buttonLinkError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
         }
+
         function setLoadingState(loading) {
             state.isLoading = loading;
             if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
         }
+
         function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
             const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
-                // Quill 2.0 configuration
-                const quillOptions = {
-                    theme: 'snow',
-                    modules: {
-                        toolbar,
-                        clipboard: { matchVisual: false }
-                    },
-                    formats,
-                    placeholder
-                };
-                state.editors[fieldName] = new Quill(element, quillOptions);
+                const quillOptions = { theme: 'snow', modules: { toolbar, clipboard: { matchVisual: false } }, formats, placeholder };
+                const editor = new Quill(element, quillOptions);
+                state.editors.set(fieldName, editor);
                 
-                const debouncedUpdate = utils.debounce((delta, oldDelta, source) => { 
-                    if (source === 'user') {
-                        const content = state.editors[fieldName].getSemanticHTML ? 
-                            state.editors[fieldName].getSemanticHTML() : 
-                            state.editors[fieldName].root.innerHTML;
-                        updateData(fieldName, utils.sanitizeHtml(content));
-                    } 
-                }, moduleConfig.debounceDelay);
-                
-                state.editors[fieldName].on('text-change', debouncedUpdate);
-                
-                // Length limiting with Quill 2.0
-                state.editors[fieldName].on('text-change', () => { 
-                    const text = state.editors[fieldName].getText(); 
-                    const maxLength = moduleConfig.fields[fieldName].maxLength; 
+                editor.on('text-change', () => { 
+                    const text = editor.getText();
+                    const maxLength = moduleConfig.fields[fieldName].maxLength;
                     if (maxLength && text.length > maxLength) {
-                        const range = state.editors[fieldName].getSelection();
-                        state.editors[fieldName].deleteText(maxLength, text.length - maxLength);
-                        if (range) {
-                            state.editors[fieldName].setSelection(Math.min(range.index, maxLength));
-                        }
+                        const range = editor.getSelection();
+                        editor.deleteText(maxLength, text.length - maxLength);
+                        if (range) { editor.setSelection(Math.min(range.index, maxLength)); }
                     }
                 });
             };
@@ -321,33 +152,35 @@
                 createEditor('description', '#descriptionEditor', [['bold', 'italic'], ['link']], ['bold', 'italic', 'link'], 'Enter description...');
             } catch (error) { throw new Error(`Failed to initialize editors: ${error.message}`); }
         }
+
+        function updateData(field, value) {
+            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+        
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+        
+        const debouncedChecklistUpdate = utils.debounce(() => {
+            const newItems = Array.from(document.querySelectorAll('#itemsContainer .item')).map(itemEl => {
+                const id = itemEl.dataset.id;
+                const editor = state.editors.get(id);
+                if (editor) {
+                    const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                    return { id, text: utils.sanitizeHtml(content) };
+                }
+                return null;
+            }).filter(Boolean);
+            updateData('items', newItems);
+        }, moduleConfig.debounceDelay + 100);
+
         function processRichText(html) {
             if (!html) return '';
             const temp = document.createElement('div');
             temp.innerHTML = utils.sanitizeHtml(html);
             return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
-        function updateData(field, value) {
-            if (state.blockData[field] != value) {
-                state.blockData[field] = value;
-                refreshPreview();
-            }
-        }
-        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
-        const debouncedChecklistUpdate = utils.debounce(() => {
-            const newItems = [];
-            document.querySelectorAll('#itemsContainer .item').forEach(itemEl => {
-                const id = itemEl.dataset.id;
-                const editor = state.editors[id];
-                if (editor) {
-                    const content = editor.getSemanticHTML ? 
-                        editor.getSemanticHTML() : 
-                        editor.root.innerHTML;
-                    newItems.push({ id, text: utils.sanitizeHtml(content) });
-                }
-            });
-            updateData('items', newItems);
-        }, moduleConfig.debounceDelay + 100);
         
         function generateTemplate() {
             const layout = utils.getFieldValue('layout');
@@ -387,10 +220,147 @@
             }
 
             const textContentTable = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;"> </td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h3></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;"> </div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
-
             const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
             const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><!--[if (gte mso 9)|(IE)]><table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top"><![endif]-->${textContentTable}<!--[if (gte mso 9)|(IE)]></td></tr><tr><td height="100%"> </td></tr></table><![endif]--></td>`;
-            
             const mainContent = layout === 'right' ? textCell + imageCell : imageCell + textCell;
-
             return `<!-- START .story-1col --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;"><tr><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${mainContent}</tr></table></td><td style="background-color: #000000; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td class="color-bg-1" height="40" style="background-color: ${bgColor}; width: 20px;"> </td></tr><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .story-1col -->`;
+        }
+
+        function refreshPreview() {
+            if (state.isLoading || !state.sdk) return;
+            utils.safeExecute(() => { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); }});
+        }
+
+        function renderItemsUI() {
+            const items = utils.getFieldValue('items');
+            elements.itemsContainer.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const itemFragment = elements.itemTemplate.content.cloneNode(true);
+                const itemEl = itemFragment.querySelector('.item');
+                const editorDiv = itemFragment.querySelector('.quill-container');
+                itemEl.dataset.id = item.id;
+                itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
+                itemEl.querySelector('.move-up-btn').disabled = index === 0;
+                itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
+                elements.itemsContainer.appendChild(itemFragment);
+                
+                const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', { 'script': 'super' }], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'script', 'link'], placeholder: 'Enter item text...' });
+                state.editors.set(item.id, editor);
+                
+                if (item.text && item.text.trim()) { editor.clipboard.dangerouslyPasteHTML(item.text); }
+                editor.on('text-change', debouncedChecklistUpdate);
+            });
+        }
+        
+        function toggleContentTypeView(type) {
+            elements.descriptionSection.style.display = type === 'description' ? 'block' : 'none';
+            elements.checklistSection.style.display = type === 'checklist' ? 'block' : 'none';
+            if (type === 'checklist') renderItemsUI();
+        }
+
+        function initializeEventHandlers() {
+            state.eventListeners.forEach(({ element, event, handler }) => element.removeEventListener(event, handler));
+            state.eventListeners = [];
+            const addListener = (el, event, handler) => { if (el) { el.addEventListener(event, handler); state.eventListeners.push({ element: el, event, handler }); }};
+            
+            const setupOptionSelector = (el, key, callback) => el.querySelectorAll('.option-button').forEach(opt => addListener(opt, 'click', e => { const btn = e.currentTarget; const value = btn.dataset.value; updateData(key, value); el.querySelectorAll('.selected').forEach(o => o.classList.remove('selected')); btn.classList.add('selected'); if(callback) callback(value); }));
+            const setupNumberInput = (el, key) => { addListener(el, 'input', e => { const v = parseInt(e.target.value, 10); if (!isNaN(v)) debouncedUpdateData(key, v); }); addListener(el, 'blur', e => { const i = e.target; let v = parseInt(i.value, 10); const min = parseInt(i.min), max = parseInt(i.max), step = 4; if (isNaN(v)) v = moduleConfig.fields[key].defaultValue; v = Math.max(min, Math.min(v, max)); i.value = Math.round(v / step) * step; updateData(key, i.value); }); };
+            const setupTextInput = (el, key, isUrl, errEl) => { addListener(el, 'input', e => { let v = e.target.value; if(moduleConfig.fields[key].maxLength) v = v.substring(0, moduleConfig.fields[key].maxLength); e.target.value = v; if(isUrl && !utils.isValidUrl(v)) { if(errEl) errEl.style.display = 'block'; return; } if(errEl) errEl.style.display = 'none'; debouncedUpdateData(key, v.trim()); }); if(isUrl) addListener(el, 'blur', () => { if(!utils.isValidUrl(el.value)) { if(errEl) errEl.style.display = 'block'; } else { if(errEl) errEl.style.display = 'none'; } }); };
+            const setupToggle = (el, key, groupEl) => addListener(el, 'change', e => { updateData(key, e.target.checked); if (groupEl) groupEl.classList.toggle('disabled-field', !e.target.checked); });
+            
+            setupOptionSelector(elements.layoutSelector, 'layout');
+            setupTextInput(elements.imageUrl, 'imageUrl', true, elements.imageUrlError);
+            setupTextInput(elements.imageAlt, 'imageAlt');
+            setupTextInput(elements.imageLink, 'imageLink', true, elements.imageLinkError);
+            setupNumberInput(elements.titleFontSize, 'titleFontSize');
+            setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
+            setupOptionSelector(elements.contentTypeSelector, 'contentType', toggleContentTypeView);
+            setupNumberInput(elements.descriptionFontSize, 'descriptionFontSize');
+            setupOptionSelector(elements.descriptionAlignmentSelector, 'descriptionAlignment');
+            setupToggle(elements.showButton, 'showButton', elements.buttonFieldsGroup);
+            setupTextInput(elements.buttonText, 'buttonText');
+            setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
+            setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
+            
+            ['title', 'description'].forEach(fieldName => { const editor = state.editors.get(fieldName); if(editor) editor.on('text-change', (delta, old, source) => { if(source === 'user') { const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML; debouncedUpdateData(fieldName, utils.sanitizeHtml(content)); } }); });
+            
+            addListener(elements.addItemBtn, 'click', () => { const items = [...utils.getFieldValue('items')]; items.push({ id: crypto.randomUUID(), text: '<strong>New Item</strong>' }); updateData('items', items); renderItemsUI(); });
+            addListener(elements.itemsContainer, 'click', e => {
+                const itemEl = e.target.closest('.item'); if (!itemEl) return;
+                const id = itemEl.dataset.id; const items = [...utils.getFieldValue('items')]; const idx = items.findIndex(i => i.id === id); if(idx === -1) return;
+                if (e.target.closest('.remove-btn')) { items.splice(idx, 1); state.editors.delete(id); } 
+                else if (e.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; }
+                else if (e.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; }
+                else return;
+                updateData('items', items); renderItemsUI();
+            });
+        }
+        
+        function updateUIFromData() {
+            const setSelectorState = (el, key) => { const v = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === v)); };
+            setSelectorState(elements.layoutSelector, 'layout');
+            ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'].forEach(key => { if (elements[key]) elements[key].value = utils.getFieldValue(key); });
+            
+            ['title', 'description'].forEach(fieldName => { const editor = state.editors.get(fieldName); if (editor) { const content = utils.getFieldValue(fieldName); editor.setContents([]); if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content); } });
+
+            setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
+            setSelectorState(elements.descriptionAlignmentSelector, 'descriptionAlignment');
+            const showButton = utils.getFieldValue('showButton');
+            elements.showButton.checked = showButton;
+            if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
+            setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
+            
+            const contentType = utils.getFieldValue('contentType');
+            setSelectorState(elements.contentTypeSelector, 'contentType');
+            toggleContentTypeView(contentType);
+        }
+
+        function loadData() {
+            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
+            setLoadingState(true);
+            state.sdk.getData((data) => {
+                utils.safeExecute(() => {
+                    state.blockData = {};
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        let value = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue;
+                        if (Array.isArray(value)) value = value.map(item => ({ ...item, id: item.id || crypto.randomUUID() }));
+                        state.blockData[key] = value;
+                    });
+                    
+                    initializeEventHandlers();
+                    updateUIFromData();
+                    refreshPreview();
+                });
+                setLoadingState(false);
+            });
+        }
+
+        function cleanup() {
+            state.eventListeners.forEach(({ element, event, handler }) => element.removeEventListener(event, handler));
+            state.eventListeners = [];
+            state.editors.forEach(editor => editor && editor.off && editor.off('text-change'));
+            state.editors.clear();
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                if (!window.Quill) throw new Error('Quill not loaded');
+                state.sdk = new window.sfdc.BlockSDK();
+                cacheElements();
+                initializeEditors();
+                loadData();
+                window.addEventListener('beforeunload', cleanup);
+                state.isInitialized = true;
+            } catch (error) {
+                utils.showError(`Initialization failed: ${error.message}`, true);
+                setLoadingState(false);
+            }
+        }
+        
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeWithRetry); } else { initializeWithRetry(); }
+
+    </script>
+</body>
+</html>
