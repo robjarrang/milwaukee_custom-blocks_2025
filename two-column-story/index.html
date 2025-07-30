@@ -183,15 +183,14 @@
             if (!window.Quill) throw new Error('Quill library not loaded');
             COLUMN_PREFIXES.forEach(p => {
                 ['title', 'description'].forEach(type => {
-                    // *** FIX IS HERE ***
                     const dataFieldKey = p + type; // e.g. 'left_title' (for data handling)
-                    const elementId = p + type + 'Editor'; // e.g. 'left_titleEditor' (for DOM lookup)
+                    const elementKey = p + type + 'Editor'; // e.g. 'left_titleEditor' (for elements object lookup)
                     
-                    const editorElement = elements[elementId]; // Use the correct key to find the DOM element
-                    // *** END FIX ***
+                    const editorElement = elements[elementKey]; // Use the correct key to find the DOM element
 
                     if (!editorElement) {
-                        throw new Error(`Invalid Quill container: #${elementId} not found.`);
+                        console.error(`Editor element not found for key: ${elementKey}`);
+                        throw new Error(`Invalid Quill container: #${elementKey} not found.`);
                     }
 
                     const quillOptions = {
