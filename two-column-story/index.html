@@ -147,7 +147,7 @@
             maxRetries: CONFIG.maxRetries
         };
         
-        const state = { sdk: null, editors: new Map(), blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
+        const state = { sdk: null, editors: new Map(), blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
         const elements = {};
         const COLUMN_PREFIXES = Object.freeze(['left_', 'right_']);
         let rafId = null;
@@ -191,14 +191,6 @@
                     const quillOptions = { theme: 'snow', modules: { ...sharedEditorModules, toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] }, formats: type === 'title' ? ['bold'] : ['bold', 'italic', 'link'], placeholder: `Enter ${type}...` };
                     const editor = new Quill(editorElement, quillOptions);
                     state.editors.set(editorId, editor);
-                    
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                        if (source === 'user') {
-                            const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
-                            updateData(editorId, utils.sanitizeHtml(content));
-                        }
-                    }, CONFIG.debounceDelay);
-                    editor.on('text-change', debouncedUpdate);
                 });
             });
         }
@@ -356,7 +348,6 @@
                 const contentType = utils.getFieldValue(p + 'contentType');
                 setSelectorState(elements[p + 'contentTypeSelector'], p + 'contentType');
                 toggleContentTypeView(p, contentType);
-                renderList(p, 'items', 'itemTemplate', true);
                 renderList(p, 'spacers', 'spacerTemplate', false);
             });
         }
@@ -396,7 +387,7 @@
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
-                loadData();
+                loadData(); // This now contains the event handler and UI setup logic in its callback
                 window.addEventListener('beforeunload', cleanup);
                 state.isInitialized = true;
             } catch (error) {
