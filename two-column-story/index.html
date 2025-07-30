@@ -247,6 +247,26 @@
                         throw new Error(`Invalid Quill container: #${elementKey} not found.`);
                     }
 
+                    // Check if Quill is already initialized on this element
+                    if (editorElement.__quill) {
+                        console.warn(`⚠️ Quill already initialized on ${elementKey}, destroying existing instance`);
+                        editorElement.__quill = null;
+                        // Clear the element content to reset it
+                        editorElement.innerHTML = '';
+                        editorElement.className = editorElement.className.replace(/ql-\S+/g, '').trim();
+                    }
+
+                    // Check element classes and structure BEFORE initialization
+                    console.log(`  🔍 Element classes before init: "${editorElement.className}"`);
+                    console.log(`  🔍 Element innerHTML before init: "${editorElement.innerHTML}"`);
+                    console.log(`  🔍 Element parent: ${editorElement.parentElement?.tagName}.${editorElement.parentElement?.className}`);
+                    
+                    // Check if element is visible
+                    const computedStyle = window.getComputedStyle(editorElement);
+                    console.log(`  👁️ Element visibility: display=${computedStyle.display}, visibility=${computedStyle.visibility}, opacity=${computedStyle.opacity}`);
+                    console.log(`  📐 Element dimensions: ${editorElement.offsetWidth}x${editorElement.offsetHeight}`);
+                    console.log(`  📍 Element position: ${editorElement.offsetTop}, ${editorElement.offsetLeft}`);
+
                     const quillOptions = {
                         theme: 'snow',
                         modules: { ...sharedEditorModules, toolbar: type === 'title' ? [['bold']] : [['bold', 'italic'], ['link']] },
@@ -259,6 +279,18 @@
                     try {
                         const editor = new Quill(editorElement, quillOptions);
                         console.log(`  ✅ Successfully created Quill editor for ${elementKey}`);
+                        console.log(`  🔍 Editor root element:`, editor.root);
+                        console.log(`  🔍 Editor container:`, editor.container);
+                        
+                        // Check post-initialization state
+                        console.log(`  🔍 Element classes after init: "${editorElement.className}"`);
+                        console.log(`  🔍 Element innerHTML after init: "${editorElement.innerHTML.substring(0, 150)}..."`);
+                        
+                        // Check if the toolbar and editor are visible
+                        const toolbar = editorElement.querySelector('.ql-toolbar');
+                        const editorDiv = editorElement.querySelector('.ql-editor');
+                        console.log(`  🔧 Toolbar found: ${!!toolbar}, visible: ${toolbar ? window.getComputedStyle(toolbar).display !== 'none' : false}`);
+                        console.log(`  ✏️ Editor div found: ${!!editorDiv}, visible: ${editorDiv ? window.getComputedStyle(editorDiv).display !== 'none' : false}`);
                         
                         state.editors.set(dataFieldKey, editor); // Store the editor instance with the data key
                         console.log(`  💾 Stored editor with key: ${dataFieldKey}`);
@@ -273,6 +305,19 @@
                         editor.on('text-change', debouncedUpdate);
                         console.log(`  🔗 Event listener attached for ${dataFieldKey}`);
                         
+                        // Force a repaint to ensure visibility
+                        setTimeout(() => {
+                            console.log(`  🔄 Forcing repaint for ${elementKey}`);
+                            const currentDisplay = editorElement.style.display;
+                            editorElement.style.display = 'none';
+                            editorElement.offsetHeight; // Force reflow
+                            editorElement.style.display = currentDisplay || '';
+                            
+                            // Double-check visibility after timeout
+                            const newStyle = window.getComputedStyle(editorElement);
+                            console.log(`  🔄 After repaint - display: ${newStyle.display}, visibility: ${newStyle.visibility}, height: ${editorElement.offsetHeight}px`);
+                        }, 100);
+                        
                     } catch (error) {
                         console.error(`❌ Failed to create Quill editor for ${elementKey}:`, error);
                         throw error;
@@ -282,6 +327,25 @@
             
             console.log(`\n✅ Editor initialization complete! Created ${state.editors.size} editors.`);
             console.log('📊 Editor state map:', Array.from(state.editors.keys()));
+            
+            // Final visibility check for all editors
+            setTimeout(() => {
+                console.log('\n🔍 Final editor visibility check:');
+                COLUMN_PREFIXES.forEach(p => {
+                    ['title', 'description'].forEach(type => {
+                        const elementKey = p + type + 'Editor';
+                        const element = elements[elementKey];
+                        if (element) {
+                            const style = window.getComputedStyle(element);
+                            const toolbar = element.querySelector('.ql-toolbar');
+                            const editor = element.querySelector('.ql-editor');
+                            console.log(`  ${elementKey}: display=${style.display}, height=${element.offsetHeight}px, toolbar=${!!toolbar}, editor=${!!editor}`);
+                            if (toolbar) console.log(`    toolbar display=${window.getComputedStyle(toolbar).display}, height=${toolbar.offsetHeight}px`);
+                            if (editor) console.log(`    editor display=${window.getComputedStyle(editor).display}, height=${editor.offsetHeight}px`);
+                        }
+                    });
+                });
+            }, 200);
         }
         
         function processRichText(html, isDescription = false) {
