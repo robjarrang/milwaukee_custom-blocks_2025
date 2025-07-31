@@ -342,7 +342,7 @@
         function initialize() {
             cacheElements();
             state.sdk = new window.sfdc.BlockSDK({ 
-                capabilities: ['htmlblock'] 
+                tabs: ['stylingblock', 'htmlblock'] 
             });
             initializeEventHandlers();
             loadData();
