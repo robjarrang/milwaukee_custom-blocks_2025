@@ -115,11 +115,7 @@
         }
         
         function initializeEventHandlers() {
-            elements.addItemBtn.addEventListener('click', () => {
-                state.blockData.accordionItems.push({ id: crypto.randomUUID(), title: '', content: '' });
-                renderItemsUI();
-                updateDataFromUI();
-            });
+            elements.addItemBtn.addEventListener('click', createCarouselDelegatedHandler(itemActions));
 
             elements.mainContainer.addEventListener('input', e => {
                 if(e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
@@ -127,30 +123,73 @@
                 }
             });
 
-            elements.itemsContainer.addEventListener('click', e => {
-                const itemEl = e.target.closest('.item');
-                if (!itemEl) return;
-                const id = itemEl.dataset.id;
-                const items = state.blockData.accordionItems;
-                const currentIndex = items.findIndex(item => item.id === id);
-                let dataChanged = false;
+            // Optimized Event Delegation with Action Maps
+            const itemActions = {
+                '.remove-btn': (item, index, items) => {
+                    items.splice(index, 1);
+                    return true;
+                },
+                '.move-up-btn': (item, index, items) => {
+                    if (index > 0) {
+                        [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                        return true;
+                    }
+                    return false;
+                },
+                '.move-down-btn': (item, index, items) => {
+                    if (index < items.length - 1) {
+                        [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                        return true;
+                    }
+                    return false;
+                }
+            };
 
-                if (e.target.closest('.remove-btn')) {
-                    items.splice(currentIndex, 1);
-                    dataChanged = true;
-                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
-                    [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
-                    dataChanged = true;
-                } else if (e.target.closest('.move-down-btn') && currentIndex < items.length - 1) {
-                    [items[currentIndex], items[currentIndex + 1]] = [items[currentIndex + 1], items[currentIndex]];
-                    dataChanged = true;
-                }
-                
-                if (dataChanged) {
-                    renderItemsUI();
-                    updateDataFromUI();
-                }
-            });
+            function createCarouselDelegatedHandler(actionMap) {
+                return (event) => {
+                    // Handle add button clicks
+                    if (event.target.closest('#addItemBtn')) {
+                        const items = state.blockData.accordionItems;
+                        items.push({ id: crypto.randomUUID(), title: 'New Item', imageUrl: '', description: 'New description' });
+                        renderItemsUI();
+                        updateDataFromUI();
+                        return;
+                    }
+
+                    // Find the closest item element
+                    const itemEl = event.target.closest('.item');
+                    if (!itemEl) return;
+
+                    const id = itemEl.dataset.id;
+                    const items = state.blockData.accordionItems;
+                    const itemIndex = items.findIndex(item => item.id === id);
+                    
+                    if (itemIndex === -1) return;
+
+                    const item = items[itemIndex];
+                    let actionExecuted = false;
+
+                    // Execute action using action map
+                    for (const [selector, action] of Object.entries(actionMap)) {
+                        if (event.target.closest(selector)) {
+                            const result = action(item, itemIndex, items);
+                            
+                            if (result) {
+                                actionExecuted = true;
+                                renderItemsUI();
+                                updateDataFromUI();
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!actionExecuted) {
+                        console.log('No matching action found for selector');
+                    }
+                };
+            }
+
+            elements.itemsContainer.addEventListener('click', createCarouselDelegatedHandler(itemActions));
         }
 
         function generateTemplate() {

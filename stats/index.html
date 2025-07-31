@@ -227,6 +227,86 @@
                 updateBlock();
             });
             
+            // Optimized Event Delegation with Action Maps
+            const statActions = {
+                '.remove-btn': (itemEl, index) => {
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const allRows = Array.from(statsTableBody.children);
+                    const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
+                    const targetRow = statRows[index];
+                    const targetRowIndex = allRows.indexOf(targetRow);
+                    const spacerRow = allRows[targetRowIndex + 1];
+                    
+                    targetRow.remove();
+                    if (spacerRow && spacerRow.textContent.trim() === '') spacerRow.remove();
+                    return true;
+                },
+                '.move-up-btn': (itemEl, index) => {
+                    if (index === 0) return false;
+                    
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const allRows = Array.from(statsTableBody.children);
+                    const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
+                    const targetRow = statRows[index];
+                    const targetRowIndex = allRows.indexOf(targetRow);
+                    const spacerRow = allRows[targetRowIndex + 1];
+                    const prevRow = statRows[index - 1];
+                    
+                    prevRow.before(targetRow);
+                    targetRow.after(spacerRow);
+                    return true;
+                },
+                '.move-down-btn': (itemEl, index) => {
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const allRows = Array.from(statsTableBody.children);
+                    const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
+                    
+                    if (index >= statRows.length - 1) return false;
+                    
+                    const targetRow = statRows[index];
+                    const targetRowIndex = allRows.indexOf(targetRow);
+                    const spacerRow = allRows[targetRowIndex + 1];
+                    const nextRow = statRows[index + 1];
+                    const nextSpacer = allRows[allRows.indexOf(nextRow) + 1];
+                    
+                    if (nextSpacer) {
+                        nextSpacer.after(targetRow);
+                        targetRow.after(spacerRow);
+                    }
+                    return true;
+                }
+            };
+
+            function createStatDelegatedHandler(actionMap) {
+                return (event) => {
+                    const btn = event.target.closest('.stat-control-btn');
+                    if (!btn || !state.dom) return;
+
+                    const itemEl = btn.closest('.stat-item');
+                    const index = parseInt(itemEl.dataset.index, 10);
+                    
+                    let actionExecuted = false;
+
+                    // Execute action using action map
+                    for (const [selector, action] of Object.entries(actionMap)) {
+                        if (btn.matches(selector)) {
+                            const result = action(itemEl, index);
+                            
+                            if (result) {
+                                actionExecuted = true;
+                                updateUIFromDOM();
+                                updateBlock();
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!actionExecuted) {
+                        console.log('No matching action found for selector');
+                    }
+                };
+            }
+            
             // Handle Stat Item changes (input, move, remove)
             elements.statsContainer.addEventListener('input', e => {
                 if (e.target.matches('[data-field]')) {
@@ -244,37 +324,7 @@
                 }
             });
             
-            elements.statsContainer.addEventListener('click', e => {
-                const btn = e.target.closest('.stat-control-btn');
-                if (!btn || !state.dom) return;
-
-                const itemEl = btn.closest('.stat-item');
-                const index = parseInt(itemEl.dataset.index, 10);
-                const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
-                const allRows = Array.from(statsTableBody.children);
-                const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
-                const targetRow = statRows[index];
-                const targetRowIndex = allRows.indexOf(targetRow);
-                const spacerRow = allRows[targetRowIndex + 1];
-
-                if (btn.matches('.remove-btn')) {
-                    targetRow.remove();
-                    if(spacerRow && spacerRow.textContent.trim() === '') spacerRow.remove(); // Remove associated spacer
-                } else if (btn.matches('.move-up-btn') && index > 0) {
-                    const prevRow = statRows[index - 1];
-                    prevRow.before(targetRow);
-                    targetRow.after(spacerRow);
-                } else if (btn.matches('.move-down-btn') && index < statRows.length - 1) {
-                    const nextRow = statRows[index + 1];
-                    const nextSpacer = allRows[allRows.indexOf(nextRow) + 1];
-                    if (nextSpacer) {
-                        nextSpacer.after(targetRow);
-                        targetRow.after(spacerRow);
-                    }
-                }
-                updateUIFromDOM();
-                updateBlock();
-            });
+            elements.statsContainer.addEventListener('click', createStatDelegatedHandler(statActions));
         }
         
         function loadData() {

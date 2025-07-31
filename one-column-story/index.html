@@ -390,10 +390,80 @@
             elements.itemsContainer.appendChild(fragment);
         }
         
-        function toggleContentTypeView(type) {
-            elements.descriptionSection.style.display = type === 'description' ? 'block' : 'none';
-            elements.checklistSection.style.display = type === 'checklist' ? 'block' : 'none';
-            if (type === 'checklist') renderItemsUI();
+        // Optimized Event Delegation with Action Maps
+        const itemActions = {
+            '.remove-btn': (item, index, items, context) => {
+                items.splice(index, 1);
+                if (context.hasQuill && item.id) {
+                    utils.cleanupEditor(item.id);
+                }
+                return true;
+            },
+            '.move-up-btn': (item, index, items) => {
+                if (index > 0) {
+                    [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.move-down-btn': (item, index, items) => {
+                if (index < items.length - 1) {
+                    [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.duplicate-btn': (item, index, items) => {
+                const newItem = { ...item, id: crypto.randomUUID() };
+                items.splice(index + 1, 0, newItem);
+                return true;
+            }
+        };
+
+        function createDelegatedHandler(fieldName, actionMap) {
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest('#addItemBtn')) {
+                    const currentItems = utils.getFieldValue(fieldName);
+                    const newItems = [...currentItems, { id: crypto.randomUUID(), text: '<strong>New Item</strong>' }];
+                    state.blockData[fieldName] = newItems;
+                    renderItemsUI();
+                    updateData(fieldName, newItems);
+                    return;
+                }
+
+                // Find the closest item element
+                const itemEl = event.target.closest('.item');
+                if (!itemEl) return;
+
+                const id = itemEl.dataset.id;
+                const currentItems = state.blockData[fieldName];
+                const itemIndex = currentItems.findIndex(i => i.id === id);
+                
+                if (itemIndex === -1) return;
+
+                const item = currentItems[itemIndex];
+                let actionExecuted = false;
+
+                // Execute action using action map
+                for (const [selector, action] of Object.entries(actionMap)) {
+                    if (event.target.closest(selector)) {
+                        const context = { hasQuill: true, fieldName };
+                        const result = action(item, itemIndex, currentItems, context);
+                        
+                        if (result) {
+                            actionExecuted = true;
+                            renderItemsUI();
+                            updateData(fieldName, currentItems);
+                        }
+                        break;
+                    }
+                }
+
+                if (!actionExecuted) {
+                    console.log('No matching action found for selector');
+                }
+            };
         }
 
         function initializeEventHandlers() {
@@ -420,14 +490,9 @@
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             
-            addListener(elements.addItemBtn, 'click', () => { const items = [...utils.getFieldValue('items')]; items.push({ id: crypto.randomUUID(), text: '<strong>New Item</strong>' }); updateData('items', items); renderItemsUI(); });
-            addListener(elements.itemsContainer, 'click', e => {
-                const itemEl = e.target.closest('.item'); if (!itemEl) return;
-                const id = itemEl.dataset.id; const items = [...utils.getFieldValue('items')]; const idx = items.findIndex(i => i.id === id); if(idx === -1) return;
-                if (e.target.closest('.remove-btn')) { items.splice(idx, 1); state.editors.delete(id); } 
-                else if (e.target.closest('.move-up-btn') && idx > 0) { [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]; }
-                else if (e.target.closest('.move-down-btn') && idx < items.length - 1) { [items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]; }
-                else return;
+            // Use delegated event handler for items
+            addListener(elements.addItemBtn, 'click', createDelegatedHandler('items', itemActions));
+            addListener(elements.itemsContainer, 'click', createDelegatedHandler('items', itemActions));
                 updateData('items', items); renderItemsUI();
             });
         }

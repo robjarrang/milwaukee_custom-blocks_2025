@@ -318,6 +318,82 @@
             elements.itemsContainer.appendChild(fragment);
         }
         
+        // Optimized Event Delegation with Action Maps
+        const itemActions = {
+            '.remove-btn': (item, index, items, context) => {
+                items.splice(index, 1);
+                if (context.hasQuill && item.id) {
+                    utils.cleanupEditor(item.id);
+                }
+                return true;
+            },
+            '.move-up-btn': (item, index, items) => {
+                if (index > 0) {
+                    [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.move-down-btn': (item, index, items) => {
+                if (index < items.length - 1) {
+                    [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.duplicate-btn': (item, index, items) => {
+                const newItem = { ...item, id: crypto.randomUUID() };
+                items.splice(index + 1, 0, newItem);
+                return true;
+            }
+        };
+
+        function createDelegatedHandler(fieldName, actionMap) {
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest('#addItemBtn')) {
+                    const currentItems = utils.getFieldValue(fieldName);
+                    const newItems = [...currentItems, { id: crypto.randomUUID(), text: '<strong>New Item</strong>' }];
+                    state.blockData[fieldName] = newItems;
+                    renderItemsUI();
+                    updateDataFromUI();
+                    return;
+                }
+
+                // Find the closest item element
+                const itemEl = event.target.closest('.item');
+                if (!itemEl) return;
+
+                const id = itemEl.dataset.id;
+                const currentItems = state.blockData[fieldName];
+                const itemIndex = currentItems.findIndex(i => i.id === id);
+                
+                if (itemIndex === -1) return;
+
+                const item = currentItems[itemIndex];
+                let actionExecuted = false;
+
+                // Execute action using action map
+                for (const [selector, action] of Object.entries(actionMap)) {
+                    if (event.target.closest(selector)) {
+                        const context = { hasQuill: true, fieldName };
+                        const result = action(item, itemIndex, currentItems, context);
+                        
+                        if (result) {
+                            actionExecuted = true;
+                            renderItemsUI();
+                            updateDataFromUI();
+                        }
+                        break;
+                    }
+                }
+
+                if (!actionExecuted) {
+                    console.log('No matching action found for selector');
+                }
+            };
+        }
+
         function initializeEventHandlers() {
             utils.addEventListenerTracked(elements.backgroundColorSelector, 'click', (e) => {
                 if (e.target.classList.contains('color-option')) {
@@ -327,39 +403,11 @@
                 }
             });
 
-            utils.addEventListenerTracked(elements.addItemBtn, 'click', () => {
-                const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
-                state.blockData.items.push(newItem);
-                renderItemsUI();
-                updateDataFromUI();
-            });
-
-            utils.addEventListenerTracked(elements.itemsContainer, 'click', (e) => {
-                const itemEl = e.target.closest('.item');
-                if (!itemEl) return;
-                
-                const id = itemEl.dataset.id;
-                const items = state.blockData.items;
-                const currentIndex = items.findIndex(item => item.id === id);
-                let dataChanged = false;
-
-                if (e.target.closest('.remove-btn')) {
-                    items.splice(currentIndex, 1);
-                    utils.cleanupEditor(id);
-                    dataChanged = true;
-                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
-                    [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
-                    dataChanged = true;
-                } else if (e.target.closest('.move-down-btn') && currentIndex < items.length - 1) {
-                    [items[currentIndex], items[currentIndex + 1]] = [items[currentIndex + 1], items[currentIndex]];
-                    dataChanged = true;
-                }
-
-                if (dataChanged) {
-                    renderItemsUI();
-                    updateDataFromUI();
-                }
-            });
+            // Optimized event delegation for checklist items
+            const checklistHandler = createDelegatedHandler('items', itemActions);
+            
+            utils.addEventListenerTracked(elements.addItemBtn, 'click', checklistHandler);
+            utils.addEventListenerTracked(elements.itemsContainer, 'click', checklistHandler);
         }
 
         function loadData() {

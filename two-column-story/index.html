@@ -407,36 +407,138 @@
                 ['subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => setupNumberInput(elements[p + type], p + type));
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
-                elements[p + 'addItemBtn'].addEventListener('click', () => { handleListActions({ target: { closest: () => true } }, p, 'items', 'itemTemplate', true, 'add'); });
-                elements[p + 'itemsContainer'].addEventListener('click', (e) => { handleListActions(e, p, 'items', 'itemTemplate', true); });
-                elements[p + 'addSpacerAllBtn'].addEventListener('click', () => addSpacer(p, 'all'));
-                elements[p + 'addSpacerMsoBtn'].addEventListener('click', () => addSpacer(p, 'mso'));
-                elements[p + 'addSpacerNotMsoBtn'].addEventListener('click', () => addSpacer(p, 'not_mso'));
-                elements[p + 'spacersContainer'].addEventListener('click', (e) => { handleListActions(e, p, 'spacers', 'spacerTemplate', false); });
+                
+                // Optimized event delegation for list items
+                const itemsHandler = createDelegatedHandler(p, 'items', 'itemTemplate', true, itemActions);
+                const spacersHandler = createDelegatedHandler(p, 'spacers', 'spacerTemplate', false, spacerActions);
+                
+                // Single event listener for items container and add buttons
+                const itemsContainer = elements[p + 'itemsContainer'];
+                const addItemBtn = elements[p + 'addItemBtn'];
+                if (itemsContainer) {
+                    itemsContainer.addEventListener('click', itemsHandler);
+                    state.eventListeners.push({ element: itemsContainer, event: 'click', handler: itemsHandler });
+                }
+                if (addItemBtn) {
+                    addItemBtn.addEventListener('click', itemsHandler);
+                    state.eventListeners.push({ element: addItemBtn, event: 'click', handler: itemsHandler });
+                }
+                
+                // Single event listener for spacers container and add buttons
+                const spacersContainer = elements[p + 'spacersContainer'];
+                const addSpacerAllBtn = elements[p + 'addSpacerAllBtn'];
+                const addSpacerMsoBtn = elements[p + 'addSpacerMsoBtn'];
+                const addSpacerNotMsoBtn = elements[p + 'addSpacerNotMsoBtn'];
+                
+                if (spacersContainer) {
+                    spacersContainer.addEventListener('click', spacersHandler);
+                    state.eventListeners.push({ element: spacersContainer, event: 'click', handler: spacersHandler });
+                }
+                [addSpacerAllBtn, addSpacerMsoBtn, addSpacerNotMsoBtn].forEach(btn => {
+                    if (btn) {
+                        btn.addEventListener('click', spacersHandler);
+                        state.eventListeners.push({ element: btn, event: 'click', handler: spacersHandler });
+                    }
+                });
             });
         }
-        function addSpacer(prefix, type) {
-            const currentSpacers = utils.getFieldValue(prefix + 'spacers');
-            const newSpacers = [...currentSpacers, { id: crypto.randomUUID(), type: type }];
-            updateData(prefix + 'spacers', newSpacers);
-            renderList(prefix, 'spacers', 'spacerTemplate');
+        // Optimized Event Delegation with Action Maps
+        const itemActions = {
+            '.remove-btn': (item, index, items, context) => {
+                items.splice(index, 1);
+                if (context.hasQuill && context.prefix) {
+                    const editorId = `${context.prefix}${context.listType}_${item.id}`;
+                    utils.cleanupEditor(editorId);
+                }
+                return true;
+            },
+            '.move-up-btn': (item, index, items) => {
+                if (index > 0) {
+                    [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.move-down-btn': (item, index, items) => {
+                if (index < items.length - 1) {
+                    [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.duplicate-btn': (item, index, items) => {
+                const newItem = { ...item, id: crypto.randomUUID() };
+                items.splice(index + 1, 0, newItem);
+                return true;
+            }
+        };
+
+        const spacerActions = {
+            '.remove-btn': (spacer, index, spacers) => {
+                spacers.splice(index, 1);
+                return true;
+            }
+        };
+
+        function createDelegatedHandler(prefix, listType, templateId, hasQuill, actionMap) {
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest(`#${prefix}addItemBtn, #${prefix}addSpacerAllBtn, #${prefix}addSpacerMsoBtn, #${prefix}addSpacerNotMsoBtn`)) {
+                    handleAddActions(event, prefix, listType, templateId, hasQuill);
+                    return;
+                }
+
+                // Find the closest item/spacer element
+                const itemEl = event.target.closest('.item, .spacer-item');
+                if (!itemEl) return;
+
+                const id = itemEl.dataset.id;
+                const currentItems = utils.getFieldValue(prefix + listType);
+                const itemIndex = currentItems.findIndex(i => i.id === id);
+                
+                if (itemIndex === -1) return;
+
+                const item = currentItems[itemIndex];
+                let actionExecuted = false;
+
+                // Execute action using action map
+                for (const [selector, action] of Object.entries(actionMap)) {
+                    if (event.target.closest(selector)) {
+                        const context = { hasQuill, prefix, listType, templateId };
+                        const result = action(item, itemIndex, currentItems, context);
+                        
+                        if (result) {
+                            actionExecuted = true;
+                            updateData(prefix + listType, currentItems);
+                            renderList(prefix, listType, templateId, hasQuill);
+                        }
+                        break;
+                    }
+                }
+
+                if (!actionExecuted) {
+                    console.log('No matching action found for selector');
+                }
+            };
         }
-        function handleListActions(event, prefix, listType, templateId, hasQuill, action) {
+
+        function handleAddActions(event, prefix, listType, templateId, hasQuill) {
+            const target = event.target;
             const currentItems = utils.getFieldValue(prefix + listType);
             let newItems = [...currentItems];
-            if (action === 'add') {
+            
+            if (target.closest(`#${prefix}addItemBtn`)) {
                 newItems.push({ id: crypto.randomUUID(), text: 'New Item' });
-                updateData(prefix + listType, newItems);
-                renderList(prefix, listType, templateId, hasQuill);
+            } else if (target.closest(`#${prefix}addSpacerAllBtn`)) {
+                newItems.push({ id: crypto.randomUUID(), type: 'all' });
+            } else if (target.closest(`#${prefix}addSpacerMsoBtn`)) {
+                newItems.push({ id: crypto.randomUUID(), type: 'mso' });
+            } else if (target.closest(`#${prefix}addSpacerNotMsoBtn`)) {
+                newItems.push({ id: crypto.randomUUID(), type: 'not_mso' });
+            } else {
                 return;
             }
-            const itemEl = event.target.closest('.item, .spacer-item'); if (!itemEl) return;
-            const id = itemEl.dataset.id;
-            const idx = newItems.findIndex(i => i.id === id);
-            if (event.target.closest('.remove-btn')) { newItems.splice(idx, 1); if(hasQuill) delete state.editors[id]; } 
-            else if (event.target.closest('.move-up-btn') && idx > 0) { [newItems[idx], newItems[idx - 1]] = [newItems[idx - 1], newItems[idx]]; } 
-            else if (event.target.closest('.move-down-btn') && idx < newItems.length - 1) { [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]]; }
-            else { return; }
+            
             updateData(prefix + listType, newItems);
             renderList(prefix, listType, templateId, hasQuill);
         }

@@ -232,6 +232,85 @@
             elements.eventsContainer.appendChild(fragment);
         }
         
+        // Optimized Event Delegation with Action Maps
+        const eventActions = {
+            '.remove-btn': (event, index, events) => {
+                events.splice(index, 1);
+                return true;
+            },
+            '.move-up-btn': (event, index, events) => {
+                if (index > 0) {
+                    [events[index], events[index - 1]] = [events[index - 1], events[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.move-down-btn': (event, index, events) => {
+                if (index < events.length - 1) {
+                    [events[index], events[index + 1]] = [events[index + 1], events[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.duplicate-btn': (event, index, events) => {
+                const newEvent = { ...event, id: crypto.randomUUID() };
+                events.splice(index + 1, 0, newEvent);
+                return true;
+            }
+        };
+
+        function createDelegatedHandler(fieldName, actionMap) {
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest('#addEventBtn')) {
+                    const newEvent = { 
+                        id: crypto.randomUUID(), 
+                        imageUrl: "https://placehold.co/178x118", 
+                        title: "New Event", 
+                        date: "TBC", 
+                        location: "TBC", 
+                        buttonText: "Learn More", 
+                        buttonUrl: "https://www.milwaukeetool.eu/" 
+                    };
+                    state.blockData.events.push(newEvent);
+                    renderEventsUI();
+                    updateDataFromUI();
+                    return;
+                }
+
+                // Find the closest event item element
+                const itemEl = event.target.closest('.event-item');
+                if (!itemEl) return;
+
+                const id = itemEl.dataset.id;
+                const currentEvents = state.blockData.events;
+                const eventIndex = currentEvents.findIndex(e => e.id === id);
+                
+                if (eventIndex === -1) return;
+
+                const eventItem = currentEvents[eventIndex];
+                let actionExecuted = false;
+
+                // Execute action using action map
+                for (const [selector, action] of Object.entries(actionMap)) {
+                    if (event.target.closest(selector)) {
+                        const result = action(eventItem, eventIndex, currentEvents);
+                        
+                        if (result) {
+                            actionExecuted = true;
+                            renderEventsUI();
+                            updateDataFromUI();
+                        }
+                        break;
+                    }
+                }
+
+                if (!actionExecuted) {
+                    console.log('No matching action found for selector');
+                }
+            };
+        }
+
         function initializeEventHandlers() {
             utils.addEventListenerTracked(elements.backgroundColorSelector, 'click', e => {
                 if (e.target.classList.contains('color-option')) {
@@ -243,12 +322,11 @@
 
             utils.addEventListenerTracked(elements.showButtonsToggle, 'change', updateDataFromUI);
 
-            utils.addEventListenerTracked(elements.addEventBtn, 'click', () => {
-                const newEvent = { id: crypto.randomUUID(), imageUrl: "https://placehold.co/178x118", title: "New Event", date: "TBC", location: "TBC", buttonText: "Learn More", buttonUrl: "https://www.milwaukeetool.eu/"};
-                state.blockData.events.push(newEvent);
-                renderEventsUI();
-                updateDataFromUI();
-            });
+            // Optimized event delegation for events
+            const eventsHandler = createDelegatedHandler('events', eventActions);
+            
+            utils.addEventListenerTracked(elements.addEventBtn, 'click', eventsHandler);
+            utils.addEventListenerTracked(elements.eventsContainer, 'click', eventsHandler);
 
             utils.addEventListenerTracked(elements.eventsContainer, 'input', e => {
                 if(e.target.classList.contains('field-input')) {
@@ -261,32 +339,6 @@
                         if(!isValid) return;
                     }
                     debouncedUpdateDataFromUI();
-                }
-            });
-
-            utils.addEventListenerTracked(elements.eventsContainer, 'click', e => {
-                const itemEl = e.target.closest('.event-item');
-                if (!itemEl) return;
-                
-                const id = itemEl.dataset.id;
-                const events = state.blockData.events;
-                const currentIndex = events.findIndex(event => event.id === id);
-                let dataChanged = false;
-
-                if (e.target.closest('.remove-btn')) {
-                    events.splice(currentIndex, 1);
-                    dataChanged = true;
-                } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
-                    [events[currentIndex], events[currentIndex - 1]] = [events[currentIndex - 1], events[currentIndex]];
-                    dataChanged = true;
-                } else if (e.target.closest('.move-down-btn') && currentIndex < events.length - 1) {
-                    [events[currentIndex], events[currentIndex + 1]] = [events[currentIndex + 1], events[currentIndex]];
-                    dataChanged = true;
-                }
-
-                if (dataChanged) {
-                    renderEventsUI();
-                    updateDataFromUI();
                 }
             });
         }
