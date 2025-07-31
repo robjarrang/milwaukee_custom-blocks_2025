@@ -273,7 +273,7 @@
             const container = elements[prefix + listType + 'Container'];
             const items = utils.getFieldValue(prefix + listType);
             const template = elements[templateId];
-            container.innerHTML = '';
+            container.replaceChildren();
             const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook' };
             items.forEach((item, index) => {
                 const itemFragment = template.content.cloneNode(true);
