@@ -74,6 +74,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
         
@@ -135,65 +136,7 @@
             },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
-            safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } },
-            
-            createEditor(container, id, content = '', config = {}) {
-                // Create editor with memory tracking
-                const defaultConfig = { 
-                    theme: 'snow', 
-                    modules: { 
-                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false } 
-                    }, 
-                    formats: ['bold', 'script', 'link'], 
-                    placeholder: 'Enter text...' 
-                };
-                
-                const editorConfig = { ...defaultConfig, ...config };
-                const editor = new Quill(container, editorConfig);
-
-                // Track editor metadata
-                const metadata = {
-                    id,
-                    created: Date.now(),
-                    container,
-                    hasContent: Boolean(content && content.trim())
-                };
-                
-                editorMetadata.set(editor, metadata);
-                cleanupRegistry.register(editor, id);
-                
-                // Set content if provided
-                if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
-                }
-                
-                return editor;
-            },
-            
-            cleanupEditor(id) {
-                const editor = state.editors.get(id);
-                if (editor) {
-                    // Get metadata before cleanup
-                    const metadata = editorMetadata.get(editor);
-                    
-                    // Clean up event listeners
-                    if (editor.off) {
-                        editor.off('text-change');
-                    }
-                    
-                    // Log cleanup info
-                    console.log('Cleaning up editor:', {
-                        id,
-                        metadata,
-                        hadListeners: Boolean(editor.off)
-                    });
-                    
-                    // Remove from state
-                    state.editors.delete(id);
-                }
-            }
+            safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } }
         };
 
         function cacheElements() {
@@ -231,61 +174,44 @@
             if (elements.mainContainer && elements.loadingOverlay) { elements.mainContainer.classList.toggle('loading', loading); elements.loadingOverlay.classList.toggle('show', loading); }
         }
 
-        function initializeEditors() {
+        async function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
+            if (!window.QuillConfigManager) throw new Error('QuillConfigManager not loaded');
             
             try {
-                // Create title editor with memory management
-                const titleEditor = utils.createEditor('#titleEditor', 'title', '', {
-                    modules: { toolbar: [['bold']], clipboard: { matchVisual: false } },
-                    formats: ['bold'],
-                    placeholder: 'Enter title...'
-                });
-                
-                const titleDebouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                    if (source === 'user') {
-                        const content = titleEditor.getSemanticHTML ? titleEditor.getSemanticHTML() : titleEditor.root.innerHTML;
-                        updateData('title', utils.sanitizeHtml(content));
+                // Use QuillConfigManager for optimal editor initialization
+                const titleEditor = await QuillConfigManager.initializeEditor(
+                    elements.titleEditor, 
+                    'title', 
+                    {
+                        placeholder: 'Enter title...',
+                        maxLength: moduleConfig.fields.title.maxLength
                     }
+                );
+                
+                const titleDebouncedUpdate = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                    const content = QuillConfigManager.getCleanContent(titleEditor, true);
+                    updateData('title', utils.sanitizeHtml(content));
                 }, moduleConfig.debounceDelay);
                 titleEditor.on('text-change', titleDebouncedUpdate);
-
-                titleEditor.on('text-change', () => { 
-                    const text = titleEditor.getText();
-                    const maxLength = moduleConfig.fields.title.maxLength;
-                    if (maxLength && text.length > maxLength + 1) {
-                        const range = titleEditor.getSelection();
-                        titleEditor.deleteText(maxLength, text.length - maxLength);
-                        if (range) { titleEditor.setSelection(Math.min(range.index, maxLength)); }
-                    }
-                });
                 
                 state.editors.set('title', titleEditor);
                 
-                // Create description editor with memory management
-                const descriptionEditor = utils.createEditor('#descriptionEditor', 'description', '', {
-                    modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } },
-                    formats: ['bold', 'italic', 'link'],
-                    placeholder: 'Enter description...'
-                });
-                
-                const descriptionDebouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                    if (source === 'user') {
-                        const content = descriptionEditor.getSemanticHTML ? descriptionEditor.getSemanticHTML() : descriptionEditor.root.innerHTML;
-                        updateData('description', utils.sanitizeHtml(content));
+                // Create description editor using shared configuration
+                const descriptionEditor = await QuillConfigManager.initializeEditor(
+                    elements.descriptionEditor, 
+                    'description', 
+                    {
+                        placeholder: 'Enter description...',
+                        maxLength: moduleConfig.fields.description.maxLength
                     }
+                );
+                
+                const descriptionDebouncedUpdate = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                    const content = QuillConfigManager.getCleanContent(descriptionEditor, true);
+                    updateData('description', utils.sanitizeHtml(content));
                 }, moduleConfig.debounceDelay);
                 descriptionEditor.on('text-change', descriptionDebouncedUpdate);
-
-                descriptionEditor.on('text-change', () => { 
-                    const text = descriptionEditor.getText();
-                    const maxLength = moduleConfig.fields.description.maxLength;
-                    if (maxLength && text.length > maxLength + 1) {
-                        const range = descriptionEditor.getSelection();
-                        descriptionEditor.deleteText(maxLength, text.length - maxLength);
-                        if (range) { descriptionEditor.setSelection(Math.min(range.index, maxLength)); }
-                    }
-                });
                 
                 state.editors.set('description', descriptionEditor);
                 
@@ -311,7 +237,7 @@
                     const id = itemEl.dataset.id;
                     const editor = state.editors.get(id);
                     if (editor) {
-                        const content = editor.getSemanticHTML ? editor.getSemanticHTML() : editor.root.innerHTML;
+                        const content = QuillConfigManager.getCleanContent(editor, true);
                         return { id, text: utils.sanitizeHtml(content) };
                     }
                     return null;
@@ -402,8 +328,20 @@
                 itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
                 fragment.appendChild(itemFragment);
 
-                // Create editor with memory management
-                const editor = utils.createEditor(editorDiv, item.id, item.text);
+                // Create editor using shared QuillConfigManager - async initialization not needed for simple editors
+                const editor = new Quill(editorDiv, QuillConfigManager.createConfig('basic', {
+                    placeholder: 'Enter item text...'
+                }));
+                
+                // Apply email-optimized formatting and space cleanup
+                QuillConfigManager.addEmailFormatting(editor);
+                QuillConfigManager.addSpaceCleanupMonitor(editor);
+                
+                // Set content if provided
+                if (item.text && item.text.trim()) {
+                    QuillConfigManager.setContent(editor, item.text);
+                }
+                
                 editor.on('text-change', debouncedChecklistUpdate);
                 state.editors.set(item.id, editor);
             });
@@ -551,14 +489,13 @@
                 if (elements[key]) elements[key].value = utils.getFieldValue(key); 
             });
             
-            // Optimize editor updates
+            // Optimize editor updates using QuillConfigManager
             const editorFields = ['title', 'description'];
             editorFields.forEach(fieldName => { 
                 const editor = state.editors.get(fieldName); 
                 if (editor) { 
                     const content = utils.getFieldValue(fieldName); 
-                    editor.setContents([]); 
-                    if (content && content.trim()) editor.clipboard.dangerouslyPasteHTML(content); 
+                    QuillConfigManager.setContent(editor, content || '');
                 } 
             });
 
@@ -612,10 +549,9 @@
         }
 
         function cleanup() {
-            // Enhanced cleanup with memory management
-            for (const [editorId, editor] of state.editors) {
-                utils.cleanupEditor(editorId);
-            }
+            // Enhanced cleanup using QuillConfigManager
+            QuillConfigManager.cleanup(Array.from(state.editors.values()));
+            state.editors.clear();
             
             // Clean up tracked event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
@@ -632,13 +568,13 @@
             console.log('One-column story cleanup completed');
         }
 
-        function initializeWithRetry() {
+        async function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
                 state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
-                initializeEditors();
+                await initializeEditors(); // Now properly await the async editor initialization
                 loadData();
                 window.addEventListener('beforeunload', cleanup);
                 state.isInitialized = true;

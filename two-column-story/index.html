@@ -344,18 +344,20 @@
                     const editorDiv = itemEl.querySelector('.quill-container');
                     const editorId = `${prefix}${listType}_${item.id}`;
                     
-                    // Create editor with proper memory management
-                    const editor = utils.createEditor(editorDiv, {
-                        theme: 'snow',
-                        modules: { 
-                            toolbar: [['bold', 'italic'], ['link']], 
-                            clipboard: { matchVisual: false } 
-                        },
-                        formats: ['bold', 'italic', 'link'],
+                    // Create editor using shared QuillConfigManager
+                    const editor = new Quill(editorDiv, QuillConfigManager.createConfig('basic', {
                         placeholder: 'Enter item text...'
-                    }, editorId);
+                    }));
                     
-                    editor.root.innerHTML = item.text || '';
+                    // Apply email-optimized formatting and space cleanup
+                    QuillConfigManager.addEmailFormatting(editor);
+                    QuillConfigManager.addSpaceCleanupMonitor(editor);
+                    
+                    // Set content using shared method
+                    if (item.text && item.text.trim()) {
+                        QuillConfigManager.setContent(editor, item.text);
+                    }
+                    
                     state.editors[editorId] = editor;
                     
                     // Update metadata

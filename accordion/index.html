@@ -98,16 +98,10 @@
             },
             
             createEditor(container, id, content = '') {
-                // Create editor with memory tracking
-                const editor = new Quill(container, {
-                    theme: 'snow',
-                    modules: { 
-                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false }
-                    },
-                    formats: ['bold', 'script', 'link'],
+                // Create editor using shared configuration
+                const editor = new Quill(container, QuillConfigManager.createConfig('basic', {
                     placeholder: 'Enter content here...'
-                });
+                }));
 
                 // Track editor metadata
                 const metadata = {
@@ -122,8 +116,7 @@
                 
                 // Set content if provided
                 if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
                 
                 return editor;

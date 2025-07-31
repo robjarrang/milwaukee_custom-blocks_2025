@@ -62,6 +62,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
         
@@ -126,16 +127,10 @@
             },
             
             createEditor(container, id, content = '') {
-                // Create editor with memory tracking
-                const editor = new Quill(container, {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [['bold', { 'script': 'super' }], ['link']],
-                        clipboard: { matchVisual: false }
-                    },
-                    formats: ['bold', 'script', 'link'],
+                // Create editor using shared configuration
+                const editor = new Quill(container, QuillConfigManager.createConfig('basic', {
                     placeholder: 'List item text...'
-                });
+                }));
 
                 // Track editor metadata
                 const metadata = {
@@ -150,8 +145,7 @@
                 
                 // Set content if provided
                 if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
                 
                 return editor;

@@ -40,6 +40,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
         
@@ -126,19 +127,11 @@
             },
             
             createEditor(container, id, content = '', config = {}) {
-                // Create editor with memory tracking
-                const defaultConfig = { 
-                    theme: 'snow', 
-                    modules: { 
-                        toolbar: [['bold', 'italic'], ['link']], 
-                        clipboard: { matchVisual: false } 
-                    }, 
-                    formats: ['bold', 'italic', 'link'], 
-                    placeholder: 'Enter text...' 
-                };
-                
-                const editorConfig = { ...defaultConfig, ...config };
-                const editor = new Quill(container, editorConfig);
+                // Create editor using shared configuration
+                const editorType = config.type || 'description';
+                const editor = new Quill(container, QuillConfigManager.createConfig(editorType, {
+                    placeholder: config.placeholder || 'Enter text...'
+                }));
 
                 // Track editor metadata
                 const metadata = {
@@ -153,8 +146,7 @@
                 
                 // Set content if provided
                 if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
                 
                 return editor;
@@ -208,66 +200,48 @@
             }
         }
         
-        function initializeEditors() {
+        async function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
+            if (!window.QuillConfigManager) throw new Error('QuillConfigManager not loaded');
             
             try {
-                const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
-                    // Create editor with memory management
-                    const editor = utils.createEditor(element, fieldName, '', {
-                        modules: { 
-                            toolbar, 
-                            clipboard: { matchVisual: false } 
-                        },
-                        formats,
-                        placeholder
-                    });
-                    
-                    state.editors[fieldName] = editor;
-                    
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                        if (source === 'user') {
-                            // Use getSemanticHTML() for Quill 2.0
-                            const content = editor.getSemanticHTML ? 
-                                editor.getSemanticHTML() : 
-                                editor.root.innerHTML;
-                            updateData(fieldName, utils.sanitizeHtml(content));
-                        }
+                // Initialize editors using shared configuration
+                state.editors.title = await QuillConfigManager.initializeEditor(
+                    elements.titleEditor, 
+                    'title', 
+                    {
+                        placeholder: 'Enter title...',
+                        maxLength: moduleConfig.fields.title.maxLength
+                    }
+                );
+                
+                state.editors.subtitle = await QuillConfigManager.initializeEditor(
+                    elements.subtitleEditor, 
+                    'description', 
+                    {
+                        placeholder: 'Enter subtitle...',
+                        maxLength: moduleConfig.fields.subtitle.maxLength
+                    }
+                );
+                
+                // Set up change handlers for all editors
+                Object.keys(state.editors).forEach(fieldName => {
+                    const editor = state.editors[fieldName];
+                    const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                        const content = QuillConfigManager.getCleanContent(editor, true);
+                        updateData(fieldName, utils.sanitizeHtml(content));
                     }, moduleConfig.debounceDelay);
                     
-                    editor.on('text-change', debouncedUpdate);
-                    
-                    // Length limiting using Quill 2.0 API
-                    editor.on('text-change', () => { 
-                        const text = editor.getText(); 
-                        const maxLength = moduleConfig.fields[fieldName].maxLength; 
-                        if (text.length > maxLength) {
-                            const range = editor.getSelection();
-                            editor.deleteText(maxLength, text.length - maxLength);
-                            if (range) {
-                                editor.setSelection(Math.min(range.index, maxLength));
-                            }
-                        }
-                    });
-                };
+                    editor.on('text-change', updateHandler);
+                });
                 
-                createEditor('title', elements.titleEditor, [[{ 'script': 'super' }], ['link']], ['script', 'link'], 'Enter title...');
-                createEditor('subtitle', elements.subtitleEditor, [['bold', 'italic'], ['link']], ['bold', 'italic', 'link'], 'Enter subtitle...');
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
             }
         }
         
         function processRichText(html) {
-            if (!html) return '';
-            const temp = document.createElement('div');
-            temp.innerHTML = utils.sanitizeHtml(html);
-            temp.querySelectorAll('a').forEach(link => { 
-                if (!link.style.color) link.style.color = '#ffffff'; 
-                link.style.textDecoration = 'none'; 
-                if (!link.getAttribute('href')) link.setAttribute('href', '#'); 
-            });
-            return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
+            return QuillConfigManager.sanitizeForEmail(html || '');
         }
         
         function updateData(field, value) {
