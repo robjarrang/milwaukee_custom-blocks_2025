@@ -114,50 +114,41 @@
             });
         }
         
-        function initializeEventHandlers() {
-            elements.addItemBtn.addEventListener('click', createCarouselDelegatedHandler(itemActions));
-
-            elements.mainContainer.addEventListener('input', e => {
-                if(e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
-                    updateDataFromUI();
-                }
-            });
-
-            // Optimized Event Delegation with Action Maps
-            const itemActions = {
-                '.remove-btn': (item, index, items) => {
-                    items.splice(index, 1);
+        // Optimized Event Delegation with Action Maps
+        const itemActions = {
+            '.remove-btn': (item, index, items) => {
+                items.splice(index, 1);
+                return true;
+            },
+            '.move-up-btn': (item, index, items) => {
+                if (index > 0) {
+                    [items[index], items[index - 1]] = [items[index - 1], items[index]];
                     return true;
-                },
-                '.move-up-btn': (item, index, items) => {
-                    if (index > 0) {
-                        [items[index], items[index - 1]] = [items[index - 1], items[index]];
-                        return true;
-                    }
-                    return false;
-                },
-                '.move-down-btn': (item, index, items) => {
-                    if (index < items.length - 1) {
-                        [items[index], items[index + 1]] = [items[index + 1], items[index]];
-                        return true;
-                    }
-                    return false;
                 }
-            };
+                return false;
+            },
+            '.move-down-btn': (item, index, items) => {
+                if (index < items.length - 1) {
+                    [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                    return true;
+                }
+                return false;
+            }
+        };
 
-            function createCarouselDelegatedHandler(actionMap) {
-                return (event) => {
-                    // Handle add button clicks
-                    if (event.target.closest('#addItemBtn')) {
-                        const items = state.blockData.accordionItems;
-                        items.push({ id: crypto.randomUUID(), title: 'New Item', imageUrl: '', description: 'New description' });
-                        renderItemsUI();
-                        updateDataFromUI();
-                        return;
-                    }
+        function createCarouselDelegatedHandler(actionMap) {
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest('#addItemBtn')) {
+                    const items = state.blockData.accordionItems;
+                    items.push({ id: crypto.randomUUID(), title: 'New Item', imageUrl: '', description: 'New description' });
+                    renderItemsUI();
+                    updateDataFromUI();
+                    return;
+                }
 
-                    // Find the closest item element
-                    const itemEl = event.target.closest('.item');
+                // Find the closest item element
+                const itemEl = event.target.closest('.item');
                     if (!itemEl) return;
 
                     const id = itemEl.dataset.id;
@@ -189,8 +180,17 @@
                 };
             }
 
-            elements.itemsContainer.addEventListener('click', createCarouselDelegatedHandler(itemActions));
-        }
+            function initializeEventHandlers() {
+                elements.addItemBtn.addEventListener('click', createCarouselDelegatedHandler(itemActions));
+
+                elements.mainContainer.addEventListener('input', e => {
+                    if(e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
+                        updateDataFromUI();
+                    }
+                });
+
+                elements.itemsContainer.addEventListener('click', createCarouselDelegatedHandler(itemActions));
+            }
 
         function generateTemplate() {
             const items = utils.getFieldValue('accordionItems');

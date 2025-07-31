@@ -224,38 +224,37 @@
             });
         }
 
-        function initializeEventHandlers() {
-            // Optimized Event Delegation with Action Maps
-            const hotspotActions = {
-                '.remove-btn': (hotspot, index, hotspots) => {
-                    const newHotspots = hotspots.filter(h => h.id !== hotspot.id);
-                    state.blockData.hotspots = newHotspots;
-                    if (state.selectedHotspotId === hotspot.id) {
-                        state.selectedHotspotId = newHotspots.length > 0 ? newHotspots[0].id : null;
-                    }
-                    return true;
-                },
-                '.move-up-btn': (hotspot, index, hotspots) => {
-                    if (index > 0) {
-                        [hotspots[index], hotspots[index - 1]] = [hotspots[index - 1], hotspots[index]];
-                        return true;
-                    }
-                    return false;
-                },
-                '.move-down-btn': (hotspot, index, hotspots) => {
-                    if (index < hotspots.length - 1) {
-                        [hotspots[index], hotspots[index + 1]] = [hotspots[index + 1], hotspots[index]];
-                        return true;
-                    }
-                    return false;
-                },
-                '.position-button': (hotspot, index, hotspots, context) => {
-                    hotspot.tooltipPosition = context.target.dataset.position;
+        // Optimized Event Delegation with Action Maps
+        const hotspotActions = {
+            '.remove-btn': (hotspot, index, hotspots) => {
+                const newHotspots = hotspots.filter(h => h.id !== hotspot.id);
+                state.blockData.hotspots = newHotspots;
+                if (state.selectedHotspotId === hotspot.id) {
+                    state.selectedHotspotId = newHotspots.length > 0 ? newHotspots[0].id : null;
+                }
+                return true;
+            },
+            '.move-up-btn': (hotspot, index, hotspots) => {
+                if (index > 0) {
+                    [hotspots[index], hotspots[index - 1]] = [hotspots[index - 1], hotspots[index]];
                     return true;
                 }
-            };
+                return false;
+            },
+            '.move-down-btn': (hotspot, index, hotspots) => {
+                if (index < hotspots.length - 1) {
+                    [hotspots[index], hotspots[index + 1]] = [hotspots[index + 1], hotspots[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.position-button': (hotspot, index, hotspots, context) => {
+                hotspot.tooltipPosition = context.target.dataset.position;
+                return true;
+            }
+        };
 
-            function createHotspotDelegatedHandler(actionMap) {
+        function createHotspotDelegatedHandler(actionMap) {
                 return (event) => {
                     // Handle add button clicks
                     if (event.target.closest('#addItemBtn')) {
@@ -318,6 +317,8 @@
                     }
                 };
             }
+
+            function initializeEventHandlers() {
 
             // Initialize event handlers after function declaration
             [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
