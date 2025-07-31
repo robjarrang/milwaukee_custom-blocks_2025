@@ -6,11 +6,44 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
-        .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
-        .field-group-inline .field-label { margin-bottom: 0; }
-        .field-group-inline .field-input { width: 80px; }
-        .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
+        
+        /* Enhanced input fields with floating labels */
+        .field-group{position:relative;margin-bottom:24px}
+        .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
+        .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
+        .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
+        .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
+        
+        .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
+        
+        /* Enhanced option selector with micro-interactions */
+        .option-selector{display:flex;gap:10px}
+        .option-button{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
+        .option-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);transition:left 0.6s}
+        .option-button:hover{border-color:#0074d9;background-color:#f0f8ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,116,217,0.15)}
+        .option-button:hover::before{left:100%}
+        .option-button.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
+        .option-button:active{transform:translateY(0);transition:transform 0.1s}
+        .option-button svg{display:block;margin:0 auto;fill:currentColor}
+        
+        /* Enhanced Quill editor styling */
+        .quill-container{background:white;border:2px solid #e1e4e8;border-radius:8px;transition:all 0.2s ease}
+        .quill-container:focus-within{border-color:#0074d9;box-shadow:0 0 0 3px rgba(0,116,217,0.1)}
+        .ql-toolbar{border:none;border-bottom:1px solid #e1e4e8;border-radius:8px 8px 0 0;background:#fafbfc}
+        .ql-container{border:none;border-radius:0 0 8px 8px;font-size:14px}
+        .ql-editor{min-height:80px;padding:12px}
+        .limited-toolbar .ql-toolbar{padding:8px}
+        .limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s ease}
+        .limited-toolbar .ql-toolbar button:hover{background:rgba(0,116,217,0.1)}
+        
+        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
+        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        
+        /* Enhanced inline controls */
+        .field-group-inline{display:flex;align-items:center;justify-content:space-between;margin-top:15px;margin-bottom:15px}
+        .field-group-inline .field-label{margin-bottom:0;position:static;transform:none;font-size:14px;color:#24292e;font-weight:600}
+        .field-group-inline .field-input{width:80px;padding:8px 12px;height:auto}
     </style>
 </head>
 <body>
@@ -22,7 +55,11 @@
         
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
-            <div class="field-group"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
+            <div class="field-group">
+                <input type="url" id="backgroundImage" class="field-input" placeholder=" " />
+                <label for="backgroundImage" class="field-label">Background Image URL</label>
+                <div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div>
+            </div>
         </div>
 
         <div class="section-divider">
@@ -31,16 +68,22 @@
             <div class="field-group"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
             <div class="section-divider" style="margin:20px 0; padding-top:15px;"></div>
 
-            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="field-group-inline"><label for="titleFontSize" class="field-label">Title Font Size (px)</label><input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4"></div></div>
+            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div>                <div class="field-group-inline">
+                    <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
+                    <input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4" />
+                </div></div>
             <div class="field-group"><label class="field-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
-            <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
+            <div class="field-group">
+                <input type="url" id="contentUrl" class="field-input" placeholder=" " />
+                <label for="contentUrl" class="field-label">Content Link URL</label>
+                <div class="field-error" id="contentUrlError">Please enter a valid URL.</div>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
-    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
         
@@ -127,11 +170,19 @@
             },
             
             createEditor(container, id, content = '', config = {}) {
-                // Create editor using shared configuration
-                const editorType = config.type || 'description';
-                const editor = new Quill(container, QuillConfigManager.createConfig(editorType, {
-                    placeholder: config.placeholder || 'Enter text...'
-                }));
+                // Create editor with memory tracking
+                const defaultConfig = { 
+                    theme: 'snow', 
+                    modules: { 
+                        toolbar: [['bold', 'italic'], ['link']], 
+                        clipboard: { matchVisual: false } 
+                    }, 
+                    formats: ['bold', 'italic', 'link'], 
+                    placeholder: 'Enter text...' 
+                };
+                
+                const editorConfig = { ...defaultConfig, ...config };
+                const editor = new Quill(container, editorConfig);
 
                 // Track editor metadata
                 const metadata = {
@@ -146,7 +197,8 @@
                 
                 // Set content if provided
                 if (content && content.trim()) {
-                    QuillConfigManager.setContent(editor, content);
+                    editor.setContents([]);
+                    editor.clipboard.dangerouslyPasteHTML(content);
                 }
                 
                 return editor;
@@ -200,48 +252,66 @@
             }
         }
         
-        async function initializeEditors() {
+        function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
-            if (!window.QuillConfigManager) throw new Error('QuillConfigManager not loaded');
             
             try {
-                // Initialize editors using shared configuration
-                state.editors.title = await QuillConfigManager.initializeEditor(
-                    elements.titleEditor, 
-                    'title', 
-                    {
-                        placeholder: 'Enter title...',
-                        maxLength: moduleConfig.fields.title.maxLength
-                    }
-                );
-                
-                state.editors.subtitle = await QuillConfigManager.initializeEditor(
-                    elements.subtitleEditor, 
-                    'description', 
-                    {
-                        placeholder: 'Enter subtitle...',
-                        maxLength: moduleConfig.fields.subtitle.maxLength
-                    }
-                );
-                
-                // Set up change handlers for all editors
-                Object.keys(state.editors).forEach(fieldName => {
-                    const editor = state.editors[fieldName];
-                    const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
-                        const content = QuillConfigManager.getCleanContent(editor, true);
-                        updateData(fieldName, utils.sanitizeHtml(content));
+                const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
+                    // Create editor with memory management
+                    const editor = utils.createEditor(element, fieldName, '', {
+                        modules: { 
+                            toolbar, 
+                            clipboard: { matchVisual: false } 
+                        },
+                        formats,
+                        placeholder
+                    });
+                    
+                    state.editors[fieldName] = editor;
+                    
+                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
+                        if (source === 'user') {
+                            // Use getSemanticHTML() for Quill 2.0
+                            const content = editor.getSemanticHTML ? 
+                                editor.getSemanticHTML() : 
+                                editor.root.innerHTML;
+                            updateData(fieldName, utils.sanitizeHtml(content));
+                        }
                     }, moduleConfig.debounceDelay);
                     
-                    editor.on('text-change', updateHandler);
-                });
+                    editor.on('text-change', debouncedUpdate);
+                    
+                    // Length limiting using Quill 2.0 API
+                    editor.on('text-change', () => { 
+                        const text = editor.getText(); 
+                        const maxLength = moduleConfig.fields[fieldName].maxLength; 
+                        if (text.length > maxLength) {
+                            const range = editor.getSelection();
+                            editor.deleteText(maxLength, text.length - maxLength);
+                            if (range) {
+                                editor.setSelection(Math.min(range.index, maxLength));
+                            }
+                        }
+                    });
+                };
                 
+                createEditor('title', elements.titleEditor, [[{ 'script': 'super' }], ['link']], ['script', 'link'], 'Enter title...');
+                createEditor('subtitle', elements.subtitleEditor, [['bold', 'italic'], ['link']], ['bold', 'italic', 'link'], 'Enter subtitle...');
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
             }
         }
         
         function processRichText(html) {
-            return QuillConfigManager.sanitizeForEmail(html || '');
+            if (!html) return '';
+            const temp = document.createElement('div');
+            temp.innerHTML = utils.sanitizeHtml(html);
+            temp.querySelectorAll('a').forEach(link => { 
+                if (!link.style.color) link.style.color = '#ffffff'; 
+                link.style.textDecoration = 'none'; 
+                if (!link.getAttribute('href')) link.setAttribute('href', '#'); 
+            });
+            return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
         }
         
         function updateData(field, value) {
@@ -447,9 +517,7 @@
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
                 
-                state.sdk = new window.sfdc.BlockSDK({
-                    tabs: ['htmlblock']
-                });
+                state.sdk = new window.sfdc.BlockSDK();
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
