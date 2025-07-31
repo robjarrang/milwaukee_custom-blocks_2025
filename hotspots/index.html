@@ -255,72 +255,70 @@
         };
 
         function createHotspotDelegatedHandler(actionMap) {
-                return (event) => {
-                    // Handle add button clicks
-                    if (event.target.closest('#addItemBtn')) {
-                        const newHotspot = { 
-                            id: crypto.randomUUID(), 
-                            text: 'New Hotspot', 
-                            posX: 50, 
-                            posY: 50, 
-                            tooltipPosition: 'top' 
-                        };
-                        state.blockData.hotspots.push(newHotspot);
-                        state.selectedHotspotId = newHotspot.id;
-                        updateUI();
-                        refreshPreview();
-                        return;
-                    }
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest('#addItemBtn')) {
+                    const newHotspot = { 
+                        id: crypto.randomUUID(), 
+                        text: 'New Hotspot', 
+                        posX: 50, 
+                        posY: 50, 
+                        tooltipPosition: 'top' 
+                    };
+                    state.blockData.hotspots.push(newHotspot);
+                    state.selectedHotspotId = newHotspot.id;
+                    updateUI();
+                    refreshPreview();
+                    return;
+                }
 
-                    // Find the closest item element
-                    const itemEl = event.target.closest('.item');
-                    if (!itemEl) return;
+                // Find the closest item element
+                const itemEl = event.target.closest('.item');
+                if (!itemEl) return;
 
-                    const id = itemEl.dataset.id;
-                    const hotspots = state.blockData.hotspots;
-                    const hotspotIndex = hotspots.findIndex(h => h.id === id);
-                    
-                    if (hotspotIndex === -1) return;
+                const id = itemEl.dataset.id;
+                const hotspots = state.blockData.hotspots;
+                const hotspotIndex = hotspots.findIndex(h => h.id === id);
+                
+                if (hotspotIndex === -1) return;
 
-                    const hotspot = hotspots[hotspotIndex];
-                    const controlButton = event.target.closest('.item-control-btn, .position-button');
-                    
-                    if (controlButton) {
-                        event.stopPropagation();
-                        let actionExecuted = false;
+                const hotspot = hotspots[hotspotIndex];
+                const controlButton = event.target.closest('.item-control-btn, .position-button');
+                
+                if (controlButton) {
+                    event.stopPropagation();
+                    let actionExecuted = false;
 
-                        // Execute action using action map
-                        for (const [selector, action] of Object.entries(actionMap)) {
-                            if (controlButton.matches(selector)) {
-                                const context = { target: event.target };
-                                const result = action(hotspot, hotspotIndex, hotspots, context);
-                                
-                                if (result) {
-                                    actionExecuted = true;
-                                    updateUI();
-                                    refreshPreview();
-                                }
-                                break;
+                    // Execute action using action map
+                    for (const [selector, action] of Object.entries(actionMap)) {
+                        if (controlButton.matches(selector)) {
+                            const context = { target: event.target };
+                            const result = action(hotspot, hotspotIndex, hotspots, context);
+                            
+                            if (result) {
+                                actionExecuted = true;
+                                updateUI();
+                                refreshPreview();
                             }
+                            break;
                         }
-
-                        if (!actionExecuted) {
-                            console.log('No matching action found for selector');
-                        }
-                        return;
                     }
 
-                    // Handle item selection
-                    if (state.selectedHotspotId !== id) {
-                        state.selectedHotspotId = id;
-                        updateUI();
+                    if (!actionExecuted) {
+                        console.log('No matching action found for selector');
                     }
-                };
-            }
+                    return;
+                }
 
-            function initializeEventHandlers() {
+                // Handle item selection
+                if (state.selectedHotspotId !== id) {
+                    state.selectedHotspotId = id;
+                    updateUI();
+                }
+            };
+        }
 
-            // Initialize event handlers after function declaration
+        function initializeEventHandlers() {
             [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
                 input.addEventListener('input', updateStateFromUI);
             });
