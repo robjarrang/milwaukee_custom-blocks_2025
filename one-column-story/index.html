@@ -136,7 +136,15 @@
             },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
-            safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } }
+            safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } },
+            cleanupEditor(id) {
+                const editor = state.editors.get(id);
+                if (editor) {
+                    QuillConfigManager.cleanup([editor]);
+                    state.editors.delete(id);
+                    console.log('Cleaned up editor:', id);
+                }
+            }
         };
 
         function cacheElements() {
@@ -383,26 +391,34 @@
 
         function createDelegatedHandler(fieldName, actionMap) {
             return (event) => {
+                console.log('Event triggered:', event.target, event.target.className);
+                
                 // Handle add button clicks
                 if (event.target.closest('#addItemBtn')) {
+                    console.log('Add button clicked');
                     const currentItems = utils.getFieldValue(fieldName);
                     const newItems = [...currentItems, { id: crypto.randomUUID(), text: '<strong>New Item</strong>' }];
-                    state.blockData[fieldName] = newItems;
+                    updateData(fieldName, newItems);
                     renderItemsUI();
-                    // Force immediate preview refresh for new items
-                    refreshPreview();
                     return;
                 }
 
                 // Find the closest item element
                 const itemEl = event.target.closest('.item');
-                if (!itemEl) return;
+                if (!itemEl) {
+                    console.log('No item element found');
+                    return;
+                }
 
                 const id = itemEl.dataset.id;
-                const currentItems = state.blockData[fieldName];
+                console.log('Item ID:', id);
+                const currentItems = [...state.blockData[fieldName]]; // Create a copy
                 const itemIndex = currentItems.findIndex(i => i.id === id);
                 
-                if (itemIndex === -1) return;
+                if (itemIndex === -1) {
+                    console.log('Item not found in array');
+                    return;
+                }
 
                 const item = currentItems[itemIndex];
                 let actionExecuted = false;
@@ -410,14 +426,16 @@
                 // Execute action using action map
                 for (const [selector, action] of Object.entries(actionMap)) {
                     if (event.target.closest(selector)) {
+                        console.log('Action found for selector:', selector);
                         const context = { hasQuill: true, fieldName };
                         const result = action(item, itemIndex, currentItems, context);
                         
                         if (result) {
+                            console.log('Action executed successfully');
                             actionExecuted = true;
+                            // Update the state with the modified array
+                            updateData(fieldName, currentItems);
                             renderItemsUI();
-                            // Force immediate preview refresh for item actions
-                            refreshPreview();
                         }
                         break;
                     }
@@ -466,9 +484,9 @@
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
             
-            // Use delegated event handler for items
-            addListener(elements.addItemBtn, 'click', createDelegatedHandler('items', itemActions));
-            addListener(elements.itemsContainer, 'click', createDelegatedHandler('items', itemActions));
+            // Use consolidated delegated event handler for items
+            const itemHandler = createDelegatedHandler('items', itemActions);
+            addListener(elements.itemsContainer, 'click', itemHandler);
         }
         
         function updateUIFromData() {
