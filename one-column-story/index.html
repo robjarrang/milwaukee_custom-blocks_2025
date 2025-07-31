@@ -187,7 +187,7 @@
         }
         
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
-        
+        let rafId = null;
         const debouncedChecklistUpdate = utils.debounce(() => {
             const newItems = Array.from(document.querySelectorAll('#itemsContainer .item')).map(itemEl => {
                 const id = itemEl.dataset.id;
@@ -245,13 +245,23 @@
         }
 
         function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            utils.safeExecute(() => { const html = generateTemplate(); state.sdk.setContent(html); if (state.sdk.setData) { state.sdk.setData({ ...state.blockData, content: html }); }});
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                if (state.isLoading || !state.sdk) return;
+                utils.safeExecute(() => { 
+                    const html = generateTemplate(); 
+                    state.sdk.setContent(html); 
+                    if (state.sdk.setData) { 
+                        state.sdk.setData({ ...state.blockData, content: html }); 
+                    }
+                });
+            });
         }
 
         function renderItemsUI() {
             const items = utils.getFieldValue('items');
-            elements.itemsContainer.innerHTML = '';
+            elements.itemsContainer.replaceChildren();
             
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);

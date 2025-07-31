@@ -85,6 +85,7 @@
 
         const state = { sdk: null, blockData: {}, selectedHotspotId: null };
         const elements = {};
+        let rafId = null;
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
@@ -125,7 +126,7 @@
             elements.fallbackLinkUrl.value = utils.getFieldValue('fallbackLinkUrl');
             elements.previewImage.src = utils.getFieldValue('backgroundImageUrl');
 
-            elements.itemsContainer.innerHTML = '';
+            elements.itemsContainer.replaceChildren();
             const hotspots = utils.getFieldValue('hotspots');
             hotspots.forEach((hotspot, index) => {
                 const fragment = elements.itemTemplate.content.cloneNode(true);
@@ -212,11 +213,15 @@
         }
 
         function refreshPreview() {
-            if (!state.sdk) return;
-            try {
-                state.sdk.setContent(generateTemplate());
-                state.sdk.setData({ ...state.blockData });
-            } catch (error) { console.error(`Preview update failed: ${error.message}`); }
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                if (!state.sdk) return;
+                try {
+                    state.sdk.setContent(generateTemplate());
+                    state.sdk.setData({ ...state.blockData });
+                } catch (error) { console.error(`Preview update failed: ${error.message}`); }
+            });
         }
 
         function initializeEventHandlers() {

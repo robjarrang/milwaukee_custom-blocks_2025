@@ -127,11 +127,12 @@
         }
 
         // --- UI Sync and Rendering ---
+        let rafId = null;
         function renderStatsUI() {
             if (!state.dom) return;
             const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
             const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
-            elements.statsContainer.innerHTML = '';
+            elements.statsContainer.replaceChildren();
             
             statRows.forEach((row, index) => {
                 const value = row.querySelector('div:first-child').textContent.trim();
@@ -174,7 +175,13 @@
             if (!state.dom) return;
             state.sdk.setContent(state.dom.outerHTML);
         }
-        const debouncedUpdateBlock = utils.debounce(updateBlock, 500);
+        const debouncedUpdateBlock = utils.debounce(() => {
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                updateBlock();
+            });
+        }, 500);
 
         // --- Initialization and Event Handlers ---
         function cacheElements() {

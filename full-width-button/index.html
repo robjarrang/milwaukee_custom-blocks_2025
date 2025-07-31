@@ -83,6 +83,7 @@
             retryCount: 0 
         };
         const elements = {};
+        let rafId = null;
 
         const utils = {
             debounce(func, wait) {
@@ -247,21 +248,25 @@
         }
 
         function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            try {
-                const html = generateTemplate();
-                
-                // Updates the view in the editor
-                state.sdk.setContent(html);
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                if (state.isLoading || !state.sdk) return;
+                try {
+                    const html = generateTemplate();
+                    
+                    // Updates the view in the editor
+                    state.sdk.setContent(html);
 
-                // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
-                // The key MUST be 'content', not 'html'.
-                if (state.sdk.setData) {
-                    state.sdk.setData({ ...state.blockData, content: html });
+                    // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
+                    // The key MUST be 'content', not 'html'.
+                    if (state.sdk.setData) {
+                        state.sdk.setData({ ...state.blockData, content: html });
+                    }
+                } catch (error) {
+                    utils.showError(`Preview update failed: ${error.message}`);
                 }
-            } catch (error) {
-                utils.showError(`Preview update failed: ${error.message}`);
-            }
+            });
         }
 
         function validateUrlInput(input, errorElement) {

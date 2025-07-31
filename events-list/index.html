@@ -103,6 +103,7 @@
 
         const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0 };
         const elements = {};
+        let rafId = null;
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
@@ -183,21 +184,25 @@
         }
 
         function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                if (state.sdk.setData) {
-                    state.sdk.setData({ ...state.blockData, content: html });
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                if (state.isLoading || !state.sdk) return;
+                try {
+                    const html = generateTemplate();
+                    state.sdk.setContent(html);
+                    if (state.sdk.setData) {
+                        state.sdk.setData({ ...state.blockData, content: html });
+                    }
+                } catch (error) {
+                    utils.showError(`Preview update failed: ${error.message}`);
                 }
-            } catch (error) {
-                utils.showError(`Preview update failed: ${error.message}`);
-            }
+            });
         }
 
         function renderEventsUI() {
             const events = utils.getFieldValue('events');
-            elements.eventsContainer.innerHTML = '';
+            elements.eventsContainer.replaceChildren();
 
             events.forEach((event, index) => {
                 const itemFragment = elements.eventTemplate.content.cloneNode(true);

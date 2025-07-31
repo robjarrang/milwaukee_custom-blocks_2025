@@ -266,7 +266,7 @@
         }
         
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
-
+        let rafId = null;
         function generateTemplate() {
             const backgroundColor = utils.getFieldValue('backgroundColor');
             const bgColorHex = backgroundColor === 'red' ? '#DB021D' : '#000000';
@@ -303,16 +303,20 @@
         }
 
         function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            try { 
-                const html = generateTemplate(); 
-                state.sdk.setContent(html); 
-                if (state.sdk.setData) { 
-                    state.sdk.setData({ ...state.blockData, content: html }); 
-                } 
-            } catch (error) { 
-                utils.showError(`Preview update failed: ${error.message}`); 
-            }
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                if (state.isLoading || !state.sdk) return;
+                try { 
+                    const html = generateTemplate(); 
+                    state.sdk.setContent(html); 
+                    if (state.sdk.setData) { 
+                        state.sdk.setData({ ...state.blockData, content: html }); 
+                    } 
+                } catch (error) { 
+                    utils.showError(`Preview update failed: ${error.message}`); 
+                }
+            });
         }
 
         function initializeEventHandlers() {

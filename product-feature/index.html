@@ -134,6 +134,7 @@
             retryCount: 0 
         };
         const elements = {};
+        let rafId = null;
 
         const utils = {
             debounce(func, wait) {
@@ -272,16 +273,20 @@
         }
 
         function refreshPreview() {
-            if (state.isLoading || !state.sdk) return;
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                if (typeof state.sdk.setData === 'function') {
-                    state.sdk.setData({ ...state.blockData, content: html });
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                if (state.isLoading || !state.sdk) return;
+                try {
+                    const html = generateTemplate();
+                    state.sdk.setContent(html);
+                    if (typeof state.sdk.setData === 'function') {
+                        state.sdk.setData({ ...state.blockData, content: html });
+                    }
+                } catch (error) { 
+                    utils.showError(`Preview update failed: ${error.message}`); 
                 }
-            } catch (error) { 
-                utils.showError(`Preview update failed: ${error.message}`); 
-            }
+            });
         }
 
         function validateUrlInput(input, errorElement) {

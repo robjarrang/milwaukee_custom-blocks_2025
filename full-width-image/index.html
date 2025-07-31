@@ -63,6 +63,7 @@
 
         const state = { sdk: null, blockData: {} };
         const elements = {};
+        let rafId = null;
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
@@ -136,13 +137,17 @@
         }
 
         function refreshPreview() {
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                state.sdk.setData({ ...state.blockData, content: html });
-            } catch (error) {
-                console.error(`Preview update failed: ${error.message}`);
-            }
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                try {
+                    const html = generateTemplate();
+                    state.sdk.setContent(html);
+                    state.sdk.setData({ ...state.blockData, content: html });
+                } catch (error) {
+                    console.error(`Preview update failed: ${error.message}`);
+                }
+            });
         }
 
         function initializeEventHandlers() {

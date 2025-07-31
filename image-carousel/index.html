@@ -62,6 +62,7 @@
 
         const state = { sdk: null, blockData: {} };
         const elements = {};
+        let rafId = null;
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; }
@@ -96,7 +97,7 @@
 
         function renderItemsUI() {
             const items = utils.getFieldValue('accordionItems');
-            elements.itemsContainer.innerHTML = '';
+            elements.itemsContainer.replaceChildren();
             
             if (!items || items.length === 0) return;
 
@@ -238,13 +239,17 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         }
 
         function refreshPreview() {
-            try {
-                const html = generateTemplate();
-                state.sdk.setContent(html);
-                state.sdk.setData({ ...state.blockData, content: html });
-            } catch (error) {
-                console.error(`Preview update failed: ${error.message}`);
-            }
+            if (rafId) cancelAnimationFrame(rafId);
+            
+            rafId = requestAnimationFrame(() => {
+                try {
+                    const html = generateTemplate();
+                    state.sdk.setContent(html);
+                    state.sdk.setData({ ...state.blockData, content: html });
+                } catch (error) {
+                    console.error(`Preview update failed: ${error.message}`);
+                }
+            });
         }
 
         function initialize() {
