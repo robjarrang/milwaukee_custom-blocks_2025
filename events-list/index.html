@@ -398,7 +398,7 @@
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 
                 state.sdk = new window.sfdc.BlockSDK({
-                    tabs: ['stylingblock', 'htmlblock']
+                    tabs: ['htmlblock']
                 });
                 cacheElements();
                 initializeEventHandlers();

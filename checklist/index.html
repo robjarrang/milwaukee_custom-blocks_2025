@@ -455,7 +455,7 @@
                 if (!window.Quill) throw new Error('Quill not loaded');
                 
                 state.sdk = new window.sfdc.BlockSDK({
-                    tabs: ['stylingblock', 'htmlblock']
+                    tabs: ['htmlblock']
                 });
                 cacheElements();
                 initializeEventHandlers();
