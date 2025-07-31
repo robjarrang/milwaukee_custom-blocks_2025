@@ -204,6 +204,9 @@
             const events = utils.getFieldValue('events');
             elements.eventsContainer.replaceChildren();
 
+            // Use DocumentFragment for batch DOM operations
+            const fragment = document.createDocumentFragment();
+
             events.forEach((event, index) => {
                 const itemFragment = elements.eventTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.event-item');
@@ -217,8 +220,11 @@
                 if(index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
                 if(index === events.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
 
-                elements.eventsContainer.appendChild(itemFragment);
+                fragment.appendChild(itemFragment);
             });
+
+            // Single DOM update with all events
+            elements.eventsContainer.appendChild(fragment);
         }
         
         function initializeEventHandlers() {

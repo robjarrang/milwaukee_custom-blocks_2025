@@ -273,8 +273,9 @@
             const container = elements[prefix + listType + 'Container'];
             const items = utils.getFieldValue(prefix + listType);
             const template = elements[templateId];
-            container.replaceChildren();
+            const fragment = document.createDocumentFragment();
             const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook' };
+            
             items.forEach((item, index) => {
                 const itemFragment = template.content.cloneNode(true);
                 const itemEl = itemFragment.firstElementChild;
@@ -286,7 +287,9 @@
                 if (moveUpBtn) moveUpBtn.disabled = index === 0;
                 const moveDownBtn = itemEl.querySelector('.move-down-btn');
                 if (moveDownBtn) moveDownBtn.disabled = index === items.length - 1;
-                container.appendChild(itemFragment);
+                
+                fragment.appendChild(itemEl);
+                
                 if (hasQuill) {
                     const editorDiv = itemEl.querySelector('.quill-container');
                     const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
@@ -296,6 +299,8 @@
                     editor.on('text-change', debouncedUpdate);
                 }
             });
+            
+            container.replaceChildren(fragment);
         }
         function toggleContentTypeView(prefix, type) {
             elements[prefix + 'descriptionSection'].style.display = type === 'description' ? 'block' : 'none';

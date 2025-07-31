@@ -134,6 +134,9 @@
             const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
             elements.statsContainer.replaceChildren();
             
+            // Use DocumentFragment for batch DOM operations
+            const fragment = document.createDocumentFragment();
+            
             statRows.forEach((row, index) => {
                 const value = row.querySelector('div:first-child').textContent.trim();
                 const label = row.querySelector('div:last-child').textContent.trim();
@@ -145,8 +148,11 @@
                 itemEl.querySelector('[data-field="label"]').value = label;
                 itemEl.querySelector('.move-up-btn').disabled = (index === 0);
                 itemEl.querySelector('.move-down-btn').disabled = (index === statRows.length - 1);
-                elements.statsContainer.appendChild(itemFragment);
+                fragment.appendChild(itemFragment);
             });
+            
+            // Single DOM update with all stats
+            elements.statsContainer.appendChild(fragment);
         }
         
         function updateUIFromDOM() {

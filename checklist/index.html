@@ -228,6 +228,10 @@
                 }
             }
 
+            // Use DocumentFragment for batch DOM operations
+            const fragment = document.createDocumentFragment();
+            const editorElements = [];
+
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.item');
@@ -239,8 +243,15 @@
                 if(index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
                 if(index === items.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
 
-                elements.itemsContainer.appendChild(itemFragment);
+                fragment.appendChild(itemFragment);
+                editorElements.push({ editorDiv, item });
+            });
 
+            // Single DOM update with all items
+            elements.itemsContainer.appendChild(fragment);
+
+            // Initialize Quill editors after DOM insertion for better performance
+            editorElements.forEach(({ editorDiv, item }) => {
                 // Initialize Quill 2.0 with updated configuration
                 const editor = new Quill(editorDiv, {
                     theme: 'snow',

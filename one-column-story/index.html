@@ -263,6 +263,10 @@
             const items = utils.getFieldValue('items');
             elements.itemsContainer.replaceChildren();
             
+            // Use DocumentFragment for batch DOM operations
+            const fragment = document.createDocumentFragment();
+            const editorElements = [];
+            
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.item');
@@ -271,8 +275,15 @@
                 itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
                 itemEl.querySelector('.move-up-btn').disabled = index === 0;
                 itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
-                elements.itemsContainer.appendChild(itemFragment);
-                
+                fragment.appendChild(itemFragment);
+                editorElements.push({ editorDiv, item });
+            });
+            
+            // Single DOM update with all items
+            elements.itemsContainer.appendChild(fragment);
+            
+            // Initialize Quill editors after DOM insertion for better performance
+            editorElements.forEach(({ editorDiv, item }) => {
                 const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', { 'script': 'super' }], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'script', 'link'], placeholder: 'Enter item text...' });
                 state.editors.set(item.id, editor);
                 
