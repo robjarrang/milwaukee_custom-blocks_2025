@@ -101,7 +101,7 @@
             maxRetries: 3
         };
 
-        const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0 };
+        const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
         const elements = {};
         let rafId = null;
 
@@ -109,7 +109,12 @@
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (e) { return false; } },
             showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
-            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
+            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; },
+            
+            addEventListenerTracked(element, event, handler) {
+                element.addEventListener(event, handler);
+                state.eventListeners.push({ element, event, handler });
+            }
         };
 
         function cacheElements() {
@@ -228,7 +233,7 @@
         }
         
         function initializeEventHandlers() {
-            elements.backgroundColorSelector.addEventListener('click', e => {
+            utils.addEventListenerTracked(elements.backgroundColorSelector, 'click', e => {
                 if (e.target.classList.contains('color-option')) {
                     elements.backgroundColorSelector.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
                     e.target.classList.add('selected');
@@ -236,16 +241,16 @@
                 }
             });
 
-            elements.showButtonsToggle.addEventListener('change', updateDataFromUI);
+            utils.addEventListenerTracked(elements.showButtonsToggle, 'change', updateDataFromUI);
 
-            elements.addEventBtn.addEventListener('click', () => {
+            utils.addEventListenerTracked(elements.addEventBtn, 'click', () => {
                 const newEvent = { id: crypto.randomUUID(), imageUrl: "https://placehold.co/178x118", title: "New Event", date: "TBC", location: "TBC", buttonText: "Learn More", buttonUrl: "https://www.milwaukeetool.eu/"};
                 state.blockData.events.push(newEvent);
                 renderEventsUI();
                 updateDataFromUI();
             });
 
-            elements.eventsContainer.addEventListener('input', e => {
+            utils.addEventListenerTracked(elements.eventsContainer, 'input', e => {
                 if(e.target.classList.contains('field-input')) {
                     const input = e.target;
                     if(input.type === 'url') {
@@ -259,7 +264,7 @@
                 }
             });
 
-            elements.eventsContainer.addEventListener('click', e => {
+            utils.addEventListenerTracked(elements.eventsContainer, 'click', e => {
                 const itemEl = e.target.closest('.event-item');
                 if (!itemEl) return;
                 
@@ -320,6 +325,22 @@
             });
         }
 
+        function cleanup() {
+            // Clean up tracked event listeners
+            state.eventListeners.forEach(({ element, event, handler }) => { 
+                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
+            }); 
+            state.eventListeners = [];
+            
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            
+            console.log('Events list cleanup completed');
+        }
+
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
@@ -328,6 +349,9 @@
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
+                
+                // Add cleanup on page unload
+                window.addEventListener('beforeunload', cleanup);
                 
                 state.isInitialized = true;
             } catch (error) {

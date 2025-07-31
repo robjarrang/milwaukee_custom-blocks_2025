@@ -82,8 +82,14 @@
             maxRetries: 3
         };
 
-        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0 };
+        const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
         const elements = {};
+
+        // Advanced memory management
+        const editorMetadata = new WeakMap();
+        const cleanupRegistry = new FinalizationRegistry((heldValue) => {
+            console.log('Cleanup registry triggered for editor:', heldValue);
+        });
 
         const utils = {
             debounce(func, wait) {
@@ -117,6 +123,66 @@
             },
             getFieldValue(fieldName) {
                 return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue;
+            },
+            
+            createEditor(container, id, content = '') {
+                // Create editor with memory tracking
+                const editor = new Quill(container, {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [['bold', { 'script': 'super' }], ['link']],
+                        clipboard: { matchVisual: false }
+                    },
+                    formats: ['bold', 'script', 'link'],
+                    placeholder: 'List item text...'
+                });
+
+                // Track editor metadata
+                const metadata = {
+                    id,
+                    created: Date.now(),
+                    container,
+                    hasContent: Boolean(content && content.trim())
+                };
+                
+                editorMetadata.set(editor, metadata);
+                cleanupRegistry.register(editor, id);
+                
+                // Set content if provided
+                if (content && content.trim()) {
+                    editor.setContents([]);
+                    editor.clipboard.dangerouslyPasteHTML(content);
+                }
+                
+                return editor;
+            },
+            
+            cleanupEditor(id) {
+                const editor = state.editors[id];
+                if (editor) {
+                    // Get metadata before cleanup
+                    const metadata = editorMetadata.get(editor);
+                    
+                    // Clean up event listeners
+                    if (editor.off) {
+                        editor.off('text-change');
+                    }
+                    
+                    // Log cleanup info
+                    console.log('Cleaning up editor:', {
+                        id,
+                        metadata,
+                        hadListeners: Boolean(editor.off)
+                    });
+                    
+                    // Remove from state
+                    delete state.editors[id];
+                }
+            },
+            
+            addEventListenerTracked(element, event, handler) {
+                element.addEventListener(event, handler);
+                state.eventListeners.push({ element, event, handler });
             }
         };
 
@@ -216,21 +282,17 @@
 
         function renderItemsUI() {
             const items = utils.getFieldValue('items');
-            elements.itemsContainer.replaceChildren();
+            
+            // Clean up existing editors first
             const currentIds = new Set(items.map(i => i.id));
-            for (const id in state.editors) {
+            Object.keys(state.editors).forEach(id => {
                 if (!currentIds.has(id)) {
-                    // Clean up Quill 2.0 event listeners
-                    if (state.editors[id] && state.editors[id].off) {
-                        state.editors[id].off('text-change');
-                    }
-                    delete state.editors[id];
+                    utils.cleanupEditor(id);
                 }
-            }
+            });
 
             // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
-            const editorElements = [];
 
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
@@ -244,38 +306,20 @@
                 if(index === items.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
 
                 fragment.appendChild(itemFragment);
-                editorElements.push({ editorDiv, item });
-            });
 
-            // Single DOM update with all items
-            elements.itemsContainer.appendChild(fragment);
-
-            // Initialize Quill editors after DOM insertion for better performance
-            editorElements.forEach(({ editorDiv, item }) => {
-                // Initialize Quill 2.0 with updated configuration
-                const editor = new Quill(editorDiv, {
-                    theme: 'snow',
-                    modules: { 
-                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false } 
-                    },
-                    formats: ['bold', 'script', 'link'],
-                    placeholder: 'Enter item text...'
-                });
-
-                // Set initial content using Quill 2.0 API
-                if (item.text && item.text.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(item.text);
-                }
-                
+                // Create editor with memory management
+                const editor = utils.createEditor(editorDiv, item.id, item.text);
                 editor.on('text-change', debouncedUpdateDataFromUI);
                 state.editors[item.id] = editor;
             });
+
+            // Single DOM update
+            elements.itemsContainer.replaceChildren();
+            elements.itemsContainer.appendChild(fragment);
         }
         
         function initializeEventHandlers() {
-            elements.backgroundColorSelector.addEventListener('click', (e) => {
+            utils.addEventListenerTracked(elements.backgroundColorSelector, 'click', (e) => {
                 if (e.target.classList.contains('color-option')) {
                     elements.backgroundColorSelector.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
                     e.target.classList.add('selected');
@@ -283,14 +327,14 @@
                 }
             });
 
-            elements.addItemBtn.addEventListener('click', () => {
+            utils.addEventListenerTracked(elements.addItemBtn, 'click', () => {
                 const newItem = { id: crypto.randomUUID(), text: '<strong>New Item</strong>' };
                 state.blockData.items.push(newItem);
                 renderItemsUI();
                 updateDataFromUI();
             });
 
-            elements.itemsContainer.addEventListener('click', (e) => {
+            utils.addEventListenerTracked(elements.itemsContainer, 'click', (e) => {
                 const itemEl = e.target.closest('.item');
                 if (!itemEl) return;
                 
@@ -301,11 +345,7 @@
 
                 if (e.target.closest('.remove-btn')) {
                     items.splice(currentIndex, 1);
-                    // Clean up Quill 2.0 editor
-                    if (state.editors[id] && state.editors[id].off) {
-                        state.editors[id].off('text-change');
-                    }
-                    delete state.editors[id];
+                    utils.cleanupEditor(id);
                     dataChanged = true;
                 } else if (e.target.closest('.move-up-btn') && currentIndex > 0) {
                     [items[currentIndex], items[currentIndex - 1]] = [items[currentIndex - 1], items[currentIndex]];
@@ -345,13 +385,26 @@
             });
         }
 
-        // Cleanup function for Quill 2.0
+        // Enhanced cleanup function with memory management
         function cleanup() {
-            Object.values(state.editors).forEach(editor => {
-                if (editor && editor.off) {
-                    editor.off('text-change');
-                }
+            // Enhanced cleanup with memory management
+            Object.keys(state.editors).forEach(editorId => {
+                utils.cleanupEditor(editorId);
             });
+            
+            // Clean up event listeners
+            state.eventListeners.forEach(({ element, event, handler }) => { 
+                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
+            }); 
+            state.eventListeners = [];
+            
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            
+            console.log('Checklist cleanup completed');
         }
 
         function initializeWithRetry() {

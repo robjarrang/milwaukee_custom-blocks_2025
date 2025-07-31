@@ -71,6 +71,12 @@
         const elements = {};
         let rafId = null;
         
+        // Advanced memory management
+        const editorMetadata = new WeakMap();
+        const cleanupRegistry = new FinalizationRegistry((heldValue) => {
+            console.log('Cleanup registry triggered for editor:', heldValue);
+        });
+        
         const utils = {
             debounce(func, wait) { 
                 let timeout; 
@@ -117,6 +123,64 @@
                 const value = state.blockData[fieldName]; 
                 const fieldConfig = moduleConfig.fields[fieldName]; 
                 return (value !== undefined && value !== null) ? (fieldConfig.type === 'number' ? parseFloat(value) : value) : fieldConfig.defaultValue; 
+            },
+            
+            createEditor(container, id, content = '', config = {}) {
+                // Create editor with memory tracking
+                const defaultConfig = { 
+                    theme: 'snow', 
+                    modules: { 
+                        toolbar: [['bold', 'italic'], ['link']], 
+                        clipboard: { matchVisual: false } 
+                    }, 
+                    formats: ['bold', 'italic', 'link'], 
+                    placeholder: 'Enter text...' 
+                };
+                
+                const editorConfig = { ...defaultConfig, ...config };
+                const editor = new Quill(container, editorConfig);
+
+                // Track editor metadata
+                const metadata = {
+                    id,
+                    created: Date.now(),
+                    container,
+                    hasContent: Boolean(content && content.trim())
+                };
+                
+                editorMetadata.set(editor, metadata);
+                cleanupRegistry.register(editor, id);
+                
+                // Set content if provided
+                if (content && content.trim()) {
+                    editor.setContents([]);
+                    editor.clipboard.dangerouslyPasteHTML(content);
+                }
+                
+                return editor;
+            },
+            
+            cleanupEditor(id) {
+                const editor = state.editors[id];
+                if (editor) {
+                    // Get metadata before cleanup
+                    const metadata = editorMetadata.get(editor);
+                    
+                    // Clean up event listeners
+                    if (editor.off) {
+                        editor.off('text-change');
+                    }
+                    
+                    // Log cleanup info
+                    console.log('Cleaning up editor:', {
+                        id,
+                        metadata,
+                        hadListeners: Boolean(editor.off)
+                    });
+                    
+                    // Remove from state
+                    delete state.editors[id];
+                }
             }
         };
         
@@ -149,40 +213,39 @@
             
             try {
                 const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
-                    // Quill 2.0 configuration
-                    const quillOptions = {
-                        theme: 'snow',
+                    // Create editor with memory management
+                    const editor = utils.createEditor(element, fieldName, '', {
                         modules: { 
                             toolbar, 
                             clipboard: { matchVisual: false } 
                         },
                         formats,
                         placeholder
-                    };
+                    });
                     
-                    state.editors[fieldName] = new Quill(element, quillOptions);
+                    state.editors[fieldName] = editor;
                     
                     const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
                         if (source === 'user') {
                             // Use getSemanticHTML() for Quill 2.0
-                            const content = state.editors[fieldName].getSemanticHTML ? 
-                                state.editors[fieldName].getSemanticHTML() : 
-                                state.editors[fieldName].root.innerHTML;
+                            const content = editor.getSemanticHTML ? 
+                                editor.getSemanticHTML() : 
+                                editor.root.innerHTML;
                             updateData(fieldName, utils.sanitizeHtml(content));
                         }
                     }, moduleConfig.debounceDelay);
                     
-                    state.editors[fieldName].on('text-change', debouncedUpdate);
+                    editor.on('text-change', debouncedUpdate);
                     
                     // Length limiting using Quill 2.0 API
-                    state.editors[fieldName].on('text-change', () => { 
-                        const text = state.editors[fieldName].getText(); 
+                    editor.on('text-change', () => { 
+                        const text = editor.getText(); 
                         const maxLength = moduleConfig.fields[fieldName].maxLength; 
                         if (text.length > maxLength) {
-                            const range = state.editors[fieldName].getSelection();
-                            state.editors[fieldName].deleteText(maxLength, text.length - maxLength);
+                            const range = editor.getSelection();
+                            editor.deleteText(maxLength, text.length - maxLength);
                             if (range) {
-                                state.editors[fieldName].setSelection(Math.min(range.index, maxLength));
+                                editor.setSelection(Math.min(range.index, maxLength));
                             }
                         }
                     });
@@ -385,16 +448,24 @@
         }
         
         function cleanup() { 
-            // Updated cleanup for Quill 2.0
-            Object.values(state.editors).forEach(editor => {
-                if (editor && editor.off) {
-                    editor.off('text-change');
-                }
-            }); 
+            // Enhanced cleanup with memory management
+            Object.keys(state.editors).forEach(editorId => {
+                utils.cleanupEditor(editorId);
+            });
+            
+            // Clean up tracked event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler); 
             }); 
-            state.eventListeners = []; 
+            state.eventListeners = [];
+            
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            
+            console.log('Lead banner cleanup completed');
         }
         
         function initializeWithRetry() {

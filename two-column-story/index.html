@@ -139,11 +139,46 @@
         const elements = {};
         const COLUMN_PREFIXES = ['left_', 'right_'];
         let rafId = null;
+        
+        // Memory management improvements
+        const editorMetadata = new WeakMap();
+        const cleanupRegistry = new FinalizationRegistry((id) => {
+            console.log(`Editor ${id} garbage collected`);
+        });
+        
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
             sanitizeHtml(h) { if (!h) return ''; const t = document.createElement('div'); t.innerHTML = h; t.querySelectorAll('script, style').forEach(e => e.remove()); const a = t.getElementsByTagName('*'); for (let e of a) { for (let r of e.attributes) { if (r.name.startsWith('on')) e.removeAttribute(r.name); } } return t.innerHTML; },
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
-            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
+            createEditor(element, options, id) {
+                const editor = new Quill(element, options);
+                editorMetadata.set(editor, {
+                    id: id,
+                    lastContent: '',
+                    isDirty: false,
+                    created: Date.now()
+                });
+                cleanupRegistry.register(editor, id);
+                return editor;
+            },
+            cleanupEditor(id) {
+                if (state.editors[id]) {
+                    const editor = state.editors[id];
+                    const metadata = editorMetadata.get(editor);
+                    if (metadata) {
+                        console.log(`Cleaning up editor ${id}, active for ${Date.now() - metadata.created}ms`);
+                    }
+                    // Remove event listeners
+                    if (editor.off) {
+                        editor.off('text-change');
+                    }
+                    // Clear from metadata
+                    editorMetadata.delete(editor);
+                    // Remove from state
+                    delete state.editors[id];
+                }
+            }
         };
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
@@ -276,30 +311,84 @@
             const fragment = document.createDocumentFragment();
             const typeLabels = { all: 'All Clients', mso: 'Outlook Only', not_mso: 'Non-Outlook' };
             
+            // Clean up existing editors for this list type
+            if (hasQuill) {
+                Object.keys(state.editors).forEach(editorId => {
+                    if (editorId.includes(prefix + listType)) {
+                        utils.cleanupEditor(editorId);
+                    }
+                });
+            }
+            
             items.forEach((item, index) => {
                 const itemFragment = template.content.cloneNode(true);
                 const itemEl = itemFragment.firstElementChild;
                 itemEl.dataset.id = item.id;
                 const titleEl = itemEl.querySelector('.item-title, .spacer-title');
-                if (listType === 'items') { titleEl.textContent = `Item ${index + 1}`; } 
-                else { titleEl.textContent = `Spacer: ${typeLabels[item.type]}`; }
+                
+                if (listType === 'items') { 
+                    titleEl.textContent = `Item ${index + 1}`; 
+                } else { 
+                    titleEl.textContent = `Spacer: ${typeLabels[item.type]}`; 
+                }
+                
                 const moveUpBtn = itemEl.querySelector('.move-up-btn');
                 if (moveUpBtn) moveUpBtn.disabled = index === 0;
                 const moveDownBtn = itemEl.querySelector('.move-down-btn');
                 if (moveDownBtn) moveDownBtn.disabled = index === items.length - 1;
                 
+                // Add to fragment first, then initialize editor
                 fragment.appendChild(itemEl);
                 
                 if (hasQuill) {
                     const editorDiv = itemEl.querySelector('.quill-container');
-                    const editor = new Quill(editorDiv, { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link']], clipboard: { matchVisual: false } }, formats: ['bold', 'italic', 'link'], placeholder: 'Enter item text...' });
+                    const editorId = `${prefix}${listType}_${item.id}`;
+                    
+                    // Create editor with proper memory management
+                    const editor = utils.createEditor(editorDiv, {
+                        theme: 'snow',
+                        modules: { 
+                            toolbar: [['bold', 'italic'], ['link']], 
+                            clipboard: { matchVisual: false } 
+                        },
+                        formats: ['bold', 'italic', 'link'],
+                        placeholder: 'Enter item text...'
+                    }, editorId);
+                    
                     editor.root.innerHTML = item.text || '';
-                    state.editors[item.id] = editor;
-                    const debouncedUpdate = utils.debounce(() => { const newItems = []; container.querySelectorAll('.item').forEach(el => { const id = el.dataset.id; if (state.editors[id]) newItems.push({ id, text: utils.sanitizeHtml(state.editors[id].root.innerHTML) }); }); updateData(prefix + 'items', newItems); }, moduleConfig.debounceDelay + 100);
+                    state.editors[editorId] = editor;
+                    
+                    // Update metadata
+                    const metadata = editorMetadata.get(editor);
+                    if (metadata) {
+                        metadata.lastContent = item.text || '';
+                    }
+                    
+                    const debouncedUpdate = utils.debounce(() => {
+                        const newItems = [];
+                        container.querySelectorAll('.item').forEach(el => {
+                            const id = el.dataset.id;
+                            const editorKey = `${prefix}${listType}_${id}`;
+                            if (state.editors[editorKey]) {
+                                const content = utils.sanitizeHtml(state.editors[editorKey].root.innerHTML);
+                                newItems.push({ id, text: content });
+                                
+                                // Update metadata
+                                const metadata = editorMetadata.get(state.editors[editorKey]);
+                                if (metadata) {
+                                    metadata.lastContent = content;
+                                    metadata.isDirty = true;
+                                }
+                            }
+                        });
+                        updateData(prefix + 'items', newItems);
+                    }, moduleConfig.debounceDelay + 100);
+                    
                     editor.on('text-change', debouncedUpdate);
                 }
             });
             
+            // Single DOM update using DocumentFragment
             container.replaceChildren(fragment);
         }
         function toggleContentTypeView(prefix, type) {
@@ -375,11 +464,29 @@
             });
         }
         function cleanup() { 
-            QuillConfigManager.cleanup(Object.values(state.editors)); 
+            // Enhanced cleanup with memory management
+            Object.keys(state.editors).forEach(editorId => {
+                utils.cleanupEditor(editorId);
+            });
+            
+            // Clear QuillConfigManager editors if available
+            if (typeof QuillConfigManager !== 'undefined' && QuillConfigManager.cleanup) {
+                QuillConfigManager.cleanup(Object.values(state.editors));
+            }
+            
+            // Clean up event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 
-            state.eventListeners = []; 
+            state.eventListeners = [];
+            
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            
+            console.log('Two-column story cleanup completed');
         }
         function initializeWithRetry() {
             try {
