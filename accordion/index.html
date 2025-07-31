@@ -447,7 +447,9 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not available');
                 if (!window.Quill) throw new Error('Quill.js not loaded');
                 
-                state.sdk = new window.sfdc.BlockSDK();
+                state.sdk = new window.sfdc.BlockSDK({
+                    capabilities: ['htmlblock']
+                });
                 cacheElements();
                 initializeEventHandlers();
                 setLoadingState(true);

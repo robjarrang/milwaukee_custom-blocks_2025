@@ -294,7 +294,9 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         function initialize() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not available');
-                state.sdk = new window.sfdc.BlockSDK();
+                state.sdk = new window.sfdc.BlockSDK({
+                    capabilities: ['htmlblock']
+                });
                 cacheElements();
                 initializeEventHandlers();
                 setLoadingState(true);

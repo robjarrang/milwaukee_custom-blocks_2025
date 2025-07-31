@@ -341,7 +341,9 @@
 
         function initialize() {
             cacheElements();
-            state.sdk = new window.sfdc.BlockSDK({ tabs: ['stylingblock', 'htmlblock'] });
+            state.sdk = new window.sfdc.BlockSDK({ 
+                capabilities: ['htmlblock'] 
+            });
             initializeEventHandlers();
             loadData();
         }

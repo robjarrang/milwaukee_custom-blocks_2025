@@ -395,7 +395,9 @@
         function initialize() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-                state.sdk = new window.sfdc.BlockSDK();
+                state.sdk = new window.sfdc.BlockSDK({
+                    capabilities: ['htmlblock']
+                });
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
