@@ -534,6 +534,19 @@
             });
         }
 
+        function toggleContentTypeView(contentType) {
+            if (elements.descriptionSection && elements.checklistSection) {
+                if (contentType === 'checklist') {
+                    elements.descriptionSection.style.display = 'none';
+                    elements.checklistSection.style.display = 'block';
+                    renderItemsUI();
+                } else {
+                    elements.descriptionSection.style.display = 'block';
+                    elements.checklistSection.style.display = 'none';
+                }
+            }
+        }
+
         function cleanup() {
             // Enhanced cleanup with memory management
             for (const [editorId, editor] of state.editors) {
