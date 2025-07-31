@@ -451,7 +451,8 @@
                     const newItems = [...currentItems, { id: crypto.randomUUID(), text: '<strong>New Item</strong>' }];
                     state.blockData[fieldName] = newItems;
                     renderItemsUI();
-                    updateData(fieldName, newItems);
+                    // Force immediate preview refresh for new items
+                    refreshPreview();
                     return;
                 }
 
@@ -477,7 +478,8 @@
                         if (result) {
                             actionExecuted = true;
                             renderItemsUI();
-                            updateData(fieldName, currentItems);
+                            // Force immediate preview refresh for item actions
+                            refreshPreview();
                         }
                         break;
                     }
