@@ -493,8 +493,6 @@
             // Use delegated event handler for items
             addListener(elements.addItemBtn, 'click', createDelegatedHandler('items', itemActions));
             addListener(elements.itemsContainer, 'click', createDelegatedHandler('items', itemActions));
-                updateData('items', items); renderItemsUI();
-            });
         }
         
         function updateUIFromData() {
