@@ -225,35 +225,6 @@
         }
 
         function initializeEventHandlers() {
-            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
-                input.addEventListener('input', updateStateFromUI);
-            });
-
-            elements.addItemBtn.addEventListener('click', createHotspotDelegatedHandler(hotspotActions));
-
-            elements.visualEditor.addEventListener('click', (e) => {
-                const targetIsMarker = e.target.classList.contains('hotspot-marker');
-                if (targetIsMarker) {
-                    state.selectedHotspotId = e.target.dataset.id;
-                    updateUI();
-                    return;
-                }
-                if (!state.selectedHotspotId) {
-                    alert('Please select a hotspot from the list below before placing it.');
-                    return;
-                }
-                const rect = elements.previewImage.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
-                if (hotspot) {
-                    hotspot.posX = parseFloat(((x / rect.width) * 100).toFixed(2));
-                    hotspot.posY = parseFloat(((y / rect.height) * 100).toFixed(2));
-                    updateUI();
-                    refreshPreview();
-                }
-            });
-            
             // Optimized Event Delegation with Action Maps
             const hotspotActions = {
                 '.remove-btn': (hotspot, index, hotspots) => {
@@ -347,7 +318,36 @@
                     }
                 };
             }
-            
+
+            // Initialize event handlers after function declaration
+            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
+                input.addEventListener('input', updateStateFromUI);
+            });
+
+            elements.addItemBtn.addEventListener('click', createHotspotDelegatedHandler(hotspotActions));
+
+            elements.visualEditor.addEventListener('click', (e) => {
+                const targetIsMarker = e.target.classList.contains('hotspot-marker');
+                if (targetIsMarker) {
+                    state.selectedHotspotId = e.target.dataset.id;
+                    updateUI();
+                    return;
+                }
+                if (!state.selectedHotspotId) {
+                    alert('Please select a hotspot from the list below before placing it.');
+                    return;
+                }
+                const rect = elements.previewImage.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
+                if (hotspot) {
+                    hotspot.posX = parseFloat(((x / rect.width) * 100).toFixed(2));
+                    hotspot.posY = parseFloat(((y / rect.height) * 100).toFixed(2));
+                    updateUI();
+                    refreshPreview();
+                }
+            });
             
             elements.itemsContainer.addEventListener('click', createHotspotDelegatedHandler(hotspotActions));
 
