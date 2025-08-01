@@ -7,46 +7,15 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <!-- Basic styling for the editor UI -->
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
-        
-        /* Modern Form Controls */
-        .field-group{position:relative;margin-bottom:24px}.field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);background:white;padding:0 4px;z-index:1}.field-input{width:100%;padding:12px;border:2px solid #e1e4e8;border-radius:6px;font-size:14px;box-sizing:border-box;background:white;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1)}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 3px rgba(0, 116, 217, 0.1)}.field-input:focus + .field-label,.field-input:not(:placeholder-shown) + .field-label{top:0;font-size:12px;color:#0074d9;font-weight:500}
-        
-        .section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}
-        
-        /* Enhanced Item Styling */
-        .item{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);padding:20px;border:2px solid #e1e4e8;border-radius:8px;position:relative;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 2px 4px rgba(0,0,0,0.05)}.item:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.1);border-color:#0074d9}
-        
-        .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0;color:#24292e}.item-controls{display:flex;gap:8px}
-        
-        /* Enhanced Control Buttons */
-        .item-control-btn{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border:2px solid #e1e4e8;cursor:pointer;padding:8px;font-size:14px;line-height:1;color:#586069;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);border-radius:6px;min-width:32px;height:32px;display:flex;align-items:center;justify-content:center}.item-control-btn:hover{background:linear-gradient(135deg, #0074d9 0%, #005a9e 100%);color:white;transform:scale(1.05);box-shadow:0 2px 8px rgba(0, 116, 217, 0.3)}.item-control-btn:disabled{background:#f1f3f4;color:#bdc1c6;cursor:not-allowed;transform:none;box-shadow:none}
-        
-        /* Enhanced Button Styling */
-        .btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg, #0074d9 0%, #005a9e 100%);color:white;text-decoration:none;border-radius:6px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 2px 4px rgba(0, 116, 217, 0.2);position:relative;overflow:hidden}.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0, 116, 217, 0.3)}.btn:active{transform:translateY(0);box-shadow:0 2px 4px rgba(0, 116, 217, 0.2)}.btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,0.3);border-radius:50%;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);transform:translate(-50%, -50%)}.btn:active::before{width:300px;height:300px}
-        
-        .add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        /* Enhanced Quill Editor Styling */
-        .quill-container{background:white;border:2px solid #e1e4e8;border-radius:6px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1)}.quill-container:focus-within{border-color:#0074d9;box-shadow:0 0 0 3px rgba(0, 116, 217, 0.1)}.ql-toolbar{border:none;border-bottom:2px solid #e1e4e8;border-radius:6px 6px 0 0;background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)}.ql-container{border:none;border-radius:0 0 6px 6px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:8px}.limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1)}.limited-toolbar .ql-toolbar button:hover{background:rgba(0, 116, 217, 0.1)}
-        
-        /* Fix for labels used with Quill editors - override floating label behavior */
-        .field-group .field-label.quill-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:12px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        /* Quill-specific styles */
+        .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
+        .field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-    
+
     <div class="container" id="mainContainer">
         <div class="section-title">Accordion Items</div>
         <div id="itemsContainer" class="items-container">
@@ -67,11 +36,11 @@
                 </div>
             </div>
             <div class="field-group">
-                <input type="text" class="field-input" data-field="title" placeholder=" ">
                 <label class="field-label">Title</label>
+                <input type="text" class="field-input" data-field="title" placeholder="ACCORDION ITEM TITLE">
             </div>
             <div class="field-group">
-                <label class="field-label quill-label">Content</label>
+                <label class="field-label">Content</label>
                 <!-- This div will be replaced by the Quill editor -->
                 <div class="quill-container limited-toolbar"></div>
             </div>
@@ -85,7 +54,7 @@
     <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
-        
+
         const moduleConfig = {
             name: 'Interactive Accordion',
             fields: {
@@ -102,13 +71,13 @@
 
         const state = { sdk: null, editors: {}, blockData: {}, eventListeners: [] };
         const elements = {};
-        
+
         // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
         });
-        
+
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; },
@@ -117,28 +86,22 @@
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
                 temp.querySelectorAll('script, style').forEach(el => el.remove());
-                
+
                 temp.querySelectorAll('a').forEach(link => {
                     link.style.color = '#ffffff';
                     link.style.textDecoration = 'underline';
                     if (!link.getAttribute('href')) link.setAttribute('href', '#');
                     if (!link.hasAttribute('target')) link.setAttribute('target', '_blank');
                 });
-                
+
                 return temp.innerHTML.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             },
-            
+
             createEditor(container, id, content = '') {
-                // Create editor with memory tracking
-                const editor = new Quill(container, {
-                    theme: 'snow',
-                    modules: { 
-                        toolbar: [['bold', { 'script': 'super' }], ['link']], 
-                        clipboard: { matchVisual: false }
-                    },
-                    formats: ['bold', 'script', 'link'],
+                // Create editor using shared configuration
+                const editor = new Quill(container, QuillConfigManager.createConfig('basic', {
                     placeholder: 'Enter content here...'
-                });
+                }));
 
                 // Track editor metadata
                 const metadata = {
@@ -147,37 +110,36 @@
                     container,
                     hasContent: Boolean(content && content.trim())
                 };
-                
+
                 editorMetadata.set(editor, metadata);
                 cleanupRegistry.register(editor, id);
-                
+
                 // Set content if provided
                 if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
-                
+
                 return editor;
             },
-            
+
             cleanupEditor(id) {
                 const editor = state.editors[id];
                 if (editor) {
                     // Get metadata before cleanup
                     const metadata = editorMetadata.get(editor);
-                    
+
                     // Clean up event listeners
                     if (editor.off) {
                         editor.off('text-change');
                     }
-                    
+
                     // Log cleanup info
                     console.log('Cleaning up editor:', {
                         id,
                         metadata,
                         hadListeners: Boolean(editor.off)
                     });
-                    
+
                     // Remove from state
                     delete state.editors[id];
                 }
@@ -196,7 +158,7 @@
             elements.mainContainer.classList.toggle('loading', loading);
             elements.loadingOverlay.classList.toggle('show', loading);
         }
-        
+
         const updateDataFromUI = utils.debounce(() => {
             const newItems = [];
             const itemElements = elements.itemsContainer.querySelectorAll('.item');
@@ -220,7 +182,7 @@
         let rafId = null;
         function renderItemsUI() {
             const items = utils.getFieldValue('accordionItems');
-            
+
             // Clean up existing editors first
             const currentIds = new Set(items.map(i => i.id));
             Object.keys(state.editors).forEach(id => {
@@ -228,10 +190,10 @@
                     utils.cleanupEditor(id);
                 }
             });
-            
+
             // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
-            
+
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
                 const el = itemFragment.querySelector('.item');
@@ -240,10 +202,10 @@
                 el.dataset.id = item.id;
                 el.querySelector('.item-title').textContent = `Item ${index + 1}`;
                 el.querySelector('[data-field="title"]').value = item.title || '';
-                
+
                 el.querySelector('.move-up-btn').disabled = (index === 0);
                 el.querySelector('.move-down-btn').disabled = (index === items.length - 1);
-                
+
                 fragment.appendChild(itemFragment);
 
                 // Create editor with memory management
@@ -251,12 +213,12 @@
                 editor.on('text-change', updateDataFromUI);
                 state.editors[item.id] = editor;
             });
-            
+
             // Single DOM update
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
         }
-        
+
         // Optimized Event Delegation with Action Maps
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
@@ -306,7 +268,7 @@
                 const id = itemEl.dataset.id;
                 const currentItems = state.blockData[fieldName];
                 const itemIndex = currentItems.findIndex(i => i.id === id);
-                
+
                 if (itemIndex === -1) return;
 
                 const item = currentItems[itemIndex];
@@ -317,7 +279,7 @@
                     if (event.target.closest(selector)) {
                         const context = { hasQuill: true, fieldName };
                         const result = action(item, itemIndex, currentItems, context);
-                        
+
                         if (result) {
                             actionExecuted = true;
                             renderItemsUI();
@@ -336,10 +298,10 @@
         function initializeEventHandlers() {
             // Optimized event delegation for accordion items
             const accordionHandler = createDelegatedHandler('accordionItems', itemActions);
-            
+
             elements.addItemBtn.addEventListener('click', accordionHandler);
             state.eventListeners.push({ element: elements.addItemBtn, event: 'click', handler: accordionHandler });
-            
+
             elements.itemsContainer.addEventListener('click', accordionHandler);
             state.eventListeners.push({ element: elements.itemsContainer, event: 'click', handler: accordionHandler });
 
@@ -359,29 +321,16 @@
             });
         }
 
-        /* ============================================
-           EMAIL TEMPLATE GENERATION
-           This function generates the final HTML that will be rendered in emails
-           ============================================ */
-        
         function generateTemplate() {
             const items = utils.getFieldValue('accordionItems');
-            
-            // Return placeholder content if no accordion items are configured
             if (!items || items.length === 0) {
                 return '<table align="center" style="width:620px; background-color:#DB021D;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
             }
 
-            // Generate interactive accordion items for modern email clients
             const interactiveItems = items.map((item, i) => `
           <div class="accordion-item">
-            <!-- Hidden checkbox that controls the expand/collapse state -->
             <input type="checkbox" id="accordion-${i + 1}" name="accordion-group">
-            
-            <!-- Clickable accordion header/title -->
             <label class="accordion-title" for="accordion-${i + 1}">${item.title}</label>
-            
-            <!-- Collapsible content area -->
             <div class="accordion-content">
               <div class="accordion-content-inner">
                 ${item.content}
@@ -389,15 +338,12 @@
             </div>
           </div>`).join('');
 
-            // Generate fallback content for email clients that don't support interactive elements
             const fallbackItems = items.map(item => `
             <tr>
               <td style="padding-bottom: 30px;">
-                <!-- Static title styling matching Milwaukee brand -->
                 <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; margin: 0 0 8px 0; text-transform: uppercase;">
                   ${item.title}
                 </h3>
-                <!-- Static content that's always visible in fallback -->
                 <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
                   ${item.content}
                 </div>
@@ -406,165 +352,54 @@
 
             return `<!--[if !mso]><!-->
 <style type="text/css">
-/* ============================================
-   EMAIL ACCORDION STYLES
-   These styles control the interactive accordion in the final email
-   ============================================ */
-
-/* Email client compatibility reset */
 body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
 img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
-
-/* Hide checkbox controls from view but keep them functional */
 input[type="checkbox"] { display: none !important; mso-hide: all !important; }
-
-/* Basic mobile responsiveness */
-@media screen and (max-width: 580px) { 
-    .content-outer { width: 100% !important; height: auto !important; } 
-    .side { width: 20px !important; } 
-    .content-inner { width: calc(100% - 40px) !important; } 
-}
-
-/* Interactive accordion functionality for modern email clients */
+@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } .side { width: 20px !important; } .content-inner { width: calc(100% - 40px) !important; } }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    /* Hide the fallback content when accordion is supported */
     .fallback { display: none !important; }
-    
-    /* Show and enable the interactive accordion */
     .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
-    
-    /* Individual accordion item styling */
     .accordion-item { border-bottom: 1px solid #000000; }
-    
-    /* Accordion title/header styling - clickable to expand/collapse */
-    .accordion-title { 
-        display: block; 
-        cursor: pointer; 
-        padding: 20px 0; 
-        position: relative; 
-        color: #ffffff; 
-        font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; 
-        font-size: 20px; 
-        font-weight: bold; 
-        line-height: 28px; 
-        text-transform: uppercase; 
-        -webkit-tap-highlight-color: transparent; 
-    }
-    
-    /* Plus/minus indicator icon */
-    .accordion-title::after { 
-        content: '+'; 
-        position: absolute; 
-        right: 0; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        font-size: 28px; 
-        font-weight: bold; 
-        color: #ffffff; 
-        transition: transform 0.3s ease; 
-    }
-    
-    /* Collapsible content container */
-    .accordion-content { 
-        max-height: 0; 
-        overflow: hidden; 
-        transition: max-height 0.4s ease-out; 
-        background-color: #000000; 
-    }
-    
-    /* Inner content wrapper with smooth padding transitions */
-    .accordion-content-inner { 
-        padding: 0; 
-        color: #ffffff; 
-        font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; 
-        font-size: 16px; 
-        font-weight: normal; 
-        line-height: 28px; 
-        transition: padding 0.4s ease-out; /* Smooth closing transition */
-    }
-    
-    /* Expanded state styles - when checkbox is checked */
-    input[type="checkbox"]:checked ~ .accordion-title::after { 
-        transform: translateY(-50%) rotate(45deg); /* Rotate plus to X */
-    }
-    input[type="checkbox"]:checked ~ .accordion-content { 
-        max-height: 500px; /* Allow content to expand */
-        transition: max-height 0.5s ease-in; 
-    }
-    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { 
-        padding: 20px 0; /* Add padding when expanded */
-        transition: padding 0.5s ease-in; /* Smooth opening transition */
-    }
+    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+    .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
+    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
+    input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
+    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
+    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; /* THE FIX: Override with the opening transition. */ transition: padding 0.5s ease-in; }
 }
-
-/* ============================================
-   EMAIL CLIENT COMPATIBILITY
-   Hide accordion from problematic email clients and show fallback
-   ============================================ */
-
-/* Apple Mail and other problematic clients */
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
-
-/* Outlook.com specific targeting */
 [class~="x_accordion-wrapper"] { display: none !important; }
 [class~="x_fallback"] { display: block !important; }
-
-/* Additional Outlook.com compatibility */
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
-
-/* Yahoo Mail targeting */
 @media screen yahoo {
     .fallback { display: block !important; max-height: none !important; }
     .accordion-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
 }
 </style>
 <!--<![endif]-->
-
-<!-- Additional Outlook.com compatibility -->
 <style type="text/css">
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
 </style>
-
-<!-- ==========================================
-     MAIN EMAIL CONTENT
-     Standard 620px email width with Milwaukee brand red background
-     ========================================== -->
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
   <tr>
-    <!-- Left gutter (20px) -->
     <td class="side" style="width: 20px;"> </td>
-    
-    <!-- Main content area (580px) -->
     <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
-      
-      <!-- ==========================================
-           INTERACTIVE ACCORDION SECTION
-           (Hidden by default, shown only in supporting email clients)
-           ========================================== -->
       <!--[if !mso]><!-->
       <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
         ${interactiveItems}
       </div>
       <!--<![endif]-->
-      
-      <!-- ==========================================
-           FALLBACK CONTENT
-           (Shown by default for email clients that don't support interactive content)
-           All accordion content is expanded and always visible
-           ========================================== -->
       <div class="fallback">
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%;">
           ${fallbackItems}
         </table>
       </div>
-      
     </td>
-    
-    <!-- Right gutter (20px) -->
     <td class="side" style="width: 20px;"> </td>
   </tr>
 </table>`;
@@ -572,7 +407,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
-            
+
             rafId = requestAnimationFrame(() => {
                 if (!state.sdk) return;
                 try {
@@ -591,19 +426,19 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
-            
+
             // Clean up event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 
             state.eventListeners = [];
-            
+
             // Cancel any pending RAF
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
-            
+
             console.log('Accordion cleanup completed');
         }
 
@@ -611,12 +446,14 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not available');
                 if (!window.Quill) throw new Error('Quill.js not loaded');
-                
-                state.sdk = new window.sfdc.BlockSDK();
+
+                state.sdk = new window.sfdc.BlockSDK({
+                    tabs: ['htmlblock']
+                });
                 cacheElements();
                 initializeEventHandlers();
                 setLoadingState(true);
-                
+
                 state.sdk.getData((data) => {
                     state.blockData.accordionItems = (data && data.accordionItems && data.accordionItems.length > 0) ? data.accordionItems : utils.getFieldValue('accordionItems');
                     state.blockData.accordionItems.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
@@ -624,7 +461,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                     refreshPreview();
                     setLoadingState(false);
                 });
-                
+
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
             } catch (error) {
@@ -636,4 +473,3 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initialize) : initialize();
     </script>
 </body>
-</html>
