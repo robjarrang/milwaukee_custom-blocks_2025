@@ -6,105 +6,38 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
-        
-        /* Enhanced input fields with floating labels */
-        .field-group{position:relative;margin-bottom:24px}
-        .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
-        .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
-        .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
-        .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
-        
-        .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
-        .checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}
-        
-        /* Enhanced toggle switch */
-        .toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}
-        .toggle-switch{position:relative;display:inline-block;width:56px;height:32px}
-        .toggle-switch input{opacity:0;width:0;height:0}
-        .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:linear-gradient(to right,#e1e4e8 0%,#e1e4e8 100%);transition:all 0.3s;border-radius:32px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1)}
-        .toggle-slider:before{position:absolute;content:"";height:26px;width:26px;left:3px;bottom:3px;background-color:white;transition:all 0.3s;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.2)}
-        input:checked + .toggle-slider{background:linear-gradient(to right,#0074d9 0%,#0366d6 100%)}
-        input:checked + .toggle-slider:before{transform:translateX(24px)}
-        
-        /* Enhanced Quill editor styling */
-        .quill-container{background:white;border:2px solid #e1e4e8;border-radius:8px;transition:all 0.2s ease}
-        .quill-container:focus-within{border-color:#0074d9;box-shadow:0 0 0 3px rgba(0,116,217,0.1)}
-        .ql-toolbar{border:none;border-bottom:1px solid #e1e4e8;border-radius:8px 8px 0 0;background:#fafbfc}
-        .ql-container{border:none;border-radius:0 0 8px 8px;font-size:14px}
-        .ql-editor{min-height:60px;padding:12px}
-        .limited-toolbar .ql-toolbar{padding:8px}
-        .limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s ease}
-        .limited-toolbar .ql-toolbar button:hover{background:rgba(0,116,217,0.1)}
-        
-        /* Fix for labels used with Quill editors - override floating label behavior */
-        .field-group .field-label.quill-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:12px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix for regular form labels - override floating label behavior for standard inputs */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:15px !important;
-            margin-top:0px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix field group spacing for static labels - more robust */
-        .field-group:has(.static-label) {
-            margin-bottom: 30px !important;
-        }
-        
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
-        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
-        .preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
-        
-        /* Enhanced font-size control styling */
-        .field-group-inline{display:flex;align-items:center;justify-content:space-between;margin-top:15px;margin-bottom:15px}
-        .field-group-inline .field-label{margin-bottom:0;position:static;transform:none;font-size:14px;color:#24292e;font-weight:600;background:none !important;padding:0 !important}
-        .field-group-inline .field-input{width:80px;padding:8px 12px;height:auto}
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}.preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
+
+        /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
+        .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
+        .field-group-inline .field-label { margin-bottom: 0; }
+        .field-group-inline .field-input { width: 80px; }
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-    
+
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Product Feature</h2>
-        
+
         <div class="error-banner" id="errorBanner"></div>
-        
+
         <!-- Product Settings -->
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Product Settings</div>
             <div class="field-group">
-                <label for="productImage" class="field-label static-label">Product Image URL</label>
+                <label for="productImage" class="field-label">Product Image URL</label>
                 <input type="url" id="productImage" class="field-input" placeholder="https://example.com/product-image.jpg">
                 <div class="field-error" id="productImageError">Please enter a valid image URL (http:// or https://)</div>
             </div>
             <div class="field-group">
-                <label for="productImageAlt" class="field-label static-label">Product Image Alt Text</label>
+                <label for="productImageAlt" class="field-label">Product Image Alt Text</label>
                 <input type="text" id="productImageAlt" class="field-input" placeholder="Product name or description">
             </div>
             <div class="field-group">
-                <label for="productUrl" class="field-label static-label">Product Link URL</label>
+                <label for="productUrl" class="field-label">Product Link URL</label>
                 <input type="url" id="productUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/product-page">
                 <div class="field-error" id="productUrlError">Please enter a valid URL (http:// or https://)</div>
             </div>
@@ -130,7 +63,7 @@
                 </div>
             </div>
             <div class="field-group">
-                <label class="field-label quill-label">Product Title</label>
+                <label class="field-label">Product Title</label>
                 <div id="productTitleEditor" class="quill-container limited-toolbar"></div>
                  <!-- NEW: Product Title Font Size Control -->
                 <div class="field-group-inline">
@@ -152,11 +85,11 @@
             </div>
             <div id="buttonFieldsGroup">
                 <div class="field-group">
-                    <label for="buttonText" class="field-label static-label">Button Text</label>
+                    <label for="buttonText" class="field-label">Button Text</label>
                     <input type="text" id="buttonText" class="field-input" placeholder="Learn More">
                 </div>
                 <div class="field-group">
-                    <label for="buttonUrl" class="field-label static-label">Button Link URL</label>
+                    <label for="buttonUrl" class="field-label">Button Link URL</label>
                     <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
                     <div class="field-error" id="buttonUrlError">Please enter a valid URL (http:// or https://)</div>
                 </div>
@@ -170,7 +103,7 @@
     <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
-        
+
         // Module configuration
         const moduleConfig = {
             name: 'Product Feature',
@@ -291,12 +224,12 @@
                         maxLength: moduleConfig.fields.productTitle.maxLength
                     }
                 );
-                
+
                 const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
                     const content = QuillConfigManager.getCleanContent(state.editors.productTitle, true);
                     updateData('productTitle', content);
                 }, moduleConfig.debounceDelay);
-                
+
                 state.editors.productTitle.on('text-change', updateHandler);
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
@@ -341,7 +274,7 @@
 
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
-            
+
             rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try {
@@ -366,7 +299,7 @@
 
         function initializeEventHandlers() {
             state.eventListeners = []; // Clear previous listeners
-            
+
             // Reusable input handler
             function setupInputHandler(element, dataKey, maxLength, isUrl = false, errorElement = null) {
                 const handler = (e) => {
@@ -427,7 +360,7 @@
                 state.eventListeners.push({ element: inputElement, event: 'input', handler: liveUpdateOnInput });
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
-            
+
             setupNumberInput(elements.subtitleFontSize, 'subtitleFontSize');
             setupNumberInput(elements.productTitleFontSize, 'productTitleFontSize');
             // --- END: ROBUST NUMBER INPUT HANDLER ---
@@ -438,7 +371,7 @@
                 return utils.showError('SDK not available');
             }
             setLoadingState(true);
-            
+
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {}; // Reset block data
@@ -450,7 +383,7 @@
                             state.blockData[key] = fields[key].defaultValue;
                         }
                     });
-                    
+
                     // Update UI from data
                     if (elements.productImage) elements.productImage.value = utils.getFieldValue('productImage');
                     if (elements.productImageAlt) elements.productImageAlt.value = utils.getFieldValue('productImageAlt');
@@ -460,7 +393,7 @@
                     if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
                     if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-                    
+
                     // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     if (state.editors.productTitle) {
                         const content = utils.getFieldValue('productTitle');
@@ -477,7 +410,7 @@
                             state.editors.productTitle.root.innerHTML = content || '';
                         }
                     }
-                    
+
                     const showSubtitle = utils.getFieldValue('showSubtitle');
                     if (elements.showSubtitle) elements.showSubtitle.checked = showSubtitle;
                     if (elements.subtitleGroup) elements.subtitleGroup.classList.toggle('disabled-field', !showSubtitle);
@@ -485,7 +418,7 @@
                     const showButton = utils.getFieldValue('showButton');
                     if (elements.showButton) elements.showButton.checked = showButton;
                     if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
-                    
+
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
@@ -513,18 +446,20 @@
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
-                
-                state.sdk = new window.sfdc.BlockSDK();
+
+                state.sdk = new window.sfdc.BlockSDK({
+                    tabs: ['htmlblock']
+                });
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
-                
+
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => { 
                     if (!document.hidden && state.isInitialized) loadData(); 
                 });
-                
+
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialisation failed: ${error.message}`);

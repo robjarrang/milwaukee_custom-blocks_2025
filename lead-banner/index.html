@@ -2,151 +2,48 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title        /* Fix for regular form labels - override floating label behavior for standard inputs */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:15px !important;
-            margin-top:0px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix field group spacing for static labels - more robust */
-        .field-group:has(.static-label) {
-            margin-bottom: 30px !important;
-        }Block</title>
+    <title>Lead Banner Block</title>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
-        
-        /* Enhanced input fields with floating labels */
-        .field-group{position:relative;margin-bottom:24px}
-        .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
-        .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
-        .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
-        .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
-        
-        .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
-        
-        /* Enhanced option selector with micro-interactions */
-        .option-selector{display:flex;gap:10px}
-        .option-button{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
-        .option-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);transition:left 0.6s}
-        .option-button:hover{border-color:#0074d9;background-color:#f0f8ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,116,217,0.15)}
-        .option-button:hover::before{left:100%}
-        .option-button.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
-        .option-button:active{transform:translateY(0);transition:transform 0.1s}
-        .option-button svg{display:block;margin:0 auto;fill:currentColor}
-        
-        /* Enhanced Quill editor styling */
-        .quill-container{background:white;border:2px solid #e1e4e8;border-radius:8px;transition:all 0.2s ease}
-        .quill-container:focus-within{border-color:#0074d9;box-shadow:0 0 0 3px rgba(0,116,217,0.1)}
-        .ql-toolbar{border:none;border-bottom:1px solid #e1e4e8;border-radius:8px 8px 0 0;background:#fafbfc}
-        .ql-container{border:none;border-radius:0 0 8px 8px;font-size:14px}
-        .ql-editor{min-height:80px;padding:12px}
-        .limited-toolbar .ql-toolbar{padding:8px}
-        .limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s ease}
-        .limited-toolbar .ql-toolbar button:hover{background:rgba(0,116,217,0.1)}
-        
-        /* Fix for labels used with Quill editors - override floating label behavior */
-        .field-group .field-label.quill-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:12px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix for labels used with option selectors - override floating label behavior */
-        .field-group .field-label.option-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:8px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix for labels used with regular form inputs - override floating label behavior */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:8px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
-        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
-        
-        /* Enhanced inline controls */
-        .field-group-inline{display:flex;align-items:center;justify-content:space-between;margin-top:15px;margin-bottom:15px}
-        .field-group-inline .field-label{margin-bottom:0;position:static;transform:none;font-size:14px;color:#24292e;font-weight:600;background:none !important;padding:0 !important}
-        .field-group-inline .field-input{width:80px;padding:8px 12px;height:auto}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
+        .field-group-inline .field-label { margin-bottom: 0; }
+        .field-group-inline .field-input { width: 80px; }
+        .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-    
+
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Lead Banner</h2>
         <div class="error-banner" id="errorBanner"></div>
-        
+
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
-            <div class="field-group">
-                <input type="url" id="backgroundImage" class="field-input" placeholder=" " />
-                <label for="backgroundImage" class="field-label static-label">Background Image URL</label>
-                <div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div>
-            </div>
+            <div class="field-group"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
         </div>
 
         <div class="section-divider">
             <div class="section-title">Content</div>
-            <div class="field-group"><label class="field-label option-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
-            <div class="field-group"><label class="field-label option-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
+            <div class="field-group"><label class="field-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
+            <div class="field-group"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
             <div class="section-divider" style="margin:20px 0; padding-top:15px;"></div>
 
-            <div class="field-group"><label class="field-label quill-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div>                <div class="field-group-inline">
-                    <label for="titleFontSize" class="field-label">Title Font Size (px)</label>
-                    <input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4" />
-                </div></div>
-            <div class="field-group"><label class="field-label quill-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
-            <div class="field-group">
-                <input type="url" id="contentUrl" class="field-input" placeholder=" " />
-                <label for="contentUrl" class="field-label static-label">Content Link URL</label>
-                <div class="field-error" id="contentUrlError">Please enter a valid URL.</div>
-            </div>
+            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="field-group-inline"><label for="titleFontSize" class="field-label">Title Font Size (px)</label><input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4"></div></div>
+            <div class="field-group"><label class="field-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
+            <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
-        
+
         const moduleConfig = {
             name: 'Lead Banner',
             fields: {
@@ -162,7 +59,7 @@
             debounceDelay: 300, 
             maxRetries: 3
         };
-        
+
         const state = { 
             sdk: null, 
             editors: {}, 
@@ -174,13 +71,13 @@
         };
         const elements = {};
         let rafId = null;
-        
+
         // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
         });
-        
+
         const utils = {
             debounce(func, wait) { 
                 let timeout; 
@@ -228,21 +125,13 @@
                 const fieldConfig = moduleConfig.fields[fieldName]; 
                 return (value !== undefined && value !== null) ? (fieldConfig.type === 'number' ? parseFloat(value) : value) : fieldConfig.defaultValue; 
             },
-            
+
             createEditor(container, id, content = '', config = {}) {
-                // Create editor with memory tracking
-                const defaultConfig = { 
-                    theme: 'snow', 
-                    modules: { 
-                        toolbar: [['bold', 'italic'], ['link']], 
-                        clipboard: { matchVisual: false } 
-                    }, 
-                    formats: ['bold', 'italic', 'link'], 
-                    placeholder: 'Enter text...' 
-                };
-                
-                const editorConfig = { ...defaultConfig, ...config };
-                const editor = new Quill(container, editorConfig);
+                // Create editor using shared configuration
+                const editorType = config.type || 'description';
+                const editor = new Quill(container, QuillConfigManager.createConfig(editorType, {
+                    placeholder: config.placeholder || 'Enter text...'
+                }));
 
                 // Track editor metadata
                 const metadata = {
@@ -251,43 +140,42 @@
                     container,
                     hasContent: Boolean(content && content.trim())
                 };
-                
+
                 editorMetadata.set(editor, metadata);
                 cleanupRegistry.register(editor, id);
-                
+
                 // Set content if provided
                 if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
-                
+
                 return editor;
             },
-            
+
             cleanupEditor(id) {
                 const editor = state.editors[id];
                 if (editor) {
                     // Get metadata before cleanup
                     const metadata = editorMetadata.get(editor);
-                    
+
                     // Clean up event listeners
                     if (editor.off) {
                         editor.off('text-change');
                     }
-                    
+
                     // Log cleanup info
                     console.log('Cleaning up editor:', {
                         id,
                         metadata,
                         hadListeners: Boolean(editor.off)
                     });
-                    
+
                     // Remove from state
                     delete state.editors[id];
                 }
             }
         };
-        
+
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
@@ -303,7 +191,7 @@
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
         }
-        
+
         function setLoadingState(loading) {
             state.isLoading = loading;
             if (elements.mainContainer && elements.loadingOverlay) { 
@@ -311,78 +199,60 @@
                 elements.loadingOverlay.classList.toggle('show', loading); 
             }
         }
-        
-        function initializeEditors() {
+
+        async function initializeEditors() {
             if (!window.Quill) throw new Error('Quill library not loaded');
-            
+            if (!window.QuillConfigManager) throw new Error('QuillConfigManager not loaded');
+
             try {
-                const createEditor = (fieldName, element, toolbar, formats, placeholder) => {
-                    // Create editor with memory management
-                    const editor = utils.createEditor(element, fieldName, '', {
-                        modules: { 
-                            toolbar, 
-                            clipboard: { matchVisual: false } 
-                        },
-                        formats,
-                        placeholder
-                    });
-                    
-                    state.editors[fieldName] = editor;
-                    
-                    const debouncedUpdate = utils.debounce((delta, oldDelta, source) => {
-                        if (source === 'user') {
-                            // Use getSemanticHTML() for Quill 2.0
-                            const content = editor.getSemanticHTML ? 
-                                editor.getSemanticHTML() : 
-                                editor.root.innerHTML;
-                            updateData(fieldName, utils.sanitizeHtml(content));
-                        }
+                // Initialize editors using shared configuration
+                state.editors.title = await QuillConfigManager.initializeEditor(
+                    elements.titleEditor, 
+                    'title', 
+                    {
+                        placeholder: 'Enter title...',
+                        maxLength: moduleConfig.fields.title.maxLength
+                    }
+                );
+
+                state.editors.subtitle = await QuillConfigManager.initializeEditor(
+                    elements.subtitleEditor, 
+                    'description', 
+                    {
+                        placeholder: 'Enter subtitle...',
+                        maxLength: moduleConfig.fields.subtitle.maxLength
+                    }
+                );
+
+                // Set up change handlers for all editors
+                Object.keys(state.editors).forEach(fieldName => {
+                    const editor = state.editors[fieldName];
+                    const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                        const content = QuillConfigManager.getCleanContent(editor, true);
+                        updateData(fieldName, utils.sanitizeHtml(content));
                     }, moduleConfig.debounceDelay);
-                    
-                    editor.on('text-change', debouncedUpdate);
-                    
-                    // Length limiting using Quill 2.0 API
-                    editor.on('text-change', () => { 
-                        const text = editor.getText(); 
-                        const maxLength = moduleConfig.fields[fieldName].maxLength; 
-                        if (text.length > maxLength) {
-                            const range = editor.getSelection();
-                            editor.deleteText(maxLength, text.length - maxLength);
-                            if (range) {
-                                editor.setSelection(Math.min(range.index, maxLength));
-                            }
-                        }
-                    });
-                };
-                
-                createEditor('title', elements.titleEditor, [[{ 'script': 'super' }], ['link']], ['script', 'link'], 'Enter title...');
-                createEditor('subtitle', elements.subtitleEditor, [['bold', 'italic'], ['link']], ['bold', 'italic', 'link'], 'Enter subtitle...');
+
+                    editor.on('text-change', updateHandler);
+                });
+
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
             }
         }
-        
+
         function processRichText(html) {
-            if (!html) return '';
-            const temp = document.createElement('div');
-            temp.innerHTML = utils.sanitizeHtml(html);
-            temp.querySelectorAll('a').forEach(link => { 
-                if (!link.style.color) link.style.color = '#ffffff'; 
-                link.style.textDecoration = 'none'; 
-                if (!link.getAttribute('href')) link.setAttribute('href', '#'); 
-            });
-            return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
+            return QuillConfigManager.sanitizeForEmail(html || '');
         }
-        
+
         function updateData(field, value) {
             if (state.blockData[field] != value) { 
                 state.blockData[field] = value; 
                 refreshPreview(); 
             }
         }
-        
+
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
-        
+
         function generateTemplate() {
             const bgImage = utils.getFieldValue('backgroundImage');
             const contentUrl = utils.getFieldValue('contentUrl');
@@ -397,7 +267,7 @@
             const logoImage = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/a3a77919-71b9-4b9d-b1ad-90f327487e3f.png';
             const logoUrl = 'https://%%CountryCode%%.milwaukeetool.eu/';
             const fallbackColor = '#DB021D';
-            
+
             // --- FIX: Dynamic Padding Logic ---
             let paddingTop = 20, paddingBottom = 20, paddingLeft = 40, paddingRight = 40;
             if (verticalAlign === 'top') paddingTop = 40;
@@ -407,13 +277,13 @@
             const paddingString = `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`;
 
             const logoHtml = `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="left" style="padding:0 0 0 12px;" valign="top"><a href="${logoUrl}" target="_blank"><img alt="Logo" src="${logoImage}" style="border:0;display:block;height:auto;outline:none;text-decoration:none;" width="180"></a></td></tr></table>`;
-            
+
             return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}"><h1 class="leadbanner-title" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',sans-serif,'Open Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0 0 10px 0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:${subtitleSize}px;font-stretch:condensed;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedSubtitle}</a></p></td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
         }
-        
+
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
-            
+
             rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try { 
@@ -427,7 +297,7 @@
                 }
             });
         }
-        
+
         function validateUrlInput(input, errorElement) { 
             const value = input.value.trim(); 
             const isValid = !value || utils.isValidUrl(value); 
@@ -435,10 +305,10 @@
             if (errorElement) errorElement.style.display = isValid ? 'none' : 'block'; 
             return isValid; 
         }
-        
+
         function initializeEventHandlers() {
             state.eventListeners = [];
-            
+
             function setupUrlInput(inputEl, errorEl, dataKey) {
                 const handler = (e) => { 
                     if (validateUrlInput(inputEl, errorEl)) { 
@@ -451,10 +321,10 @@
                 state.eventListeners.push({ element: inputEl, event: 'input', handler });
                 state.eventListeners.push({ element: inputEl, event: 'blur', handler: blurHandler });
             }
-            
+
             setupUrlInput(elements.backgroundImage, elements.backgroundImageError, 'backgroundImage');
             setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
-            
+
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
                 const correctValueOnBlur = (e) => {
@@ -470,10 +340,10 @@
                 inputElement.addEventListener('blur', correctValueOnBlur);
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
-            
+
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.subtitleFontSize, 'subtitleFontSize');
-            
+
             function setupOptionSelector(el, key) { 
                 if (!el) return; 
                 el.querySelectorAll('.option-button').forEach(opt => { 
@@ -487,15 +357,15 @@
                     state.eventListeners.push({ element: opt, event: 'click', handler }); 
                 }); 
             }
-            
+
             setupOptionSelector(elements.verticalAlignSelector, 'verticalAlign');
             setupOptionSelector(elements.textAlignSelector, 'textAlign');
         }
-        
+
         function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') return utils.showError('SDK not available');
             setLoadingState(true);
-            
+
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
@@ -506,12 +376,12 @@
                             state.blockData[key] = utils.sanitizeHtml(state.blockData[key]); 
                         } 
                     });
-                    
+
                     elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
                     elements.contentUrl.value = utils.getFieldValue('contentUrl');
                     elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
-                    
+
                     // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     Object.keys(state.editors).forEach(key => {
                         if (state.editors[key]) {
@@ -530,15 +400,15 @@
                             }
                         }
                     });
-                    
+
                     function setSelectorState(el, key) { 
                         const val = utils.getFieldValue(key); 
                         if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
                     }
-                    
+
                     setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
                     setSelectorState(elements.textAlignSelector, 'textAlign');
-                    
+
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) { 
@@ -550,44 +420,46 @@
                 }
             });
         }
-        
+
         function cleanup() { 
             // Enhanced cleanup with memory management
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
-            
+
             // Clean up tracked event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler); 
             }); 
             state.eventListeners = [];
-            
+
             // Cancel any pending RAF
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
-            
+
             console.log('Lead banner cleanup completed');
         }
-        
+
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
-                
-                state.sdk = new window.sfdc.BlockSDK();
+
+                state.sdk = new window.sfdc.BlockSDK({
+                    tabs: ['htmlblock']
+                });
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
-                
+
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => { 
                     if (!document.hidden && state.isInitialized) loadData(); 
                 });
-                
+
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialisation failed: ${error.message}`);
@@ -600,7 +472,7 @@
                 setLoadingState(false);
             }
         }
-        
+
         if (document.readyState === 'loading') { 
             document.addEventListener('DOMContentLoaded', initializeWithRetry); 
         } else { 

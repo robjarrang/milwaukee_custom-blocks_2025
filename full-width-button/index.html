@@ -1,99 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf        /* Fix for regular form labels - override floating label behavior for standard inputs */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:15px !important;
-            margin-top:0px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix field group spacing for static labels - more robust */
-        .field-group:has(.static-label) {
-            margin-bottom: 30px !important;
-        }le>Full Width Button Block</title>
+    <meta charset="utf-8">
+    <title>Full Width Button Block</title>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
-        
-        /* Enhanced input fields with floating labels */
-        .field-group{position:relative;margin-bottom:24px}
-        .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
-        .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
-        .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
-        .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
-        
-        .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
-        
-        /* Enhanced option selector with micro-interactions */
-        .option-selector{display:flex;gap:10px}
-        .option-button{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
-        .option-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);transition:left 0.6s}
-        .option-button:hover{border-color:#0074d9;background-color:#f0f8ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,116,217,0.15)}
-        .option-button:hover::before{left:100%}
-        .option-button.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
-        .option-button:active{transform:translateY(0);transition:transform 0.1s}
-        
-        /* Enhanced Quill editor styling */
-        .quill-container{background:white;border:2px solid #e1e4e8;border-radius:8px;transition:all 0.2s ease}
-        .quill-container:focus-within{border-color:#0074d9;box-shadow:0 0 0 3px rgba(0,116,217,0.1)}
-        .ql-toolbar{border:none;border-bottom:1px solid #e1e4e8;border-radius:8px 8px 0 0;background:#fafbfc}
-        .ql-container{border:none;border-radius:0 0 8px 8px;font-size:14px}
-        .ql-editor{min-height:40px;padding:12px}
-        .limited-toolbar .ql-toolbar{padding:8px}
-        .limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s ease}
-        .limited-toolbar .ql-toolbar button:hover{background:rgba(0,116,217,0.1)}
-        
-        /* Fix for labels used with Quill editors - override floating label behavior */
-        .field-group .field-label.quill-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:12px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix for labels used with regular form inputs - override floating label behavior */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:8px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:40px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-    
+
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Full Width Button</h2>
-        
+
         <div class="error-banner" id="errorBanner"></div>
-        
+
         <!-- General Settings -->
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
@@ -110,12 +35,12 @@
         <div class="section-divider">
             <div class="section-title">Button Settings</div>
             <div class="field-group">
-                <label class="field-label quill-label">Button Text</label>
+                <label class="field-label">Button Text</label>
                 <div id="buttonTextEditor" class="quill-container limited-toolbar"></div>
             </div>
             <div class="field-group">
-                <label for="buttonUrl" class="field-label static-label">Button Link URL</label>
-                <input type="url" id="buttonUrl" class="field-input" placeholder=" ">
+                <label for="buttonUrl" class="field-label">Button Link URL</label>
+                <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
                 <div class="field-error" id="buttonUrlError">Please enter a valid URL.</div>
             </div>
             <div class="field-group">
@@ -134,7 +59,7 @@
     <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
-        
+
         // Module configuration
         const moduleConfig = {
             name: 'Full Width Button',
@@ -237,13 +162,13 @@
                     const content = QuillConfigManager.getCleanContent(state.editors.buttonText, true);
                     updateData('buttonText', content);
                 }, moduleConfig.debounceDelay);
-                
+
                 state.editors.buttonText.on('text-change', updateHandler);
             } catch (error) {
                 throw new Error(`Failed to initialize editor: ${error.message}`);
             }
         }
-        
+
         function processRichText(html) {
             return QuillConfigManager.sanitizeForEmail(html || '');
         }
@@ -254,7 +179,7 @@
                 refreshPreview();
             }
         }
-        
+
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         function generateTemplate() {
@@ -265,7 +190,7 @@
             const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
 
             let buttonTableStyle;
-            
+
             if (backgroundColor === 'black') {
                 // White bordered button for black background, matching Product Feature style
                 buttonTableStyle = `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`;
@@ -273,7 +198,7 @@
                 // Black solid button for red background
                 buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
             }
-            
+
             const buttonLinkStyle = `color: #ffffff; text-decoration: none;`;
             const buttonCellStyle = `border-radius: 4px !important; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;`;
 
@@ -324,12 +249,12 @@
 
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
-            
+
             rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try {
                     const html = generateTemplate();
-                    
+
                     // Updates the view in the editor
                     state.sdk.setContent(html);
 
@@ -354,7 +279,7 @@
 
         function initializeEventHandlers() {
             state.eventListeners = [];
-            
+
             // Option selectors
             function setupOptionSelector(selectorElement, dataKey) {
                 if (!selectorElement) return;
@@ -369,7 +294,7 @@
                     state.eventListeners.push({ element: option, event: 'click', handler });
                 });
             }
-            
+
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
 
@@ -389,7 +314,7 @@
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
-            
+
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
@@ -408,12 +333,12 @@
                             o.classList.toggle('selected', o.dataset.value === value);
                         });
                     }
-                    
+
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
-                    
+
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-                    
+
                     // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     if (state.editors.buttonText) {
                         const content = utils.getFieldValue('buttonText');
@@ -430,7 +355,7 @@
                             state.editors.buttonText.root.innerHTML = content || '';
                         }
                     }
-                    
+
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
@@ -457,18 +382,20 @@
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 if (!window.Quill) throw new Error('Quill not loaded');
-                
-                state.sdk = new window.sfdc.BlockSDK();
+
+                state.sdk = new window.sfdc.BlockSDK({
+                    tabs: ['htmlblock']
+                });
                 cacheElements();
                 initializeEditors();
                 initializeEventHandlers();
                 loadData();
-                
+
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => {
                     if (!document.hidden && state.isInitialized) loadData();
                 });
-                
+
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialisation failed: ${error.message}`);

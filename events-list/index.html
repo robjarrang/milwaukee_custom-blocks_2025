@@ -1,110 +1,28 @@
 <!DOCTYPE html>
-<h        /* Fix for regular form labels - override floating label behavior for standard inputs */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:15px !important;
-            margin-top:0px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Fix field group spacing for static labels - more robust */
-        .field-group:has(.static-label) {
-            margin-bottom: 30px !important;
-        }   <meta charset="utf-8">
+<html>
+<head>
+    <meta charset="utf-8">
     <title>Events List Block</title>
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
-        
-        /* Enhanced input fields with floating labels */
-        .field-group{position:relative;margin-bottom:24px}
-        .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
-        .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
-        .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
-        .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
-        
-        .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
-        
-        /* Fix for labels used with regular form inputs - override floating label behavior */
-        .field-group .field-label.static-label {
-            position:static !important;
-            transform:none !important;
-            top:auto !important;
-            font-size:14px !important;
-            color:#333 !important;
-            font-weight:bold !important;
-            margin-bottom:8px !important;
-            display:block !important;
-            background:none !important;
-            padding:0 !important;
-        }
-        
-        /* Enhanced color selector with micro-interactions */
-        .color-selector{display:flex;gap:10px}
-        .color-option{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
-        .color-option::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);transition:left 0.6s}
-        .color-option:hover{border-color:#0074d9;background-color:#f0f8ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,116,217,0.15)}
-        .color-option:hover::before{left:100%}
-        .color-option.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
-        .color-option:active{transform:translateY(0);transition:transform 0.1s}
-        
-        /* Enhanced toggle switch */
-        .toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px;margin-top:20px}
-        .toggle-switch{position:relative;display:inline-block;width:56px;height:32px}
-        .toggle-switch input{opacity:0;width:0;height:0}
-        .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:linear-gradient(to right,#e1e4e8 0%,#e1e4e8 100%);transition:all 0.3s;border-radius:32px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1)}
-        .toggle-slider:before{position:absolute;content:"";height:26px;width:26px;left:3px;bottom:3px;background-color:white;transition:all 0.3s;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.2)}
-        input:checked + .toggle-slider{background:linear-gradient(to right,#0074d9 0%,#0366d6 100%)}
-        input:checked + .toggle-slider:before{transform:translateX(24px)}
-        
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.events-container{display:flex;flex-direction:column;gap:15px}
-        
-        /* Enhanced event items */
-        .event-item{background:linear-gradient(145deg,#fafbfc,#f6f8fa);padding:20px;border:2px solid #e1e4e8;border-radius:12px;position:relative;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
-        .event-item:hover{border-color:#d1d5da;transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.1)}
-        .event-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-        .event-title{font-weight:bold;font-size:16px;color:#24292e}
-        .event-controls{display:flex;gap:8px}
-        
-        /* Enhanced control buttons */
-        .event-control-btn{background:none;border:2px solid transparent;cursor:pointer;padding:8px;font-size:16px;line-height:1;color:#586069;transition:all 0.2s ease;border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
-        .event-control-btn:hover{color:#0074d9;border-color:#0074d9;background:rgba(0,116,217,0.1);transform:scale(1.05)}
-        .event-control-btn:active{transform:scale(0.95)}
-        .event-control-btn:disabled{color:#d1d5da;cursor:not-allowed;border-color:transparent;background:none;transform:none}
-        
-        /* Enhanced button styling */
-        .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;text-decoration:none;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
-        .btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.6s}
-        .btn:hover{background:linear-gradient(135deg,#005a9e,#044289);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
-        .btn:hover::before{left:100%}
-        .btn:active{transform:translateY(0);transition:transform 0.1s}
-        .add-event-btn{margin-top:20px}
-        
-        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px;margin-top:20px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.events-container{display:flex;flex-direction:column;gap:15px}.event-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.event-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.event-title{font-weight:bold;font-size:16px}.event-controls{display:flex;gap:8px}.event-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.event-control-btn:hover{color:#0074d9}.event-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-event-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-    
+
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Events List Settings</h2>
         <div class="error-banner" id="errorBanner"></div>
-        
+
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
             <div class="field-group">
+                <label class="field-label">Background Colour</label>
                 <div class="color-selector" id="backgroundColorSelector">
                     <div class="color-option selected" data-color="red">Red</div>
                     <div class="color-option" data-color="black">Black</div>
                 </div>
-                <label class="field-label">Background Colour</label>
             </div>
             <div class="toggle-container">
                 <label class="toggle-switch">
@@ -133,28 +51,28 @@
                 </div>
             </div>
             <div class="field-group">
-                <label class="field-label static-label">Image URL (178px wide)</label>
+                <label class="field-label">Image URL (178px wide)</label>
                 <input type="url" class="field-input" data-field="imageUrl" placeholder="https://example.com/event-image.jpg">
                 <div class="field-error">Please enter a valid image URL.</div>
             </div>
             <div class="field-group">
-                <label class="field-label static-label">Title</label>
+                <label class="field-label">Title</label>
                 <input type="text" class="field-input" data-field="title" placeholder="EXECUTIVE HIRE SHOW">
             </div>
             <div class="field-group">
-                <label class="field-label static-label">Date</label>
+                <label class="field-label">Date</label>
                 <input type="text" class="field-input" data-field="date" placeholder="3rd February">
             </div>
             <div class="field-group">
-                <label class="field-label static-label">Location</label>
+                <label class="field-label">Location</label>
                 <input type="text" class="field-input" data-field="location" placeholder="CBS Arena, Coventry">
             </div>
             <div class="field-group">
-                <label class="field-label static-label">Button Text</label>
+                <label class="field-label">Button Text</label>
                 <input type="text" class="field-input" data-field="buttonText" placeholder="Learn More">
             </div>
             <div class="field-group">
-                <label class="field-label static-label">Button/Image Link URL</label>
+                <label class="field-label">Button/Image Link URL</label>
                 <input type="url" class="field-input" data-field="buttonUrl" placeholder="https://example.com/event-details">
                 <div class="field-error">Please enter a valid link URL.</div>
             </div>
@@ -165,7 +83,7 @@
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
-        
+
         const moduleConfig = {
             name: 'Events List Block',
             fields: {
@@ -192,7 +110,7 @@
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (e) { return false; } },
             showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
             getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; },
-            
+
             addEventListenerTracked(element, event, handler) {
                 element.addEventListener(event, handler);
                 state.eventListeners.push({ element, event, handler });
@@ -220,7 +138,7 @@
             const selectedColorEl = elements.backgroundColorSelector.querySelector('.selected');
             state.blockData.backgroundColor = selectedColorEl ? selectedColorEl.dataset.color : 'red';
             state.blockData.showButtons = elements.showButtonsToggle.checked;
-            
+
             const newEvents = Array.from(elements.eventsContainer.querySelectorAll('.event-item')).map(itemEl => {
                 const event = { id: itemEl.dataset.id };
                 itemEl.querySelectorAll('.field-input').forEach(input => {
@@ -239,12 +157,12 @@
             if (showButtons) {
                 let buttonClassName = 'button-1-black';
                 let buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
-                
+
                 if (blockBackgroundColor === 'black') {
                     buttonClassName = 'button-2-white';
                     buttonTableStyle = `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`;
                 }
-                
+
                 buttonHtml = `<tr><td align="left" class="mobile-text-center"><table align="left" border="0" cellpadding="0" cellspacing="0" class="sect sect-button" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="${buttonClassName}" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;"><a href="${event.buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${event.buttonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
@@ -259,7 +177,7 @@
             const bgColorHex = backgroundColor === 'red' ? '#DB021D' : '#000000';
             const events = utils.getFieldValue('events');
             const dividerHtml = `<!-- Divider --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;" width="100%"><tr><td style="padding: 20px 0;"><hr style="border: 0; height: 1px; background-color: #ffffff; opacity: 0.3; margin: 0;"></td></tr></table>`;
-            
+
             const allEventsHtml = events.map((event, index) => {
                 const eventHtml = generateEventHtml(event, backgroundColor, showButtons);
                 return index < events.length - 1 ? eventHtml + dividerHtml : eventHtml;
@@ -272,7 +190,7 @@
 
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
-            
+
             rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try {
@@ -299,7 +217,7 @@
                 const itemEl = itemFragment.querySelector('.event-item');
                 itemEl.dataset.id = event.id;
                 itemEl.querySelector('.event-title').textContent = `Event ${index + 1}`;
-                
+
                 itemEl.querySelectorAll('.field-input').forEach(input => {
                     input.value = event[input.dataset.field] || '';
                 });
@@ -313,7 +231,7 @@
             // Single DOM update with all events
             elements.eventsContainer.appendChild(fragment);
         }
-        
+
         // Optimized Event Delegation with Action Maps
         const eventActions = {
             '.remove-btn': (event, index, events) => {
@@ -367,7 +285,7 @@
                 const id = itemEl.dataset.id;
                 const currentEvents = state.blockData.events;
                 const eventIndex = currentEvents.findIndex(e => e.id === id);
-                
+
                 if (eventIndex === -1) return;
 
                 const eventItem = currentEvents[eventIndex];
@@ -377,7 +295,7 @@
                 for (const [selector, action] of Object.entries(actionMap)) {
                     if (event.target.closest(selector)) {
                         const result = action(eventItem, eventIndex, currentEvents);
-                        
+
                         if (result) {
                             actionExecuted = true;
                             renderEventsUI();
@@ -406,7 +324,7 @@
 
             // Optimized event delegation for events
             const eventsHandler = createDelegatedHandler('events', eventActions);
-            
+
             utils.addEventListenerTracked(elements.addEventBtn, 'click', eventsHandler);
             utils.addEventListenerTracked(elements.eventsContainer, 'click', eventsHandler);
 
@@ -428,19 +346,19 @@
         function loadData() {
             if (!state.sdk) return utils.showError('SDK not available');
             setLoadingState(true);
-            
+
             state.sdk.getData((data) => {
                 try {
                     const newBlockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => {
                         newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
                     });
-                    
+
                     if(newBlockData.events) {
                         newBlockData.events.forEach(event => { if (!event.id) event.id = crypto.randomUUID(); });
                     }
                     state.blockData = newBlockData;
-                    
+
                     document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
                     elements.showButtonsToggle.checked = state.blockData.showButtons;
                     renderEventsUI();
@@ -465,28 +383,30 @@
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 
             state.eventListeners = [];
-            
+
             // Cancel any pending RAF
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
-            
+
             console.log('Events list cleanup completed');
         }
 
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-                
-                state.sdk = new window.sfdc.BlockSDK();
+
+                state.sdk = new window.sfdc.BlockSDK({
+                    tabs: ['htmlblock']
+                });
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
-                
+
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
-                
+
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
@@ -503,4 +423,3 @@
         document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initializeWithRetry) : initializeWithRetry();
     </script>
 </body>
-</html>

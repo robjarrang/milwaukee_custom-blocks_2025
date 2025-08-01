@@ -5,40 +5,16 @@
     <title>Spacer Block</title>
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
-        
-        /* Enhanced input fields with floating labels */
-        .field-group{position:relative;margin-bottom:24px}
-        .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
-        
-        /* Enhanced option selector with micro-interactions */
-        .option-selector{display:flex;gap:10px;margin-bottom:15px}
-        .option-button{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
-        .option-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);transition:left 0.6s}
-        .option-button:hover{border-color:#0074d9;background-color:#f0f8ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,116,217,0.15)}
-        .option-button:hover::before{left:100%}
-        .option-button.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
-        .option-button:active{transform:translateY(0);transition:transform 0.1s}
-        
-        /* Enhanced slider styling */
-        .slider-group{display:flex;align-items:center;gap:15px}
-        .slider-input{flex-grow:1;cursor:pointer;height:8px;border-radius:4px;background:linear-gradient(to right,#e1e4e8 0%,#e1e4e8 100%);outline:none;transition:all 0.2s ease}
-        .slider-input::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#0074d9,#0366d6);cursor:pointer;box-shadow:0 2px 6px rgba(0,116,217,0.3);transition:all 0.2s ease}
-        .slider-input::-webkit-slider-thumb:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,116,217,0.5)}
-        .slider-input::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#0074d9,#0366d6);cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,116,217,0.3)}
-        
-        .slider-value{font-size:14px;font-weight:bold;color:#333;background:linear-gradient(135deg,#f0f8ff,#e6f3ff);padding:8px 12px;border-radius:6px;min-width:60px;text-align:center;border:2px solid #e1e4e8;transition:all 0.2s ease}
-        
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.option-selector{display:flex;gap:10px;margin-bottom:15px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.slider-group{display:flex;align-items:center;gap:15px}.slider-input{flex-grow:1;cursor:pointer}.slider-value{font-size:14px;font-weight:bold;color:#333;background-color:#f0f0f0;padding:4px 8px;border-radius:4px;min-width:50px;text-align:center}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-    
+
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Spacer Settings</h2>
         <div class="error-banner" id="errorBanner"></div>
-        
+
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Customisation</div>
             <div class="field-group">
@@ -63,7 +39,7 @@
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
 <script>
     'use strict';
-    
+
     const moduleConfig = {
         name: 'Spacer',
         fields: {
@@ -104,7 +80,7 @@
     function updateUIFromState() {
         const bgColor = utils.getFieldValue('backgroundColor');
         const height = utils.getFieldValue('spacerHeight');
-        
+
         elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(o => {
             o.classList.toggle('selected', o.dataset.value === bgColor);
         });
@@ -115,7 +91,7 @@
     function generateTemplate() {
         const backgroundColorValue = utils.getFieldValue('backgroundColor');
         const spacerHeightValue = utils.getFieldValue('spacerHeight');
-        
+
         const bgColor = backgroundColorValue === 'red' ? '#DB021D' : '#000000';
         const height = `${spacerHeightValue}px`;
 
@@ -138,14 +114,14 @@
 
         const heightMatch = html.match(/height:\s*(\d+)(px)?/);
         const colorMatch = html.match(/background-color:\s*([^;]+)/);
-        
+
         if (!heightMatch || !colorMatch) return null;
 
         const spacerHeight = parseInt(heightMatch[1], 10);
         const bgColorHex = colorMatch[1].trim().toUpperCase();
 
         const backgroundColor = (bgColorHex === '#DB021D') ? 'red' : 'black';
-        
+
         return { backgroundColor, spacerHeight };
     }
 
@@ -154,7 +130,7 @@
      */
     function refreshPreview() {
         if (rafId) cancelAnimationFrame(rafId);
-        
+
         rafId = requestAnimationFrame(() => {
             try {
                 const html = generateTemplate();
@@ -178,7 +154,7 @@
                 updateStateFromUI();
             }
         });
-        
+
         elements.spacerHeight.addEventListener('input', () => {
             elements.spacerHeightValue.textContent = `${elements.spacerHeight.value}px`;
             updateStateFromUI();
@@ -206,7 +182,7 @@
                     // Fallback to saved data if parsing fails (e.g., new or empty block).
                     state.blockData.backgroundColor = data.backgroundColor || moduleConfig.fields.backgroundColor.defaultValue;
                     state.blockData.spacerHeight = data.spacerHeight || moduleConfig.fields.spacerHeight.defaultValue;
-                    
+
                     // Since there was no valid content, generate it now. This happens for new blocks.
                     refreshPreview();
                 }
@@ -220,9 +196,9 @@
     function initialize() {
         try {
             if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-            
+
             state.sdk = new window.sfdc.BlockSDK({
-                tabs: ['stylingblock', 'htmlblock'] 
+                tabs: ['htmlblock']
             });
 
             cacheElements();
