@@ -60,6 +60,20 @@
             padding:0 !important;
         }
         
+        /* Fix for regular form labels - override floating label behavior for standard inputs */
+        .field-group .field-label.static-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:8px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
+        
         .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
         .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
         
@@ -68,6 +82,11 @@
         .style-control-group .field-label{margin-bottom:10px;position:static;transform:none;font-size:14px;color:#24292e;font-weight:600}
         .style-control-group .field-input{width:80px;padding:8px 12px;height:auto}
         .style-control-group .option-selector{width:110px}
+        
+        /* Fix alignment label spacing */
+        .style-control-group:last-child {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -113,7 +132,7 @@
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
             <div id="buttonFieldsGroup">
                 <div class="field-group"><label for="buttonText" class="field-label quill-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div>
-                <div class="field-group"><label for="buttonUrl" class="field-label">Button Link URL</label><input type="url" id="buttonUrl" class="field-input"><div class="field-error" id="buttonUrlError">Please enter a valid URL.</div></div>
+                <div class="field-group"><label for="buttonUrl" class="field-label static-label">Button Link URL</label><input type="url" id="buttonUrl" class="field-input"><div class="field-error" id="buttonUrlError">Please enter a valid URL.</div></div>
                 <div class="style-controls-wrapper">
                     <div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
