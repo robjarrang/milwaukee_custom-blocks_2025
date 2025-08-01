@@ -49,6 +49,20 @@
         .limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s ease}
         .limited-toolbar .ql-toolbar button:hover{background:rgba(0,116,217,0.1)}
         
+        /* Fix for labels used with Quill editors - override floating label behavior */
+        .field-group .field-label.quill-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:8px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
+        
         .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
         .style-controls-wrapper{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:15px}
         .style-control-group .field-label{margin-bottom:5px;position:static;transform:none;font-size:14px;color:#24292e;font-weight:600}
@@ -100,7 +114,7 @@
         <div class="section-divider">
             <div class="section-title">Content Settings</div>
             <div class="field-group">
-                <label class="field-label">Title</label>
+                <label class="field-label quill-label">Title</label>
                 <!-- FIX: Added data-lpignore -->
                 <div id="titleEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
                 <div class="style-controls-wrapper">
@@ -111,7 +125,7 @@
             <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
             <div id="descriptionSection">
                 <div class="field-group">
-                    <label class="field-label">Description</label>
+                    <label class="field-label quill-label">Description</label>
                     <!-- FIX: Added data-lpignore -->
                     <div id="descriptionEditor" class="quill-container" data-lpignore="true"></div>
                     <div class="style-controls-wrapper">
@@ -551,8 +565,6 @@
             // Use delegated event handler for items
             addListener(elements.addItemBtn, 'click', createDelegatedHandler('items', itemActions));
             addListener(elements.itemsContainer, 'click', createDelegatedHandler('items', itemActions));
-                updateData('items', items); renderItemsUI();
-            });
         }
         
         function updateUIFromData() {

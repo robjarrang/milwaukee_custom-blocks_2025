@@ -28,6 +28,20 @@
         .add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Enhanced Quill Editor Styling */
         .quill-container{background:white;border:2px solid #e1e4e8;border-radius:6px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1)}.quill-container:focus-within{border-color:#0074d9;box-shadow:0 0 0 3px rgba(0, 116, 217, 0.1)}.ql-toolbar{border:none;border-bottom:2px solid #e1e4e8;border-radius:6px 6px 0 0;background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)}.ql-container{border:none;border-radius:0 0 6px 6px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:8px}.limited-toolbar .ql-toolbar button{width:28px;height:28px;border-radius:4px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1)}.limited-toolbar .ql-toolbar button:hover{background:rgba(0, 116, 217, 0.1)}
+        
+        /* Fix for labels used with Quill editors - override floating label behavior */
+        .field-group .field-label.quill-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:8px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
     </style>
 </head>
 <body>
@@ -57,7 +71,7 @@
                 <label class="field-label">Title</label>
             </div>
             <div class="field-group">
-                <label class="field-label" style="position: static; transform: none; font-size: 14px; color: #24292e; font-weight: 600; margin-bottom: 10px; display: block;">Content</label>
+                <label class="field-label quill-label">Content</label>
                 <!-- This div will be replaced by the Quill editor -->
                 <div class="quill-container limited-toolbar"></div>
             </div>
