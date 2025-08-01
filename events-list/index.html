@@ -1,7 +1,22 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
+<h        /* Fix for regular form labels - override floating label behavior for standard inputs */
+        .field-group .field-label.static-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:12px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
+        
+        /* Fix field group spacing for static labels */
+        .field-group:has(.static-label) {
+            margin-bottom: 28px;
+        }   <meta charset="utf-8">
     <title>Events List Block</title>
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
