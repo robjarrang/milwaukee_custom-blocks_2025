@@ -125,25 +125,30 @@
         .add-item-btn{margin-top:20px}
         .checklist-section{display:none}
         
-        .add-spacer-controls{display:flex;gap:10px;margin-top:25px}
+        .add-spacer-controls{display:flex;gap:10px;margin-top:20px}
         .add-spacer-btn{flex:1;font-size:12px;padding:8px 12px}
         
         /* Fix spacer section title spacing */
         .spacer-section-title {
             font-weight:bold; 
             color:#555;
-            margin-bottom: 15px;
-            margin-top: 0px;
+            margin-bottom: 20px;
+            margin-top: 15px;
         }
         
         /* Proper spacing for spacer field groups */
         .field-group:has(.spacer-section-title) {
-            margin-top: 30px;
+            margin-top: 25px;
         }
         
-        /* Specific spacing for spacers container */
-        .spacers-container {
-            margin-bottom: 10px;
+        /* Additional spacing for spacer buttons to prevent overlap */
+        .field-group .spacers-container {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .field-group .add-spacer-controls {
+            margin-top: 25px;
         }
     </style>
 </head>
