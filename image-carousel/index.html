@@ -3,35 +3,44 @@
 <head>
     <meta charset="utf-8">
     <title>Interactive Carousel Block</title>
+    <!-- Custom block styling for the editor interface -->
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
+        /* ============================================
+           EDITOR INTERFACE STYLES
+           (These styles are for the block configuration interface only)
+           ============================================ */
+        
+        /* Basic layout and container styles for the editor */
         body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
         
-        /* Enhanced input fields with floating labels */
+        /* Enhanced input fields with floating labels for better UX */
         .field-group{position:relative;margin-bottom:24px}
         .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
         .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
         .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
         .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
         
+        /* Form validation styling */
         .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
         
+        /* Section organization for the editor interface */
         .section-divider{margin-top:30px;padding-top:20px;border-top:2px solid #eee}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px;border-bottom:2px solid #eee;padding-bottom:10px}.slides-container{display:flex;flex-direction:column;gap:15px}
         
-        /* Enhanced slide items */
+        /* Individual slide item styling in the editor */
         .slide-item{background:linear-gradient(145deg,#fafbfc,#f6f8fa);padding:20px;border:2px solid #e1e4e8;border-radius:12px;position:relative;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
         .slide-item:hover{border-color:#d1d5da;transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.1)}
         .slide-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
         .slide-title{font-weight:bold;font-size:16px;margin:0;color:#24292e}
         .slide-controls{display:flex;gap:8px}
         
-        /* Enhanced control buttons */
+        /* Control buttons for slide management (move up/down/delete) */
         .slide-control-btn{background:none;border:2px solid transparent;cursor:pointer;padding:8px;font-size:16px;line-height:1;color:#586069;transition:all 0.2s ease;border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
         .slide-control-btn:hover{color:#0074d9;border-color:#0074d9;background:rgba(0,116,217,0.1);transform:scale(1.05)}
         .slide-control-btn:active{transform:scale(0.95)}
         .slide-control-btn:disabled{color:#d1d5da;cursor:not-allowed;border-color:transparent;background:none;transform:none}
         
-        /* Enhanced button styling */
+        /* Primary action buttons (Add Slide) */
         .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;text-decoration:none;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
         .btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.6s}
         .btn:hover{background:linear-gradient(135deg,#005a9e,#044289);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
@@ -39,14 +48,18 @@
         .btn:active{transform:translateY(0);transition:transform 0.1s}
         .add-slide-btn{margin-top:20px}
         
+        /* Loading and error states for the editor */
         .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
+    <!-- Loading overlay shown during initialization and data operations -->
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
+    <!-- Main editor container - this is the configuration interface -->
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Interactive Carousel</h2>
+        <!-- Error messages are displayed here when validation fails -->
         <div class="error-banner" id="errorBanner"></div>
 
         <div class="section-title">Slides</div>
@@ -55,18 +68,23 @@
         </div>
         <button id="addSlideBtn" class="btn add-slide-btn">Add New Slide</button>
 
-        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
-             <div class="section-title" style="border-bottom:none; margin-bottom:0;">Fallback Image Settings</div>
-             <p style="font-size:12px; color:#666; margin-top:0; margin-bottom:15px;">Optional: Provide a specific image for email clients that don't support carousels. If left blank, the first slide will be used as the fallback.</p>
-             <div class="field-group">
+        
+        <!-- Fallback image settings section -->
+        <div class="section-divider">
+            <div class="section-title">Fallback Image Settings</div>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                This image will be shown to email clients that don't support interactive carousels (like Outlook). 
+                If left blank, the first slide will be used as the fallback.
+            </p>
+            <div class="field-group">
                 <input type="url" id="fallbackImageUrl" class="field-input" placeholder=" ">
-                <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
-                <div class="field-error">Please enter a valid image URL.</div>
+                <label for="fallbackImageUrl" class="field-label">Fallback Image URL (620x350px)</label>
+                <div class="field-error" id="fallbackImageUrlError">Please enter a valid image URL.</div>
             </div>
             <div class="field-group">
                 <input type="url" id="fallbackLinkUrl" class="field-input" placeholder=" ">
                 <label for="fallbackLinkUrl" class="field-label">Fallback Link URL</label>
-                <div class="field-error">Please enter a valid link URL.</div>
+                <div class="field-error" id="fallbackLinkUrlError">Please enter a valid link URL.</div>
             </div>
             <div class="field-group">
                 <input type="text" id="fallbackAltText" class="field-input" placeholder=" ">
@@ -74,7 +92,22 @@
             </div>
         </div>
 
+        <!-- Slides management section -->
+        <div class="section-divider">
+            <div class="section-title">Carousel Slides</div>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                Configure each slide in your carousel. Each slide should have an image (620x350px), 
+                optional link URL, and descriptive alt text for accessibility.
+            </p>
+            <div id="slidesContainer" class="slides-container">
+                <!-- Slide items will be dynamically inserted here by JavaScript -->
+            </div>
+            <button id="addSlideBtn" class="btn add-slide-btn">Add New Slide</button>
+        </div>
     </div>
+
+    <!-- Template for individual slide configuration - cloned by JavaScript -->
+    <template id="slideTemplate">    </div>
 
     <!-- Template for a single slide's UI -->
     <template id="slideTemplate">
@@ -104,11 +137,17 @@
         </div>
     </template>
 
+    <!-- Required scripts for Salesforce Marketing Cloud Content Builder blocks -->
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
 
+        /* ============================================
+           BLOCK CONFIGURATION
+           ============================================ */
+        
+        // Configuration object defining the block's behavior and default values
         const moduleConfig = {
             name: 'Interactive Carousel',
             fields: {
@@ -123,26 +162,32 @@
                 fallbackLinkUrl: { type: 'url', defaultValue: '' },
                 fallbackAltText: { type: 'text', defaultValue: '' }
             },
-            debounceDelay: 400,
-            maxRetries: 3
+            debounceDelay: 400,  // Delay before saving changes to prevent excessive API calls
+            maxRetries: 3        // Maximum initialization retry attempts
         };
 
+        // Application state management
         const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
-        const elements = {};
-        let rafId = null;
+        const elements = {};  // Cached DOM elements for performance
+        let rafId = null;     // RequestAnimationFrame ID for optimization
 
-        // Advanced memory management
+        // Memory management for better performance
         const slideMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for slide:', heldValue);
         });
 
+        /* ============================================
+           UTILITY FUNCTIONS
+           ============================================ */
+        
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; } },
             showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
             getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; },
             
+            // Track event listeners for proper cleanup
             addEventListenerTracked(element, event, handler) {
                 element.addEventListener(event, handler);
                 state.eventListeners.push({ element, event, handler });
@@ -322,17 +367,25 @@
             utils.addEventListenerTracked(elements.slidesContainer, 'click', slideHandler);
         }
 
+        /* ============================================
+           EMAIL TEMPLATE GENERATION
+           This function generates the final HTML that will be rendered in emails
+           ============================================ */
+        
         function generateTemplate() {
             const slides = utils.getFieldValue('slides');
+            
+            // Return placeholder content if no slides are configured
             if (!slides || slides.length === 0) {
                 return '<table align="center" style="width:620px; height:350px; background-color:#ccc;"><tr><td style="text-align:center;font-family:Arial,sans-serif;">Add slides to build your carousel.</td></tr></table>';
             }
 
+            // Fallback settings - used for email clients that don't support interactive content
             let fallbackImageUrl = utils.getFieldValue('fallbackImageUrl');
             let fallbackLinkUrl = utils.getFieldValue('fallbackLinkUrl');
             let fallbackAltText = utils.getFieldValue('fallbackAltText');
 
-            // Fallback logic remains the same: default to the first slide if fields are empty
+            // If no fallback is specified, use the first slide as fallback
             if (!fallbackImageUrl && slides.length > 0) {
                 const firstSlide = slides[0];
                 fallbackImageUrl = firstSlide.imageUrl || '';
@@ -340,34 +393,54 @@
                 fallbackAltText = firstSlide.altText || '';
             }
 
+            // Calculate carousel dimensions for CSS transforms
             const slideCount = slides.length;
-            const carouselSlidesWidth = slideCount * 100;
-            // FIX 1: Use the raw calculation for better precision, matching AMPscript's output more closely.
-            const carouselSlideWidth = 100 / slideCount; 
+            const carouselSlidesWidth = slideCount * 100;  // Total width as percentage
+            const carouselSlideWidth = 100 / slideCount;   // Individual slide width as percentage
             
-            const radioInputs = slides.map((s, i) => `<input type="radio" name="carousel" id="slide${i + 1}" ${i === 0 ? 'checked="checked"' : ''} style="display: none !important; mso-hide: all !important;">`).join('\n        ');
-            const slideDivs = slides.map(s => `<div class="carousel-slide"><a href="${s.linkUrl || '#'}" target="_blank"><img src="${s.imageUrl || ''}" alt="${s.altText || ''}" width="620" height="350" style="display: block; width: 100%; height: 100%;"></a></div>`).join('\n            ');
-            const arrowLabels = Array.from({length: slideCount}, (_, i) => `<label for="slide${i + 1}" class="arrow-left"></label>\n            <label for="slide${i + 1}" class="arrow-right"></label>`).join('\n          ');
-            const dotLabels = Array.from({length: slideCount}, (_, i) => `<label for="slide${i + 1}"></label>`).join('\n            ');
-
+            // Generate hidden radio buttons that control slide navigation
+            const radioInputs = slides.map((s, i) => 
+                `<input type="radio" name="carousel" id="slide${i + 1}" ${i === 0 ? 'checked="checked"' : ''} style="display: none !important; mso-hide: all !important;">`
+            ).join('\n        ');
+            
+            // Generate slide content (images with optional links)
+            const slideDivs = slides.map(s => 
+                `<div class="carousel-slide"><a href="${s.linkUrl || '#'}" target="_blank"><img src="${s.imageUrl || ''}" alt="${s.altText || ''}" width="620" height="350" style="display: block; width: 100%; height: 100%;"></a></div>`
+            ).join('\n            ');
+            
+            // Generate arrow navigation labels (each radio button gets left/right arrows)
+            const arrowLabels = Array.from({length: slideCount}, (_, i) => 
+                `<label for="slide${i + 1}" class="arrow-left"></label>\n            <label for="slide${i + 1}" class="arrow-right"></label>`
+            ).join('\n          ');
+            
+            // Generate progress dots for slide indication
+            const dotLabels = Array.from({length: slideCount}, (_, i) => 
+                `<label for="slide${i + 1}"></label>`
+            ).join('\n            ');
+            
+            // Generate dynamic CSS that controls slide animations and visibility
             const dynamicCSS = slides.map((s, i) => {
                 const slideNum = i + 1;
-                const transformX = i * carouselSlideWidth;
+                const transformX = i * carouselSlideWidth;  // Horizontal offset for this slide
                 const prevSlide = slideNum - 1;
                 const nextSlide = slideNum + 1;
+                
                 return `
+      /* When slide ${slideNum} is selected, transform the slides container */
       #slide${slideNum}:checked ~ .carousel-container .carousel-slides {
         transform: translateX(-${transformX}%);
         -webkit-transform: translateX(-${transformX}%);
       }
+      
+      /* Show appropriate navigation arrows for this slide */
       ${slideNum > 1 ? `
       #slide${slideNum}:checked ~ .carousel-container .arrow-controls .arrow-left[for="slide${prevSlide}"] { display: block; }` : ''}
       ${slideNum < slideCount ? `
       #slide${slideNum}:checked ~ .carousel-container .arrow-controls .arrow-right[for="slide${nextSlide}"] { display: block; }` : ''}
 
+      /* Highlight the active progress dot */
       #slide${slideNum}:checked ~ .carousel-container .progress-dots label[for="slide${slideNum}"] {
-        /* FIX 2: Corrected the active dot color to match the original. */
-        background-color: #DB021D;
+        background-color: #DB021D;  /* Milwaukee brand red */
         border-color: rgba(0, 0, 0, 0.5);
       }
     `;
@@ -376,18 +449,23 @@
             return `
 <!--[if !mso]><!-->
 <style type="text/css">
-/* Reset styles */
+/* ============================================
+   EMAIL CAROUSEL STYLES
+   These styles control the interactive carousel in the final email
+   ============================================ */
+
+/* Email client compatibility reset */
 body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
 img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 
-/* Hide radio buttons */
+/* Hide radio button controls from view but keep them functional */
 input[type="radio"] {
     display: none !important;
     mso-hide: all !important;
 }
 
-/* Mobile responsive styles */
+/* Basic mobile responsiveness */
 @media screen and (max-width: 580px) {
     .content-outer {
         width: 100% !important;
@@ -395,20 +473,21 @@ input[type="radio"] {
     }
 }
 
-/* Interactive carousel styles for supporting clients */
+/* Interactive carousel functionality for modern email clients */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    /* Hide fallback content */
+    /* Hide the fallback content when carousel is supported */
     .fallback {
         display: none !important;
     }
     
-    /* Show carousel */
+    /* Show and enable the interactive carousel */
     .carousel-wrapper {
         display: block !important;
         max-height: none !important;
         overflow: visible !important;
     }
     
+    /* Main carousel container - fixed dimensions for consistent layout */
     .carousel-container {
         position: relative;
         overflow: hidden;
@@ -416,47 +495,48 @@ input[type="radio"] {
         height: 350px;
     }
     
-    /* Carousel slides container */
+    /* Slides container - holds all slides in a horizontal row */
     .carousel-slides {
         position: relative;
-        width: ${carouselSlidesWidth}%;
+        width: ${carouselSlidesWidth}%;  /* Total width = number of slides × 100% */
         height: 100%;
-        transition: transform 0.5s ease-in-out;
+        transition: transform 0.5s ease-in-out;  /* Smooth slide transitions */
         -webkit-transition: -webkit-transform 0.5s ease-in-out;
     }
     
-    /* Individual slides */
+    /* Individual slide styling */
     .carousel-slide {
-        float: left;
-        width: ${carouselSlideWidth}%;
+        float: left;  /* Arrange slides horizontally */
+        width: ${carouselSlideWidth}%;  /* Each slide width = 100% ÷ number of slides */
         height: 100%;
     }
     
     .carousel-slide img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: cover;  /* Maintain aspect ratio, crop if necessary */
         display: block;
     }
     
-    /* Arrow controls */
+    /* Navigation arrow container */
     .arrow-controls {
         position: absolute;
         top: 50%;
         width: 100%;
-        margin-top: -25px;
-        pointer-events: none;
+        margin-top: -25px;  /* Center vertically */
+        pointer-events: none;  /* Allow clicks to pass through container */
     }
     
+    /* Individual arrow buttons */
     .arrow-controls label {
-        display: none;
+        display: none;  /* Hidden by default, shown via dynamic CSS */
         position: absolute;
         width: 50px;
         height: 50px;
         background-color: rgba(0, 0, 0, 0.5);
         border-radius: 50%;
         cursor: pointer;
-        pointer-events: all;
+        pointer-events: all;  /* Re-enable clicks on individual arrows */
         transition: background-color 0.3s;
     }
     
@@ -464,7 +544,7 @@ input[type="radio"] {
         background-color: rgba(0, 0, 0, 0.7);
     }
     
-    /* Arrow icons */
+    /* Arrow icon styling using CSS borders */
     .arrow-controls label:before {
         content: '';
         position: absolute;
@@ -477,26 +557,28 @@ input[type="radio"] {
         border-right: 3px solid #ffffff;
     }
     
+    /* Left arrow positioning and rotation */
     .arrow-left {
         left: 20px;
     }
     
     .arrow-left:before {
-        transform: rotate(-135deg);
+        transform: rotate(-135deg);  /* Point left */
         -webkit-transform: rotate(-135deg);
     }
     
+    /* Right arrow positioning and rotation */
     .arrow-right {
         right: 20px;
     }
     
     .arrow-right:before {
-        transform: rotate(45deg);
+        transform: rotate(45deg);  /* Point right */
         -webkit-transform: rotate(45deg);
-        margin-left: -8px !important;
+        margin-left: -8px !important;  /* Fine-tune positioning */
     }
     
-    /* Progress dots */
+    /* Progress dots container */
     .progress-dots {
         position: absolute;
         bottom: 20px;
@@ -505,12 +587,13 @@ input[type="radio"] {
         text-align: center;
     }
     
+    /* Individual progress dots */
     .progress-dots label {
         display: inline-block;
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background-color: #000000;
+        background-color: #000000;  /* Default state */
         margin: 0 5px;
         cursor: pointer;
         transition: background-color 0.3s;
@@ -521,10 +604,14 @@ input[type="radio"] {
         background-color: #333333;
     }
     
-    /* --- DYNAMIC CSS GENERATED BY JAVASCRIPT --- */
+    /* ========================================
+       DYNAMIC CSS - GENERATED BY JAVASCRIPT
+       This section contains the slide-specific CSS rules
+       ======================================== */
     ${dynamicCSS}
-    /* --- END DYNAMIC CSS --- */
+    /* === END DYNAMIC CSS === */
 
+    /* Mobile responsive adjustments */
     @media only screen and (max-width: 620px) {
         .carousel-container {
             width: 100% !important;
@@ -537,7 +624,12 @@ input[type="radio"] {
     }
 }
 
-/* Hide carousel from problematic clients */
+/* ============================================
+   EMAIL CLIENT COMPATIBILITY
+   Hide carousel from problematic email clients and show fallback
+   ============================================ */
+
+/* Apple Mail and other problematic clients */
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .carousel-wrapper, body.MsgBody .carousel-wrapper { display: none !important; }
 
@@ -545,58 +637,68 @@ input[type="radio"] {
 [class~="x_carousel-wrapper"] { display: none !important; }
 [class~="x_fallback"] { display: block !important; }
 
-/* FIX 3: Added the missing Yahoo-specific media query. */
+/* Yahoo Mail targeting */
 @media screen yahoo {
     .fallback { display: block !important; max-height: none !important; }
     .carousel-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
 }
 </style>
 <!--<![endif]-->
-<!-- Separate style block for Outlook.com \\0 hack -->
+
+<!-- Additional Outlook.com compatibility -->
 <style type="text/css">
 .carousel-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
 </style>
 
-<!-- Full Width Image Carousel -->
+<!-- ============================================
+     MAIN EMAIL CONTENT
+     ============================================ -->
+<!-- Main email content table - 620px standard email width -->
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="width: 620px;">
   <tr>
     <td align="center" style="padding: 0;" valign="top">
       
-      <!-- Interactive Carousel with Arrows -->
+      <!-- ==========================================
+           INTERACTIVE CAROUSEL SECTION
+           (Hidden by default, shown only in supporting email clients)
+           ========================================== -->
       <!--[if !mso]><!-->
       <div class="carousel-wrapper" style="display: none; max-height: 0; overflow: hidden;">
         
-        <!-- Radio buttons for slide control (DYNAMIC) -->
+        <!-- Radio button controls for slide navigation (hidden but functional) -->
         ${radioInputs}
 
+        <!-- Main carousel container -->
         <div class="carousel-container">
+          <!-- Slides wrapper - transforms horizontally to show different slides -->
           <div class="carousel-slides">
-            
-            <!-- Slides (DYNAMIC) -->
+            <!-- Individual slide content (dynamically generated) -->
             ${slideDivs}
-
           </div>
           
-          <!-- Arrow Controls (DYNAMIC) -->
+          <!-- Left/Right arrow navigation (dynamically generated) -->
           <div class="arrow-controls">
             ${arrowLabels}
           </div>
           
-          <!-- Progress Dots (DYNAMIC) -->
+          <!-- Progress dots for slide indication (dynamically generated) -->
           <div class="progress-dots">
             ${dotLabels}
           </div>
-
         </div>
       </div>
       <!--<![endif]-->
       
-      <!-- Fallback Content (Shown by default) - Single Hero Image -->
+      <!-- ==========================================
+           FALLBACK CONTENT
+           (Shown by default for email clients that don't support interactive content)
+           ========================================== -->
       <div class="fallback">
         <table align="center" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
           <tr>
             <td align="center" style="padding: 0;">
+              <!-- Single hero image with optional link -->
               <a href="${fallbackLinkUrl}" target="_blank">
                 <img src="${fallbackImageUrl}" alt="${fallbackAltText}" width="620" height="350" style="display: block; width: 100%; max-width: 620px; height: auto;">
               </a>
@@ -606,11 +708,15 @@ input[type="radio"] {
       </div>
 
     </td>
-
   </tr>
 </table>`;
         }
 
+        /* ============================================
+           PREVIEW AND DATA MANAGEMENT
+           ============================================ */
+        
+        // Update the preview pane with the latest email HTML
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
             
@@ -620,7 +726,7 @@ input[type="radio"] {
                     const html = generateTemplate();
                     state.sdk.setContent(html);
                     
-                    // Save the data for persistence and for the Preview tab
+                    // Save both structured data and generated HTML for persistence
                     if (state.sdk.setData) {
                         state.sdk.setData({ ...state.blockData, content: html });
                     }
@@ -630,22 +736,24 @@ input[type="radio"] {
             });
         }
 
+        // Load saved data from Content Builder
         function loadData() {
             if (!state.sdk) return utils.showError('SDK not available');
             setLoadingState(true);
             
             state.sdk.getData((data) => {
                 try {
-                    // When loading, prioritize the structured 'slides' data over saved 'content'
+                    // Prioritize structured slide data over saved HTML content
                     state.blockData.slides = (data && data.slides && data.slides.length > 0) ? data.slides : utils.getFieldValue('slides');
                     state.blockData.slides.forEach(s => { if (!s.id) s.id = crypto.randomUUID(); });
                     
+                    // Load fallback image settings
                     state.blockData.fallbackImageUrl = data?.fallbackImageUrl || '';
                     state.blockData.fallbackLinkUrl = data?.fallbackLinkUrl || '';
                     state.blockData.fallbackAltText = data?.fallbackAltText || '';
 
+                    // Update the UI with loaded data
                     renderSlidesUI();
-
                     elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl;
                     elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl;
                     elements.fallbackAltText.value = state.blockData.fallbackAltText;
@@ -663,43 +771,52 @@ input[type="radio"] {
             });
         }
         
-        // Enhanced cleanup function with memory management
+        /* ============================================
+           CLEANUP AND INITIALIZATION
+           ============================================ */
+        
+        // Clean up resources when the block is destroyed
         function cleanup() {
-            // Clean up event listeners
+            // Remove all tracked event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 
             state.eventListeners = [];
             
-            // Cancel any pending RAF
+            // Cancel pending animation frames
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
             
-            // Clear slide metadata
+            // Clear memory references
             slideMetadata.clear();
             
             console.log('Image Carousel cleanup completed');
         }
         
+        // Initialize the block with retry logic for reliability
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
                 
+                // Initialize the Salesforce Content Builder SDK
                 state.sdk = new window.sfdc.BlockSDK({
-                    tabs: ['htmlblock']
+                    tabs: ['htmlblock']  // Show the HTML/Preview tab
                 });
-                cacheElements();
-                initializeEventHandlers();
-                loadData();
                 
-                // Add cleanup on page unload
+                cacheElements();       // Cache DOM elements for performance
+                initializeEventHandlers();  // Set up user interaction handlers
+                loadData();           // Load any saved block data
+                
+                // Clean up when the page is about to close
                 window.addEventListener('beforeunload', cleanup);
                 
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
+                
+                // Retry initialization up to maxRetries times
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
                     setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
@@ -710,6 +827,7 @@ input[type="radio"] {
             }
         }
 
+        // Start initialization when DOM is ready
         document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initializeWithRetry) : initializeWithRetry();
     </script>
 </body>

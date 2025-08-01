@@ -345,16 +345,29 @@
             });
         }
 
+        /* ============================================
+           EMAIL TEMPLATE GENERATION
+           This function generates the final HTML that will be rendered in emails
+           ============================================ */
+        
         function generateTemplate() {
             const items = utils.getFieldValue('accordionItems');
+            
+            // Return placeholder content if no accordion items are configured
             if (!items || items.length === 0) {
                 return '<table align="center" style="width:620px; background-color:#DB021D;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
             }
 
+            // Generate interactive accordion items for modern email clients
             const interactiveItems = items.map((item, i) => `
           <div class="accordion-item">
+            <!-- Hidden checkbox that controls the expand/collapse state -->
             <input type="checkbox" id="accordion-${i + 1}" name="accordion-group">
+            
+            <!-- Clickable accordion header/title -->
             <label class="accordion-title" for="accordion-${i + 1}">${item.title}</label>
+            
+            <!-- Collapsible content area -->
             <div class="accordion-content">
               <div class="accordion-content-inner">
                 ${item.content}
@@ -362,12 +375,15 @@
             </div>
           </div>`).join('');
 
+            // Generate fallback content for email clients that don't support interactive elements
             const fallbackItems = items.map(item => `
             <tr>
               <td style="padding-bottom: 30px;">
+                <!-- Static title styling matching Milwaukee brand -->
                 <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; margin: 0 0 8px 0; text-transform: uppercase;">
                   ${item.title}
                 </h3>
+                <!-- Static content that's always visible in fallback -->
                 <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
                   ${item.content}
                 </div>
@@ -376,54 +392,165 @@
 
             return `<!--[if !mso]><!-->
 <style type="text/css">
+/* ============================================
+   EMAIL ACCORDION STYLES
+   These styles control the interactive accordion in the final email
+   ============================================ */
+
+/* Email client compatibility reset */
 body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
 img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+
+/* Hide checkbox controls from view but keep them functional */
 input[type="checkbox"] { display: none !important; mso-hide: all !important; }
-@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } .side { width: 20px !important; } .content-inner { width: calc(100% - 40px) !important; } }
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .fallback { display: none !important; }
-    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
-    .accordion-item { border-bottom: 1px solid #000000; }
-    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
-    .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
-    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
-    input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
-    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
-    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; /* THE FIX: Override with the opening transition. */ transition: padding 0.5s ease-in; }
+
+/* Basic mobile responsiveness */
+@media screen and (max-width: 580px) { 
+    .content-outer { width: 100% !important; height: auto !important; } 
+    .side { width: 20px !important; } 
+    .content-inner { width: calc(100% - 40px) !important; } 
 }
+
+/* Interactive accordion functionality for modern email clients */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* Hide the fallback content when accordion is supported */
+    .fallback { display: none !important; }
+    
+    /* Show and enable the interactive accordion */
+    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
+    
+    /* Individual accordion item styling */
+    .accordion-item { border-bottom: 1px solid #000000; }
+    
+    /* Accordion title/header styling - clickable to expand/collapse */
+    .accordion-title { 
+        display: block; 
+        cursor: pointer; 
+        padding: 20px 0; 
+        position: relative; 
+        color: #ffffff; 
+        font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; 
+        font-size: 20px; 
+        font-weight: bold; 
+        line-height: 28px; 
+        text-transform: uppercase; 
+        -webkit-tap-highlight-color: transparent; 
+    }
+    
+    /* Plus/minus indicator icon */
+    .accordion-title::after { 
+        content: '+'; 
+        position: absolute; 
+        right: 0; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        font-size: 28px; 
+        font-weight: bold; 
+        color: #ffffff; 
+        transition: transform 0.3s ease; 
+    }
+    
+    /* Collapsible content container */
+    .accordion-content { 
+        max-height: 0; 
+        overflow: hidden; 
+        transition: max-height 0.4s ease-out; 
+        background-color: #000000; 
+    }
+    
+    /* Inner content wrapper with smooth padding transitions */
+    .accordion-content-inner { 
+        padding: 0; 
+        color: #ffffff; 
+        font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; 
+        font-size: 16px; 
+        font-weight: normal; 
+        line-height: 28px; 
+        transition: padding 0.4s ease-out; /* Smooth closing transition */
+    }
+    
+    /* Expanded state styles - when checkbox is checked */
+    input[type="checkbox"]:checked ~ .accordion-title::after { 
+        transform: translateY(-50%) rotate(45deg); /* Rotate plus to X */
+    }
+    input[type="checkbox"]:checked ~ .accordion-content { 
+        max-height: 500px; /* Allow content to expand */
+        transition: max-height 0.5s ease-in; 
+    }
+    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { 
+        padding: 20px 0; /* Add padding when expanded */
+        transition: padding 0.5s ease-in; /* Smooth opening transition */
+    }
+}
+
+/* ============================================
+   EMAIL CLIENT COMPATIBILITY
+   Hide accordion from problematic email clients and show fallback
+   ============================================ */
+
+/* Apple Mail and other problematic clients */
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
+
+/* Outlook.com specific targeting */
 [class~="x_accordion-wrapper"] { display: none !important; }
 [class~="x_fallback"] { display: block !important; }
+
+/* Additional Outlook.com compatibility */
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
+
+/* Yahoo Mail targeting */
 @media screen yahoo {
     .fallback { display: block !important; max-height: none !important; }
     .accordion-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
 }
 </style>
 <!--<![endif]-->
+
+<!-- Additional Outlook.com compatibility -->
 <style type="text/css">
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
 </style>
+
+<!-- ==========================================
+     MAIN EMAIL CONTENT
+     Standard 620px email width with Milwaukee brand red background
+     ========================================== -->
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
   <tr>
+    <!-- Left gutter (20px) -->
     <td class="side" style="width: 20px;"> </td>
+    
+    <!-- Main content area (580px) -->
     <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
+      
+      <!-- ==========================================
+           INTERACTIVE ACCORDION SECTION
+           (Hidden by default, shown only in supporting email clients)
+           ========================================== -->
       <!--[if !mso]><!-->
       <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
         ${interactiveItems}
       </div>
       <!--<![endif]-->
+      
+      <!-- ==========================================
+           FALLBACK CONTENT
+           (Shown by default for email clients that don't support interactive content)
+           All accordion content is expanded and always visible
+           ========================================== -->
       <div class="fallback">
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%;">
           ${fallbackItems}
         </table>
       </div>
+      
     </td>
+    
+    <!-- Right gutter (20px) -->
     <td class="side" style="width: 20px;"> </td>
   </tr>
 </table>`;

@@ -3,20 +3,28 @@
 <head>
     <meta charset="utf-8">
     <title>Full Width Image Block</title>
+    <!-- Custom block styling for the editor interface -->
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
+        /* ============================================
+           EDITOR INTERFACE STYLES
+           (These styles are for the block configuration interface only)
+           ============================================ */
+        
+        /* Basic layout and container styles for the editor */
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}
         
-        /* Enhanced input fields with floating labels */
+        /* Enhanced input fields with floating labels for better UX */
         .field-group{position:relative;margin-bottom:24px}
         .field-input{width:100%;padding:20px 12px 8px 12px;border:2px solid #e1e4e8;border-radius:8px;font-size:14px;transition:all 0.2s ease;background:#fafbfc;box-sizing:border-box}
         .field-input:focus{border-color:#0074d9;background:white;box-shadow:0 0 0 3px rgba(0,116,217,0.1);outline:none}
         .field-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#586069;pointer-events:none;transition:all 0.2s ease;background:white;padding:0 4px;font-weight:bold}
         .field-input:focus ~ .field-label,.field-input:not(:placeholder-shown) ~ .field-label{top:-8px;font-size:12px;color:#0074d9}
         
+        /* Form validation styling */
         .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
         
-        /* Enhanced option selector with micro-interactions */
+        /* Background color selector with micro-interactions */
         .option-selector{display:flex;gap:10px}
         .option-button{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
         .option-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);transition:left 0.6s}
@@ -25,14 +33,21 @@
         .option-button.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
         .option-button:active{transform:translateY(0);transition:transform 0.1s}
         
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        /* Section organization for the editor interface */
+        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
+        
+        /* Loading and error states for the editor */
+        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
+    <!-- Loading overlay shown during initialization and data operations -->
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
     
+    <!-- Main editor container - this is the configuration interface -->
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Full Width Image</h2>
+        <!-- Error messages are displayed here when validation fails -->
         <div class="error-banner" id="errorBanner"></div>
         
                 <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
@@ -123,37 +138,59 @@
             elements.imageAlt.value = utils.getFieldValue('imageAlt');
         }
 
+        /* ============================================
+           EMAIL TEMPLATE GENERATION
+           This function generates the final HTML that will be rendered in emails
+           ============================================ */
+        
         function generateTemplate() {
             const backgroundColor = utils.getFieldValue('backgroundColor');
             const imageUrl = utils.getFieldValue('imageUrl');
             const imageLink = utils.getFieldValue('imageLink');
             const imageAlt = utils.getFieldValue('imageAlt');
             
+            // Convert color names to hex values for email compatibility
             const bgColorHex = backgroundColor === 'red' ? '#DB021D' : '#000000';
 
+            // Show placeholder if no image URL is provided
             if (!imageUrl) {
                 return `<table align="center" style="width:620px; background-color:${bgColorHex};"><tr><td style="padding:40px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Please provide an image URL.</td></tr></table>`;
             }
 
-            return `<!-- START .fw-image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
+            // Generate the main email template with proper table structure for maximum compatibility
+            return `<!-- ==========================================
+     FULL WIDTH IMAGE BLOCK
+     Standard 620px email width with 20px side gutters
+     ========================================== -->
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
+    <tr>
+        <!-- Left gutter (20px) -->
+        <td class="side" style="width: 20px;"> </td>
+        
+        <!-- Main content area (580px) -->
+        <td align="center" class="content-inner" style="width: 580px;" valign="top">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+                <!-- Top spacer (28px) -->
+                <tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>
+                
+                <!-- Image content -->
                 <tr>
-                    <td class="side" style="width: 20px;"> </td>
-                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
-                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                            <tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>
-                            <tr>
-                                <td align="center" class="block" style="width: 100%;" valign="top">
-                                    <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
-                                      <img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580">
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>
-                        </table>
+                    <td align="center" class="block" style="width: 100%;" valign="top">
+                        <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
+                          <img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580">
+                        </a>
                     </td>
-                    <td class="side" style="width: 20px;"> </td>
                 </tr>
-            </table><!-- END .fw-image -->`;
+                
+                <!-- Bottom spacer (28px) -->
+                <tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>
+            </table>
+        </td>
+        
+        <!-- Right gutter (20px) -->
+        <td class="side" style="width: 20px;"> </td>
+    </tr>
+</table><!-- END Full Width Image Block -->`;
         }
 
         function refreshPreview() {
