@@ -16,6 +16,20 @@
         
         .field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}
         
+        /* Fix for labels used with regular form inputs - override floating label behavior */
+        .field-group .field-label.static-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:8px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
+        
         /* Enhanced color selector with micro-interactions */
         .color-selector{display:flex;gap:10px}
         .color-option{flex:1;padding:12px;text-align:center;border:2px solid #e1e4e8;border-radius:8px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);background:#fafbfc;font-weight:500;position:relative;overflow:hidden}
@@ -103,28 +117,28 @@
                 </div>
             </div>
             <div class="field-group">
-                <label class="field-label">Image URL (178px wide)</label>
+                <label class="field-label static-label">Image URL (178px wide)</label>
                 <input type="url" class="field-input" data-field="imageUrl" placeholder="https://example.com/event-image.jpg">
                 <div class="field-error">Please enter a valid image URL.</div>
             </div>
             <div class="field-group">
-                <label class="field-label">Title</label>
+                <label class="field-label static-label">Title</label>
                 <input type="text" class="field-input" data-field="title" placeholder="EXECUTIVE HIRE SHOW">
             </div>
             <div class="field-group">
-                <label class="field-label">Date</label>
+                <label class="field-label static-label">Date</label>
                 <input type="text" class="field-input" data-field="date" placeholder="3rd February">
             </div>
             <div class="field-group">
-                <label class="field-label">Location</label>
+                <label class="field-label static-label">Location</label>
                 <input type="text" class="field-input" data-field="location" placeholder="CBS Arena, Coventry">
             </div>
             <div class="field-group">
-                <label class="field-label">Button Text</label>
+                <label class="field-label static-label">Button Text</label>
                 <input type="text" class="field-input" data-field="buttonText" placeholder="Learn More">
             </div>
             <div class="field-group">
-                <label class="field-label">Button/Image Link URL</label>
+                <label class="field-label static-label">Button/Image Link URL</label>
                 <input type="url" class="field-input" data-field="buttonUrl" placeholder="https://example.com/event-details">
                 <div class="field-error">Please enter a valid link URL.</div>
             </div>

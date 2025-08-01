@@ -33,6 +33,20 @@
         .option-button.selected{border-color:#0074d9;background:linear-gradient(135deg,#0074d9,#0366d6);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,116,217,0.3)}
         .option-button:active{transform:translateY(0);transition:transform 0.1s}
         
+        /* Fix for labels used with regular form inputs - override floating label behavior */
+        .field-group .field-label.static-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:8px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
+        
         /* Section organization for the editor interface */
         .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
         
@@ -65,17 +79,17 @@
             <div class="section-title">Image Settings</div>
             <div class="field-group">
                 <input type="url" id="imageUrl" class="field-input" placeholder=" ">
-                <label for="imageUrl" class="field-label">Image URL (620px wide)</label>
+                <label for="imageUrl" class="field-label static-label">Image URL (620px wide)</label>
                 <div class="field-error" id="imageUrlError">Please enter a valid image URL.</div>
             </div>
             <div class="field-group">
                 <input type="url" id="imageLink" class="field-input" placeholder=" ">
-                <label for="imageLink" class="field-label">Image Link URL</label>
+                <label for="imageLink" class="field-label static-label">Image Link URL</label>
                 <div class="field-error" id="imageLinkError">Please enter a valid link URL.</div>
             </div>
             <div class="field-group">
                 <input type="text" id="imageAlt" class="field-input" placeholder=" ">
-                <label for="imageAlt" class="field-label">Image Alt Text</label>
+                <label for="imageAlt" class="field-label static-label">Image Alt Text</label>
             </div>
         </div>
     </div>

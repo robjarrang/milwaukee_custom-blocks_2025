@@ -51,6 +51,20 @@
             padding:0 !important;
         }
         
+        /* Fix for regular form labels - override floating label behavior for standard inputs */
+        .field-group .field-label.static-label {
+            position:static !important;
+            transform:none !important;
+            top:auto !important;
+            font-size:14px !important;
+            color:#333 !important;
+            font-weight:bold !important;
+            margin-bottom:8px !important;
+            display:block !important;
+            background:none !important;
+            padding:0 !important;
+        }
+        
         .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
         .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
         .preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
@@ -75,16 +89,16 @@
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Product Settings</div>
             <div class="field-group">
-                <label for="productImage" class="field-label">Product Image URL</label>
+                <label for="productImage" class="field-label static-label">Product Image URL</label>
                 <input type="url" id="productImage" class="field-input" placeholder="https://example.com/product-image.jpg">
                 <div class="field-error" id="productImageError">Please enter a valid image URL (http:// or https://)</div>
             </div>
             <div class="field-group">
-                <label for="productImageAlt" class="field-label">Product Image Alt Text</label>
+                <label for="productImageAlt" class="field-label static-label">Product Image Alt Text</label>
                 <input type="text" id="productImageAlt" class="field-input" placeholder="Product name or description">
             </div>
             <div class="field-group">
-                <label for="productUrl" class="field-label">Product Link URL</label>
+                <label for="productUrl" class="field-label static-label">Product Link URL</label>
                 <input type="url" id="productUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/product-page">
                 <div class="field-error" id="productUrlError">Please enter a valid URL (http:// or https://)</div>
             </div>
@@ -132,11 +146,11 @@
             </div>
             <div id="buttonFieldsGroup">
                 <div class="field-group">
-                    <label for="buttonText" class="field-label">Button Text</label>
+                    <label for="buttonText" class="field-label static-label">Button Text</label>
                     <input type="text" id="buttonText" class="field-input" placeholder="Learn More">
                 </div>
                 <div class="field-group">
-                    <label for="buttonUrl" class="field-label">Button Link URL</label>
+                    <label for="buttonUrl" class="field-label static-label">Button Link URL</label>
                     <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
                     <div class="field-error" id="buttonUrlError">Please enter a valid URL (http:// or https://)</div>
                 </div>
