@@ -72,11 +72,77 @@
         const elements = {};
         let rafId = null;
 
+        // Create a DOM cache utility to consolidate repeated DOM queries
+        // This pattern improves performance by caching DOM element references
+        const DOMCache = {
+            cache: new Map(),
+            
+            // Get a single element by selector
+            get(selector) {
+                if (!this.cache.has(selector)) {
+                    this.cache.set(selector, document.querySelector(selector));
+                }
+                return this.cache.get(selector);
+            },
+            
+            // Get all elements by selector
+            getAll(selector) {
+                if (!this.cache.has(selector + '_all')) {
+                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                }
+                return this.cache.get(selector + '_all');
+            },
+            
+            // Clear all cached elements
+            clear() {
+                this.cache.clear();
+            },
+            
+            // Clear cache for dynamic content that changes frequently
+            clearDynamic() {
+                // Clear cache entries for dynamic selectors that might change
+                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
+                    key.includes('.field-') || key.includes('[data-')
+                );
+                dynamicKeys.forEach(key => this.cache.delete(key));
+            }
+        };
+
         // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
         });
+
+        // Utility for retryable operations
+        const RetryableOperation = {
+            async execute(operation, options = {}) {
+                const {
+                    maxRetries = 3,
+                    delay = 1000,
+                    backoff = 2,
+                    onRetry = () => {}
+                } = options;
+                
+                let lastError;
+                
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        return await operation();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < maxRetries - 1) {
+                            onRetry(i + 1, error);
+                            await new Promise(resolve => 
+                                setTimeout(resolve, delay * Math.pow(backoff, i))
+                            );
+                        }
+                    }
+                }
+                
+                throw lastError;
+            }
+        };
 
         const utils = {
             debounce(func, wait) { 
@@ -124,6 +190,21 @@
                 const value = state.blockData[fieldName]; 
                 const fieldConfig = moduleConfig.fields[fieldName]; 
                 return (value !== undefined && value !== null) ? (fieldConfig.type === 'number' ? parseFloat(value) : value) : fieldConfig.defaultValue; 
+            },
+
+            // SDK operations with retry logic
+            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
+                return RetryableOperation.execute(
+                    operation,
+                    {
+                        maxRetries: 2,
+                        delay: 500,
+                        onRetry: (attempt, error) => {
+                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
+                        },
+                        ...options
+                    }
+                );
             },
 
             createEditor(container, id, content = '', config = {}) {
@@ -177,19 +258,20 @@
         };
 
         function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.errorBanner = document.getElementById('errorBanner');
-            elements.backgroundImage = document.getElementById('backgroundImage');
-            elements.backgroundImageError = document.getElementById('backgroundImageError');
-            elements.verticalAlignSelector = document.getElementById('verticalAlignSelector');
-            elements.textAlignSelector = document.getElementById('textAlignSelector');
-            elements.titleEditor = document.getElementById('titleEditor');
-            elements.titleFontSize = document.getElementById('titleFontSize');
-            elements.subtitleEditor = document.getElementById('subtitleEditor');
-            elements.subtitleFontSize = document.getElementById('subtitleFontSize');
-            elements.contentUrl = document.getElementById('contentUrl');
-            elements.contentUrlError = document.getElementById('contentUrlError');
+            // Use DOMCache for better performance
+            elements.mainContainer = DOMCache.get('#mainContainer');
+            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
+            elements.errorBanner = DOMCache.get('#errorBanner');
+            elements.backgroundImage = DOMCache.get('#backgroundImage');
+            elements.backgroundImageError = DOMCache.get('#backgroundImageError');
+            elements.verticalAlignSelector = DOMCache.get('#verticalAlignSelector');
+            elements.textAlignSelector = DOMCache.get('#textAlignSelector');
+            elements.titleEditor = DOMCache.get('#titleEditor');
+            elements.titleFontSize = DOMCache.get('#titleFontSize');
+            elements.subtitleEditor = DOMCache.get('#subtitleEditor');
+            elements.subtitleFontSize = DOMCache.get('#subtitleFontSize');
+            elements.contentUrl = DOMCache.get('#contentUrl');
+            elements.contentUrlError = DOMCache.get('#contentUrlError');
         }
 
         function setLoadingState(loading) {
@@ -284,15 +366,28 @@
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(() => {
+            rafId = requestAnimationFrame(async () => {
                 if (state.isLoading || !state.sdk) return;
                 try { 
                     const html = generateTemplate(); 
-                    state.sdk.setContent(html); 
-                    if (typeof state.sdk.setData === 'function') { 
-                        state.sdk.setData({ ...state.blockData, content: html }); 
-                    } 
+                    
+                    // Use retry logic for SDK operations
+                    await utils.performSDKOperation(
+                        () => new Promise((resolve, reject) => {
+                            try {
+                                state.sdk.setContent(html);
+                                if (typeof state.sdk.setData === 'function') { 
+                                    state.sdk.setData({ ...state.blockData, content: html }); 
+                                }
+                                resolve();
+                            } catch (error) {
+                                reject(error);
+                            }
+                        }),
+                        'preview update'
+                    );
                 } catch (error) { 
+                    console.error(`Preview update failed after retries: ${error.message}`);
                     utils.showError(`Preview update failed: ${error.message}`); 
                 }
             });
@@ -362,63 +457,80 @@
             setupOptionSelector(elements.textAlignSelector, 'textAlign');
         }
 
-        function loadData() {
+        async function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') return utils.showError('SDK not available');
             setLoadingState(true);
 
-            state.sdk.getData((data) => {
-                try {
-                    state.blockData = {};
-                    const fields = moduleConfig.fields;
-                    Object.keys(fields).forEach(key => { 
-                        state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : fields[key].defaultValue; 
-                        if (fields[key].type === 'richtext') { 
-                            state.blockData[key] = utils.sanitizeHtml(state.blockData[key]); 
-                        } 
-                    });
-
-                    elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
-                    elements.contentUrl.value = utils.getFieldValue('contentUrl');
-                    elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
-                    elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
-
-                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
-                    Object.keys(state.editors).forEach(key => {
-                        if (state.editors[key]) {
-                            const content = utils.getFieldValue(key);
-                            try {
-                                // Clear existing content first
-                                state.editors[key].setContents([]);
-                                // Use the new clipboard API to paste HTML content
-                                if (content && content.trim()) {
-                                    state.editors[key].clipboard.dangerouslyPasteHTML(content);
-                                }
-                            } catch (error) {
-                                // Fallback to root innerHTML for compatibility
-                                console.warn(`Using fallback method for editor ${key}:`, error);
-                                state.editors[key].root.innerHTML = content || '';
+            try {
+                // Use retry logic for data loading
+                const data = await utils.performSDKOperation(
+                    () => new Promise((resolve, reject) => {
+                        state.sdk.getData((data) => {
+                            if (data === undefined && !state.sdk) {
+                                reject(new Error('Failed to load data - SDK unavailable'));
+                            } else {
+                                resolve(data);
                             }
-                        }
-                    });
-
-                    function setSelectorState(el, key) { 
-                        const val = utils.getFieldValue(key); 
-                        if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
+                        });
+                    }),
+                    'data loading',
+                    {
+                        maxRetries: 3,
+                        delay: 1000
                     }
+                );
 
-                    setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
-                    setSelectorState(elements.textAlignSelector, 'textAlign');
+                state.blockData = {};
+                const fields = moduleConfig.fields;
+                Object.keys(fields).forEach(key => { 
+                    state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : fields[key].defaultValue; 
+                    if (fields[key].type === 'richtext') { 
+                        state.blockData[key] = utils.sanitizeHtml(state.blockData[key]); 
+                    } 
+                });
 
-                    refreshPreview();
-                    state.retryCount = 0;
-                } catch (error) { 
-                    utils.showError(`Failed to load data: ${error.message}`); 
-                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); 
-                    refreshPreview(); 
-                } finally { 
-                    setLoadingState(false); 
+                elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
+                elements.contentUrl.value = utils.getFieldValue('contentUrl');
+                elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
+                elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+
+                // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                Object.keys(state.editors).forEach(key => {
+                    if (state.editors[key]) {
+                        const content = utils.getFieldValue(key);
+                        try {
+                            // Clear existing content first
+                            state.editors[key].setContents([]);
+                            // Use the new clipboard API to paste HTML content
+                            if (content && content.trim()) {
+                                state.editors[key].clipboard.dangerouslyPasteHTML(content);
+                            }
+                        } catch (error) {
+                            // Fallback to root innerHTML for compatibility
+                            console.warn(`Using fallback method for editor ${key}:`, error);
+                            state.editors[key].root.innerHTML = content || '';
+                        }
+                    }
+                });
+
+                function setSelectorState(el, key) { 
+                    const val = utils.getFieldValue(key); 
+                    if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
                 }
-            });
+
+                setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
+                setSelectorState(elements.textAlignSelector, 'textAlign');
+
+                refreshPreview();
+                state.retryCount = 0;
+            } catch (error) { 
+                console.error('Failed to load data after multiple attempts:', error.message);
+                utils.showError(`Failed to load data: ${error.message}`); 
+                Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); 
+                refreshPreview(); 
+            } finally { 
+                setLoadingState(false); 
+            }
         }
 
         function cleanup() { 
@@ -438,6 +550,9 @@
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
+
+            // Clear DOM cache
+            DOMCache.clear();
 
             console.log('Lead banner cleanup completed');
         }

@@ -137,6 +137,72 @@
         };
         const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [], retryCount: 0 };
         const elements = {};
+
+        // Create a DOM cache utility to consolidate repeated DOM queries
+        // This pattern improves performance by caching DOM element references
+        const DOMCache = {
+            cache: new Map(),
+            
+            // Get a single element by selector
+            get(selector) {
+                if (!this.cache.has(selector)) {
+                    this.cache.set(selector, document.querySelector(selector));
+                }
+                return this.cache.get(selector);
+            },
+            
+            // Get all elements by selector
+            getAll(selector) {
+                if (!this.cache.has(selector + '_all')) {
+                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                }
+                return this.cache.get(selector + '_all');
+            },
+            
+            // Clear all cached elements
+            clear() {
+                this.cache.clear();
+            },
+            
+            // Clear cache for dynamic content that changes frequently
+            clearDynamic() {
+                // Clear cache entries for dynamic selectors that might change
+                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
+                    key.includes('.field-') || key.includes('[data-')
+                );
+                dynamicKeys.forEach(key => this.cache.delete(key));
+            }
+        };
+
+        // Utility for retryable operations
+        const RetryableOperation = {
+            async execute(operation, options = {}) {
+                const {
+                    maxRetries = 3,
+                    delay = 1000,
+                    backoff = 2,
+                    onRetry = () => {}
+                } = options;
+                
+                let lastError;
+                
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        return await operation();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < maxRetries - 1) {
+                            onRetry(i + 1, error);
+                            await new Promise(resolve => 
+                                setTimeout(resolve, delay * Math.pow(backoff, i))
+                            );
+                        }
+                    }
+                }
+                
+                throw lastError;
+            }
+        };
         const COLUMN_PREFIXES = ['left_', 'right_'];
         let rafId = null;
 
@@ -181,15 +247,16 @@
             }
         };
         function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.errorBanner = document.getElementById('errorBanner');
-            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
-            elements.itemTemplate = document.getElementById('itemTemplate');
-            elements.spacerTemplate = document.getElementById('spacerTemplate');
+            // Use DOMCache for better performance
+            elements.mainContainer = DOMCache.get('#mainContainer');
+            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
+            elements.errorBanner = DOMCache.get('#errorBanner');
+            elements.backgroundColorSelector = DOMCache.get('#backgroundColorSelector');
+            elements.itemTemplate = DOMCache.get('#itemTemplate');
+            elements.spacerTemplate = DOMCache.get('#spacerTemplate');
             COLUMN_PREFIXES.forEach(p => {
                 const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
-                keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
+                keys.forEach(k => { elements[p + k] = DOMCache.get('#' + p + k); });
             });
         }
         function setLoadingState(loading) {

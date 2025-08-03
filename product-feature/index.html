@@ -136,6 +136,78 @@
         const elements = {};
         let rafId = null;
 
+        // Create a DOM cache utility to consolidate repeated DOM queries
+        // This pattern improves performance by caching DOM element references
+        const DOMCache = {
+            cache: new Map(),
+            
+            // Get a single element by selector
+            get(selector) {
+                if (!this.cache.has(selector)) {
+                    this.cache.set(selector, document.querySelector(selector));
+                }
+                return this.cache.get(selector);
+            },
+            
+            // Get all elements by selector
+            getAll(selector) {
+                if (!this.cache.has(selector + '_all')) {
+                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                }
+                return this.cache.get(selector + '_all');
+            },
+            
+            // Clear all cached elements
+            clear() {
+                this.cache.clear();
+            },
+            
+            // Clear cache for dynamic content that changes frequently
+            clearDynamic() {
+                // Clear cache entries for dynamic selectors that might change
+                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
+                    key.includes('.field-') || key.includes('[data-')
+                );
+                dynamicKeys.forEach(key => this.cache.delete(key));
+            }
+        };
+
+        // Advanced memory management
+        const editorMetadata = new WeakMap();
+        const cleanupRegistry = new FinalizationRegistry((heldValue) => {
+            console.log('Cleanup registry triggered for editor:', heldValue);
+        });
+
+        // Utility for retryable operations
+        const RetryableOperation = {
+            async execute(operation, options = {}) {
+                const {
+                    maxRetries = 3,
+                    delay = 1000,
+                    backoff = 2,
+                    onRetry = () => {}
+                } = options;
+                
+                let lastError;
+                
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        return await operation();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < maxRetries - 1) {
+                            onRetry(i + 1, error);
+                            await new Promise(resolve => 
+                                setTimeout(resolve, delay * Math.pow(backoff, i))
+                            );
+                        }
+                    }
+                }
+                
+                throw lastError;
+            }
+        };
+
         const utils = {
             debounce(func, wait) {
                 let timeout;
@@ -174,6 +246,22 @@
                 }
                 console.error('Product Feature Error:', message);
             },
+
+            // SDK operations with retry logic
+            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
+                return RetryableOperation.execute(
+                    operation,
+                    {
+                        maxRetries: 2,
+                        delay: 500,
+                        onRetry: (attempt, error) => {
+                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
+                        },
+                        ...options
+                    }
+                );
+            },
+
             getFieldValue(fieldName) {
                 const value = state.blockData[fieldName];
                 const fieldConfig = moduleConfig.fields[fieldName];
@@ -185,25 +273,26 @@
         };
 
         function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.errorBanner = document.getElementById('errorBanner');
-            elements.productImage = document.getElementById('productImage');
-            elements.productImageError = document.getElementById('productImageError');
-            elements.productImageAlt = document.getElementById('productImageAlt');
-            elements.productUrl = document.getElementById('productUrl');
-            elements.productUrlError = document.getElementById('productUrlError');
-            elements.showSubtitle = document.getElementById('showSubtitle');
-            elements.subtitle = document.getElementById('subtitle');
-            elements.subtitleGroup = document.getElementById('subtitleGroup');
-            elements.subtitleFontSize = document.getElementById('subtitleFontSize'); // NEW
-            elements.productTitleEditor = document.getElementById('productTitleEditor');
-            elements.productTitleFontSize = document.getElementById('productTitleFontSize'); // NEW
-            elements.showButton = document.getElementById('showButton');
-            elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
-            elements.buttonText = document.getElementById('buttonText');
-            elements.buttonUrl = document.getElementById('buttonUrl');
-            elements.buttonUrlError = document.getElementById('buttonUrlError');
+            // Use DOMCache for better performance
+            elements.mainContainer = DOMCache.get('#mainContainer');
+            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
+            elements.errorBanner = DOMCache.get('#errorBanner');
+            elements.productImage = DOMCache.get('#productImage');
+            elements.productImageError = DOMCache.get('#productImageError');
+            elements.productImageAlt = DOMCache.get('#productImageAlt');
+            elements.productUrl = DOMCache.get('#productUrl');
+            elements.productUrlError = DOMCache.get('#productUrlError');
+            elements.showSubtitle = DOMCache.get('#showSubtitle');
+            elements.subtitle = DOMCache.get('#subtitle');
+            elements.subtitleGroup = DOMCache.get('#subtitleGroup');
+            elements.subtitleFontSize = DOMCache.get('#subtitleFontSize'); // NEW
+            elements.productTitleEditor = DOMCache.get('#productTitleEditor');
+            elements.productTitleFontSize = DOMCache.get('#productTitleFontSize'); // NEW
+            elements.showButton = DOMCache.get('#showButton');
+            elements.buttonFieldsGroup = DOMCache.get('#buttonFieldsGroup');
+            elements.buttonText = DOMCache.get('#buttonText');
+            elements.buttonUrl = DOMCache.get('#buttonUrl');
+            elements.buttonUrlError = DOMCache.get('#buttonUrlError');
         }
 
         function setLoadingState(loading) {
@@ -275,15 +364,28 @@
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(() => {
+            rafId = requestAnimationFrame(async () => {
                 if (state.isLoading || !state.sdk) return;
                 try {
                     const html = generateTemplate();
-                    state.sdk.setContent(html);
-                    if (typeof state.sdk.setData === 'function') {
-                        state.sdk.setData({ ...state.blockData, content: html });
-                    }
+                    
+                    // Use retry logic for SDK operations
+                    await utils.performSDKOperation(
+                        () => new Promise((resolve, reject) => {
+                            try {
+                                state.sdk.setContent(html);
+                                if (typeof state.sdk.setData === 'function') {
+                                    state.sdk.setData({ ...state.blockData, content: html });
+                                }
+                                resolve();
+                            } catch (error) {
+                                reject(error);
+                            }
+                        }),
+                        'preview update'
+                    );
                 } catch (error) { 
+                    console.error(`Preview update failed after retries: ${error.message}`);
                     utils.showError(`Preview update failed: ${error.message}`); 
                 }
             });
@@ -366,73 +468,90 @@
             // --- END: ROBUST NUMBER INPUT HANDLER ---
         }
 
-        function loadData() {
+        async function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') {
                 return utils.showError('SDK not available');
             }
             setLoadingState(true);
 
-            state.sdk.getData((data) => {
-                try {
-                    state.blockData = {}; // Reset block data
-                    const fields = moduleConfig.fields;
-                    Object.keys(fields).forEach(key => {
-                        if (data && data.hasOwnProperty(key)) {
-                            state.blockData[key] = (fields[key].type === 'richtext') ? utils.sanitizeHtml(data[key]) : data[key];
-                        } else {
-                            state.blockData[key] = fields[key].defaultValue;
-                        }
-                    });
-
-                    // Update UI from data
-                    if (elements.productImage) elements.productImage.value = utils.getFieldValue('productImage');
-                    if (elements.productImageAlt) elements.productImageAlt.value = utils.getFieldValue('productImageAlt');
-                    if (elements.productUrl) elements.productUrl.value = utils.getFieldValue('productUrl');
-                    if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
-                    if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize'); // NEW
-                    if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
-                    if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
-                    if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-
-                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
-                    if (state.editors.productTitle) {
-                        const content = utils.getFieldValue('productTitle');
-                        try {
-                            // Clear existing content first
-                            state.editors.productTitle.setContents([]);
-                            // Use the new clipboard API to paste HTML content
-                            if (content && content.trim()) {
-                                state.editors.productTitle.clipboard.dangerouslyPasteHTML(content);
+            try {
+                // Use retry logic for data loading
+                const data = await utils.performSDKOperation(
+                    () => new Promise((resolve, reject) => {
+                        state.sdk.getData((data) => {
+                            if (data === undefined && !state.sdk) {
+                                reject(new Error('Failed to load data - SDK unavailable'));
+                            } else {
+                                resolve(data);
                             }
-                        } catch (error) {
-                            // Fallback to root innerHTML for compatibility
-                            console.warn(`Using fallback method for productTitle editor:`, error);
-                            state.editors.productTitle.root.innerHTML = content || '';
-                        }
+                        });
+                    }),
+                    'data loading',
+                    {
+                        maxRetries: 3,
+                        delay: 1000
                     }
+                );
 
-                    const showSubtitle = utils.getFieldValue('showSubtitle');
-                    if (elements.showSubtitle) elements.showSubtitle.checked = showSubtitle;
-                    if (elements.subtitleGroup) elements.subtitleGroup.classList.toggle('disabled-field', !showSubtitle);
+                state.blockData = {}; // Reset block data
+                const fields = moduleConfig.fields;
+                Object.keys(fields).forEach(key => {
+                    if (data && data.hasOwnProperty(key)) {
+                        state.blockData[key] = (fields[key].type === 'richtext') ? utils.sanitizeHtml(data[key]) : data[key];
+                    } else {
+                        state.blockData[key] = fields[key].defaultValue;
+                    }
+                });
 
-                    const showButton = utils.getFieldValue('showButton');
-                    if (elements.showButton) elements.showButton.checked = showButton;
-                    if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
+                // Update UI from data
+                if (elements.productImage) elements.productImage.value = utils.getFieldValue('productImage');
+                if (elements.productImageAlt) elements.productImageAlt.value = utils.getFieldValue('productImageAlt');
+                if (elements.productUrl) elements.productUrl.value = utils.getFieldValue('productUrl');
+                if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
+                if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize'); // NEW
+                if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
+                if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
+                if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
 
-                    refreshPreview();
-                    state.retryCount = 0;
-                } catch (error) {
-                    utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
-                    refreshPreview();
-                } finally {
-                    setLoadingState(false);
+                // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                if (state.editors.productTitle) {
+                    const content = utils.getFieldValue('productTitle');
+                    try {
+                        // Clear existing content first
+                        state.editors.productTitle.setContents([]);
+                        // Use the new clipboard API to paste HTML content
+                        if (content && content.trim()) {
+                            state.editors.productTitle.clipboard.dangerouslyPasteHTML(content);
+                        }
+                    } catch (error) {
+                        // Fallback to root innerHTML for compatibility
+                        console.warn(`Using fallback method for productTitle editor:`, error);
+                        state.editors.productTitle.root.innerHTML = content || '';
+                    }
                 }
-            });
+
+                const showSubtitle = utils.getFieldValue('showSubtitle');
+                if (elements.showSubtitle) elements.showSubtitle.checked = showSubtitle;
+                if (elements.subtitleGroup) elements.subtitleGroup.classList.toggle('disabled-field', !showSubtitle);
+
+                const showButton = utils.getFieldValue('showButton');
+                if (elements.showButton) elements.showButton.checked = showButton;
+                if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
+
+                refreshPreview();
+                state.retryCount = 0;
+            } catch (error) {
+                console.error('Failed to load data after multiple attempts:', error.message);
+                utils.showError(`Failed to load data: ${error.message}`);
+                Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
+                refreshPreview();
+            } finally {
+                setLoadingState(false);
+            }
         }
 
         function cleanup() {
-            // Updated cleanup for Quill 2.0
+            // Updated cleanup for Quill 2.0 with memory management
             if (state.editors.productTitle && state.editors.productTitle.off) {
                 state.editors.productTitle.off('text-change');
             }
@@ -440,6 +559,17 @@
                 if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler);
             });
             state.eventListeners = [];
+
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+
+            // Clear DOM cache
+            DOMCache.clear();
+
+            console.log('Product feature cleanup completed');
         }
 
         function initializeWithRetry() {

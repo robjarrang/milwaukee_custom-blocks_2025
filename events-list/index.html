@@ -103,6 +103,50 @@
 
         const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
         const elements = {};
+
+        // Create a DOM cache utility to consolidate repeated DOM queries
+        const DOMCache = {
+            cache: new Map(),
+            get(selector) {
+                if (!this.cache.has(selector)) {
+                    this.cache.set(selector, document.querySelector(selector));
+                }
+                return this.cache.get(selector);
+            },
+            getAll(selector) {
+                if (!this.cache.has(selector + '_all')) {
+                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                }
+                return this.cache.get(selector + '_all');
+            },
+            clear() { this.cache.clear(); },
+            clearDynamic() {
+                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
+                    key.includes('.event') || key.includes('[data-')
+                );
+                dynamicKeys.forEach(key => this.cache.delete(key));
+            }
+        };
+
+        // Utility for retryable operations
+        const RetryableOperation = {
+            async execute(operation, options = {}) {
+                const { maxRetries = 3, delay = 1000, backoff = 2, onRetry = () => {} } = options;
+                let lastError;
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        return await operation();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < maxRetries - 1) {
+                            onRetry(i + 1, error);
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(backoff, i)));
+                        }
+                    }
+                }
+                throw lastError;
+            }
+        };
         let rafId = null;
 
         const utils = {

@@ -76,24 +76,83 @@
 
         // --- Config and State ---
         const PRESET_COLORS = { RED: '#DB021D', BLACK: '#000000' };
-        const DEFAULTS = {
-            backgroundColor: PRESET_COLORS.RED,
-            imageUrl: 'https://image.s11.sfmc-content.com/lib/fe3011737164047e741c71/m/1/5d8a26c4-275a-4632-9c04-ac0360a7192b.png',
-            imageLink: 'https://www.milwaukeetool.eu/',
-            imageAlt: 'Milwaukee Tool Product',
-            stats: [
-                { value: '800+', label: 'NEW INNOVATIONS' },
-                { value: '10', label: 'WORKSTATIONS' },
-                { value: '70+', label: 'COUNTRIES' }
-            ]
-        };
+        const DEFAULTS = { backgroundColor: 'red', statItems: [{ id: crypto.randomUUID(), number: '87', label: 'Projects completed', alignment: 'center' }] };
         const state = { sdk: null, dom: null };
         const elements = {};
-        const utils = {
-            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; }
+        
+        // Create a DOM cache utility to consolidate repeated DOM queries
+        const DOMCache = {
+            cache: new Map(),
+            
+            get(selector) {
+                if (!this.cache.has(selector)) {
+                    this.cache.set(selector, document.querySelector(selector));
+                }
+                return this.cache.get(selector);
+            },
+            
+            getAll(selector) {
+                if (!this.cache.has(selector + '_all')) {
+                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                }
+                return this.cache.get(selector + '_all');
+            },
+            
+            clear() {
+                this.cache.clear();
+            }
         };
 
-        // --- DOM and Template Generation ---
+        // Utility for retryable operations
+        const RetryableOperation = {
+            async execute(operation, options = {}) {
+                const {
+                    maxRetries = 3,
+                    delay = 1000,
+                    backoff = 2,
+                    onRetry = () => {}
+                } = options;
+                
+                let lastError;
+                
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        return await operation();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < maxRetries - 1) {
+                            onRetry(i + 1, error);
+                            await new Promise(resolve => 
+                                setTimeout(resolve, delay * Math.pow(backoff, i))
+                            );
+                        }
+                    }
+                }
+                
+                throw lastError;
+            }
+        };
+        
+        const utils = {
+            debounce: (func, wait) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
+            
+            // SDK operations with retry logic
+            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
+                return RetryableOperation.execute(
+                    operation,
+                    {
+                        maxRetries: 2,
+                        delay: 500,
+                        onRetry: (attempt, error) => {
+                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
+                        },
+                        ...options
+                    }
+                );
+            },
+            
+            getValue: (key) => state.dom[key] !== undefined ? state.dom[key] : DEFAULTS[key]
+        };        // --- DOM and Template Generation ---
         function parseToDOM(html) {
             const doc = new DOMParser().parseFromString(html, 'text/html');
             return doc.body.firstChild;
