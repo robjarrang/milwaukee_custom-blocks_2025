@@ -71,6 +71,42 @@
             clip: rect(0, 0, 0, 0) !important;
             border: 0 !important;
         }
+        
+        /* Debug container for visibility */
+        .debug-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 400px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            z-index: 10000;
+            border: 2px solid #0074d9;
+        }
+        
+        .debug-entry {
+            margin-bottom: 2px;
+            word-wrap: break-word;
+        }
+        
+        .debug-entry.error {
+            color: #ff6b6b;
+        }
+        
+        .debug-entry.warning {
+            color: #ffd93d;
+        }
+        
+        .debug-entry.group {
+            color: #4ecdc4;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -168,20 +204,24 @@
             log(...args) {
                 if (this.enabled) {
                     console.log(this.prefix, ...args);
+                    this.addToPage('LOG', args.join(' '));
                 }
             },
             
             error(...args) {
                 console.error(this.prefix + ' ERROR:', ...args);
+                this.addToPage('ERROR', args.join(' '), 'error');
             },
             
             warn(...args) {
                 console.warn(this.prefix + ' WARNING:', ...args);
+                this.addToPage('WARN', args.join(' '), 'warning');
             },
             
             group(title) {
                 if (this.enabled) {
                     console.group(this.prefix + ' ' + title);
+                    this.addToPage('GROUP', title, 'group');
                 }
             },
             
@@ -210,6 +250,28 @@
                 this.log('DOM Cache entries:', DOMCache.cache.size);
                 this.log('Module config:', moduleConfig);
                 this.groupEnd();
+            },
+            
+            addToPage(type, message, className = '') {
+                // Add debug info to the page for visibility
+                let debugContainer = document.getElementById('debug-container');
+                if (!debugContainer) {
+                    debugContainer = document.createElement('div');
+                    debugContainer.id = 'debug-container';
+                    debugContainer.className = 'debug-container';
+                    document.body.appendChild(debugContainer);
+                }
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = `debug-entry ${className}`;
+                logEntry.textContent = `${new Date().toLocaleTimeString()} [${type}] ${message}`;
+                debugContainer.appendChild(logEntry);
+                
+                // Limit to last 50 entries
+                const entries = debugContainer.children;
+                if (entries.length > 50) {
+                    debugContainer.removeChild(entries[0]);
+                }
             }
         };
 
@@ -218,6 +280,26 @@
 
         Debug.log('Module initialization started');
         Debug.state();
+        
+        // Monitor for CSP violations
+        document.addEventListener('securitypolicyviolation', (e) => {
+            Debug.error('CSP Violation detected:', {
+                directive: e.violatedDirective,
+                blocked: e.blockedURI,
+                source: e.sourceFile,
+                line: e.lineNumber
+            });
+        });
+        
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            Debug.error('Global error:', e.message, 'at', e.filename + ':' + e.lineno);
+        });
+        
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', (e) => {
+            Debug.error('Unhandled promise rejection:', e.reason);
+        });
 
         // Global error handler for debugging
         window.addEventListener('error', (event) => {
@@ -317,7 +399,7 @@
                 
                 // Show/hide error message if error element provided
                 if (errorElement) {
-                    errorElement.style.display = isValid ? 'none' : 'block';
+                    errorElement.classList.toggle('show', !isValid);
                     if (!isValid) {
                         errorElement.textContent = this.getErrorMessage(input, rules);
                     }

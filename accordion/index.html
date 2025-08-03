@@ -477,7 +477,7 @@
                 
                 // Show/hide error message if error element provided
                 if (errorElement) {
-                    errorElement.style.display = isValid ? 'none' : 'block';
+                    errorElement.classList.toggle('show', !isValid);
                     if (!isValid) {
                         errorElement.textContent = this.getErrorMessage(input, rules);
                     }
@@ -794,18 +794,15 @@
             container.setAttribute('aria-live', 'polite');
             container.setAttribute('aria-describedby', 'accordion-help');
             
-            // Add hidden help text for screen readers
-            let helpText = document.getElementById('accordion-help');
-            if (!helpText) {
-                helpText = document.createElement('div');
-                helpText.id = 'accordion-help';
-                helpText.className = 'sr-only';
-                helpText.textContent = 'Use arrow keys to navigate, Enter to edit, and control buttons to reorder or remove items';
-                helpText.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
-                container.parentNode.insertBefore(helpText, container);
-            }
-
-            // Use DocumentFragment for batch DOM operations
+                // Add hidden help text for screen readers
+                let helpText = document.getElementById('accordion-help');
+                if (!helpText) {
+                    helpText = document.createElement('div');
+                    helpText.id = 'accordion-help';
+                    helpText.className = 'sr-only';
+                    helpText.textContent = 'Use arrow keys to navigate, Enter to edit, and control buttons to reorder or remove items';
+                    container.parentNode.insertBefore(helpText, container);
+                }            // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
 
             items.forEach((item, index) => {
@@ -826,7 +823,6 @@
                 description.id = `item-${item.id}-description`;
                 description.className = 'sr-only';
                 description.textContent = `Contains title input and rich text content editor`;
-                description.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
                 el.appendChild(description);
                 
                 // Cache queries within the item element
@@ -934,7 +930,7 @@
                 announcer.id = 'accessibility-announcer';
                 announcer.setAttribute('aria-live', priority);
                 announcer.setAttribute('aria-atomic', 'true');
-                announcer.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
+                announcer.className = 'sr-only';
                 document.body.appendChild(announcer);
             }
             
@@ -959,7 +955,6 @@
                     helpText.id = 'add-btn-help';
                     helpText.className = 'sr-only';
                     helpText.textContent = 'Adds a new accordion item with title and content fields to the end of the list';
-                    helpText.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
                     addBtn.parentNode.insertBefore(helpText, addBtn.nextSibling);
                 }
             }
