@@ -292,6 +292,94 @@
             SlideManager.cleanup();
         });
 
+        // Lazy loading utility for performance optimization (images)
+        const LazyLoader = {
+            observer: null,
+            pendingElements: new Map(),
+            
+            init() {
+                if (!window.IntersectionObserver) {
+                    console.warn('IntersectionObserver not supported, images will load immediately');
+                    return false;
+                }
+                
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            
+                            if (src) {
+                                console.log(`Lazy loading image:`, src);
+                                img.src = src;
+                                img.removeAttribute('data-src');
+                                this.observer.unobserve(img);
+                                this.pendingElements.delete(img);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: '50px',
+                    threshold: 0.1
+                });
+                
+                console.log('LazyLoader initialized for images');
+                return true;
+            },
+            
+            observe(img, src) {
+                if (!this.observer) {
+                    // Fallback to immediate loading
+                    img.src = src;
+                    return;
+                }
+                
+                img.dataset.src = src;
+                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjIwIiBoZWlnaHQ9IjM1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+'; // Loading placeholder
+                
+                this.pendingElements.set(img, {
+                    src,
+                    timestamp: Date.now()
+                });
+                
+                this.observer.observe(img);
+                console.log(`Image queued for lazy loading:`, src);
+            },
+            
+            disconnect() {
+                if (this.observer) {
+                    this.observer.disconnect();
+                    this.pendingElements.clear();
+                    console.log('LazyLoader disconnected');
+                }
+            },
+            
+            getStats() {
+                return {
+                    supported: Boolean(this.observer),
+                    pending: this.pendingElements.size
+                };
+            },
+            
+            // Force load all pending images (fallback)
+            forceLoadAll() {
+                const images = Array.from(this.pendingElements.keys());
+                images.forEach(img => {
+                    const src = img.dataset.src;
+                    if (src) {
+                        img.src = src;
+                        img.removeAttribute('data-src');
+                        if (this.observer) {
+                            this.observer.unobserve(img);
+                        }
+                        this.pendingElements.delete(img);
+                    }
+                });
+                console.log(`Force loaded ${images.length} pending images`);
+                return images.length;
+            }
+        };
+
         // Enhanced memory management for slide elements
         const SlideManager = {
             slides: new WeakMap(),
@@ -1011,6 +1099,9 @@ input[type="radio"] {
             // Clean up slide manager and all references
             SlideManager.clear();
 
+            // Cleanup lazy loader
+            LazyLoader.disconnect();
+
             console.log('Image Carousel cleanup completed with enhanced memory management');
         }
         }
@@ -1022,6 +1113,10 @@ input[type="radio"] {
                 state.sdk = new window.sfdc.BlockSDK({
                     tabs: ['htmlblock']
                 });
+                
+                // Initialize lazy loading for images
+                LazyLoader.init();
+                
                 cacheElements();
                 initializeEventHandlers();
                 loadData();

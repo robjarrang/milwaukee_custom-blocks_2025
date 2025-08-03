@@ -213,11 +213,111 @@
             EditorManager.cleanup();
         });
 
+        // Lazy loading utility for performance optimization
+        const LazyLoader = {
+            observer: null,
+            pendingElements: new Map(),
+            
+            init() {
+                if (!window.IntersectionObserver) {
+                    console.warn('IntersectionObserver not supported, falling back to immediate initialization');
+                    return false;
+                }
+                
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const target = entry.target;
+                            const loader = target.dataset.lazyLoad;
+                            
+                            if (loader && typeof window[loader] === 'function') {
+                                console.log(`Lazy loading: ${loader} for element`, target);
+                                window[loader](target);
+                                this.observer.unobserve(target);
+                                this.pendingElements.delete(target);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: '50px',
+                    threshold: 0.1
+                });
+                
+                console.log('LazyLoader initialized with IntersectionObserver');
+                return true;
+            },
+            
+            observe(element, loaderFunction = null) {
+                if (!this.observer) {
+                    console.warn('LazyLoader not initialized, falling back to immediate execution');
+                    if (loaderFunction) {
+                        loaderFunction(element);
+                    }
+                    return;
+                }
+                
+                if (loaderFunction) {
+                    element.dataset.lazyLoad = loaderFunction.name;
+                    window[loaderFunction.name] = loaderFunction;
+                }
+                
+                this.pendingElements.set(element, {
+                    loader: element.dataset.lazyLoad,
+                    timestamp: Date.now()
+                });
+                
+                this.observer.observe(element);
+                console.log(`Element added to lazy loading queue:`, element.dataset.lazyLoad);
+            },
+            
+            unobserve(element) {
+                if (this.observer) {
+                    this.observer.unobserve(element);
+                    this.pendingElements.delete(element);
+                }
+            },
+            
+            disconnect() {
+                if (this.observer) {
+                    this.observer.disconnect();
+                    this.pendingElements.clear();
+                    console.log('LazyLoader disconnected');
+                }
+            },
+            
+            getStats() {
+                return {
+                    supported: Boolean(this.observer),
+                    pending: this.pendingElements.size,
+                    elements: Array.from(this.pendingElements.keys()).map(el => ({
+                        loader: el.dataset.lazyLoad,
+                        tagName: el.tagName,
+                        className: el.className
+                    }))
+                };
+            },
+            
+            // Force load all pending elements (fallback)
+            forceLoadAll() {
+                const elements = Array.from(this.pendingElements.keys());
+                elements.forEach(element => {
+                    const loader = element.dataset.lazyLoad;
+                    if (loader && typeof window[loader] === 'function') {
+                        window[loader](element);
+                        this.unobserve(element);
+                    }
+                });
+                console.log(`Force loaded ${elements.length} pending elements`);
+                return elements.length;
+            }
+        };
+
         // Enhanced memory management for editors
         const EditorManager = {
             editors: new WeakMap(),
             references: new Map(),
             metadata: new Map(),
+            lazyQueue: new Map(),
             
             register(id, editor, metadata = {}) {
                 const ref = new WeakRef(editor);
