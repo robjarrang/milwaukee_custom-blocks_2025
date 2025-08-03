@@ -6,7 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}.preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}.field-input.valid{border-color:#28a745;background-color:#f8fff9;box-shadow:0 0 0 2px rgba(40,167,69,0.1)}.field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}.field-error.show{display:block}.field-success{color:#28a745;font-size:12px;margin-top:4px;display:none;font-weight:500}.field-success.show{display:block}.field-input-wrapper{position:relative}.field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}.field-input.error + .validation-icon.error{opacity:1;color:#dc3545}.field-input.valid + .validation-icon.success{opacity:1;color:#28a745}.field-input{transition:all 0.3s ease}.field-input.error{animation:shake 0.5s ease-in-out}.field-input.valid{animation:pulse-success 0.3s ease-in-out}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}@keyframes pulse-success{0%{box-shadow:0 0 0 2px rgba(40,167,69,0.1)}50%{box-shadow:0 0 0 6px rgba(40,167,69,0.3)}100%{box-shadow:0 0 0 2px rgba(40,167,69,0.1)}}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}.preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
 
         /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
         .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
@@ -29,17 +29,33 @@
             <div class="section-title">Product Settings</div>
             <div class="field-group">
                 <label for="productImage" class="field-label">Product Image URL</label>
-                <input type="url" id="productImage" class="field-input" placeholder="https://example.com/product-image.jpg">
-                <div class="field-error" id="productImageError">Please enter a valid image URL (http:// or https://)</div>
+                <div class="field-input-wrapper">
+                    <input type="url" id="productImage" class="field-input" placeholder="https://example.com/product-image.jpg" aria-describedby="productImage-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="productImage-error" role="alert"></div>
+                <div class="field-success">Valid image URL!</div>
             </div>
             <div class="field-group">
                 <label for="productImageAlt" class="field-label">Product Image Alt Text</label>
-                <input type="text" id="productImageAlt" class="field-input" placeholder="Product name or description">
+                <div class="field-input-wrapper">
+                    <input type="text" id="productImageAlt" class="field-input" placeholder="Product name or description" maxlength="100" aria-describedby="productImageAlt-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="productImageAlt-error" role="alert"></div>
+                <div class="field-success">Alt text looks good!</div>
             </div>
             <div class="field-group">
                 <label for="productUrl" class="field-label">Product Link URL</label>
-                <input type="url" id="productUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/product-page">
-                <div class="field-error" id="productUrlError">Please enter a valid URL (http:// or https://)</div>
+                <div class="field-input-wrapper">
+                    <input type="url" id="productUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/product-page" aria-describedby="productUrl-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="productUrl-error" role="alert"></div>
+                <div class="field-success">Valid URL!</div>
             </div>
         </div>
 
@@ -55,7 +71,13 @@
             </div>
             <div class="field-group" id="subtitleGroup">
                 <label for="subtitle" class="field-label">Subtitle</label>
-                <input type="text" id="subtitle" class="field-input" placeholder="M12 FHAC16-502X">
+                <div class="field-input-wrapper">
+                    <input type="text" id="subtitle" class="field-input" placeholder="M12 FHAC16-502X" maxlength="50" aria-describedby="subtitle-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="subtitle-error" role="alert"></div>
+                <div class="field-success">Subtitle looks good!</div>
                  <!-- NEW: Subtitle Font Size Control -->
                 <div class="field-group-inline">
                     <label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label>
@@ -86,12 +108,23 @@
             <div id="buttonFieldsGroup">
                 <div class="field-group">
                     <label for="buttonText" class="field-label">Button Text</label>
-                    <input type="text" id="buttonText" class="field-input" placeholder="Learn More">
+                    <div class="field-input-wrapper">
+                        <input type="text" id="buttonText" class="field-input" placeholder="Learn More" maxlength="25" aria-describedby="buttonText-error">
+                        <span class="validation-icon success">✓</span>
+                        <span class="validation-icon error">✗</span>
+                    </div>
+                    <div class="field-error" id="buttonText-error" role="alert"></div>
+                    <div class="field-success">Button text looks good!</div>
                 </div>
                 <div class="field-group">
                     <label for="buttonUrl" class="field-label">Button Link URL</label>
-                    <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
-                    <div class="field-error" id="buttonUrlError">Please enter a valid URL (http:// or https://)</div>
+                    <div class="field-input-wrapper">
+                        <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/" aria-describedby="buttonUrl-error">
+                        <span class="validation-icon success">✓</span>
+                        <span class="validation-icon error">✗</span>
+                    </div>
+                    <div class="field-error" id="buttonUrl-error" role="alert"></div>
+                    <div class="field-success">Valid URL!</div>
                 </div>
             </div>
         </div>
@@ -208,6 +241,122 @@
             }
         };
 
+        // Enhanced validation utility
+        const Validator = {
+            rules: {
+                url: (value) => !value || utils.isValidUrl(value),
+                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+                number: (min, max) => (value) => {
+                    const num = parseFloat(value);
+                    return !isNaN(num) && num >= min && num <= max;
+                },
+                length: (max) => (value) => !value || value.length <= max,
+                required: (value) => value && value.trim().length > 0,
+                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
+                noHtml: (value) => !value || !/[<>]/.test(value)
+            },
+            
+            validateField(input, rules, errorElement = null) {
+                const isValid = rules.every(rule => rule(input.value));
+                
+                // Visual feedback
+                input.classList.toggle('error', !isValid);
+                input.setAttribute('aria-invalid', !isValid);
+                
+                // Show/hide error message if error element provided
+                if (errorElement) {
+                    errorElement.classList.toggle('show', !isValid);
+                    if (!isValid) {
+                        errorElement.textContent = this.getErrorMessage(input, rules);
+                    }
+                }
+                
+                // Add visual success indicator for valid non-empty inputs
+                if (isValid && input.value.trim()) {
+                    input.classList.add('valid');
+                } else {
+                    input.classList.remove('valid');
+                }
+                
+                return isValid;
+            },
+            
+            getErrorMessage(input, rules) {
+                const value = input.value;
+                
+                if (rules.includes(this.rules.required) && !value.trim()) {
+                    return 'This field is required';
+                }
+                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
+                    return 'Please enter a valid URL (http:// or https://)';
+                }
+                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
+                    return 'Please enter a valid email address';
+                }
+                if (rules.some(rule => rule.toString().includes('length')) && value.length > 0) {
+                    const maxLength = input.getAttribute('maxlength') || '100';
+                    return `Maximum ${maxLength} characters allowed`;
+                }
+                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
+                    return 'HTML tags are not allowed';
+                }
+                
+                return 'Invalid input';
+            },
+            
+            // Real-time validation setup
+            setupRealTimeValidation(input, rules, errorElement = null) {
+                const validateInput = () => {
+                    return this.validateField(input, rules, errorElement);
+                };
+                
+                input.addEventListener('input', validateInput);
+                input.addEventListener('blur', validateInput);
+                
+                if (input.value) {
+                    validateInput();
+                }
+                
+                return validateInput;
+            },
+            
+            // Validate all form fields
+            validateAll(container = document) {
+                const inputs = container.querySelectorAll('.field-input');
+                let allValid = true;
+                
+                inputs.forEach(input => {
+                    const rules = [];
+                    
+                    // Add rules based on input attributes and type
+                    if (input.hasAttribute('required')) {
+                        rules.push(this.rules.required);
+                    }
+                    if (input.type === 'url') {
+                        rules.push(this.rules.url);
+                    }
+                    if (input.type === 'email') {
+                        rules.push(this.rules.email);
+                    }
+                    if (input.hasAttribute('maxlength')) {
+                        const max = parseInt(input.getAttribute('maxlength'));
+                        rules.push(this.rules.length(max));
+                    }
+                    
+                    rules.push(this.rules.noHtml);
+                    
+                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
+                    const isValid = this.validateField(input, rules, errorElement);
+                    
+                    if (!isValid) {
+                        allValid = false;
+                    }
+                });
+                
+                return allValid;
+            }
+        };
+
         const utils = {
             debounce(func, wait) {
                 let timeout;
@@ -278,12 +427,14 @@
             elements.loadingOverlay = DOMCache.get('#loadingOverlay');
             elements.errorBanner = DOMCache.get('#errorBanner');
             elements.productImage = DOMCache.get('#productImage');
-            elements.productImageError = DOMCache.get('#productImageError');
+            elements.productImageError = DOMCache.get('#productImage-error');
             elements.productImageAlt = DOMCache.get('#productImageAlt');
+            elements.productImageAltError = DOMCache.get('#productImageAlt-error');
             elements.productUrl = DOMCache.get('#productUrl');
-            elements.productUrlError = DOMCache.get('#productUrlError');
+            elements.productUrlError = DOMCache.get('#productUrl-error');
             elements.showSubtitle = DOMCache.get('#showSubtitle');
             elements.subtitle = DOMCache.get('#subtitle');
+            elements.subtitleError = DOMCache.get('#subtitle-error');
             elements.subtitleGroup = DOMCache.get('#subtitleGroup');
             elements.subtitleFontSize = DOMCache.get('#subtitleFontSize'); // NEW
             elements.productTitleEditor = DOMCache.get('#productTitleEditor');
@@ -291,8 +442,9 @@
             elements.showButton = DOMCache.get('#showButton');
             elements.buttonFieldsGroup = DOMCache.get('#buttonFieldsGroup');
             elements.buttonText = DOMCache.get('#buttonText');
+            elements.buttonTextError = DOMCache.get('#buttonText-error');
             elements.buttonUrl = DOMCache.get('#buttonUrl');
-            elements.buttonUrlError = DOMCache.get('#buttonUrlError');
+            elements.buttonUrlError = DOMCache.get('#buttonUrl-error');
         }
 
         function setLoadingState(loading) {
@@ -402,27 +554,58 @@
         function initializeEventHandlers() {
             state.eventListeners = []; // Clear previous listeners
 
-            // Reusable input handler
+            // Enhanced input handler with validation
             function setupInputHandler(element, dataKey, maxLength, isUrl = false, errorElement = null) {
+                const successElement = element.closest('.field-group')?.querySelector('.field-success');
+                const rules = [];
+                
+                // Add validation rules based on input type
+                if (isUrl) {
+                    rules.push(Validator.rules.url);
+                }
+                if (maxLength) {
+                    rules.push(Validator.rules.length(maxLength));
+                }
+                rules.push(Validator.rules.noHtml);
+                
+                // Setup real-time validation
+                Validator.setupRealTimeValidation(element, rules, errorElement);
+                
                 const handler = (e) => {
                     let value = e.target.value;
                     if (maxLength) value = value.substring(0, maxLength);
                     e.target.value = value;
-                    if (isUrl && !validateUrlInput(element, errorElement)) return;
-                    debouncedUpdateData(dataKey, value.trim());
+                    
+                    // Validate the input
+                    const isValid = Validator.validateField(element, rules, errorElement);
+                    
+                    // Show success message for valid inputs
+                    if (successElement) {
+                        if (isValid && value.trim()) {
+                            successElement.classList.add('show');
+                        } else {
+                            successElement.classList.remove('show');
+                        }
+                    }
+                    
+                    // Only update data if valid
+                    if (isValid) {
+                        debouncedUpdateData(dataKey, value.trim());
+                    }
                 };
-                const blurHandler = isUrl ? () => validateUrlInput(element, errorElement) : null;
+                
                 element.addEventListener('input', handler);
-                if(isUrl && blurHandler) element.addEventListener('blur', blurHandler);
+                element.addEventListener('blur', handler);
                 state.eventListeners.push({ element, event: 'input', handler });
-                if(blurHandler) state.eventListeners.push({ element, event: 'blur', handler: blurHandler });
+                state.eventListeners.push({ element, event: 'blur', handler });
             }
 
+            // Setup validation for all inputs
             setupInputHandler(elements.productImage, 'productImage', null, true, elements.productImageError);
-            setupInputHandler(elements.productImageAlt, 'productImageAlt', moduleConfig.fields.productImageAlt.maxLength);
+            setupInputHandler(elements.productImageAlt, 'productImageAlt', moduleConfig.fields.productImageAlt.maxLength, false, elements.productImageAltError);
             setupInputHandler(elements.productUrl, 'productUrl', null, true, elements.productUrlError);
-            setupInputHandler(elements.subtitle, 'subtitle', moduleConfig.fields.subtitle.maxLength);
-            setupInputHandler(elements.buttonText, 'buttonText', moduleConfig.fields.buttonText.maxLength);
+            setupInputHandler(elements.subtitle, 'subtitle', moduleConfig.fields.subtitle.maxLength, false, elements.subtitleError);
+            setupInputHandler(elements.buttonText, 'buttonText', moduleConfig.fields.buttonText.maxLength, false, elements.buttonTextError);
             setupInputHandler(elements.buttonUrl, 'buttonUrl', null, true, elements.buttonUrlError);
 
             // Toggle handlers

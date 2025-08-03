@@ -5,7 +5,7 @@
     <title>Stats Block</title>
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.stats-container{display:flex;flex-direction:column;gap:15px}.stat-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.stat-title{font-weight:bold;font-size:16px}.stat-controls{display:flex;gap:8px}.stat-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.stat-control-btn:hover{color:#0074d9}.stat-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-stat-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}.field-input.valid{border-color:#28a745;background-color:#f8fff9;box-shadow:0 0 0 2px rgba(40,167,69,0.1)}.field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}.field-error.show{display:block}.field-success{color:#28a745;font-size:12px;margin-top:4px;display:none;font-weight:500}.field-success.show{display:block}.field-input-wrapper{position:relative}.field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}.field-input.error + .validation-icon.error{opacity:1;color:#dc3545}.field-input.valid + .validation-icon.success{opacity:1;color:#28a745}.field-input{transition:all 0.3s ease}.field-input.error{animation:shake 0.5s ease-in-out}.field-input.valid{animation:pulse-success 0.3s ease-in-out}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}@keyframes pulse-success{0%{box-shadow:0 0 0 2px rgba(40,167,69,0.1)}50%{box-shadow:0 0 0 6px rgba(40,167,69,0.3)}100%{box-shadow:0 0 0 2px rgba(40,167,69,0.1)}}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.stats-container{display:flex;flex-direction:column;gap:15px}.stat-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.stat-title{font-weight:bold;font-size:16px}.stat-controls{display:flex;gap:8px}.stat-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.stat-control-btn:hover{color:#0074d9}.stat-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-stat-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
@@ -29,15 +29,33 @@
             <div class="section-title">Left Column Image</div>
             <div class="field-group">
                 <label class="field-label">Image URL (300px wide)</label>
-                <input type="url" class="field-input" id="imageUrl" placeholder="https://example.com/image.jpg">
+                <div class="field-input-wrapper">
+                    <input type="url" class="field-input" id="imageUrl" placeholder="https://example.com/image.jpg" aria-describedby="imageUrl-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="imageUrl-error" role="alert"></div>
+                <div class="field-success">Valid image URL!</div>
             </div>
             <div class="field-group">
                 <label class="field-label">Image Link URL</label>
-                <input type="url" class="field-input" id="imageLink" placeholder="https://example.com/link">
+                <div class="field-input-wrapper">
+                    <input type="url" class="field-input" id="imageLink" placeholder="https://example.com/link" aria-describedby="imageLink-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="imageLink-error" role="alert"></div>
+                <div class="field-success">Valid URL!</div>
             </div>
             <div class="field-group">
                 <label class="field-label">Image Alt Text</label>
-                <input type="text" class="field-input" id="imageAlt" placeholder="Descriptive text">
+                <div class="field-input-wrapper">
+                    <input type="text" class="field-input" id="imageAlt" placeholder="Descriptive text" maxlength="100" aria-describedby="imageAlt-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="imageAlt-error" role="alert"></div>
+                <div class="field-success">Alt text looks good!</div>
             </div>
         </div>
 
@@ -60,11 +78,23 @@
             </div>
             <div class="field-group">
                 <label class="field-label">Value</label>
-                <input type="text" class="field-input" data-field="value" placeholder="800+">
+                <div class="field-input-wrapper">
+                    <input type="text" class="field-input" data-field="value" placeholder="800+" maxlength="20" required aria-describedby="value-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="value-error" role="alert"></div>
+                <div class="field-success">Value looks good!</div>
             </div>
             <div class="field-group">
                 <label class="field-label">Label</label>
-                <input type="text" class="field-input" data-field="label" placeholder="NEW INNOVATIONS">
+                <div class="field-input-wrapper">
+                    <input type="text" class="field-input" data-field="label" placeholder="NEW INNOVATIONS" maxlength="50" required aria-describedby="label-error">
+                    <span class="validation-icon success">✓</span>
+                    <span class="validation-icon error">✗</span>
+                </div>
+                <div class="field-error" id="label-error" role="alert"></div>
+                <div class="field-success">Label looks good!</div>
             </div>
         </div>
     </template>
@@ -132,9 +162,127 @@
                 throw lastError;
             }
         };
+
+        // Enhanced validation utility
+        const Validator = {
+            rules: {
+                url: (value) => !value || utils.isValidUrl(value),
+                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+                number: (min, max) => (value) => {
+                    const num = parseFloat(value);
+                    return !isNaN(num) && num >= min && num <= max;
+                },
+                length: (max) => (value) => !value || value.length <= max,
+                required: (value) => value && value.trim().length > 0,
+                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
+                noHtml: (value) => !value || !/[<>]/.test(value)
+            },
+            
+            validateField(input, rules, errorElement = null) {
+                const isValid = rules.every(rule => rule(input.value));
+                
+                // Visual feedback
+                input.classList.toggle('error', !isValid);
+                input.setAttribute('aria-invalid', !isValid);
+                
+                // Show/hide error message if error element provided
+                if (errorElement) {
+                    errorElement.classList.toggle('show', !isValid);
+                    if (!isValid) {
+                        errorElement.textContent = this.getErrorMessage(input, rules);
+                    }
+                }
+                
+                // Add visual success indicator for valid non-empty inputs
+                if (isValid && input.value.trim()) {
+                    input.classList.add('valid');
+                } else {
+                    input.classList.remove('valid');
+                }
+                
+                return isValid;
+            },
+            
+            getErrorMessage(input, rules) {
+                const value = input.value;
+                
+                if (rules.includes(this.rules.required) && !value.trim()) {
+                    return 'This field is required';
+                }
+                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
+                    return 'Please enter a valid URL (http:// or https://)';
+                }
+                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
+                    return 'Please enter a valid email address';
+                }
+                if (rules.some(rule => rule.toString().includes('length')) && value.length > 0) {
+                    const maxLength = input.getAttribute('maxlength') || '100';
+                    return `Maximum ${maxLength} characters allowed`;
+                }
+                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
+                    return 'HTML tags are not allowed';
+                }
+                
+                return 'Invalid input';
+            },
+            
+            // Real-time validation setup
+            setupRealTimeValidation(input, rules, errorElement = null) {
+                const validateInput = () => {
+                    return this.validateField(input, rules, errorElement);
+                };
+                
+                input.addEventListener('input', validateInput);
+                input.addEventListener('blur', validateInput);
+                
+                if (input.value) {
+                    validateInput();
+                }
+                
+                return validateInput;
+            },
+            
+            // Validate all form fields
+            validateAll(container = document) {
+                const inputs = container.querySelectorAll('.field-input');
+                let allValid = true;
+                
+                inputs.forEach(input => {
+                    const rules = [];
+                    
+                    // Add rules based on input attributes and type
+                    if (input.hasAttribute('required') || input.dataset.field === 'value' || input.dataset.field === 'label') {
+                        rules.push(this.rules.required);
+                    }
+                    if (input.type === 'url') {
+                        rules.push(this.rules.url);
+                    }
+                    if (input.type === 'email') {
+                        rules.push(this.rules.email);
+                    }
+                    if (input.hasAttribute('maxlength')) {
+                        const max = parseInt(input.getAttribute('maxlength'));
+                        rules.push(this.rules.length(max));
+                    }
+                    
+                    rules.push(this.rules.noHtml);
+                    
+                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
+                    const isValid = this.validateField(input, rules, errorElement);
+                    
+                    if (!isValid) {
+                        allValid = false;
+                    }
+                });
+                
+                return allValid;
+            }
+        };
         
         const utils = {
             debounce: (func, wait) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
+            
+            isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (e) { return false; } },
             
             // SDK operations with retry logic
             async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
