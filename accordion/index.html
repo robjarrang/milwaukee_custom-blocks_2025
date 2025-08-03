@@ -28,20 +28,6 @@
         
                 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
         
-        /* Screen reader only content */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        
-        /* Focus indicators for accessibility */
         .item:focus {
             outline: 2px solid #0074d9;
             outline-offset: 2px;
@@ -50,6 +36,22 @@
         .item-control-btn:focus {
             outline: 2px solid #0074d9;
             outline-offset: 1px;
+        }
+        
+        /* Screen reader only content - MUST be last to override any conflicts */
+        .sr-only,
+        #sr-announcer {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
         }
     </style>
 </head>
@@ -688,7 +690,6 @@
                     announcer.setAttribute('aria-live', 'polite');
                     announcer.setAttribute('aria-atomic', 'true');
                     announcer.className = 'sr-only';
-                    announcer.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
                     document.body.appendChild(announcer);
                 }
                 

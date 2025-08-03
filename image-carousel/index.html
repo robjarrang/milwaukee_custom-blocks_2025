@@ -45,6 +45,21 @@
         .field-input.error{animation:shake 0.5s ease-in-out}
         
         @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        /* Error banner and fallback field styles */
+        .error-banner {
+            background-color: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+            font-weight: 500;
+        }
+        .error-banner.show {
+            display: block;
+        }
+        
         /* Screen reader only content */
         .sr-only {
             position: absolute !important;
@@ -61,13 +76,37 @@
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-        <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
+    <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
+        <div class="error-banner" id="errorBanner"></div>
+        
         <h1 id="main-heading" class="section-title">Interactive Carousel Slides</h1>
-        <div id="slidesContainer" class="slides-container">
-            <!-- Slides will be dynamically inserted here -->
+        
+        <div class="section-divider">
+            <div class="section-title">Fallback Settings</div>
+            <div class="field-group">
+                <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
+                <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://placehold.co/620x350">
+                <div class="field-error">Please enter a valid image URL.</div>
+            </div>
+            <div class="field-group">
+                <label for="fallbackLinkUrl" class="field-label">Fallback Link URL</label>
+                <input type="url" id="fallbackLinkUrl" class="field-input" placeholder="https://example.com">
+                <div class="field-error">Please enter a valid link URL.</div>
+            </div>
+            <div class="field-group">
+                <label for="fallbackAltText" class="field-label">Fallback Alt Text</label>
+                <input type="text" id="fallbackAltText" class="field-input" placeholder="Default alt text">
+            </div>
         </div>
-        <button id="addSlideBtn" class="btn add-slide-btn" aria-describedby="add-slide-help">Add New Slide</button>
-        <div id="add-slide-help" class="sr-only">Adds a new slide to the end of the carousel</div>
+        
+        <div class="section-divider">
+            <div class="section-title">Carousel Slides</div>
+            <div id="slidesContainer" class="slides-container">
+                <!-- Slides will be dynamically inserted here -->
+            </div>
+            <button id="addSlideBtn" class="btn add-slide-btn" aria-describedby="add-slide-help">Add New Slide</button>
+            <div id="add-slide-help" class="sr-only">Adds a new slide to the end of the carousel</div>
+        </div>
     </div>
 
     <!-- Template for a single slide's UI -->
@@ -1103,7 +1142,6 @@ input[type="radio"] {
             LazyLoader.disconnect();
 
             console.log('Image Carousel cleanup completed with enhanced memory management');
-        }
         }
 
         function initializeWithRetry() {
