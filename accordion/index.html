@@ -14,25 +14,19 @@
         
         /* Enhanced validation styles */
         .field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}
-        .field-input.valid{border-color:#28a745;background-color:#f8fff9;box-shadow:0 0 0 2px rgba(40,167,69,0.1)}
         .field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}
         .field-error.show{display:block}
-        .field-success{color:#28a745;font-size:12px;margin-top:4px;display:none;font-weight:500}
-        .field-success.show{display:block}
         
         /* Validation icons */
         .field-input-wrapper{position:relative}
         .field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}
         .field-input.error + .validation-icon.error{opacity:1;color:#dc3545}
-        .field-input.valid + .validation-icon.success{opacity:1;color:#28a745}
         
         /* Real-time feedback animations */
         .field-input{transition:all 0.3s ease}
         .field-input.error{animation:shake 0.5s ease-in-out}
-        .field-input.valid{animation:pulse-success 0.3s ease-in-out}
         
         @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-        @keyframes pulse-success{0%{box-shadow:0 0 0 2px rgba(40,167,69,0.1)}50%{box-shadow:0 0 0 6px rgba(40,167,69,0.3)}100%{box-shadow:0 0 0 2px rgba(40,167,69,0.1)}}
     </style>
 </head>
 <body>
@@ -61,11 +55,9 @@
                 <label class="field-label">Title</label>
                 <div class="field-input-wrapper">
                     <input type="text" class="field-input" data-field="title" placeholder="ACCORDION ITEM TITLE" maxlength="100" aria-describedby="title-error">
-                    <span class="validation-icon success">✓</span>
                     <span class="validation-icon error">✗</span>
                 </div>
                 <div class="field-error" id="title-error" role="alert"></div>
-                <div class="field-success">Title looks good!</div>
             </div>
             <div class="field-group">
                 <label class="field-label">Content</label>
@@ -219,13 +211,6 @@
                     if (!isValid) {
                         errorElement.textContent = this.getErrorMessage(input, rules);
                     }
-                }
-                
-                // Add visual success indicator for valid non-empty inputs
-                if (isValid && input.value.trim()) {
-                    input.classList.add('valid');
-                } else {
-                    input.classList.remove('valid');
                 }
                 
                 return isValid;
@@ -479,7 +464,6 @@
                 const itemTitle = el.querySelector('.item-title');
                 const titleInput = el.querySelector('[data-field="title"]');
                 const titleError = el.querySelector('.field-error');
-                const titleSuccess = el.querySelector('.field-success');
                 const moveUpBtn = el.querySelector('.move-up-btn');
                 const moveDownBtn = el.querySelector('.move-down-btn');
                 
@@ -501,13 +485,6 @@
                 // Enhanced input handler with validation
                 const handleTitleInput = (e) => {
                     const isValid = Validator.validateField(e.target, validationRules, titleError);
-                    
-                    // Show success message for valid inputs
-                    if (isValid && e.target.value.trim()) {
-                        titleSuccess.classList.add('show');
-                    } else {
-                        titleSuccess.classList.remove('show');
-                    }
                     
                     // Only update data if valid
                     if (isValid) {
