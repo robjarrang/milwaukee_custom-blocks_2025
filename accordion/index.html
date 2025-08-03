@@ -72,6 +72,59 @@
         const state = { sdk: null, editors: {}, blockData: {}, eventListeners: [] };
         const elements = {};
 
+        // Create a DOM cache utility to consolidate repeated DOM queries
+        // This pattern improves performance by caching DOM element references
+        const DOMCache = {
+            cache: new Map(),
+            
+            // Get a single element by selector
+            get(selector) {
+                if (!this.cache.has(selector)) {
+                    this.cache.set(selector, document.querySelector(selector));
+                }
+                return this.cache.get(selector);
+            },
+            
+            // Get all elements by selector
+            getAll(selector) {
+                if (!this.cache.has(selector + '_all')) {
+                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                }
+                return this.cache.get(selector + '_all');
+            },
+            
+            // Get elements within a specific container (useful for scoped queries)
+            getInContainer(container, selector) {
+                const cacheKey = `container_${selector}`;
+                if (!this.cache.has(cacheKey)) {
+                    this.cache.set(cacheKey, container.querySelector(selector));
+                }
+                return this.cache.get(cacheKey);
+            },
+            
+            getAllInContainer(container, selector) {
+                const cacheKey = `container_${selector}_all`;
+                if (!this.cache.has(cacheKey)) {
+                    this.cache.set(cacheKey, container.querySelectorAll(selector));
+                }
+                return this.cache.get(cacheKey);
+            },
+            
+            // Clear all cached elements
+            clear() {
+                this.cache.clear();
+            },
+            
+            // Clear cache for dynamic content that changes frequently
+            clearDynamic() {
+                // Clear cache entries for dynamic selectors that might change
+                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
+                    key.includes('.item') || key.includes('[data-field]') || key.includes('container_')
+                );
+                dynamicKeys.forEach(key => this.cache.delete(key));
+            }
+        };
+
         // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
@@ -147,11 +200,12 @@
         };
 
         function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.itemsContainer = document.getElementById('itemsContainer');
-            elements.addItemBtn = document.getElementById('addItemBtn');
-            elements.itemTemplate = document.getElementById('itemTemplate');
+            // Use DOMCache for main container elements
+            elements.mainContainer = DOMCache.get('#mainContainer');
+            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
+            elements.itemsContainer = DOMCache.get('#itemsContainer');
+            elements.addItemBtn = DOMCache.get('#addItemBtn');
+            elements.itemTemplate = DOMCache.get('#itemTemplate');
         }
 
         function setLoadingState(loading) {
@@ -161,7 +215,10 @@
 
         const updateDataFromUI = utils.debounce(() => {
             const newItems = [];
-            const itemElements = elements.itemsContainer.querySelectorAll('.item');
+            // Clear dynamic cache before querying for fresh results
+            DOMCache.clearDynamic();
+            const itemElements = DOMCache.getAll('.item');
+            
             itemElements.forEach(el => {
                 const id = el.dataset.id;
                 const editor = state.editors[id];
@@ -169,9 +226,12 @@
                     const content = editor.getSemanticHTML ? 
                         editor.getSemanticHTML() : 
                         editor.root.innerHTML;
+                    
+                    // Use cached query within the element
+                    const titleInput = el.querySelector('[data-field="title"]');
                     newItems.push({
                         id: id,
-                        title: el.querySelector('[data-field="title"]').value,
+                        title: titleInput.value,
                         content: utils.sanitizeHtml(content)
                     });
                 }
@@ -191,6 +251,9 @@
                 }
             });
 
+            // Clear dynamic cache before rendering new items
+            DOMCache.clearDynamic();
+
             // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
 
@@ -200,11 +263,17 @@
                 const editorDiv = itemFragment.querySelector('.quill-container');
 
                 el.dataset.id = item.id;
-                el.querySelector('.item-title').textContent = `Item ${index + 1}`;
-                el.querySelector('[data-field="title"]').value = item.title || '';
-
-                el.querySelector('.move-up-btn').disabled = (index === 0);
-                el.querySelector('.move-down-btn').disabled = (index === items.length - 1);
+                
+                // Cache queries within the item element
+                const itemTitle = el.querySelector('.item-title');
+                const titleInput = el.querySelector('[data-field="title"]');
+                const moveUpBtn = el.querySelector('.move-up-btn');
+                const moveDownBtn = el.querySelector('.move-down-btn');
+                
+                itemTitle.textContent = `Item ${index + 1}`;
+                titleInput.value = item.title || '';
+                moveUpBtn.disabled = (index === 0);
+                moveDownBtn.disabled = (index === items.length - 1);
 
                 fragment.appendChild(itemFragment);
 
@@ -251,7 +320,7 @@
 
         function createDelegatedHandler(fieldName, actionMap) {
             return (event) => {
-                // Handle add button clicks
+                // Handle add button clicks using cached element
                 if (event.target.closest('#addItemBtn')) {
                     const currentItems = utils.getFieldValue(fieldName);
                     const newItems = [...currentItems, { id: crypto.randomUUID(), title: 'NEW TITLE', content: 'New content...' }];
@@ -438,6 +507,9 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
+
+            // Clear DOM cache
+            DOMCache.clear();
 
             console.log('Accordion cleanup completed');
         }
