@@ -45,50 +45,29 @@
         .field-input.error{animation:shake 0.5s ease-in-out}
         
         @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            border: 0 !important;
+        }
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-    <div class="container" id="mainContainer">
-        <h2 style="margin-top: 0; color: #333;">Interactive Carousel</h2>
-        <div class="error-banner" id="errorBanner"></div>
-
-        <div class="section-title">Slides</div>
+        <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
+        <h1 id="main-heading" class="section-title">Interactive Carousel Slides</h1>
         <div id="slidesContainer" class="slides-container">
             <!-- Slides will be dynamically inserted here -->
         </div>
-        <button id="addSlideBtn" class="btn add-slide-btn">Add New Slide</button>
-
-        <div class="section-divider">
-             <div class="section-title" style="border-bottom:none; margin-bottom:0;">Fallback Image Settings</div>
-             <p style="font-size:12px; color:#666; margin-top:0; margin-bottom:15px;">Optional: Provide a specific image for email clients that don't support carousels. If left blank, the first slide will be used as the fallback.</p>
-             <div class="field-group">
-                <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://example.com/fallback-image.jpg" aria-describedby="fallbackImageUrl-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="fallbackImageUrl-error" role="alert"></div>
-            </div>
-            <div class="field-group">
-                <label for="fallbackLinkUrl" class="field-label">Fallback Link URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" id="fallbackLinkUrl" class="field-input" placeholder="https://example.com/fallback-link" aria-describedby="fallbackLinkUrl-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="fallbackLinkUrl-error" role="alert"></div>
-            </div>
-            <div class="field-group">
-                <label for="fallbackAltText" class="field-label">Fallback Image Alt Text</label>
-                <div class="field-input-wrapper">
-                    <input type="text" id="fallbackAltText" class="field-input" placeholder="Fallback image description" maxlength="100" aria-describedby="fallbackAltText-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="fallbackAltText-error" role="alert"></div>
-            </div>
-        </div>
-
+        <button id="addSlideBtn" class="btn add-slide-btn" aria-describedby="add-slide-help">Add New Slide</button>
+        <div id="add-slide-help" class="sr-only">Adds a new slide to the end of the carousel</div>
     </div>
 
     <!-- Template for a single slide's UI -->
@@ -1049,6 +1028,49 @@ input[type="radio"] {
 
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
+
+                // Add automatic cleanup on visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        console.log('Tab hidden - pausing expensive operations');
+                        
+                        // Pause expensive operations
+                        if (rafId) {
+                            cancelAnimationFrame(rafId);
+                            rafId = null;
+                        }
+                        
+                        // Clear caches to free memory (if DOMCache exists)
+                        if (typeof DOMCache !== 'undefined') {
+                            DOMCache.clear();
+                        }
+                        
+                        // Perform memory cleanup with SlideManager
+                        const cleanupStats = SlideManager.cleanup();
+                        console.log('Visibility cleanup - slides cleaned:', cleanupStats);
+                        
+                        // Run garbage collection hint if available
+                        if (window.gc) {
+                            console.log('Running garbage collection hint');
+                            window.gc();
+                        }
+                    } else {
+                        console.log('Tab visible - resuming operations');
+                        
+                        // Resume operations if needed
+                        if (state.isInitialized && !state.isLoading) {
+                            // Recache elements if DOMCache exists
+                            if (typeof cacheElements === 'function') {
+                                cacheElements();
+                            }
+                            
+                            // Refresh preview to ensure sync
+                            refreshPreview();
+                            
+                            console.log('Operations resumed, slide stats:', SlideManager.getStats());
+                        }
+                    }
+                });
 
                 // Start periodic memory cleanup
                 setInterval(() => {

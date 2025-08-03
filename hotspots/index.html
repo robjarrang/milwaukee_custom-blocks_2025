@@ -662,6 +662,26 @@
             });
         }
 
+        // Enhanced cleanup function
+        function cleanup() {
+            // Clean up event listeners
+            state.eventListeners.forEach(({ element, event, handler }) => { 
+                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
+            }); 
+            state.eventListeners = [];
+
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+
+            // Clear DOM cache
+            DOMCache.clear();
+
+            console.log('Hotspots cleanup completed');
+        }
+
         function initialize() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
@@ -671,6 +691,45 @@
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
+
+                // Add cleanup on page unload
+                window.addEventListener('beforeunload', cleanup);
+
+                // Add automatic cleanup on visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        console.log('Tab hidden - pausing expensive operations');
+                        
+                        // Pause expensive operations
+                        if (rafId) {
+                            cancelAnimationFrame(rafId);
+                            rafId = null;
+                        }
+                        
+                        // Clear caches to free memory
+                        DOMCache.clear();
+                        
+                        // Run garbage collection hint if available
+                        if (window.gc) {
+                            console.log('Running garbage collection hint');
+                            window.gc();
+                        }
+                    } else {
+                        console.log('Tab visible - resuming operations');
+                        
+                        // Resume operations if needed
+                        if (state.sdk && !state.isLoading) {
+                            // Recache elements after clearing
+                            cacheElements();
+                            
+                            // Refresh preview to ensure sync
+                            refreshPreview();
+                            
+                            console.log('Operations resumed');
+                        }
+                    }
+                });
+                
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);

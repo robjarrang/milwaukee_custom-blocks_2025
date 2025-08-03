@@ -547,8 +547,49 @@
                 loadData();
 
                 window.addEventListener('beforeunload', cleanup);
-                document.addEventListener('visibilitychange', () => { 
-                    if (!document.hidden && state.isInitialized) loadData(); 
+                
+                // Enhanced automatic cleanup on visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        console.log('Tab hidden - pausing expensive operations');
+                        
+                        // Pause expensive operations
+                        if (rafId) {
+                            cancelAnimationFrame(rafId);
+                            rafId = null;
+                        }
+                        
+                        // Clear caches to free memory
+                        if (typeof DOMCache !== 'undefined') {
+                            DOMCache.clear();
+                        }
+                        
+                        // Perform memory cleanup if editorMetadata exists
+                        if (typeof editorMetadata !== 'undefined') {
+                            console.log('Visibility cleanup - clearing editor metadata');
+                        }
+                        
+                        // Run garbage collection hint if available
+                        if (window.gc) {
+                            console.log('Running garbage collection hint');
+                            window.gc();
+                        }
+                    } else {
+                        console.log('Tab visible - resuming operations');
+                        
+                        // Resume operations if needed
+                        if (state.isInitialized) {
+                            // Recache elements if DOMCache exists
+                            if (typeof cacheElements === 'function') {
+                                cacheElements();
+                            }
+                            
+                            // Reload data to ensure sync
+                            loadData();
+                            
+                            console.log('Operations resumed');
+                        }
+                    }
                 });
 
                 state.isInitialized = true;

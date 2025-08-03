@@ -536,6 +536,20 @@
             });
         }
 
+        // Enhanced cleanup function
+        function cleanup() {
+            // Cancel any pending RAF
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+
+            // Clear DOM cache
+            DOMCache.clear();
+
+            console.log('Stats cleanup completed');
+        }
+
         function initialize() {
             cacheElements();
             state.sdk = new window.sfdc.BlockSDK({ 
@@ -543,6 +557,44 @@
             });
             initializeEventHandlers();
             loadData();
+
+            // Add cleanup on page unload
+            window.addEventListener('beforeunload', cleanup);
+
+            // Add automatic cleanup on visibility change
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    console.log('Tab hidden - pausing expensive operations');
+                    
+                    // Pause expensive operations
+                    if (rafId) {
+                        cancelAnimationFrame(rafId);
+                        rafId = null;
+                    }
+                    
+                    // Clear caches to free memory
+                    DOMCache.clear();
+                    
+                    // Run garbage collection hint if available
+                    if (window.gc) {
+                        console.log('Running garbage collection hint');
+                        window.gc();
+                    }
+                } else {
+                    console.log('Tab visible - resuming operations');
+                    
+                    // Resume operations if needed
+                    if (state.sdk && state.dom) {
+                        // Recache elements after clearing
+                        cacheElements();
+                        
+                        // Refresh to ensure sync
+                        updateUIFromDOM();
+                        
+                        console.log('Operations resumed');
+                    }
+                }
+            });
         }
 
         document.addEventListener('DOMContentLoaded', initialize);

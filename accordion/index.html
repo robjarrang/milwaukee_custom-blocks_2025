@@ -26,43 +26,105 @@
         .field-input{transition:all 0.3s ease}
         .field-input.error{animation:shake 0.5s ease-in-out}
         
-        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+                @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Focus indicators for accessibility */
+        .item:focus {
+            outline: 2px solid #0074d9;
+            outline-offset: 2px;
+        }
+        
+        .item-control-btn:focus {
+            outline: 2px solid #0074d9;
+            outline-offset: 1px;
+        }
+    </style>
+        
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            border: 0 !important;
+        }
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-    <div class="container" id="mainContainer">
-        <div class="section-title">Accordion Items</div>
+    <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
+        <h1 id="main-heading" class="section-title">Accordion Items</h1>
         <div id="itemsContainer" class="items-container">
             <!-- Accordion items will be dynamically inserted here -->
         </div>
-        <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
+        <button id="addItemBtn" class="btn add-item-btn" aria-describedby="add-item-help">Add New Item</button>
+        <div id="add-item-help" class="sr-only">Adds a new accordion item to the end of the list</div>
     </div>
 
     <!-- Template for a single accordion item's UI -->
     <template id="itemTemplate">
-        <div class="item">
+        <div class="item" role="group" aria-labelledby="item-title" tabindex="0">
             <div class="item-header">
-                <h3 class="item-title">Item</h3>
-                <div class="item-controls">
-                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
-                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
-                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+                <h3 class="item-title" id="item-title">Item</h3>
+                <div class="item-controls" role="toolbar" aria-label="Item controls">
+                    <button class="item-control-btn move-up-btn" type="button" aria-label="Move item up">
+                        <span aria-hidden="true">▲</span>
+                        <span class="sr-only">Move up</span>
+                    </button>
+                    <button class="item-control-btn move-down-btn" type="button" aria-label="Move item down">
+                        <span aria-hidden="true">▼</span>
+                        <span class="sr-only">Move down</span>
+                    </button>
+                    <button class="item-control-btn remove-btn" type="button" aria-label="Remove item">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Remove</span>
+                    </button>
                 </div>
             </div>
             <div class="field-group">
-                <label class="field-label">Title</label>
+                <label class="field-label" for="title-input">Title</label>
                 <div class="field-input-wrapper">
-                    <input type="text" class="field-input" data-field="title" placeholder="ACCORDION ITEM TITLE" maxlength="100" aria-describedby="title-error">
-                    <span class="validation-icon error">✗</span>
+                    <input type="text" 
+                           id="title-input"
+                           class="field-input" 
+                           data-field="title" 
+                           placeholder="ACCORDION ITEM TITLE" 
+                           maxlength="100" 
+                           aria-describedby="title-error title-help"
+                           aria-required="true"
+                           aria-invalid="false">
+                    <span class="validation-icon error" aria-hidden="true">✗</span>
                 </div>
-                <div class="field-error" id="title-error" role="alert"></div>
+                <div id="title-help" class="sr-only">Enter a descriptive title for this accordion section</div>
+                <div class="field-error" id="title-error" role="alert" aria-live="polite"></div>
             </div>
             <div class="field-group">
-                <label class="field-label">Content</label>
+                <label class="field-label" for="content-editor">Content</label>
                 <!-- This div will be replaced by the Quill editor -->
-                <div class="quill-container limited-toolbar"></div>
+                <div class="quill-container limited-toolbar" 
+                     id="content-editor"
+                     role="textbox" 
+                     aria-label="Rich text content editor"
+                     aria-multiline="true"
+                     aria-describedby="content-help"></div>
+                <div id="content-help" class="sr-only">Use this editor to add formatted content for the accordion section</div>
             </div>
         </div>
     </template>
@@ -528,8 +590,33 @@
                 });
                 
                 return { deadRefs, oldEditors };
+            },
+
+            // Screen reader announcement utility
+            announceToScreenReader(message) {
+                let announcer = document.getElementById('sr-announcer');
+                if (!announcer) {
+                    announcer = document.createElement('div');
+                    announcer.id = 'sr-announcer';
+                    announcer.setAttribute('aria-live', 'polite');
+                    announcer.setAttribute('aria-atomic', 'true');
+                    announcer.className = 'sr-only';
+                    announcer.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
+                    document.body.appendChild(announcer);
+                }
+                
+                // Clear and announce
+                announcer.textContent = '';
+                setTimeout(() => {
+                    announcer.textContent = message;
+                }, 100);
             }
         };
+
+        // Make announceToScreenReader globally available
+        function announceToScreenReader(message) {
+            return utils.announceToScreenReader(message);
+        }
 
         function cacheElements() {
             // Use DOMCache for main container elements
@@ -610,6 +697,26 @@
             // Clear dynamic cache before rendering new items
             DOMCache.clearDynamic();
 
+            // Enhanced accessibility for dynamic content
+            const container = elements.itemsContainer;
+            
+            // Add ARIA live region and accessibility attributes
+            container.setAttribute('role', 'list');
+            container.setAttribute('aria-label', 'Editable accordion items list');
+            container.setAttribute('aria-live', 'polite');
+            container.setAttribute('aria-describedby', 'accordion-help');
+            
+            // Add hidden help text for screen readers
+            let helpText = document.getElementById('accordion-help');
+            if (!helpText) {
+                helpText = document.createElement('div');
+                helpText.id = 'accordion-help';
+                helpText.className = 'sr-only';
+                helpText.textContent = 'Use arrow keys to navigate, Enter to edit, and control buttons to reorder or remove items';
+                helpText.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
+                container.parentNode.insertBefore(helpText, container);
+            }
+
             // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
 
@@ -620,17 +727,58 @@
 
                 el.dataset.id = item.id;
                 
+                // Enhanced accessibility for each item
+                el.setAttribute('role', 'listitem');
+                el.setAttribute('aria-label', `Accordion item ${index + 1} of ${items.length}: ${item.title || 'Untitled'}`);
+                el.setAttribute('tabindex', '0');
+                el.setAttribute('aria-describedby', `item-${item.id}-description`);
+                
+                // Add description for screen readers
+                const description = document.createElement('div');
+                description.id = `item-${item.id}-description`;
+                description.className = 'sr-only';
+                description.textContent = `Contains title input and rich text content editor`;
+                description.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
+                el.appendChild(description);
+                
                 // Cache queries within the item element
                 const itemTitle = el.querySelector('.item-title');
                 const titleInput = el.querySelector('[data-field="title"]');
                 const titleError = el.querySelector('.field-error');
                 const moveUpBtn = el.querySelector('.move-up-btn');
                 const moveDownBtn = el.querySelector('.move-down-btn');
+                const removeBtn = el.querySelector('.remove-btn');
                 
                 itemTitle.textContent = `Item ${index + 1}`;
                 titleInput.value = item.title || '';
+                
+                // Enhanced accessibility for form controls
+                titleInput.setAttribute('aria-label', `Title for accordion item ${index + 1}`);
+                titleInput.setAttribute('aria-required', 'true');
+                
+                // Enhanced accessibility for control buttons
                 moveUpBtn.disabled = (index === 0);
                 moveDownBtn.disabled = (index === items.length - 1);
+                
+                moveUpBtn.setAttribute('aria-label', `Move "${item.title || 'Untitled'}" item up. Currently item ${index + 1} of ${items.length}`);
+                moveDownBtn.setAttribute('aria-label', `Move "${item.title || 'Untitled'}" item down. Currently item ${index + 1} of ${items.length}`);
+                removeBtn.setAttribute('aria-label', `Remove "${item.title || 'Untitled'}" item. This action cannot be undone`);
+                
+                // Add keyboard navigation support
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        titleInput.focus();
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const nextItem = el.nextElementSibling;
+                        if (nextItem) nextItem.focus();
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prevItem = el.previousElementSibling;
+                        if (prevItem) prevItem.focus();
+                    }
+                });
 
                 // Set up validation for title input
                 const validationRules = [
@@ -646,6 +794,13 @@
                 const handleTitleInput = (e) => {
                     const isValid = Validator.validateField(e.target, validationRules, titleError);
                     
+                    // Update ARIA labels with current title
+                    const currentTitle = e.target.value || 'Untitled';
+                    el.setAttribute('aria-label', `Accordion item ${index + 1} of ${items.length}: ${currentTitle}`);
+                    moveUpBtn.setAttribute('aria-label', `Move "${currentTitle}" item up. Currently item ${index + 1} of ${items.length}`);
+                    moveDownBtn.setAttribute('aria-label', `Move "${currentTitle}" item down. Currently item ${index + 1} of ${items.length}`);
+                    removeBtn.setAttribute('aria-label', `Remove "${currentTitle}" item. This action cannot be undone`);
+                    
                     // Only update data if valid
                     if (isValid) {
                         updateDataFromUI();
@@ -654,6 +809,11 @@
 
                 titleInput.addEventListener('input', handleTitleInput);
                 titleInput.addEventListener('blur', handleTitleInput);
+
+                // Enhanced accessibility for editor container
+                editorDiv.setAttribute('role', 'textbox');
+                editorDiv.setAttribute('aria-label', `Content editor for accordion item ${index + 1}`);
+                editorDiv.setAttribute('aria-multiline', 'true');
 
                 fragment.appendChild(itemFragment);
 
@@ -669,22 +829,69 @@
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
             
+            // Announce changes to screen readers
+            const announcement = `Accordion updated. Now showing ${items.length} item${items.length === 1 ? '' : 's'}.`;
+            announceToScreenReader(announcement);
+            
             // Perform periodic memory cleanup
             utils.performMemoryCleanup();
         }
 
-        // Optimized Event Delegation with Action Maps
+        // Enhanced accessibility utility for screen reader announcements
+        function announceToScreenReader(message, priority = 'polite') {
+            // Create or get existing announcement region
+            let announcer = document.getElementById('accessibility-announcer');
+            if (!announcer) {
+                announcer = document.createElement('div');
+                announcer.id = 'accessibility-announcer';
+                announcer.setAttribute('aria-live', priority);
+                announcer.setAttribute('aria-atomic', 'true');
+                announcer.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
+                document.body.appendChild(announcer);
+            }
+            
+            // Clear and set new message
+            announcer.textContent = '';
+            setTimeout(() => {
+                announcer.textContent = message;
+            }, 100);
+        }
+
+        // Enhanced accessibility for add button
+        function enhanceAddButtonAccessibility() {
+            const addBtn = elements.addItemBtn;
+            if (addBtn) {
+                addBtn.setAttribute('aria-label', 'Add new accordion item');
+                addBtn.setAttribute('aria-describedby', 'add-btn-help');
+                
+                // Add hidden help text
+                let helpText = document.getElementById('add-btn-help');
+                if (!helpText) {
+                    helpText = document.createElement('div');
+                    helpText.id = 'add-btn-help';
+                    helpText.className = 'sr-only';
+                    helpText.textContent = 'Adds a new accordion item with title and content fields to the end of the list';
+                    helpText.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;';
+                    addBtn.parentNode.insertBefore(helpText, addBtn.nextSibling);
+                }
+            }
+        }
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
+                const itemTitle = item.title || 'Untitled';
                 items.splice(index, 1);
                 if (context.hasQuill && item.id) {
                     utils.cleanupEditor(item.id);
                 }
+                // Announce removal to screen readers
+                announceToScreenReader(`Removed accordion item "${itemTitle}". ${items.length} item${items.length === 1 ? '' : 's'} remaining.`);
                 return true;
             },
             '.move-up-btn': (item, index, items) => {
                 if (index > 0) {
                     [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                    const itemTitle = item.title || 'Untitled';
+                    announceToScreenReader(`Moved "${itemTitle}" up. Now in position ${index}.`);
                     return true;
                 }
                 return false;
@@ -692,6 +899,8 @@
             '.move-down-btn': (item, index, items) => {
                 if (index < items.length - 1) {
                     [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                    const itemTitle = item.title || 'Untitled';
+                    announceToScreenReader(`Moved "${itemTitle}" down. Now in position ${index + 2}.`);
                     return true;
                 }
                 return false;
@@ -699,6 +908,8 @@
             '.duplicate-btn': (item, index, items) => {
                 const newItem = { ...item, id: crypto.randomUUID() };
                 items.splice(index + 1, 0, newItem);
+                const itemTitle = item.title || 'Untitled';
+                announceToScreenReader(`Duplicated "${itemTitle}". New item added in position ${index + 2}.`);
                 return true;
             }
         };
@@ -710,8 +921,21 @@
                     const currentItems = utils.getFieldValue(fieldName);
                     const newItems = [...currentItems, { id: crypto.randomUUID(), title: 'NEW TITLE', content: 'New content...' }];
                     state.blockData[fieldName] = newItems;
+                    
+                    // Announce addition to screen readers
+                    announceToScreenReader(`Added new accordion item. Now ${newItems.length} item${newItems.length === 1 ? '' : 's'} total.`);
+                    
                     renderItemsUI();
                     updateDataFromUI();
+                    
+                    // Focus the new item's title input for immediate editing
+                    setTimeout(() => {
+                        const newItemInput = elements.itemsContainer.querySelector('.item:last-child [data-field="title"]');
+                        if (newItemInput) {
+                            newItemInput.focus();
+                            newItemInput.select();
+                        }
+                    }, 100);
                     return;
                 }
 
@@ -758,6 +982,16 @@
 
             elements.itemsContainer.addEventListener('click', accordionHandler);
             state.eventListeners.push({ element: elements.itemsContainer, event: 'click', handler: accordionHandler });
+
+            // Enhanced accessibility setup
+            enhanceAddButtonAccessibility();
+            
+            // Add keyboard navigation for main container
+            const mainContainer = elements.mainContainer;
+            if (mainContainer) {
+                mainContainer.setAttribute('role', 'application');
+                mainContainer.setAttribute('aria-label', 'Accordion editor interface');
+            }
 
             // Note: Input validation is now handled in renderItemsUI for each individual input
         }
@@ -969,6 +1203,45 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
+
+                // Add automatic cleanup on visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        console.log('Tab hidden - pausing expensive operations');
+                        
+                        // Pause expensive operations
+                        if (rafId) {
+                            cancelAnimationFrame(rafId);
+                            rafId = null;
+                        }
+                        
+                        // Clear caches to free memory
+                        DOMCache.clear();
+                        
+                        // Perform memory cleanup
+                        const cleanupStats = utils.performMemoryCleanup();
+                        console.log('Visibility cleanup stats:', cleanupStats);
+                        
+                        // Run garbage collection hint if available
+                        if (window.gc) {
+                            console.log('Running garbage collection hint');
+                            window.gc();
+                        }
+                    } else {
+                        console.log('Tab visible - resuming operations');
+                        
+                        // Resume operations if needed
+                        if (state.isInitialized && !elements.mainContainer.classList.contains('loading')) {
+                            // Recache elements after clearing
+                            cacheElements();
+                            
+                            // Refresh preview to ensure sync
+                            refreshPreview();
+                            
+                            console.log('Operations resumed, memory stats:', utils.getMemoryStats());
+                        }
+                    }
+                });
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);
