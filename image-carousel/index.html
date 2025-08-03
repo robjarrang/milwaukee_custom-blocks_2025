@@ -307,11 +307,115 @@
 
         let rafId = null;
 
-        // Advanced memory management
-        const slideMetadata = new WeakMap();
+        // Enhanced memory management with weak references for slides
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for slide:', heldValue);
+            SlideManager.cleanup();
         });
+
+        // Enhanced memory management for slide elements
+        const SlideManager = {
+            slides: new WeakMap(),
+            references: new Map(),
+            metadata: new Map(),
+            
+            register(id, slideElement, metadata = {}) {
+                const ref = new WeakRef(slideElement);
+                this.references.set(id, ref);
+                this.slides.set(slideElement, {
+                    id,
+                    ...metadata,
+                    created: Date.now(),
+                    lastAccessed: Date.now()
+                });
+                this.metadata.set(id, {
+                    id,
+                    ...metadata,
+                    created: Date.now(),
+                    element: slideElement
+                });
+                
+                // Register for cleanup
+                cleanupRegistry.register(slideElement, id);
+                
+                console.log(`Slide ${id} registered with enhanced memory management`);
+                return ref;
+            },
+            
+            get(id) {
+                const ref = this.references.get(id);
+                if (ref) {
+                    const slide = ref.deref();
+                    if (slide) {
+                        // Update last accessed time
+                        const slideData = this.slides.get(slide);
+                        if (slideData) {
+                            slideData.lastAccessed = Date.now();
+                        }
+                        return slide;
+                    } else {
+                        // Slide was garbage collected
+                        console.log(`Slide ${id} was garbage collected`);
+                        this.references.delete(id);
+                        this.metadata.delete(id);
+                    }
+                }
+                return null;
+            },
+            
+            has(id) {
+                const ref = this.references.get(id);
+                return ref && ref.deref() !== undefined;
+            },
+            
+            delete(id) {
+                const ref = this.references.get(id);
+                if (ref) {
+                    const slide = ref.deref();
+                    if (slide) {
+                        this.slides.delete(slide);
+                    }
+                }
+                this.references.delete(id);
+                this.metadata.delete(id);
+                console.log(`Slide ${id} removed from memory management`);
+            },
+            
+            cleanup() {
+                // Clean up dead references
+                let cleaned = 0;
+                for (const [id, ref] of this.references) {
+                    if (!ref.deref()) {
+                        this.references.delete(id);
+                        this.metadata.delete(id);
+                        cleaned++;
+                    }
+                }
+                if (cleaned > 0) {
+                    console.log(`Cleaned up ${cleaned} dead slide references`);
+                }
+                return cleaned;
+            },
+            
+            getStats() {
+                const alive = Array.from(this.references.values())
+                    .filter(ref => ref.deref()).length;
+                return {
+                    total: this.references.size,
+                    alive,
+                    dead: this.references.size - alive,
+                    metadata: this.metadata.size
+                };
+            },
+            
+            // Clear all references
+            clear() {
+                this.references.clear();
+                this.metadata.clear();
+                this.slides = new WeakMap();
+                console.log('All slide references cleared');
+            }
+        };
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
@@ -464,10 +568,12 @@
 
                 fragment.appendChild(slideFragment);
 
-                // Track slide metadata
-                const metadata = { id: slide.id, index, element: slideEl };
-                slideMetadata.set(slideEl, metadata);
-                cleanupRegistry.register(slideEl, slide.id);
+                // Track slide metadata with enhanced memory management
+                SlideManager.register(slide.id, slideEl, {
+                    id: slide.id,
+                    index,
+                    element: slideEl
+                });
             });
 
             // Single DOM update
@@ -923,10 +1029,11 @@ input[type="radio"] {
                 rafId = null;
             }
 
-            // Clear slide metadata
-            slideMetadata.clear();
+            // Clean up slide manager and all references
+            SlideManager.clear();
 
-            console.log('Image Carousel cleanup completed');
+            console.log('Image Carousel cleanup completed with enhanced memory management');
+        }
         }
 
         function initializeWithRetry() {
@@ -942,6 +1049,17 @@ input[type="radio"] {
 
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
+
+                // Start periodic memory cleanup
+                setInterval(() => {
+                    const stats = SlideManager.getStats();
+                    const cleaned = SlideManager.cleanup();
+                    console.log('Periodic memory cleanup:', {
+                        cleaned,
+                        stats,
+                        timestamp: new Date().toISOString()
+                    });
+                }, 120000); // Every 2 minutes
 
                 state.isInitialized = true;
             } catch (error) {

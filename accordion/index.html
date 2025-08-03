@@ -145,11 +145,130 @@
             }
         };
 
-        // Advanced memory management
-        const editorMetadata = new WeakMap();
+        // Enhanced memory management with weak references
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
+            EditorManager.cleanup();
         });
+
+        // Enhanced memory management for editors
+        const EditorManager = {
+            editors: new WeakMap(),
+            references: new Map(),
+            metadata: new Map(),
+            
+            register(id, editor, metadata = {}) {
+                const ref = new WeakRef(editor);
+                this.references.set(id, ref);
+                this.editors.set(editor, {
+                    id,
+                    ...metadata,
+                    created: Date.now(),
+                    lastAccessed: Date.now()
+                });
+                this.metadata.set(id, {
+                    id,
+                    ...metadata,
+                    created: Date.now(),
+                    element: metadata.container
+                });
+                
+                // Register for cleanup
+                cleanupRegistry.register(editor, id);
+                
+                console.log(`Editor ${id} registered with enhanced memory management`);
+                return ref;
+            },
+            
+            get(id) {
+                const ref = this.references.get(id);
+                if (ref) {
+                    const editor = ref.deref();
+                    if (editor) {
+                        // Update last accessed time
+                        const editorData = this.editors.get(editor);
+                        if (editorData) {
+                            editorData.lastAccessed = Date.now();
+                        }
+                        return editor;
+                    } else {
+                        // Editor was garbage collected
+                        console.log(`Editor ${id} was garbage collected`);
+                        this.references.delete(id);
+                        this.metadata.delete(id);
+                    }
+                }
+                return null;
+            },
+            
+            has(id) {
+                const ref = this.references.get(id);
+                return ref && ref.deref() !== undefined;
+            },
+            
+            delete(id) {
+                const ref = this.references.get(id);
+                if (ref) {
+                    const editor = ref.deref();
+                    if (editor) {
+                        this.editors.delete(editor);
+                    }
+                }
+                this.references.delete(id);
+                this.metadata.delete(id);
+                console.log(`Editor ${id} removed from memory management`);
+            },
+            
+            cleanup() {
+                // Clean up dead references
+                let cleaned = 0;
+                for (const [id, ref] of this.references) {
+                    if (!ref.deref()) {
+                        this.references.delete(id);
+                        this.metadata.delete(id);
+                        cleaned++;
+                    }
+                }
+                if (cleaned > 0) {
+                    console.log(`Cleaned up ${cleaned} dead editor references`);
+                }
+                return cleaned;
+            },
+            
+            getStats() {
+                const alive = Array.from(this.references.values())
+                    .filter(ref => ref.deref()).length;
+                return {
+                    total: this.references.size,
+                    alive,
+                    dead: this.references.size - alive,
+                    metadata: this.metadata.size
+                };
+            },
+            
+            // Force cleanup of old editors (older than threshold)
+            cleanupOld(threshold = 5 * 60 * 1000) { // 5 minutes default
+                const now = Date.now();
+                let cleaned = 0;
+                
+                for (const [id, ref] of this.references) {
+                    const editor = ref.deref();
+                    if (editor) {
+                        const editorData = this.editors.get(editor);
+                        if (editorData && (now - editorData.lastAccessed) > threshold) {
+                            // Clean up old unused editor
+                            this.delete(id);
+                            cleaned++;
+                        }
+                    }
+                }
+                
+                if (cleaned > 0) {
+                    console.log(`Cleaned up ${cleaned} old unused editors`);
+                }
+                return cleaned;
+            }
+        };
 
         // Utility for retryable operations
         const RetryableOperation = {
@@ -337,16 +456,12 @@
                     placeholder: 'Enter content here...'
                 }));
 
-                // Track editor metadata
-                const metadata = {
-                    id,
-                    created: Date.now(),
+                // Register with enhanced memory management
+                EditorManager.register(id, editor, {
                     container,
-                    hasContent: Boolean(content && content.trim())
-                };
-
-                editorMetadata.set(editor, metadata);
-                cleanupRegistry.register(editor, id);
+                    hasContent: Boolean(content && content.trim()),
+                    type: 'accordion-item'
+                });
 
                 // Set content if provided
                 if (content && content.trim()) {
@@ -357,10 +472,10 @@
             },
 
             cleanupEditor(id) {
-                const editor = state.editors[id];
+                const editor = EditorManager.get(id);
                 if (editor) {
                     // Get metadata before cleanup
-                    const metadata = editorMetadata.get(editor);
+                    const metadata = EditorManager.metadata.get(id);
 
                     // Clean up event listeners
                     if (editor.off) {
@@ -374,9 +489,45 @@
                         hadListeners: Boolean(editor.off)
                     });
 
-                    // Remove from state
-                    delete state.editors[id];
+                    // Remove from enhanced memory management
+                    EditorManager.delete(id);
                 }
+
+                // Also remove from legacy state (backward compatibility)
+                delete state.editors[id];
+            },
+
+            // Get editor with memory management
+            getEditor(id) {
+                // Try enhanced memory management first
+                const editor = EditorManager.get(id);
+                if (editor) {
+                    return editor;
+                }
+                
+                // Fallback to legacy state
+                return state.editors[id] || null;
+            },
+
+            // Memory management utilities
+            getMemoryStats() {
+                return {
+                    editorManager: EditorManager.getStats(),
+                    legacyEditors: Object.keys(state.editors).length
+                };
+            },
+
+            performMemoryCleanup() {
+                const deadRefs = EditorManager.cleanup();
+                const oldEditors = EditorManager.cleanupOld();
+                
+                console.log('Memory cleanup completed:', {
+                    deadReferences: deadRefs,
+                    oldEditors: oldEditors,
+                    stats: this.getMemoryStats()
+                });
+                
+                return { deadRefs, oldEditors };
             }
         };
 
@@ -405,7 +556,7 @@
             
             itemElements.forEach(el => {
                 const id = el.dataset.id;
-                const editor = state.editors[id];
+                const editor = utils.getEditor(id);
                 if (editor) {
                     const content = editor.getSemanticHTML ? 
                         editor.getSemanticHTML() : 
@@ -439,8 +590,17 @@
         function renderItemsUI() {
             const items = utils.getFieldValue('accordionItems');
 
-            // Clean up existing editors first
+            // Clean up existing editors first using enhanced memory management
             const currentIds = new Set(items.map(i => i.id));
+            
+            // Clean up editors not in current items
+            for (const [id] of EditorManager.references) {
+                if (!currentIds.has(id)) {
+                    utils.cleanupEditor(id);
+                }
+            }
+            
+            // Also clean legacy editors for backward compatibility
             Object.keys(state.editors).forEach(id => {
                 if (!currentIds.has(id)) {
                     utils.cleanupEditor(id);
@@ -497,15 +657,20 @@
 
                 fragment.appendChild(itemFragment);
 
-                // Create editor with memory management
+                // Create editor with enhanced memory management
                 const editor = utils.createEditor(editorDiv, item.id, item.content);
                 editor.on('text-change', updateDataFromUI);
+                
+                // Keep legacy reference for backward compatibility
                 state.editors[item.id] = editor;
             });
 
             // Single DOM update
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
+            
+            // Perform periodic memory cleanup
+            utils.performMemoryCleanup();
         }
 
         // Optimized Event Delegation with Action Maps
@@ -708,9 +873,14 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
             });
         }
 
-        // Enhanced cleanup function with memory management
+        // Enhanced cleanup function with advanced memory management
         function cleanup() {
             // Enhanced cleanup with memory management
+            for (const [id] of EditorManager.references) {
+                utils.cleanupEditor(id);
+            }
+            
+            // Legacy cleanup for backward compatibility
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
@@ -730,7 +900,11 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
             // Clear DOM cache
             DOMCache.clear();
 
-            console.log('Accordion cleanup completed');
+            // Final memory cleanup
+            EditorManager.cleanup();
+            
+            console.log('Accordion cleanup completed with enhanced memory management');
+            console.log('Final memory stats:', utils.getMemoryStats());
         }
 
         function initialize() {
@@ -780,6 +954,17 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                     refreshPreview();
                 }).finally(() => {
                     setLoadingState(false);
+                    
+                    // Set up periodic memory cleanup (every 2 minutes)
+                    const memoryCleanupInterval = setInterval(() => {
+                        utils.performMemoryCleanup();
+                    }, 2 * 60 * 1000); // 2 minutes
+                    
+                    // Clean up interval on page unload
+                    window.addEventListener('beforeunload', () => {
+                        clearInterval(memoryCleanupInterval);
+                        cleanup();
+                    });
                 });
 
                 // Add cleanup on page unload

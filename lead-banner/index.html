@@ -100,6 +100,108 @@
             retryCount: 0 
         };
         const elements = {};
+
+        // Enhanced memory management with weak references
+        const cleanupRegistry = new FinalizationRegistry((heldValue) => {
+            console.log('Cleanup registry triggered for editor:', heldValue);
+            EditorManager.cleanup();
+        });
+
+        // Enhanced memory management for editors
+        const EditorManager = {
+            editors: new WeakMap(),
+            references: new Map(),
+            metadata: new Map(),
+            
+            register(id, editor, metadata = {}) {
+                const ref = new WeakRef(editor);
+                this.references.set(id, ref);
+                this.editors.set(editor, {
+                    id,
+                    ...metadata,
+                    created: Date.now(),
+                    lastAccessed: Date.now()
+                });
+                this.metadata.set(id, {
+                    id,
+                    ...metadata,
+                    created: Date.now(),
+                    element: metadata.container
+                });
+                
+                // Register for cleanup
+                cleanupRegistry.register(editor, id);
+                
+                console.log(`Editor ${id} registered with enhanced memory management`);
+                return ref;
+            },
+            
+            get(id) {
+                const ref = this.references.get(id);
+                if (ref) {
+                    const editor = ref.deref();
+                    if (editor) {
+                        // Update last accessed time
+                        const editorData = this.editors.get(editor);
+                        if (editorData) {
+                            editorData.lastAccessed = Date.now();
+                        }
+                        return editor;
+                    } else {
+                        // Editor was garbage collected
+                        console.log(`Editor ${id} was garbage collected`);
+                        this.references.delete(id);
+                        this.metadata.delete(id);
+                    }
+                }
+                return null;
+            },
+            
+            has(id) {
+                const ref = this.references.get(id);
+                return ref && ref.deref() !== undefined;
+            },
+            
+            delete(id) {
+                const ref = this.references.get(id);
+                if (ref) {
+                    const editor = ref.deref();
+                    if (editor) {
+                        this.editors.delete(editor);
+                    }
+                }
+                this.references.delete(id);
+                this.metadata.delete(id);
+                console.log(`Editor ${id} removed from memory management`);
+            },
+            
+            cleanup() {
+                // Clean up dead references
+                let cleaned = 0;
+                for (const [id, ref] of this.references) {
+                    if (!ref.deref()) {
+                        this.references.delete(id);
+                        this.metadata.delete(id);
+                        cleaned++;
+                    }
+                }
+                if (cleaned > 0) {
+                    console.log(`Cleaned up ${cleaned} dead editor references`);
+                }
+                return cleaned;
+            },
+            
+            getStats() {
+                const alive = Array.from(this.references.values())
+                    .filter(ref => ref.deref()).length;
+                return {
+                    total: this.references.size,
+                    alive,
+                    dead: this.references.size - alive,
+                    metadata: this.metadata.size
+                };
+            }
+        };
         let rafId = null;
 
         // Create a DOM cache utility to consolidate repeated DOM queries
@@ -322,16 +424,13 @@
                     placeholder: config.placeholder || 'Enter text...'
                 }));
 
-                // Track editor metadata
-                const metadata = {
-                    id,
-                    created: Date.now(),
+                // Register with enhanced memory management
+                EditorManager.register(id, editor, {
                     container,
-                    hasContent: Boolean(content && content.trim())
-                };
-
-                editorMetadata.set(editor, metadata);
-                cleanupRegistry.register(editor, id);
+                    hasContent: Boolean(content && content.trim()),
+                    type: 'lead-banner',
+                    editorType
+                });
 
                 // Set content if provided
                 if (content && content.trim()) {
@@ -342,10 +441,10 @@
             },
 
             cleanupEditor(id) {
-                const editor = state.editors[id];
+                const editor = EditorManager.get(id);
                 if (editor) {
                     // Get metadata before cleanup
-                    const metadata = editorMetadata.get(editor);
+                    const metadata = EditorManager.metadata.get(id);
 
                     // Clean up event listeners
                     if (editor.off) {
@@ -356,6 +455,47 @@
                     console.log('Cleaning up editor:', {
                         id,
                         metadata,
+                        hadListeners: Boolean(editor.off)
+                    });
+
+                    // Remove from enhanced memory management
+                    EditorManager.delete(id);
+                }
+
+                // Also remove from legacy state (backward compatibility)
+                delete state.editors[id];
+            },
+
+            // Get editor with memory management
+            getEditor(id) {
+                // Try enhanced memory management first
+                const editor = EditorManager.get(id);
+                if (editor) {
+                    return editor;
+                }
+                
+                // Fallback to legacy state
+                return state.editors[id] || null;
+            },
+
+            // Memory management utilities
+            getMemoryStats() {
+                return {
+                    editorManager: EditorManager.getStats(),
+                    legacyEditors: Object.keys(state.editors).length
+                };
+            },
+
+            performMemoryCleanup() {
+                const deadRefs = EditorManager.cleanup();
+                
+                console.log('Memory cleanup completed:', {
+                    deadReferences: deadRefs,
+                    stats: this.getMemoryStats()
+                });
+                
+                return { deadRefs };
+            }
                         hadListeners: Boolean(editor.off)
                     });
 
