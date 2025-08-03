@@ -160,29 +160,113 @@
             maxRetries: 3
         };
 
+        // Debug logging utility
+        const Debug = {
+            enabled: true,
+            prefix: '[IMAGE-CAROUSEL]',
+            
+            log(...args) {
+                if (this.enabled) {
+                    console.log(this.prefix, ...args);
+                }
+            },
+            
+            error(...args) {
+                console.error(this.prefix + ' ERROR:', ...args);
+            },
+            
+            warn(...args) {
+                console.warn(this.prefix + ' WARNING:', ...args);
+            },
+            
+            group(title) {
+                if (this.enabled) {
+                    console.group(this.prefix + ' ' + title);
+                }
+            },
+            
+            groupEnd() {
+                if (this.enabled) {
+                    console.groupEnd();
+                }
+            },
+            
+            time(label) {
+                if (this.enabled) {
+                    console.time(this.prefix + ' ' + label);
+                }
+            },
+            
+            timeEnd(label) {
+                if (this.enabled) {
+                    console.timeEnd(this.prefix + ' ' + label);
+                }
+            },
+            
+            state() {
+                this.group('Current State');
+                this.log('State object:', JSON.parse(JSON.stringify(state)));
+                this.log('Elements cache:', Object.keys(elements).length > 0 ? elements : 'Empty');
+                this.log('DOM Cache entries:', DOMCache.cache.size);
+                this.log('Module config:', moduleConfig);
+                this.groupEnd();
+            }
+        };
+
         const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
         const elements = {};
+
+        Debug.log('Module initialization started');
+        Debug.state();
+
+        // Global error handler for debugging
+        window.addEventListener('error', (event) => {
+            Debug.error('Global error caught:', {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                error: event.error
+            });
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            Debug.error('Unhandled promise rejection:', {
+                reason: event.reason,
+                promise: event.promise
+            });
+        });
 
         // Create a DOM cache utility to consolidate repeated DOM queries
         const DOMCache = {
             cache: new Map(),
             get(selector) {
+                Debug.log(`DOMCache.get('${selector}')`);
                 if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
+                    const element = document.querySelector(selector);
+                    Debug.log(`Element found for '${selector}':`, element ? 'YES' : 'NO');
+                    this.cache.set(selector, element);
                 }
                 return this.cache.get(selector);
             },
             getAll(selector) {
+                Debug.log(`DOMCache.getAll('${selector}')`);
                 if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
+                    const elements = document.querySelectorAll(selector);
+                    Debug.log(`Elements found for '${selector}':`, elements.length);
+                    this.cache.set(selector + '_all', elements);
                 }
                 return this.cache.get(selector + '_all');
             },
-            clear() { this.cache.clear(); },
+            clear() { 
+                Debug.log('DOMCache cleared');
+                this.cache.clear(); 
+            },
             clearDynamic() {
                 const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
                     key.includes('.image-item') || key.includes('[data-')
                 );
+                Debug.log('Clearing dynamic cache entries:', dynamicKeys);
                 dynamicKeys.forEach(key => this.cache.delete(key));
             }
         };
@@ -526,7 +610,18 @@
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; } },
-            showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
+            showError(msg, p = false) { 
+                Debug.error('Showing error:', msg);
+                console.error(msg); 
+                if(elements.errorBanner) { 
+                    Debug.log('Error banner element found - displaying error');
+                    elements.errorBanner.textContent=msg; 
+                    elements.errorBanner.classList.add('show'); 
+                    if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); 
+                } else {
+                    Debug.error('Error banner element not found - cannot display error visually');
+                }
+            },
             getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; },
 
             addEventListenerTracked(element, event, handler) {
@@ -536,17 +631,53 @@
         };
 
         function cacheElements() {
-            elements.mainContainer = document.getElementById('mainContainer');
-            elements.loadingOverlay = document.getElementById('loadingOverlay');
-            elements.errorBanner = document.getElementById('errorBanner');
-            elements.slidesContainer = document.getElementById('slidesContainer');
-            elements.addSlideBtn = document.getElementById('addSlideBtn');
-            elements.slideTemplate = document.getElementById('slideTemplate');
-            elements.fallbackImageUrl = document.getElementById('fallbackImageUrl');
-            elements.fallbackLinkUrl = document.getElementById('fallbackLinkUrl');
-            elements.fallbackAltText = document.getElementById('fallbackAltText');
-            elements.fallbackImageUrlError = elements.fallbackImageUrl.nextElementSibling;
-            elements.fallbackLinkUrlError = elements.fallbackLinkUrl.nextElementSibling;
+            Debug.group('Caching Elements');
+            Debug.time('Element Caching');
+            
+            const requiredElements = [
+                'mainContainer',
+                'loadingOverlay', 
+                'errorBanner',
+                'slidesContainer',
+                'addSlideBtn',
+                'slideTemplate',
+                'fallbackImageUrl',
+                'fallbackLinkUrl',
+                'fallbackAltText'
+            ];
+            
+            requiredElements.forEach(id => {
+                const element = document.getElementById(id);
+                elements[id] = element;
+                Debug.log(`${id}:`, element ? '✓ Found' : '✗ Missing');
+                if (!element) {
+                    Debug.error(`Critical element missing: #${id}`);
+                }
+            });
+            
+            // Cache error elements
+            if (elements.fallbackImageUrl) {
+                elements.fallbackImageUrlError = elements.fallbackImageUrl.nextElementSibling;
+                Debug.log('fallbackImageUrlError:', elements.fallbackImageUrlError ? '✓ Found' : '✗ Missing');
+            }
+            
+            if (elements.fallbackLinkUrl) {
+                elements.fallbackLinkUrlError = elements.fallbackLinkUrl.nextElementSibling;
+                Debug.log('fallbackLinkUrlError:', elements.fallbackLinkUrlError ? '✓ Found' : '✗ Missing');
+            }
+            
+            Debug.timeEnd('Element Caching');
+            Debug.log('Total elements cached:', Object.keys(elements).length);
+            Debug.groupEnd();
+            
+            // Check if any critical elements are missing
+            const missingElements = requiredElements.filter(id => !elements[id]);
+            if (missingElements.length > 0) {
+                Debug.error('Missing critical elements:', missingElements);
+                return false;
+            }
+            
+            return true;
         }
 
         function setLoadingState(loading) {
@@ -609,10 +740,29 @@
         const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
 
         function renderSlidesUI() {
+            Debug.group('Rendering Slides UI');
+            Debug.time('Slide Rendering');
+            
             const slides = utils.getFieldValue('slides');
+            Debug.log('Slides to render:', slides?.length || 0);
 
             if (!slides || slides.length === 0) {
-                elements.slidesContainer.replaceChildren();
+                Debug.warn('No slides to render - clearing container');
+                if (elements.slidesContainer) {
+                    elements.slidesContainer.replaceChildren();
+                } else {
+                    Debug.error('slidesContainer element not found!');
+                }
+                Debug.timeEnd('Slide Rendering');
+                Debug.groupEnd();
+                return;
+            }
+
+            Debug.log('Template element:', elements.slideTemplate ? '✓ Found' : '✗ Missing');
+            if (!elements.slideTemplate) {
+                Debug.error('slideTemplate element missing - cannot render slides');
+                Debug.timeEnd('Slide Rendering');
+                Debug.groupEnd();
                 return;
             }
 
@@ -620,44 +770,78 @@
             const fragment = document.createDocumentFragment();
 
             slides.forEach((slide, index) => {
+                Debug.log(`Rendering slide ${index + 1}:`, slide);
+                
                 const slideFragment = elements.slideTemplate.content.cloneNode(true);
                 const slideEl = slideFragment.querySelector('.slide-item');
+                
+                if (!slideEl) {
+                    Debug.error('slide-item element not found in template');
+                    return;
+                }
+                
                 slideEl.dataset.id = slide.id;
-                slideEl.querySelector('.slide-title').textContent = `Slide ${index + 1}`;
+                
+                const slideTitle = slideEl.querySelector('.slide-title');
+                if (slideTitle) {
+                    slideTitle.textContent = `Slide ${index + 1}`;
+                } else {
+                    Debug.warn('slide-title element not found');
+                }
                 
                 const imageInput = slideEl.querySelector('[data-field="imageUrl"]');
                 const linkInput = slideEl.querySelector('[data-field="linkUrl"]');
                 const altInput = slideEl.querySelector('[data-field="altText"]');
                 
-                imageInput.value = slide.imageUrl || '';
-                linkInput.value = slide.linkUrl || '';
-                altInput.value = slide.altText || '';
+                Debug.log('Form inputs found:', {
+                    imageInput: !!imageInput,
+                    linkInput: !!linkInput,
+                    altInput: !!altInput
+                });
+                
+                if (imageInput) imageInput.value = slide.imageUrl || '';
+                if (linkInput) linkInput.value = slide.linkUrl || '';
+                if (altInput) altInput.value = slide.altText || '';
 
                 // Set up validation for each field
                 const imageError = slideEl.querySelector('#imageUrl-error');
                 const linkError = slideEl.querySelector('#linkUrl-error');
                 const altError = slideEl.querySelector('#altText-error');
 
+                Debug.log('Error elements found:', {
+                    imageError: !!imageError,
+                    linkError: !!linkError,
+                    altError: !!altError
+                });
+
                 // Image URL validation (required)
-                const imageRules = [Validator.rules.required, Validator.rules.url];
-                Validator.setupRealTimeValidation(imageInput, imageRules, imageError);
+                if (imageInput) {
+                    const imageRules = [Validator.rules.required, Validator.rules.url];
+                    Validator.setupRealTimeValidation(imageInput, imageRules, imageError);
+                }
                 
                 // Link URL validation (optional)
-                const linkRules = [Validator.rules.url];
-                Validator.setupRealTimeValidation(linkInput, linkRules, linkError);
+                if (linkInput) {
+                    const linkRules = [Validator.rules.url];
+                    Validator.setupRealTimeValidation(linkInput, linkRules, linkError);
+                }
                 
                 // Alt text validation
-                const altRules = [Validator.rules.length(100), Validator.rules.noHtml];
-                Validator.setupRealTimeValidation(altInput, altRules, altError);
+                if (altInput) {
+                    const altRules = [Validator.rules.length(100), Validator.rules.noHtml];
+                    Validator.setupRealTimeValidation(altInput, altRules, altError);
+                }
 
                 // Enhanced input handlers with validation
-                [imageInput, linkInput, altInput].forEach(input => {
-                    const rules = input === imageInput ? imageRules : 
-                                 input === linkInput ? linkRules : altRules;
+                [imageInput, linkInput, altInput].filter(Boolean).forEach(input => {
+                    const rules = input === imageInput ? [Validator.rules.required, Validator.rules.url] : 
+                                 input === linkInput ? [Validator.rules.url] : 
+                                 [Validator.rules.length(100), Validator.rules.noHtml];
                     const errorElement = input.closest('.field-group')?.querySelector('.field-error');
                     
                     const handleInput = (e) => {
                         const isValid = Validator.validateField(e.target, rules, errorElement);
+                        Debug.log(`Input validation for ${input.dataset.field}:`, isValid);
                         
                         // Only update data if valid
                         if (isValid) {
@@ -669,8 +853,12 @@
                     input.addEventListener('blur', handleInput);
                 });
 
-                if(index === 0) slideEl.querySelector('.move-up-btn').disabled = true;
-                if(index === slides.length - 1) slideEl.querySelector('.move-down-btn').disabled = true;
+                // Control button states
+                const moveUpBtn = slideEl.querySelector('.move-up-btn');
+                const moveDownBtn = slideEl.querySelector('.move-down-btn');
+                
+                if (moveUpBtn && index === 0) moveUpBtn.disabled = true;
+                if (moveDownBtn && index === slides.length - 1) moveDownBtn.disabled = true;
 
                 fragment.appendChild(slideFragment);
 
@@ -680,11 +868,22 @@
                     index,
                     element: slideEl
                 });
+                
+                Debug.log(`✓ Slide ${index + 1} rendered successfully`);
             });
 
             // Single DOM update
-            elements.slidesContainer.replaceChildren();
-            elements.slidesContainer.appendChild(fragment);
+            Debug.log('Updating DOM with rendered slides...');
+            if (elements.slidesContainer) {
+                elements.slidesContainer.replaceChildren();
+                elements.slidesContainer.appendChild(fragment);
+                Debug.log('✓ DOM updated with', slides.length, 'slides');
+            } else {
+                Debug.error('slidesContainer not available for DOM update');
+            }
+            
+            Debug.timeEnd('Slide Rendering');
+            Debug.groupEnd();
         }
 
         // Optimized Event Delegation with Action Maps
@@ -1089,28 +1288,59 @@ input[type="radio"] {
         }
 
         function loadData() {
-            if (!state.sdk) return utils.showError('SDK not available');
+            Debug.group('Loading Data');
+            Debug.time('Data Loading');
+            
+            if (!state.sdk) {
+                Debug.error('SDK not available for data loading');
+                return utils.showError('SDK not available');
+            }
+            
+            Debug.log('Setting loading state...');
             setLoadingState(true);
 
+            Debug.log('Requesting data from SDK...');
             state.sdk.getData((data) => {
                 try {
+                    Debug.log('Raw data received:', data);
+                    
                     // When loading, prioritize the structured 'slides' data over saved 'content'
                     state.blockData.slides = (data && data.slides && data.slides.length > 0) ? data.slides : utils.getFieldValue('slides');
+                    Debug.log('Slides data processed:', state.blockData.slides.length, 'slides');
+                    
                     state.blockData.slides.forEach(s => { if (!s.id) s.id = crypto.randomUUID(); });
 
                     state.blockData.fallbackImageUrl = data?.fallbackImageUrl || '';
                     state.blockData.fallbackLinkUrl = data?.fallbackLinkUrl || '';
                     state.blockData.fallbackAltText = data?.fallbackAltText || '';
+                    
+                    Debug.log('Fallback data:', {
+                        imageUrl: state.blockData.fallbackImageUrl,
+                        linkUrl: state.blockData.fallbackLinkUrl,
+                        altText: state.blockData.fallbackAltText
+                    });
 
+                    Debug.log('Rendering slides UI...');
                     renderSlidesUI();
 
-                    elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl;
-                    elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl;
-                    elements.fallbackAltText.value = state.blockData.fallbackAltText;
+                    Debug.log('Setting fallback field values...');
+                    if (elements.fallbackImageUrl) elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl;
+                    if (elements.fallbackLinkUrl) elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl;
+                    if (elements.fallbackAltText) elements.fallbackAltText.value = state.blockData.fallbackAltText;
 
+                    Debug.log('Refreshing preview...');
                     refreshPreview();
                     state.retryCount = 0;
+                    
+                    Debug.log('✓ Data loading completed successfully');
+                    Debug.timeEnd('Data Loading');
+                    Debug.groupEnd();
+                    
                 } catch (error) {
+                    Debug.error('Data loading failed:', error);
+                    Debug.timeEnd('Data Loading');
+                    Debug.groupEnd();
+                    
                     utils.showError(`Failed to load data: ${error.message}`);
                     state.blockData = {}; // Reset to defaults on error
                     renderSlidesUI();
@@ -1145,19 +1375,41 @@ input[type="radio"] {
         }
 
         function initializeWithRetry() {
+            Debug.group('Initialization Started');
+            Debug.time('Total Initialization');
+            
             try {
-                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+                Debug.log('Checking BlockSDK availability...');
+                if (!window.sfdc || !window.sfdc.BlockSDK) {
+                    throw new Error('BlockSDK not loaded');
+                }
+                Debug.log('✓ BlockSDK is available');
 
+                Debug.log('Creating BlockSDK instance...');
                 state.sdk = new window.sfdc.BlockSDK({
                     tabs: ['htmlblock']
                 });
+                Debug.log('✓ BlockSDK instance created');
                 
                 // Initialize lazy loading for images
-                LazyLoader.init();
+                Debug.log('Initializing LazyLoader...');
+                const lazySupported = LazyLoader.init();
+                Debug.log('LazyLoader supported:', lazySupported);
                 
-                cacheElements();
+                Debug.log('Caching elements...');
+                const elementsCached = cacheElements();
+                if (!elementsCached) {
+                    throw new Error('Failed to cache required elements');
+                }
+                Debug.log('✓ Elements cached successfully');
+                
+                Debug.log('Initializing event handlers...');
                 initializeEventHandlers();
+                Debug.log('✓ Event handlers initialized');
+                
+                Debug.log('Loading initial data...');
                 loadData();
+                Debug.log('✓ Data loading initiated');
 
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
@@ -1165,7 +1417,7 @@ input[type="radio"] {
                 // Add automatic cleanup on visibility change
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
+                        Debug.log('Tab hidden - pausing expensive operations');
                         
                         // Pause expensive operations
                         if (rafId) {
@@ -1180,15 +1432,15 @@ input[type="radio"] {
                         
                         // Perform memory cleanup with SlideManager
                         const cleanupStats = SlideManager.cleanup();
-                        console.log('Visibility cleanup - slides cleaned:', cleanupStats);
+                        Debug.log('Visibility cleanup - slides cleaned:', cleanupStats);
                         
                         // Run garbage collection hint if available
                         if (window.gc) {
-                            console.log('Running garbage collection hint');
+                            Debug.log('Running garbage collection hint');
                             window.gc();
                         }
                     } else {
-                        console.log('Tab visible - resuming operations');
+                        Debug.log('Tab visible - resuming operations');
                         
                         // Resume operations if needed
                         if (state.isInitialized && !state.isLoading) {
@@ -1200,7 +1452,7 @@ input[type="radio"] {
                             // Refresh preview to ensure sync
                             refreshPreview();
                             
-                            console.log('Operations resumed, slide stats:', SlideManager.getStats());
+                            Debug.log('Operations resumed, slide stats:', SlideManager.getStats());
                         }
                     }
                 });
@@ -1209,7 +1461,7 @@ input[type="radio"] {
                 setInterval(() => {
                     const stats = SlideManager.getStats();
                     const cleaned = SlideManager.cleanup();
-                    console.log('Periodic memory cleanup:', {
+                    Debug.log('Periodic memory cleanup:', {
                         cleaned,
                         stats,
                         timestamp: new Date().toISOString()
@@ -1217,19 +1469,41 @@ input[type="radio"] {
                 }, 120000); // Every 2 minutes
 
                 state.isInitialized = true;
+                Debug.log('✓ Initialization completed successfully');
+                Debug.timeEnd('Total Initialization');
+                Debug.state();
+                Debug.groupEnd();
+                
             } catch (error) {
+                Debug.error('Initialization failed:', error);
+                Debug.timeEnd('Total Initialization');
+                Debug.groupEnd();
+                
                 utils.showError(`Initialization failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
+                    Debug.warn(`Retrying initialization... Attempt ${state.retryCount}/${moduleConfig.maxRetries}`);
                     setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
                 } else {
+                    Debug.error('Failed to initialize after multiple attempts');
                     utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
                 }
                 setLoadingState(false);
             }
         }
 
-        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initializeWithRetry) : initializeWithRetry();
+        // Initialize when DOM is ready
+        Debug.log('Document ready state:', document.readyState);
+        if (document.readyState === 'loading') {
+            Debug.log('Waiting for DOMContentLoaded...');
+            document.addEventListener('DOMContentLoaded', () => {
+                Debug.log('DOMContentLoaded fired - starting initialization');
+                initializeWithRetry();
+            });
+        } else {
+            Debug.log('DOM already ready - starting initialization immediately');
+            initializeWithRetry();
+        }
     </script>
 </body>
 </html>
