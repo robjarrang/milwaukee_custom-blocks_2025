@@ -110,9 +110,19 @@
     </style>
 </head>
 <body>
+    <!-- Immediate JS test -->
+    <script>
+        document.write('<div style="background: red; color: white; padding: 10px; margin: 10px; font-weight: bold;">JavaScript is running - timestamp: ' + new Date().toLocaleTimeString() + '</div>');
+    </script>
+    
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
     <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
+        <!-- Status indicators -->
+        <div id="status-indicator" style="background: blue; color: white; padding: 10px; margin: 10px;">
+            Status: HTML loaded, waiting for JavaScript initialization...
+        </div>
+        
         <div class="error-banner" id="errorBanner"></div>
         
         <h1 id="main-heading" class="section-title">Interactive Carousel Slides</h1>
@@ -177,6 +187,17 @@
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
+        
+        // Immediate status update
+        try {
+            const statusEl = document.getElementById('status-indicator');
+            if (statusEl) {
+                statusEl.innerHTML = 'Status: JavaScript started executing...';
+                statusEl.style.background = 'green';
+            }
+        } catch (e) {
+            console.error('Status update failed:', e);
+        }
 
         const moduleConfig = {
             name: 'Interactive Carousel',
@@ -254,23 +275,39 @@
             
             addToPage(type, message, className = '') {
                 // Add debug info to the page for visibility
-                let debugContainer = document.getElementById('debug-container');
-                if (!debugContainer) {
-                    debugContainer = document.createElement('div');
-                    debugContainer.id = 'debug-container';
-                    debugContainer.className = 'debug-container';
-                    document.body.appendChild(debugContainer);
-                }
-                
-                const logEntry = document.createElement('div');
-                logEntry.className = `debug-entry ${className}`;
-                logEntry.textContent = `${new Date().toLocaleTimeString()} [${type}] ${message}`;
-                debugContainer.appendChild(logEntry);
-                
-                // Limit to last 50 entries
-                const entries = debugContainer.children;
-                if (entries.length > 50) {
-                    debugContainer.removeChild(entries[0]);
+                try {
+                    const statusEl = document.getElementById('status-indicator');
+                    if (statusEl && type === 'ERROR') {
+                        statusEl.innerHTML = `Status: ERROR - ${message}`;
+                        statusEl.style.background = 'red';
+                    }
+                    
+                    let debugContainer = document.getElementById('debug-container');
+                    if (!debugContainer) {
+                        debugContainer = document.createElement('div');
+                        debugContainer.id = 'debug-container';
+                        debugContainer.className = 'debug-container';
+                        document.body.appendChild(debugContainer);
+                        
+                        // Update status
+                        if (statusEl) {
+                            statusEl.innerHTML = 'Status: Debug panel created...';
+                            statusEl.style.background = 'orange';
+                        }
+                    }
+                    
+                    const logEntry = document.createElement('div');
+                    logEntry.className = `debug-entry ${className}`;
+                    logEntry.textContent = `${new Date().toLocaleTimeString()} [${type}] ${message}`;
+                    debugContainer.appendChild(logEntry);
+                    
+                    // Limit to last 50 entries
+                    const entries = debugContainer.children;
+                    if (entries.length > 50) {
+                        debugContainer.removeChild(entries[0]);
+                    }
+                } catch (debugError) {
+                    console.error('Debug panel error:', debugError);
                 }
             }
         };
@@ -281,6 +318,17 @@
         Debug.log('Module initialization started');
         Debug.state();
         
+        // Update status
+        try {
+            const statusEl = document.getElementById('status-indicator');
+            if (statusEl) {
+                statusEl.innerHTML = 'Status: Debug system initialized...';
+                statusEl.style.background = 'purple';
+            }
+        } catch (e) {
+            console.error('Status update failed:', e);
+        }
+        
         // Monitor for CSP violations
         document.addEventListener('securitypolicyviolation', (e) => {
             Debug.error('CSP Violation detected:', {
@@ -290,6 +338,28 @@
                 line: e.lineNumber
             });
         });
+        
+        // Check if external scripts loaded
+        setTimeout(() => {
+            try {
+                const statusEl = document.getElementById('status-indicator');
+                if (typeof window.sfdc !== 'undefined') {
+                    Debug.log('✓ Salesforce SDK available');
+                    if (statusEl) {
+                        statusEl.innerHTML = 'Status: Salesforce SDK found...';
+                        statusEl.style.background = 'teal';
+                    }
+                } else {
+                    Debug.error('✗ Salesforce SDK not available');
+                    if (statusEl) {
+                        statusEl.innerHTML = 'Status: ERROR - Salesforce SDK not found';
+                        statusEl.style.background = 'red';
+                    }
+                }
+            } catch (e) {
+                Debug.error('SDK check failed:', e);
+            }
+        }, 1000);
         
         // Global error handler
         window.addEventListener('error', (e) => {
