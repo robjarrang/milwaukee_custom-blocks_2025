@@ -203,7 +203,6 @@
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
             safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } },
-            },
 
             // SDK operations with retry logic
             async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
