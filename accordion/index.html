@@ -354,31 +354,45 @@
 <style type="text/css">
 body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; max-width: 100%; height: auto; }
 input[type="checkbox"] { display: none !important; mso-hide: all !important; }
-@media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } .side { width: 20px !important; } .content-inner { width: calc(100% - 40px) !important; } }
+* { box-sizing: border-box; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; }
+@media screen and (max-width: 580px) { 
+    .content-outer { width: 100% !important; height: auto !important; } 
+    .side { width: 20px !important; } 
+    .content-inner { width: calc(100% - 40px) !important; }
+    .accordion-wrapper { width: 100% !important; max-width: none !important; }
+    .accordion-item { width: 100% !important; }
+    .accordion-title { font-size: 18px !important; padding: 15px 0 !important; }
+    .accordion-content-inner { font-size: 14px !important; }
+}
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .fallback { display: none !important; }
-    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
-    .accordion-item { border-bottom: 1px solid #000000; }
-    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; width: 100% !important; max-width: 580px !important; box-sizing: border-box !important; }
+    .accordion-item { border-bottom: 1px solid #000000; width: 100% !important; box-sizing: border-box !important; }
+    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; width: 100% !important; box-sizing: border-box !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
     .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
-    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; width: 100% !important; box-sizing: border-box !important; }
+    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; width: 100% !important; box-sizing: border-box !important; word-wrap: break-word !important; overflow-wrap: break-word !important; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
     input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
     input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
     input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; /* THE FIX: Override with the opening transition. */ transition: padding 0.5s ease-in; }
 }
+/* Additional email client specific rules */
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
 [class~="x_accordion-wrapper"] { display: none !important; }
 [class~="x_fallback"] { display: block !important; }
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
+/* Outlook specific width containment */
 @media screen yahoo {
     .fallback { display: block !important; max-height: none !important; }
     .accordion-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
 }
+/* Additional content safety rules */
+.accordion-wrapper * { max-width: 100% !important; box-sizing: border-box !important; }
+.accordion-content-inner * { max-width: 100% !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
 </style>
 <!--<![endif]-->
 <style type="text/css">
@@ -390,7 +404,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
     <td class="side" style="width: 20px;"> </td>
     <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
       <!--[if !mso]><!-->
-      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
+      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%; max-width: 100%; box-sizing: border-box;">
         ${interactiveItems}
       </div>
       <!--<![endif]-->
