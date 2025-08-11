@@ -65,88 +65,19 @@
         const elements = {};
         let rafId = null;
 
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        const DOMCache = {
-            cache: new Map(),
-            
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            
-            clear() {
-                this.cache.clear();
-            }
-        };
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const {
-                    maxRetries = 3,
-                    delay = 1000,
-                    backoff = 2,
-                    onRetry = () => {}
-                } = options;
-                
-                let lastError;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => 
-                                setTimeout(resolve, delay * Math.pow(backoff, i))
-                            );
-                        }
-                    }
-                }
-                
-                throw lastError;
-            }
-        };
-
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            
-            // SDK operations with retry logic
-            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-                return RetryableOperation.execute(
-                    operation,
-                    {
-                        maxRetries: 2,
-                        delay: 500,
-                        onRetry: (attempt, error) => {
-                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                        },
-                        ...options
-                    }
-                );
-            },
-            
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (_) { return false; } },
             getFieldValue(fieldName) { return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue; }
         };
 
         function cacheElements() {
-            elements.mainContainer = DOMCache.get('#mainContainer');
-            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-            elements.backgroundColorSelector = DOMCache.get('#backgroundColorSelector');
-            elements.imageUrl = DOMCache.get('#imageUrl');
-            elements.imageLink = DOMCache.get('#imageLink');
-            elements.imageAlt = DOMCache.get('#imageAlt');
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.imageUrl = document.getElementById('imageUrl');
+            elements.imageLink = document.getElementById('imageLink');
+            elements.imageAlt = document.getElementById('imageAlt');
         }
 
         function setLoadingState(loading) {
@@ -208,25 +139,13 @@
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(async () => {
+            rafId = requestAnimationFrame(() => {
                 try {
                     const html = generateTemplate();
-                    
-                    // Use retry logic for SDK operations
-                    await utils.performSDKOperation(
-                        () => new Promise((resolve, reject) => {
-                            try {
-                                state.sdk.setContent(html);
-                                state.sdk.setData({ ...state.blockData, content: html });
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        }),
-                        'preview update'
-                    );
+                    state.sdk.setContent(html);
+                    state.sdk.setData({ ...state.blockData, content: html });
                 } catch (error) {
-                    console.error(`Preview update failed after retries: ${error.message}`);
+                    console.error(`Preview update failed: ${error.message}`);
                 }
             });
         }
@@ -250,22 +169,7 @@
             if (!state.sdk) return console.error('SDK not available');
             setLoadingState(true);
 
-            utils.performSDKOperation(
-                () => new Promise((resolve, reject) => {
-                    state.sdk.getData((data) => {
-                        if (data === undefined && !state.sdk) {
-                            reject(new Error('Failed to load data - SDK unavailable'));
-                        } else {
-                            resolve(data);
-                        }
-                    });
-                }),
-                'initial data load',
-                {
-                    maxRetries: 3,
-                    delay: 1000
-                }
-            ).then(data => {
+            state.sdk.getData((data) => {
                 const newBlockData = {};
                 Object.keys(moduleConfig.fields).forEach(key => {
                     newBlockData[key] = (data && data[key] !== undefined) ? data[key] : moduleConfig.fields[key].defaultValue;
@@ -274,35 +178,8 @@
 
                 updateUIFromState();
                 refreshPreview();
-            }).catch(error => {
-                console.error('Failed to load data after multiple attempts:', error.message);
-                // Use default data if loading fails
-                const newBlockData = {};
-                Object.keys(moduleConfig.fields).forEach(key => {
-                    newBlockData[key] = moduleConfig.fields[key].defaultValue;
-                });
-                state.blockData = newBlockData;
-                updateUIFromState();
-                refreshPreview();
-            }).finally(() => {
                 setLoadingState(false);
             });
-        }
-
-        function cleanup() {
-            // Clean up event listeners
-            state.eventListeners.forEach(({ element, event, handler }) => { 
-                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
-            }); 
-            state.eventListeners = [];
-
-            // Cancel any pending RAF
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-
-            console.log('Full width image cleanup completed');
         }
 
         function initialize() {
@@ -314,38 +191,6 @@
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
-
-                // Add cleanup on page unload
-                window.addEventListener('beforeunload', cleanup);
-
-                // Add automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            console.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        console.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.sdk && !state.isLoading) {
-                            // Refresh preview to ensure sync
-                            refreshPreview();
-                            
-                            console.log('Operations resumed');
-                        }
-                    }
-                });
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);

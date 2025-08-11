@@ -4,23 +4,7 @@
     <meta charset="utf-8">
     <title>Interactive Hotspots Block</title>
     <style>
-        body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        
-        /* Enhanced validation styles */
-        .field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}
-        .field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}
-        .field-error.show{display:block}
-        
-        /* Validation icons */
-        .field-input-wrapper{position:relative}
-        .field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}
-        .field-input.error + .validation-icon.error{opacity:1;color:#dc3545}
-        
-        /* Real-time feedback animations */
-        .field-input{transition:all 0.3s ease}
-        .field-input.error{animation:shake 0.5s ease-in-out}
-        
-        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Visual Editor Styles */
         #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
         /* Tooltip Position Selector Styles */
@@ -34,30 +18,9 @@
         <h2 style="margin-top: 0; color: #333;">Hotspots Module</h2>
 
         <div class="section-title">Global Settings</div>
-        <div class="field-group">
-            <label for="backgroundImageUrl" class="field-label">Interactive Background Image URL</label>
-            <div class="field-input-wrapper">
-                <input type="url" id="backgroundImageUrl" class="field-input" placeholder="https://example.com/image.jpg" aria-describedby="backgroundImageUrl-error">
-                <span class="validation-icon error">✗</span>
-            </div>
-            <div class="field-error" id="backgroundImageUrl-error" role="alert"></div>
-        </div>
-        <div class="field-group">
-            <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
-            <div class="field-input-wrapper">
-                <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://example.com/fallback.jpg" aria-describedby="fallbackImageUrl-error">
-                <span class="validation-icon error">✗</span>
-            </div>
-            <div class="field-error" id="fallbackImageUrl-error" role="alert"></div>
-        </div>
-        <div class="field-group">
-            <label for="fallbackLinkUrl" class="field-label">Fallback Image Link URL</label>
-            <div class="field-input-wrapper">
-                <input type="url" id="fallbackLinkUrl" class="field-input" placeholder="https://example.com/link" aria-describedby="fallbackLinkUrl-error">
-                <span class="validation-icon error">✗</span>
-            </div>
-            <div class="field-error" id="fallbackLinkUrl-error" role="alert"></div>
-        </div>
+        <div class="field-group"><label for="backgroundImageUrl" class="field-label">Interactive Background Image URL</label><input type="url" id="backgroundImageUrl" class="field-input"></div>
+        <div class="field-group"><label for="fallbackImageUrl" class="field-label">Fallback Image URL</label><input type="url" id="fallbackImageUrl" class="field-input"></div>
+        <div class="field-group"><label for="fallbackLinkUrl" class="field-label">Fallback Image Link URL</label><input type="url" id="fallbackLinkUrl" class="field-input"></div>
 
         <div class="section-title">Visual Editor</div>
         <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
@@ -81,14 +44,7 @@
                     <button class="item-control-btn remove-btn" title="Remove Item">×</button>
                 </div>
             </div>
-            <div class="field-group">
-                <label class="field-label">Tooltip Text</label>
-                <div class="field-input-wrapper">
-                    <input type="text" class="field-input" data-field="text" placeholder="Enter tooltip text" maxlength="100" required aria-describedby="text-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="text-error" role="alert"></div>
-            </div>
+            <div class="field-group"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text"></div>
             <div class="field-group" style="margin-bottom:0;"><label class="field-label">Tooltip Position</label>
                 <div class="position-selector">
                     <button class="position-button" data-position="top-left"><div class="dot"></div></button>
@@ -129,180 +85,10 @@
 
         const state = { sdk: null, blockData: {}, selectedHotspotId: null };
         const elements = {};
-
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        const DOMCache = {
-            cache: new Map(),
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            clear() { this.cache.clear(); },
-            clearDynamic() {
-                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
-                    key.includes('.hotspot') || key.includes('[data-')
-                );
-                dynamicKeys.forEach(key => this.cache.delete(key));
-            }
-        };
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const { maxRetries = 3, delay = 1000, backoff = 2, onRetry = () => {} } = options;
-                let lastError;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(backoff, i)));
-                        }
-                    }
-                }
-                throw lastError;
-            }
-        };
-
-        // Enhanced validation utility
-        const Validator = {
-            rules: {
-                url: (value) => !value || utils.isValidUrl(value),
-                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-                number: (min, max) => (value) => {
-                    const num = parseFloat(value);
-                    return !isNaN(num) && num >= min && num <= max;
-                },
-                length: (max) => (value) => !value || value.length <= max,
-                required: (value) => value && value.trim().length > 0,
-                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
-                noHtml: (value) => !value || !/[<>]/.test(value)
-            },
-            
-            validateField(input, rules, errorElement = null) {
-                const isValid = rules.every(rule => rule(input.value));
-                
-                // Visual feedback
-                input.classList.toggle('error', !isValid);
-                
-                // Add aria-invalid for accessibility
-                input.setAttribute('aria-invalid', !isValid);
-                
-                // Show/hide error message if error element provided
-                if (errorElement) {
-                    errorElement.style.display = isValid ? 'none' : 'block';
-                    if (!isValid) {
-                        errorElement.textContent = this.getErrorMessage(input, rules);
-                    }
-                }
-                
-                return isValid;
-            },
-            
-            getErrorMessage(input, rules) {
-                const value = input.value;
-                
-                if (rules.includes(this.rules.required) && !value.trim()) {
-                    return 'This field is required';
-                }
-                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
-                    return 'Please enter a valid URL (http:// or https://)';
-                }
-                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
-                    return 'Please enter a valid email address';
-                }
-                if (rules.some(rule => rule.toString().includes('length')) && value.length > 0) {
-                    const maxLength = input.getAttribute('maxlength') || '100';
-                    return `Maximum ${maxLength} characters allowed`;
-                }
-                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
-                    return 'HTML tags are not allowed';
-                }
-                
-                return 'Invalid input';
-            },
-            
-            // Real-time validation setup
-            setupRealTimeValidation(input, rules, errorElement = null) {
-                const validateInput = () => {
-                    return this.validateField(input, rules, errorElement);
-                };
-                
-                // Validate on input (immediate feedback)
-                input.addEventListener('input', validateInput);
-                
-                // Validate on blur (final check)
-                input.addEventListener('blur', validateInput);
-                
-                // Initial validation if field has value
-                if (input.value) {
-                    validateInput();
-                }
-                
-                return validateInput;
-            },
-            
-            // Validate all form fields
-            validateAll(container = document) {
-                const inputs = container.querySelectorAll('.field-input[data-field]');
-                let allValid = true;
-                
-                inputs.forEach(input => {
-                    const rules = [];
-                    
-                    // Add rules based on input attributes and type
-                    if (input.hasAttribute('required') || input.dataset.field === 'text') {
-                        rules.push(this.rules.required);
-                    }
-                    if (input.type === 'url') {
-                        rules.push(this.rules.url);
-                    }
-                    if (input.type === 'email') {
-                        rules.push(this.rules.email);
-                    }
-                    if (input.hasAttribute('maxlength')) {
-                        const max = parseInt(input.getAttribute('maxlength'));
-                        rules.push(this.rules.length(max));
-                    }
-                    
-                    // Always check for HTML
-                    rules.push(this.rules.noHtml);
-                    
-                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
-                    const isValid = this.validateField(input, rules, errorElement);
-                    
-                    if (!isValid) {
-                        allValid = false;
-                    }
-                });
-                
-                return allValid;
-            }
-        };
-
         let rafId = null;
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; },
-            isValidUrl(url) {
-                if (!url) return true; // Empty URL is considered valid (optional field)
-                try {
-                    const urlObj = new URL(url);
-                    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
-                } catch {
-                    return false;
-                }
-            }
+            getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; }
         };
 
         function cacheElements() {
@@ -328,31 +114,10 @@
         }
 
         const updateStateFromUI = utils.debounce(() => {
-            // Validate all form fields before updating
-            const isFormValid = Validator.validateAll(elements.itemsContainer);
-            
-            // Validate global fields
-            const globalFields = [
-                { element: elements.backgroundImageUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackImageUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackLinkUrl, rules: [Validator.rules.url] }
-            ];
-            
-            let globalValid = true;
-            globalFields.forEach(({ element, rules }) => {
-                const errorElement = element.closest('.field-group')?.querySelector('.field-error');
-                if (!Validator.validateField(element, rules, errorElement)) {
-                    globalValid = false;
-                }
-            });
-            
-            // Only update if valid
-            if (isFormValid && globalValid) {
-                state.blockData.backgroundImageUrl = elements.backgroundImageUrl.value;
-                state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
-                state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
-                refreshPreview();
-            }
+            state.blockData.backgroundImageUrl = elements.backgroundImageUrl.value;
+            state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
+            state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
+            refreshPreview();
         }, moduleConfig.debounceDelay);
 
         function updateUI() {
@@ -369,33 +134,7 @@
                 el.dataset.id = hotspot.id;
                 el.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
                 el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
-                
-                const textInput = el.querySelector('[data-field="text"]');
-                const textError = el.querySelector('.field-error');
-                textInput.value = hotspot.text;
-
-                // Set up validation for text input
-                const validationRules = [
-                    Validator.rules.length(100),
-                    Validator.rules.noHtml,
-                    Validator.rules.required
-                ];
-
-                // Setup real-time validation
-                Validator.setupRealTimeValidation(textInput, validationRules, textError);
-
-                // Enhanced input handler with validation
-                const handleTextInput = (e) => {
-                    const isValid = Validator.validateField(e.target, validationRules, textError);
-                    
-                    // Only update data if valid
-                    if (isValid) {
-                        updateHotspotData();
-                    }
-                };
-
-                textInput.addEventListener('input', handleTextInput);
-                textInput.addEventListener('blur', handleTextInput);
+                el.querySelector('[data-field="text"]').value = hotspot.text;
 
                 const posButton = el.querySelector(`.position-button[data-position="${hotspot.tooltipPosition}"]`);
                 if (posButton) posButton.classList.add('selected');
@@ -486,17 +225,8 @@
         }
 
         function initializeEventHandlers() {
-            // Set up validation for global fields
-            const globalFields = [
-                { element: elements.backgroundImageUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackImageUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackLinkUrl, rules: [Validator.rules.url] }
-            ];
-            
-            globalFields.forEach(({ element, rules }) => {
-                const errorElement = element.closest('.field-group')?.querySelector('.field-error');
-                Validator.setupRealTimeValidation(element, rules, errorElement);
-                element.addEventListener('input', updateStateFromUI);
+            [elements.backgroundImageUrl, elements.fallbackImageUrl, elements.fallbackLinkUrl].forEach(input => {
+                input.addEventListener('input', updateStateFromUI);
             });
 
             elements.addItemBtn.addEventListener('click', createHotspotDelegatedHandler(hotspotActions));
@@ -662,26 +392,6 @@
             });
         }
 
-        // Enhanced cleanup function
-        function cleanup() {
-            // Clean up event listeners
-            state.eventListeners.forEach(({ element, event, handler }) => { 
-                if (element && element.removeEventListener) element.removeEventListener(event, handler); 
-            }); 
-            state.eventListeners = [];
-
-            // Cancel any pending RAF
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-
-            // Clear DOM cache
-            DOMCache.clear();
-
-            console.log('Hotspots cleanup completed');
-        }
-
         function initialize() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
@@ -691,45 +401,6 @@
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
-
-                // Add cleanup on page unload
-                window.addEventListener('beforeunload', cleanup);
-
-                // Add automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Clear caches to free memory
-                        DOMCache.clear();
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            console.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        console.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.sdk && !state.isLoading) {
-                            // Recache elements after clearing
-                            cacheElements();
-                            
-                            // Refresh preview to ensure sync
-                            refreshPreview();
-                            
-                            console.log('Operations resumed');
-                        }
-                    }
-                });
-                
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);

@@ -6,7 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}.field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}.field-error.show{display:block}.field-input-wrapper{position:relative}.field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}.field-input.error + .validation-icon.error{opacity:1;color:#dc3545}.field-input{transition:all 0.3s ease}.field-input.error{animation:shake 0.5s ease-in-out}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}.preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}.preview-note{background:#f0f8ff;border:1px solid #cce5ff;color:#004085;padding:10px;margin-bottom:15px;border-radius:4px;font-size:13px}
 
         /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
         .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
@@ -29,27 +29,17 @@
             <div class="section-title">Product Settings</div>
             <div class="field-group">
                 <label for="productImage" class="field-label">Product Image URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" id="productImage" class="field-input" placeholder="https://example.com/product-image.jpg" aria-describedby="productImage-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="productImage-error" role="alert"></div>
+                <input type="url" id="productImage" class="field-input" placeholder="https://example.com/product-image.jpg">
+                <div class="field-error" id="productImageError">Please enter a valid image URL (http:// or https://)</div>
             </div>
             <div class="field-group">
                 <label for="productImageAlt" class="field-label">Product Image Alt Text</label>
-                <div class="field-input-wrapper">
-                    <input type="text" id="productImageAlt" class="field-input" placeholder="Product name or description" maxlength="100" aria-describedby="productImageAlt-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="productImageAlt-error" role="alert"></div>
+                <input type="text" id="productImageAlt" class="field-input" placeholder="Product name or description">
             </div>
             <div class="field-group">
                 <label for="productUrl" class="field-label">Product Link URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" id="productUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/product-page" aria-describedby="productUrl-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="productUrl-error" role="alert"></div>
+                <input type="url" id="productUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/product-page">
+                <div class="field-error" id="productUrlError">Please enter a valid URL (http:// or https://)</div>
             </div>
         </div>
 
@@ -65,11 +55,7 @@
             </div>
             <div class="field-group" id="subtitleGroup">
                 <label for="subtitle" class="field-label">Subtitle</label>
-                <div class="field-input-wrapper">
-                    <input type="text" id="subtitle" class="field-input" placeholder="M12 FHAC16-502X" maxlength="50" aria-describedby="subtitle-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="subtitle-error" role="alert"></div>
+                <input type="text" id="subtitle" class="field-input" placeholder="M12 FHAC16-502X">
                  <!-- NEW: Subtitle Font Size Control -->
                 <div class="field-group-inline">
                     <label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label>
@@ -100,19 +86,12 @@
             <div id="buttonFieldsGroup">
                 <div class="field-group">
                     <label for="buttonText" class="field-label">Button Text</label>
-                    <div class="field-input-wrapper">
-                        <input type="text" id="buttonText" class="field-input" placeholder="Learn More" maxlength="25" aria-describedby="buttonText-error">
-                        <span class="validation-icon error">✗</span>
-                    </div>
-                    <div class="field-error" id="buttonText-error" role="alert"></div>
+                    <input type="text" id="buttonText" class="field-input" placeholder="Learn More">
                 </div>
                 <div class="field-group">
                     <label for="buttonUrl" class="field-label">Button Link URL</label>
-                    <div class="field-input-wrapper">
-                        <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/" aria-describedby="buttonUrl-error">
-                        <span class="validation-icon error">✗</span>
-                    </div>
-                    <div class="field-error" id="buttonUrl-error" role="alert"></div>
+                    <input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                    <div class="field-error" id="buttonUrlError">Please enter a valid URL (http:// or https://)</div>
                 </div>
             </div>
         </div>
@@ -157,187 +136,6 @@
         const elements = {};
         let rafId = null;
 
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        // This pattern improves performance by caching DOM element references
-        const DOMCache = {
-            cache: new Map(),
-            
-            // Get a single element by selector
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            
-            // Get all elements by selector
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            
-            // Clear all cached elements
-            clear() {
-                this.cache.clear();
-            },
-            
-            // Clear cache for dynamic content that changes frequently
-            clearDynamic() {
-                // Clear cache entries for dynamic selectors that might change
-                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
-                    key.includes('.field-') || key.includes('[data-')
-                );
-                dynamicKeys.forEach(key => this.cache.delete(key));
-            }
-        };
-
-        // Advanced memory management
-        const editorMetadata = new WeakMap();
-        const cleanupRegistry = new FinalizationRegistry((heldValue) => {
-            console.log('Cleanup registry triggered for editor:', heldValue);
-        });
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const {
-                    maxRetries = 3,
-                    delay = 1000,
-                    backoff = 2,
-                    onRetry = () => {}
-                } = options;
-                
-                let lastError;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => 
-                                setTimeout(resolve, delay * Math.pow(backoff, i))
-                            );
-                        }
-                    }
-                }
-                
-                throw lastError;
-            }
-        };
-
-        // Enhanced validation utility
-        const Validator = {
-            rules: {
-                url: (value) => !value || utils.isValidUrl(value),
-                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-                number: (min, max) => (value) => {
-                    const num = parseFloat(value);
-                    return !isNaN(num) && num >= min && num <= max;
-                },
-                length: (max) => (value) => !value || value.length <= max,
-                required: (value) => value && value.trim().length > 0,
-                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
-                noHtml: (value) => !value || !/[<>]/.test(value)
-            },
-            
-            validateField(input, rules, errorElement = null) {
-                const isValid = rules.every(rule => rule(input.value));
-                
-                // Visual feedback
-                input.classList.toggle('error', !isValid);
-                input.setAttribute('aria-invalid', !isValid);
-                
-                // Show/hide error message if error element provided
-                if (errorElement) {
-                    errorElement.classList.toggle('show', !isValid);
-                    if (!isValid) {
-                        errorElement.textContent = this.getErrorMessage(input, rules);
-                    }
-                }
-                
-                return isValid;
-            },
-            
-            getErrorMessage(input, rules) {
-                const value = input.value;
-                
-                if (rules.includes(this.rules.required) && !value.trim()) {
-                    return 'This field is required';
-                }
-                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
-                    return 'Please enter a valid URL (http:// or https://)';
-                }
-                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
-                    return 'Please enter a valid email address';
-                }
-                if (rules.some(rule => rule.toString().includes('length')) && value.length > 0) {
-                    const maxLength = input.getAttribute('maxlength') || '100';
-                    return `Maximum ${maxLength} characters allowed`;
-                }
-                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
-                    return 'HTML tags are not allowed';
-                }
-                
-                return 'Invalid input';
-            },
-            
-            // Real-time validation setup
-            setupRealTimeValidation(input, rules, errorElement = null) {
-                const validateInput = () => {
-                    return this.validateField(input, rules, errorElement);
-                };
-                
-                input.addEventListener('input', validateInput);
-                input.addEventListener('blur', validateInput);
-                
-                if (input.value) {
-                    validateInput();
-                }
-                
-                return validateInput;
-            },
-            
-            // Validate all form fields
-            validateAll(container = document) {
-                const inputs = container.querySelectorAll('.field-input');
-                let allValid = true;
-                
-                inputs.forEach(input => {
-                    const rules = [];
-                    
-                    // Add rules based on input attributes and type
-                    if (input.hasAttribute('required')) {
-                        rules.push(this.rules.required);
-                    }
-                    if (input.type === 'url') {
-                        rules.push(this.rules.url);
-                    }
-                    if (input.type === 'email') {
-                        rules.push(this.rules.email);
-                    }
-                    if (input.hasAttribute('maxlength')) {
-                        const max = parseInt(input.getAttribute('maxlength'));
-                        rules.push(this.rules.length(max));
-                    }
-                    
-                    rules.push(this.rules.noHtml);
-                    
-                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
-                    const isValid = this.validateField(input, rules, errorElement);
-                    
-                    if (!isValid) {
-                        allValid = false;
-                    }
-                });
-                
-                return allValid;
-            }
-        };
-
         const utils = {
             debounce(func, wait) {
                 let timeout;
@@ -376,22 +174,6 @@
                 }
                 console.error('Product Feature Error:', message);
             },
-
-            // SDK operations with retry logic
-            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-                return RetryableOperation.execute(
-                    operation,
-                    {
-                        maxRetries: 2,
-                        delay: 500,
-                        onRetry: (attempt, error) => {
-                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                        },
-                        ...options
-                    }
-                );
-            },
-
             getFieldValue(fieldName) {
                 const value = state.blockData[fieldName];
                 const fieldConfig = moduleConfig.fields[fieldName];
@@ -403,29 +185,25 @@
         };
 
         function cacheElements() {
-            // Use DOMCache for better performance
-            elements.mainContainer = DOMCache.get('#mainContainer');
-            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-            elements.errorBanner = DOMCache.get('#errorBanner');
-            elements.productImage = DOMCache.get('#productImage');
-            elements.productImageError = DOMCache.get('#productImage-error');
-            elements.productImageAlt = DOMCache.get('#productImageAlt');
-            elements.productImageAltError = DOMCache.get('#productImageAlt-error');
-            elements.productUrl = DOMCache.get('#productUrl');
-            elements.productUrlError = DOMCache.get('#productUrl-error');
-            elements.showSubtitle = DOMCache.get('#showSubtitle');
-            elements.subtitle = DOMCache.get('#subtitle');
-            elements.subtitleError = DOMCache.get('#subtitle-error');
-            elements.subtitleGroup = DOMCache.get('#subtitleGroup');
-            elements.subtitleFontSize = DOMCache.get('#subtitleFontSize'); // NEW
-            elements.productTitleEditor = DOMCache.get('#productTitleEditor');
-            elements.productTitleFontSize = DOMCache.get('#productTitleFontSize'); // NEW
-            elements.showButton = DOMCache.get('#showButton');
-            elements.buttonFieldsGroup = DOMCache.get('#buttonFieldsGroup');
-            elements.buttonText = DOMCache.get('#buttonText');
-            elements.buttonTextError = DOMCache.get('#buttonText-error');
-            elements.buttonUrl = DOMCache.get('#buttonUrl');
-            elements.buttonUrlError = DOMCache.get('#buttonUrl-error');
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.productImage = document.getElementById('productImage');
+            elements.productImageError = document.getElementById('productImageError');
+            elements.productImageAlt = document.getElementById('productImageAlt');
+            elements.productUrl = document.getElementById('productUrl');
+            elements.productUrlError = document.getElementById('productUrlError');
+            elements.showSubtitle = document.getElementById('showSubtitle');
+            elements.subtitle = document.getElementById('subtitle');
+            elements.subtitleGroup = document.getElementById('subtitleGroup');
+            elements.subtitleFontSize = document.getElementById('subtitleFontSize'); // NEW
+            elements.productTitleEditor = document.getElementById('productTitleEditor');
+            elements.productTitleFontSize = document.getElementById('productTitleFontSize'); // NEW
+            elements.showButton = document.getElementById('showButton');
+            elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
+            elements.buttonText = document.getElementById('buttonText');
+            elements.buttonUrl = document.getElementById('buttonUrl');
+            elements.buttonUrlError = document.getElementById('buttonUrlError');
         }
 
         function setLoadingState(loading) {
@@ -497,28 +275,15 @@
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(async () => {
+            rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try {
                     const html = generateTemplate();
-                    
-                    // Use retry logic for SDK operations
-                    await utils.performSDKOperation(
-                        () => new Promise((resolve, reject) => {
-                            try {
-                                state.sdk.setContent(html);
-                                if (typeof state.sdk.setData === 'function') {
-                                    state.sdk.setData({ ...state.blockData, content: html });
-                                }
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        }),
-                        'preview update'
-                    );
+                    state.sdk.setContent(html);
+                    if (typeof state.sdk.setData === 'function') {
+                        state.sdk.setData({ ...state.blockData, content: html });
+                    }
                 } catch (error) { 
-                    console.error(`Preview update failed after retries: ${error.message}`);
                     utils.showError(`Preview update failed: ${error.message}`); 
                 }
             });
@@ -535,48 +300,27 @@
         function initializeEventHandlers() {
             state.eventListeners = []; // Clear previous listeners
 
-            // Enhanced input handler with validation
+            // Reusable input handler
             function setupInputHandler(element, dataKey, maxLength, isUrl = false, errorElement = null) {
-                const rules = [];
-                
-                // Add validation rules based on input type
-                if (isUrl) {
-                    rules.push(Validator.rules.url);
-                }
-                if (maxLength) {
-                    rules.push(Validator.rules.length(maxLength));
-                }
-                rules.push(Validator.rules.noHtml);
-                
-                // Setup real-time validation
-                Validator.setupRealTimeValidation(element, rules, errorElement);
-                
                 const handler = (e) => {
                     let value = e.target.value;
                     if (maxLength) value = value.substring(0, maxLength);
                     e.target.value = value;
-                    
-                    // Validate the input
-                    const isValid = Validator.validateField(element, rules, errorElement);
-                    
-                    // Only update data if valid
-                    if (isValid) {
-                        debouncedUpdateData(dataKey, value.trim());
-                    }
+                    if (isUrl && !validateUrlInput(element, errorElement)) return;
+                    debouncedUpdateData(dataKey, value.trim());
                 };
-                
+                const blurHandler = isUrl ? () => validateUrlInput(element, errorElement) : null;
                 element.addEventListener('input', handler);
-                element.addEventListener('blur', handler);
+                if(isUrl && blurHandler) element.addEventListener('blur', blurHandler);
                 state.eventListeners.push({ element, event: 'input', handler });
-                state.eventListeners.push({ element, event: 'blur', handler });
+                if(blurHandler) state.eventListeners.push({ element, event: 'blur', handler: blurHandler });
             }
 
-            // Setup validation for all inputs
             setupInputHandler(elements.productImage, 'productImage', null, true, elements.productImageError);
-            setupInputHandler(elements.productImageAlt, 'productImageAlt', moduleConfig.fields.productImageAlt.maxLength, false, elements.productImageAltError);
+            setupInputHandler(elements.productImageAlt, 'productImageAlt', moduleConfig.fields.productImageAlt.maxLength);
             setupInputHandler(elements.productUrl, 'productUrl', null, true, elements.productUrlError);
-            setupInputHandler(elements.subtitle, 'subtitle', moduleConfig.fields.subtitle.maxLength, false, elements.subtitleError);
-            setupInputHandler(elements.buttonText, 'buttonText', moduleConfig.fields.buttonText.maxLength, false, elements.buttonTextError);
+            setupInputHandler(elements.subtitle, 'subtitle', moduleConfig.fields.subtitle.maxLength);
+            setupInputHandler(elements.buttonText, 'buttonText', moduleConfig.fields.buttonText.maxLength);
             setupInputHandler(elements.buttonUrl, 'buttonUrl', null, true, elements.buttonUrlError);
 
             // Toggle handlers
@@ -622,90 +366,73 @@
             // --- END: ROBUST NUMBER INPUT HANDLER ---
         }
 
-        async function loadData() {
+        function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') {
                 return utils.showError('SDK not available');
             }
             setLoadingState(true);
 
-            try {
-                // Use retry logic for data loading
-                const data = await utils.performSDKOperation(
-                    () => new Promise((resolve, reject) => {
-                        state.sdk.getData((data) => {
-                            if (data === undefined && !state.sdk) {
-                                reject(new Error('Failed to load data - SDK unavailable'));
-                            } else {
-                                resolve(data);
-                            }
-                        });
-                    }),
-                    'data loading',
-                    {
-                        maxRetries: 3,
-                        delay: 1000
-                    }
-                );
-
-                state.blockData = {}; // Reset block data
-                const fields = moduleConfig.fields;
-                Object.keys(fields).forEach(key => {
-                    if (data && data.hasOwnProperty(key)) {
-                        state.blockData[key] = (fields[key].type === 'richtext') ? utils.sanitizeHtml(data[key]) : data[key];
-                    } else {
-                        state.blockData[key] = fields[key].defaultValue;
-                    }
-                });
-
-                // Update UI from data
-                if (elements.productImage) elements.productImage.value = utils.getFieldValue('productImage');
-                if (elements.productImageAlt) elements.productImageAlt.value = utils.getFieldValue('productImageAlt');
-                if (elements.productUrl) elements.productUrl.value = utils.getFieldValue('productUrl');
-                if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
-                if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize'); // NEW
-                if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
-                if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
-                if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-
-                // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
-                if (state.editors.productTitle) {
-                    const content = utils.getFieldValue('productTitle');
-                    try {
-                        // Clear existing content first
-                        state.editors.productTitle.setContents([]);
-                        // Use the new clipboard API to paste HTML content
-                        if (content && content.trim()) {
-                            state.editors.productTitle.clipboard.dangerouslyPasteHTML(content);
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData = {}; // Reset block data
+                    const fields = moduleConfig.fields;
+                    Object.keys(fields).forEach(key => {
+                        if (data && data.hasOwnProperty(key)) {
+                            state.blockData[key] = (fields[key].type === 'richtext') ? utils.sanitizeHtml(data[key]) : data[key];
+                        } else {
+                            state.blockData[key] = fields[key].defaultValue;
                         }
-                    } catch (error) {
-                        // Fallback to root innerHTML for compatibility
-                        console.warn(`Using fallback method for productTitle editor:`, error);
-                        state.editors.productTitle.root.innerHTML = content || '';
+                    });
+
+                    // Update UI from data
+                    if (elements.productImage) elements.productImage.value = utils.getFieldValue('productImage');
+                    if (elements.productImageAlt) elements.productImageAlt.value = utils.getFieldValue('productImageAlt');
+                    if (elements.productUrl) elements.productUrl.value = utils.getFieldValue('productUrl');
+                    if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
+                    if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize'); // NEW
+                    if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
+                    if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
+                    if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
+
+                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                    if (state.editors.productTitle) {
+                        const content = utils.getFieldValue('productTitle');
+                        try {
+                            // Clear existing content first
+                            state.editors.productTitle.setContents([]);
+                            // Use the new clipboard API to paste HTML content
+                            if (content && content.trim()) {
+                                state.editors.productTitle.clipboard.dangerouslyPasteHTML(content);
+                            }
+                        } catch (error) {
+                            // Fallback to root innerHTML for compatibility
+                            console.warn(`Using fallback method for productTitle editor:`, error);
+                            state.editors.productTitle.root.innerHTML = content || '';
+                        }
                     }
+
+                    const showSubtitle = utils.getFieldValue('showSubtitle');
+                    if (elements.showSubtitle) elements.showSubtitle.checked = showSubtitle;
+                    if (elements.subtitleGroup) elements.subtitleGroup.classList.toggle('disabled-field', !showSubtitle);
+
+                    const showButton = utils.getFieldValue('showButton');
+                    if (elements.showButton) elements.showButton.checked = showButton;
+                    if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
+
+                    refreshPreview();
+                    state.retryCount = 0;
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
+                    refreshPreview();
+                } finally {
+                    setLoadingState(false);
                 }
-
-                const showSubtitle = utils.getFieldValue('showSubtitle');
-                if (elements.showSubtitle) elements.showSubtitle.checked = showSubtitle;
-                if (elements.subtitleGroup) elements.subtitleGroup.classList.toggle('disabled-field', !showSubtitle);
-
-                const showButton = utils.getFieldValue('showButton');
-                if (elements.showButton) elements.showButton.checked = showButton;
-                if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
-
-                refreshPreview();
-                state.retryCount = 0;
-            } catch (error) {
-                console.error('Failed to load data after multiple attempts:', error.message);
-                utils.showError(`Failed to load data: ${error.message}`);
-                Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue);
-                refreshPreview();
-            } finally {
-                setLoadingState(false);
-            }
+            });
         }
 
         function cleanup() {
-            // Updated cleanup for Quill 2.0 with memory management
+            // Updated cleanup for Quill 2.0
             if (state.editors.productTitle && state.editors.productTitle.off) {
                 state.editors.productTitle.off('text-change');
             }
@@ -713,17 +440,6 @@
                 if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler);
             });
             state.eventListeners = [];
-
-            // Cancel any pending RAF
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-
-            // Clear DOM cache
-            DOMCache.clear();
-
-            console.log('Product feature cleanup completed');
         }
 
         function initializeWithRetry() {
@@ -740,45 +456,8 @@
                 loadData();
 
                 window.addEventListener('beforeunload', cleanup);
-                
-                // Enhanced automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Clear caches to free memory
-                        DOMCache.clear();
-                        
-                        // Perform memory cleanup if editorMetadata exists
-                        if (typeof editorMetadata !== 'undefined') {
-                            console.log('Visibility cleanup - clearing editor metadata');
-                        }
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            console.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        console.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.isInitialized) {
-                            // Recache elements after clearing
-                            cacheElements();
-                            
-                            // Reload data to ensure sync
-                            loadData();
-                            
-                            console.log('Operations resumed');
-                        }
-                    }
+                document.addEventListener('visibilitychange', () => { 
+                    if (!document.hidden && state.isInitialized) loadData(); 
                 });
 
                 state.isInitialized = true;

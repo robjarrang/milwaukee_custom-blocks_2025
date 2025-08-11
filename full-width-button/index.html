@@ -79,63 +79,13 @@
             blockData: {}, 
             isLoading: false, 
             isInitialized: false, 
-            eventListeners: []
+            eventListeners: [], 
+            retryCount: 0 
         };
         const elements = {};
         let rafId = null;
 
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        const DOMCache = {
-            cache: new Map(),
-            
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            
-            clear() {
-                this.cache.clear();
-            }
-        };
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const {
-                    maxRetries = 3,
-                    delay = 1000,
-                    backoff = 2,
-                    onRetry = () => {}
-                } = options;
-                
-                let lastError;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => 
-                                setTimeout(resolve, delay * Math.pow(backoff, i))
-                            );
-                        }
-                    }
-                }
-                
-                throw lastError;
-            }
-        };        const utils = {
+        const utils = {
             debounce(func, wait) {
                 let timeout;
                 return function executedFunction(...args) {
@@ -144,22 +94,6 @@
                     timeout = setTimeout(later, wait);
                 };
             },
-            
-            // SDK operations with retry logic
-            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-                return RetryableOperation.execute(
-                    operation,
-                    {
-                        maxRetries: 2,
-                        delay: 500,
-                        onRetry: (attempt, error) => {
-                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                        },
-                        ...options
-                    }
-                );
-            },
-            
             isValidUrl(string) {
                 if (!string || string.trim() === '') return true;
                 try {
@@ -181,7 +115,7 @@
                 return temp.innerHTML;
             },
             showError(message, permanent = false) {
-                const errorBanner = DOMCache.get('#errorBanner');
+                const errorBanner = elements.errorBanner;
                 if (errorBanner) {
                     errorBanner.textContent = message;
                     errorBanner.classList.add('show');
@@ -195,14 +129,14 @@
         };
 
         function cacheElements() {
-            elements.mainContainer = DOMCache.get('#mainContainer');
-            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-            elements.errorBanner = DOMCache.get('#errorBanner');
-            elements.backgroundColorSelector = DOMCache.get('#backgroundColorSelector');
-            elements.buttonTextEditor = DOMCache.get('#buttonTextEditor');
-            elements.buttonUrl = DOMCache.get('#buttonUrl');
-            elements.buttonUrlError = DOMCache.get('#buttonUrlError');
-            elements.buttonAlignmentSelector = DOMCache.get('#buttonAlignmentSelector');
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.buttonTextEditor = document.getElementById('buttonTextEditor');
+            elements.buttonUrl = document.getElementById('buttonUrl');
+            elements.buttonUrlError = document.getElementById('buttonUrlError');
+            elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
         }
 
         function setLoadingState(loading) {
@@ -316,28 +250,21 @@
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(async () => {
+            rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try {
                     const html = generateTemplate();
 
-                    // Use retry logic for SDK operations
-                    await utils.performSDKOperation(
-                        () => new Promise((resolve, reject) => {
-                            try {
-                                state.sdk.setContent(html);
-                                if (state.sdk.setData) {
-                                    state.sdk.setData({ ...state.blockData, content: html });
-                                }
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        }),
-                        'preview update'
-                    );
+                    // Updates the view in the editor
+                    state.sdk.setContent(html);
+
+                    // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
+                    // The key MUST be 'content', not 'html'.
+                    if (state.sdk.setData) {
+                        state.sdk.setData({ ...state.blockData, content: html });
+                    }
                 } catch (error) {
-                    utils.showError(`Preview update failed after retries: ${error.message}`);
+                    utils.showError(`Preview update failed: ${error.message}`);
                 }
             });
         }
@@ -388,22 +315,7 @@
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
 
-            utils.performSDKOperation(
-                () => new Promise((resolve, reject) => {
-                    state.sdk.getData((data) => {
-                        if (data === undefined && !state.sdk) {
-                            reject(new Error('Failed to load data - SDK unavailable'));
-                        } else {
-                            resolve(data);
-                        }
-                    });
-                }),
-                'initial data load',
-                {
-                    maxRetries: 3,
-                    delay: 1000
-                }
-            ).then(data => {
+            state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
                     if (data && Object.keys(data).length > 0) {
@@ -447,23 +359,15 @@
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
-                    utils.showError(`Failed to process data: ${error.message}`);
+                    utils.showError(`Failed to load data: ${error.message}`);
                     Object.keys(moduleConfig.fields).forEach(key => { 
                         state.blockData[key] = moduleConfig.fields[key].defaultValue; 
                     });
                     refreshPreview();
+                } finally {
+                    setLoadingState(false);
                 }
-            }).catch(error => {
-                console.error('Failed to load data after multiple attempts:', error.message);
-                // Use default data if loading fails
-                Object.keys(moduleConfig.fields).forEach(key => { 
-                    state.blockData[key] = moduleConfig.fields[key].defaultValue; 
-                });
-                refreshPreview();
-            }).finally(() => {
-                setLoadingState(false);
             });
-        }
         }
 
         function cleanup() {
@@ -472,15 +376,6 @@
                 if (element && element.removeEventListener) element.removeEventListener(event, handler);
             });
             state.eventListeners = [];
-            
-            // Cancel any pending RAF
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-            
-            // Clear DOM cache
-            DOMCache.clear();
         }
 
         function initializeWithRetry() {

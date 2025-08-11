@@ -11,109 +11,38 @@
         /* Quill-specific styles */
         .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
         .field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}
-        
-        /* Enhanced validation styles */
-        .field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}
-        .field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}
-        .field-error.show{display:block}
-        
-        /* Validation icons */
-        .field-input-wrapper{position:relative}
-        .field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}
-        .field-input.error + .validation-icon.error{opacity:1;color:#dc3545}
-        
-        /* Real-time feedback animations */
-        .field-input{transition:all 0.3s ease}
-        .field-input.error{animation:shake 0.5s ease-in-out}
-        
-                @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-        
-        .item:focus {
-            outline: 2px solid #0074d9;
-            outline-offset: 2px;
-        }
-        
-        .item-control-btn:focus {
-            outline: 2px solid #0074d9;
-            outline-offset: 1px;
-        }
-        
-        /* Screen reader only content - MUST be last to override any conflicts */
-        .sr-only,
-        #sr-announcer {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-        }
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-    <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
-        <h1 id="main-heading" class="section-title">Accordion Items</h1>
+    <div class="container" id="mainContainer">
+        <div class="section-title">Accordion Items</div>
         <div id="itemsContainer" class="items-container">
             <!-- Accordion items will be dynamically inserted here -->
         </div>
-        <button id="addItemBtn" class="btn add-item-btn" aria-describedby="add-item-help">Add New Item</button>
-        <div id="add-item-help" class="sr-only">Adds a new accordion item to the end of the list</div>
+        <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
     </div>
 
     <!-- Template for a single accordion item's UI -->
     <template id="itemTemplate">
-        <div class="item" role="group" aria-labelledby="item-title" tabindex="0">
+        <div class="item">
             <div class="item-header">
-                <h3 class="item-title" id="item-title">Item</h3>
-                <div class="item-controls" role="toolbar" aria-label="Item controls">
-                    <button class="item-control-btn move-up-btn" type="button" aria-label="Move item up">
-                        <span aria-hidden="true">▲</span>
-                        <span class="sr-only">Move up</span>
-                    </button>
-                    <button class="item-control-btn move-down-btn" type="button" aria-label="Move item down">
-                        <span aria-hidden="true">▼</span>
-                        <span class="sr-only">Move down</span>
-                    </button>
-                    <button class="item-control-btn remove-btn" type="button" aria-label="Remove item">
-                        <span aria-hidden="true">×</span>
-                        <span class="sr-only">Remove</span>
-                    </button>
+                <h3 class="item-title">Item</h3>
+                <div class="item-controls">
+                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
                 </div>
             </div>
             <div class="field-group">
-                <label class="field-label" for="title-input">Title</label>
-                <div class="field-input-wrapper">
-                    <input type="text" 
-                           id="title-input"
-                           class="field-input" 
-                           data-field="title" 
-                           placeholder="ACCORDION ITEM TITLE" 
-                           maxlength="100" 
-                           aria-describedby="title-error title-help"
-                           aria-required="true"
-                           aria-invalid="false">
-                    <span class="validation-icon error" aria-hidden="true">✗</span>
-                </div>
-                <div id="title-help" class="sr-only">Enter a descriptive title for this accordion section</div>
-                <div class="field-error" id="title-error" role="alert" aria-live="polite"></div>
+                <label class="field-label">Title</label>
+                <input type="text" class="field-input" data-field="title" placeholder="ACCORDION ITEM TITLE">
             </div>
             <div class="field-group">
-                <label class="field-label" for="content-editor">Content</label>
+                <label class="field-label">Content</label>
                 <!-- This div will be replaced by the Quill editor -->
-                <div class="quill-container limited-toolbar" 
-                     id="content-editor"
-                     role="textbox" 
-                     aria-label="Rich text content editor"
-                     aria-multiline="true"
-                     aria-describedby="content-help"></div>
-                <div id="content-help" class="sr-only">Use this editor to add formatted content for the accordion section</div>
+                <div class="quill-container limited-toolbar"></div>
             </div>
         </div>
     </template>
@@ -143,429 +72,11 @@
         const state = { sdk: null, editors: {}, blockData: {}, eventListeners: [] };
         const elements = {};
 
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        // This pattern improves performance by caching DOM element references
-        const DOMCache = {
-            cache: new Map(),
-            
-            // Get a single element by selector
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            
-            // Get all elements by selector
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            
-            // Get elements within a specific container (useful for scoped queries)
-            getInContainer(container, selector) {
-                const cacheKey = `container_${selector}`;
-                if (!this.cache.has(cacheKey)) {
-                    this.cache.set(cacheKey, container.querySelector(selector));
-                }
-                return this.cache.get(cacheKey);
-            },
-            
-            getAllInContainer(container, selector) {
-                const cacheKey = `container_${selector}_all`;
-                if (!this.cache.has(cacheKey)) {
-                    this.cache.set(cacheKey, container.querySelectorAll(selector));
-                }
-                return this.cache.get(cacheKey);
-            },
-            
-            // Clear all cached elements
-            clear() {
-                this.cache.clear();
-            },
-            
-            // Clear cache for dynamic content that changes frequently
-            clearDynamic() {
-                // Clear cache entries for dynamic selectors that might change
-                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
-                    key.includes('.item') || key.includes('[data-field]') || key.includes('container_')
-                );
-                dynamicKeys.forEach(key => this.cache.delete(key));
-            }
-        };
-
-        // Enhanced memory management with weak references
+        // Advanced memory management
+        const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
-            EditorManager.cleanup();
         });
-
-        // Lazy loading utility for performance optimization
-        const LazyLoader = {
-            observer: null,
-            pendingElements: new Map(),
-            
-            init() {
-                if (!window.IntersectionObserver) {
-                    console.warn('IntersectionObserver not supported, falling back to immediate initialization');
-                    return false;
-                }
-                
-                this.observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const target = entry.target;
-                            const loader = target.dataset.lazyLoad;
-                            
-                            if (loader && typeof window[loader] === 'function') {
-                                console.log(`Lazy loading: ${loader} for element`, target);
-                                window[loader](target);
-                                this.observer.unobserve(target);
-                                this.pendingElements.delete(target);
-                            }
-                        }
-                    });
-                }, {
-                    rootMargin: '50px',
-                    threshold: 0.1
-                });
-                
-                console.log('LazyLoader initialized with IntersectionObserver');
-                return true;
-            },
-            
-            observe(element, loaderFunction = null) {
-                if (!this.observer) {
-                    console.warn('LazyLoader not initialized, falling back to immediate execution');
-                    if (loaderFunction) {
-                        loaderFunction(element);
-                    }
-                    return;
-                }
-                
-                if (loaderFunction) {
-                    element.dataset.lazyLoad = loaderFunction.name;
-                    window[loaderFunction.name] = loaderFunction;
-                }
-                
-                this.pendingElements.set(element, {
-                    loader: element.dataset.lazyLoad,
-                    timestamp: Date.now()
-                });
-                
-                this.observer.observe(element);
-                console.log(`Element added to lazy loading queue:`, element.dataset.lazyLoad);
-            },
-            
-            unobserve(element) {
-                if (this.observer) {
-                    this.observer.unobserve(element);
-                    this.pendingElements.delete(element);
-                }
-            },
-            
-            disconnect() {
-                if (this.observer) {
-                    this.observer.disconnect();
-                    this.pendingElements.clear();
-                    console.log('LazyLoader disconnected');
-                }
-            },
-            
-            getStats() {
-                return {
-                    supported: Boolean(this.observer),
-                    pending: this.pendingElements.size,
-                    elements: Array.from(this.pendingElements.keys()).map(el => ({
-                        loader: el.dataset.lazyLoad,
-                        tagName: el.tagName,
-                        className: el.className
-                    }))
-                };
-            },
-            
-            // Force load all pending elements (fallback)
-            forceLoadAll() {
-                const elements = Array.from(this.pendingElements.keys());
-                elements.forEach(element => {
-                    const loader = element.dataset.lazyLoad;
-                    if (loader && typeof window[loader] === 'function') {
-                        window[loader](element);
-                        this.unobserve(element);
-                    }
-                });
-                console.log(`Force loaded ${elements.length} pending elements`);
-                return elements.length;
-            }
-        };
-
-        // Enhanced memory management for editors
-        const EditorManager = {
-            editors: new WeakMap(),
-            references: new Map(),
-            metadata: new Map(),
-            lazyQueue: new Map(),
-            
-            register(id, editor, metadata = {}) {
-                const ref = new WeakRef(editor);
-                this.references.set(id, ref);
-                this.editors.set(editor, {
-                    id,
-                    ...metadata,
-                    created: Date.now(),
-                    lastAccessed: Date.now()
-                });
-                this.metadata.set(id, {
-                    id,
-                    ...metadata,
-                    created: Date.now(),
-                    element: metadata.container
-                });
-                
-                // Register for cleanup
-                cleanupRegistry.register(editor, id);
-                
-                console.log(`Editor ${id} registered with enhanced memory management`);
-                return ref;
-            },
-            
-            get(id) {
-                const ref = this.references.get(id);
-                if (ref) {
-                    const editor = ref.deref();
-                    if (editor) {
-                        // Update last accessed time
-                        const editorData = this.editors.get(editor);
-                        if (editorData) {
-                            editorData.lastAccessed = Date.now();
-                        }
-                        return editor;
-                    } else {
-                        // Editor was garbage collected
-                        console.log(`Editor ${id} was garbage collected`);
-                        this.references.delete(id);
-                        this.metadata.delete(id);
-                    }
-                }
-                return null;
-            },
-            
-            has(id) {
-                const ref = this.references.get(id);
-                return ref && ref.deref() !== undefined;
-            },
-            
-            delete(id) {
-                const ref = this.references.get(id);
-                if (ref) {
-                    const editor = ref.deref();
-                    if (editor) {
-                        this.editors.delete(editor);
-                    }
-                }
-                this.references.delete(id);
-                this.metadata.delete(id);
-                console.log(`Editor ${id} removed from memory management`);
-            },
-            
-            cleanup() {
-                // Clean up dead references
-                let cleaned = 0;
-                for (const [id, ref] of this.references) {
-                    if (!ref.deref()) {
-                        this.references.delete(id);
-                        this.metadata.delete(id);
-                        cleaned++;
-                    }
-                }
-                if (cleaned > 0) {
-                    console.log(`Cleaned up ${cleaned} dead editor references`);
-                }
-                return cleaned;
-            },
-            
-            getStats() {
-                const alive = Array.from(this.references.values())
-                    .filter(ref => ref.deref()).length;
-                return {
-                    total: this.references.size,
-                    alive,
-                    dead: this.references.size - alive,
-                    metadata: this.metadata.size
-                };
-            },
-            
-            // Force cleanup of old editors (older than threshold)
-            cleanupOld(threshold = 5 * 60 * 1000) { // 5 minutes default
-                const now = Date.now();
-                let cleaned = 0;
-                
-                for (const [id, ref] of this.references) {
-                    const editor = ref.deref();
-                    if (editor) {
-                        const editorData = this.editors.get(editor);
-                        if (editorData && (now - editorData.lastAccessed) > threshold) {
-                            // Clean up old unused editor
-                            this.delete(id);
-                            cleaned++;
-                        }
-                    }
-                }
-                
-                if (cleaned > 0) {
-                    console.log(`Cleaned up ${cleaned} old unused editors`);
-                }
-                return cleaned;
-            }
-        };
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const {
-                    maxRetries = 3,
-                    delay = 1000,
-                    backoff = 2,
-                    onRetry = () => {}
-                } = options;
-                
-                let lastError;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => 
-                                setTimeout(resolve, delay * Math.pow(backoff, i))
-                            );
-                        }
-                    }
-                }
-                
-                throw lastError;
-            }
-        };
-
-        // Enhanced validation utility
-        const Validator = {
-            rules: {
-                url: (value) => !value || utils.isValidUrl(value),
-                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-                number: (min, max) => (value) => {
-                    const num = parseFloat(value);
-                    return !isNaN(num) && num >= min && num <= max;
-                },
-                length: (max) => (value) => !value || value.length <= max,
-                required: (value) => value && value.trim().length > 0,
-                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
-                noHtml: (value) => !value || !/[<>]/.test(value)
-            },
-            
-            validateField(input, rules, errorElement = null) {
-                const isValid = rules.every(rule => rule(input.value));
-                
-                // Visual feedback
-                input.classList.toggle('error', !isValid);
-                
-                // Add aria-invalid for accessibility
-                input.setAttribute('aria-invalid', !isValid);
-                
-                // Show/hide error message if error element provided
-                if (errorElement) {
-                    errorElement.classList.toggle('show', !isValid);
-                    if (!isValid) {
-                        errorElement.textContent = this.getErrorMessage(input, rules);
-                    }
-                }
-                
-                return isValid;
-            },
-            
-            getErrorMessage(input, rules) {
-                const value = input.value;
-                
-                if (rules.includes(this.rules.required) && !value.trim()) {
-                    return 'This field is required';
-                }
-                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
-                    return 'Please enter a valid URL (http:// or https://)';
-                }
-                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
-                    return 'Please enter a valid email address';
-                }
-                if (rules.some(rule => rule.toString().includes('length')) && value.length > 0) {
-                    const maxLength = input.getAttribute('maxlength') || '100';
-                    return `Maximum ${maxLength} characters allowed`;
-                }
-                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
-                    return 'HTML tags are not allowed';
-                }
-                
-                return 'Invalid input';
-            },
-            
-            // Real-time validation setup
-            setupRealTimeValidation(input, rules, errorElement = null) {
-                const validateInput = () => {
-                    return this.validateField(input, rules, errorElement);
-                };
-                
-                // Validate on input (immediate feedback)
-                input.addEventListener('input', validateInput);
-                
-                // Validate on blur (final check)
-                input.addEventListener('blur', validateInput);
-                
-                // Initial validation if field has value
-                if (input.value) {
-                    validateInput();
-                }
-                
-                return validateInput;
-            },
-            
-            // Validate all form fields
-            validateAll(container = document) {
-                const inputs = container.querySelectorAll('.field-input[data-field]');
-                let allValid = true;
-                
-                inputs.forEach(input => {
-                    const rules = [];
-                    
-                    // Add rules based on input attributes and type
-                    if (input.hasAttribute('required') || input.dataset.field === 'title') {
-                        rules.push(this.rules.required);
-                    }
-                    if (input.type === 'url') {
-                        rules.push(this.rules.url);
-                    }
-                    if (input.type === 'email') {
-                        rules.push(this.rules.email);
-                    }
-                    if (input.hasAttribute('maxlength')) {
-                        const max = parseInt(input.getAttribute('maxlength'));
-                        rules.push(this.rules.length(max));
-                    }
-                    
-                    // Always check for HTML
-                    rules.push(this.rules.noHtml);
-                    
-                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
-                    const isValid = this.validateField(input, rules, errorElement);
-                    
-                    if (!isValid) {
-                        allValid = false;
-                    }
-                });
-                
-                return allValid;
-            }
-        };
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
@@ -586,33 +97,22 @@
                 return temp.innerHTML.replace(/<p><br><\/p>/g, '').replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             },
 
-            // SDK operations with retry logic
-            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-                return RetryableOperation.execute(
-                    operation,
-                    {
-                        maxRetries: 2,
-                        delay: 500,
-                        onRetry: (attempt, error) => {
-                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                        },
-                        ...options
-                    }
-                );
-            },
-
             createEditor(container, id, content = '') {
                 // Create editor using shared configuration
                 const editor = new Quill(container, QuillConfigManager.createConfig('basic', {
                     placeholder: 'Enter content here...'
                 }));
 
-                // Register with enhanced memory management
-                EditorManager.register(id, editor, {
+                // Track editor metadata
+                const metadata = {
+                    id,
+                    created: Date.now(),
                     container,
-                    hasContent: Boolean(content && content.trim()),
-                    type: 'accordion-item'
-                });
+                    hasContent: Boolean(content && content.trim())
+                };
+
+                editorMetadata.set(editor, metadata);
+                cleanupRegistry.register(editor, id);
 
                 // Set content if provided
                 if (content && content.trim()) {
@@ -623,10 +123,10 @@
             },
 
             cleanupEditor(id) {
-                const editor = EditorManager.get(id);
+                const editor = state.editors[id];
                 if (editor) {
                     // Get metadata before cleanup
-                    const metadata = EditorManager.metadata.get(id);
+                    const metadata = editorMetadata.get(editor);
 
                     // Clean up event listeners
                     if (editor.off) {
@@ -640,79 +140,18 @@
                         hadListeners: Boolean(editor.off)
                     });
 
-                    // Remove from enhanced memory management
-                    EditorManager.delete(id);
+                    // Remove from state
+                    delete state.editors[id];
                 }
-
-                // Also remove from legacy state (backward compatibility)
-                delete state.editors[id];
-            },
-
-            // Get editor with memory management
-            getEditor(id) {
-                // Try enhanced memory management first
-                const editor = EditorManager.get(id);
-                if (editor) {
-                    return editor;
-                }
-                
-                // Fallback to legacy state
-                return state.editors[id] || null;
-            },
-
-            // Memory management utilities
-            getMemoryStats() {
-                return {
-                    editorManager: EditorManager.getStats(),
-                    legacyEditors: Object.keys(state.editors).length
-                };
-            },
-
-            performMemoryCleanup() {
-                const deadRefs = EditorManager.cleanup();
-                const oldEditors = EditorManager.cleanupOld();
-                
-                console.log('Memory cleanup completed:', {
-                    deadReferences: deadRefs,
-                    oldEditors: oldEditors,
-                    stats: this.getMemoryStats()
-                });
-                
-                return { deadRefs, oldEditors };
-            },
-
-            // Screen reader announcement utility
-            announceToScreenReader(message) {
-                let announcer = document.getElementById('sr-announcer');
-                if (!announcer) {
-                    announcer = document.createElement('div');
-                    announcer.id = 'sr-announcer';
-                    announcer.setAttribute('aria-live', 'polite');
-                    announcer.setAttribute('aria-atomic', 'true');
-                    announcer.className = 'sr-only';
-                    document.body.appendChild(announcer);
-                }
-                
-                // Clear and announce
-                announcer.textContent = '';
-                setTimeout(() => {
-                    announcer.textContent = message;
-                }, 100);
             }
         };
 
-        // Make announceToScreenReader globally available
-        function announceToScreenReader(message) {
-            return utils.announceToScreenReader(message);
-        }
-
         function cacheElements() {
-            // Use DOMCache for main container elements
-            elements.mainContainer = DOMCache.get('#mainContainer');
-            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-            elements.itemsContainer = DOMCache.get('#itemsContainer');
-            elements.addItemBtn = DOMCache.get('#addItemBtn');
-            elements.itemTemplate = DOMCache.get('#itemTemplate');
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
         }
 
         function setLoadingState(loading) {
@@ -721,88 +160,38 @@
         }
 
         const updateDataFromUI = utils.debounce(() => {
-            // Validate all fields before updating
-            const isFormValid = Validator.validateAll(elements.itemsContainer);
-            
             const newItems = [];
-            // Clear dynamic cache before querying for fresh results
-            DOMCache.clearDynamic();
-            const itemElements = DOMCache.getAll('.item');
-            
+            const itemElements = elements.itemsContainer.querySelectorAll('.item');
             itemElements.forEach(el => {
                 const id = el.dataset.id;
-                const editor = utils.getEditor(id);
+                const editor = state.editors[id];
                 if (editor) {
                     const content = editor.getSemanticHTML ? 
                         editor.getSemanticHTML() : 
                         editor.root.innerHTML;
-                    
-                    // Use cached query within the element
-                    const titleInput = el.querySelector('[data-field="title"]');
-                    
-                    // Only include valid items
-                    if (titleInput.value.trim() && !titleInput.classList.contains('error')) {
-                        newItems.push({
-                            id: id,
-                            title: titleInput.value,
-                            content: utils.sanitizeHtml(content)
-                        });
-                    }
+                    newItems.push({
+                        id: id,
+                        title: el.querySelector('[data-field="title"]').value,
+                        content: utils.sanitizeHtml(content)
+                    });
                 }
             });
-            
-            // Only update if we have valid data and form is valid
-            if (isFormValid && newItems.length > 0) {
-                state.blockData.accordionItems = newItems;
-                refreshPreview();
-            } else if (newItems.length === 0) {
-                // Show empty state but don't break functionality
-                state.blockData.accordionItems = [];
-                refreshPreview();
-            }
+            state.blockData.accordionItems = newItems;
+            refreshPreview();
         }, moduleConfig.debounceDelay);
         let rafId = null;
         function renderItemsUI() {
             const items = utils.getFieldValue('accordionItems');
 
-            // Clean up existing editors first using enhanced memory management
+            // Clean up existing editors first
             const currentIds = new Set(items.map(i => i.id));
-            
-            // Clean up editors not in current items
-            for (const [id] of EditorManager.references) {
-                if (!currentIds.has(id)) {
-                    utils.cleanupEditor(id);
-                }
-            }
-            
-            // Also clean legacy editors for backward compatibility
             Object.keys(state.editors).forEach(id => {
                 if (!currentIds.has(id)) {
                     utils.cleanupEditor(id);
                 }
             });
 
-            // Clear dynamic cache before rendering new items
-            DOMCache.clearDynamic();
-
-            // Enhanced accessibility for dynamic content
-            const container = elements.itemsContainer;
-            
-            // Add ARIA live region and accessibility attributes
-            container.setAttribute('role', 'list');
-            container.setAttribute('aria-label', 'Editable accordion items list');
-            container.setAttribute('aria-live', 'polite');
-            container.setAttribute('aria-describedby', 'accordion-help');
-            
-                // Add hidden help text for screen readers
-                let helpText = document.getElementById('accordion-help');
-                if (!helpText) {
-                    helpText = document.createElement('div');
-                    helpText.id = 'accordion-help';
-                    helpText.className = 'sr-only';
-                    helpText.textContent = 'Use arrow keys to navigate, Enter to edit, and control buttons to reorder or remove items';
-                    container.parentNode.insertBefore(helpText, container);
-                }            // Use DocumentFragment for batch DOM operations
+            // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
 
             items.forEach((item, index) => {
@@ -811,170 +200,37 @@
                 const editorDiv = itemFragment.querySelector('.quill-container');
 
                 el.dataset.id = item.id;
-                
-                // Enhanced accessibility for each item
-                el.setAttribute('role', 'listitem');
-                el.setAttribute('aria-label', `Accordion item ${index + 1} of ${items.length}: ${item.title || 'Untitled'}`);
-                el.setAttribute('tabindex', '0');
-                el.setAttribute('aria-describedby', `item-${item.id}-description`);
-                
-                // Add description for screen readers
-                const description = document.createElement('div');
-                description.id = `item-${item.id}-description`;
-                description.className = 'sr-only';
-                description.textContent = `Contains title input and rich text content editor`;
-                el.appendChild(description);
-                
-                // Cache queries within the item element
-                const itemTitle = el.querySelector('.item-title');
-                const titleInput = el.querySelector('[data-field="title"]');
-                const titleError = el.querySelector('.field-error');
-                const moveUpBtn = el.querySelector('.move-up-btn');
-                const moveDownBtn = el.querySelector('.move-down-btn');
-                const removeBtn = el.querySelector('.remove-btn');
-                
-                itemTitle.textContent = `Item ${index + 1}`;
-                titleInput.value = item.title || '';
-                
-                // Enhanced accessibility for form controls
-                titleInput.setAttribute('aria-label', `Title for accordion item ${index + 1}`);
-                titleInput.setAttribute('aria-required', 'true');
-                
-                // Enhanced accessibility for control buttons
-                moveUpBtn.disabled = (index === 0);
-                moveDownBtn.disabled = (index === items.length - 1);
-                
-                moveUpBtn.setAttribute('aria-label', `Move "${item.title || 'Untitled'}" item up. Currently item ${index + 1} of ${items.length}`);
-                moveDownBtn.setAttribute('aria-label', `Move "${item.title || 'Untitled'}" item down. Currently item ${index + 1} of ${items.length}`);
-                removeBtn.setAttribute('aria-label', `Remove "${item.title || 'Untitled'}" item. This action cannot be undone`);
-                
-                // Add keyboard navigation support
-                el.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        titleInput.focus();
-                    } else if (e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        const nextItem = el.nextElementSibling;
-                        if (nextItem) nextItem.focus();
-                    } else if (e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        const prevItem = el.previousElementSibling;
-                        if (prevItem) prevItem.focus();
-                    }
-                });
+                el.querySelector('.item-title').textContent = `Item ${index + 1}`;
+                el.querySelector('[data-field="title"]').value = item.title || '';
 
-                // Set up validation for title input
-                const validationRules = [
-                    Validator.rules.length(100),
-                    Validator.rules.noHtml,
-                    Validator.rules.required
-                ];
-
-                // Setup real-time validation
-                Validator.setupRealTimeValidation(titleInput, validationRules, titleError);
-
-                // Enhanced input handler with validation
-                const handleTitleInput = (e) => {
-                    const isValid = Validator.validateField(e.target, validationRules, titleError);
-                    
-                    // Update ARIA labels with current title
-                    const currentTitle = e.target.value || 'Untitled';
-                    el.setAttribute('aria-label', `Accordion item ${index + 1} of ${items.length}: ${currentTitle}`);
-                    moveUpBtn.setAttribute('aria-label', `Move "${currentTitle}" item up. Currently item ${index + 1} of ${items.length}`);
-                    moveDownBtn.setAttribute('aria-label', `Move "${currentTitle}" item down. Currently item ${index + 1} of ${items.length}`);
-                    removeBtn.setAttribute('aria-label', `Remove "${currentTitle}" item. This action cannot be undone`);
-                    
-                    // Only update data if valid
-                    if (isValid) {
-                        updateDataFromUI();
-                    }
-                };
-
-                titleInput.addEventListener('input', handleTitleInput);
-                titleInput.addEventListener('blur', handleTitleInput);
-
-                // Enhanced accessibility for editor container
-                editorDiv.setAttribute('role', 'textbox');
-                editorDiv.setAttribute('aria-label', `Content editor for accordion item ${index + 1}`);
-                editorDiv.setAttribute('aria-multiline', 'true');
+                el.querySelector('.move-up-btn').disabled = (index === 0);
+                el.querySelector('.move-down-btn').disabled = (index === items.length - 1);
 
                 fragment.appendChild(itemFragment);
 
-                // Create editor with enhanced memory management
+                // Create editor with memory management
                 const editor = utils.createEditor(editorDiv, item.id, item.content);
                 editor.on('text-change', updateDataFromUI);
-                
-                // Keep legacy reference for backward compatibility
                 state.editors[item.id] = editor;
             });
 
             // Single DOM update
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
-            
-            // Announce changes to screen readers
-            const announcement = `Accordion updated. Now showing ${items.length} item${items.length === 1 ? '' : 's'}.`;
-            announceToScreenReader(announcement);
-            
-            // Perform periodic memory cleanup
-            utils.performMemoryCleanup();
         }
 
-        // Enhanced accessibility utility for screen reader announcements
-        function announceToScreenReader(message, priority = 'polite') {
-            // Create or get existing announcement region
-            let announcer = document.getElementById('accessibility-announcer');
-            if (!announcer) {
-                announcer = document.createElement('div');
-                announcer.id = 'accessibility-announcer';
-                announcer.setAttribute('aria-live', priority);
-                announcer.setAttribute('aria-atomic', 'true');
-                announcer.className = 'sr-only';
-                document.body.appendChild(announcer);
-            }
-            
-            // Clear and set new message
-            announcer.textContent = '';
-            setTimeout(() => {
-                announcer.textContent = message;
-            }, 100);
-        }
-
-        // Enhanced accessibility for add button
-        function enhanceAddButtonAccessibility() {
-            const addBtn = elements.addItemBtn;
-            if (addBtn) {
-                addBtn.setAttribute('aria-label', 'Add new accordion item');
-                addBtn.setAttribute('aria-describedby', 'add-btn-help');
-                
-                // Add hidden help text
-                let helpText = document.getElementById('add-btn-help');
-                if (!helpText) {
-                    helpText = document.createElement('div');
-                    helpText.id = 'add-btn-help';
-                    helpText.className = 'sr-only';
-                    helpText.textContent = 'Adds a new accordion item with title and content fields to the end of the list';
-                    addBtn.parentNode.insertBefore(helpText, addBtn.nextSibling);
-                }
-            }
-        }
+        // Optimized Event Delegation with Action Maps
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
-                const itemTitle = item.title || 'Untitled';
                 items.splice(index, 1);
                 if (context.hasQuill && item.id) {
                     utils.cleanupEditor(item.id);
                 }
-                // Announce removal to screen readers
-                announceToScreenReader(`Removed accordion item "${itemTitle}". ${items.length} item${items.length === 1 ? '' : 's'} remaining.`);
                 return true;
             },
             '.move-up-btn': (item, index, items) => {
                 if (index > 0) {
                     [items[index], items[index - 1]] = [items[index - 1], items[index]];
-                    const itemTitle = item.title || 'Untitled';
-                    announceToScreenReader(`Moved "${itemTitle}" up. Now in position ${index}.`);
                     return true;
                 }
                 return false;
@@ -982,8 +238,6 @@
             '.move-down-btn': (item, index, items) => {
                 if (index < items.length - 1) {
                     [items[index], items[index + 1]] = [items[index + 1], items[index]];
-                    const itemTitle = item.title || 'Untitled';
-                    announceToScreenReader(`Moved "${itemTitle}" down. Now in position ${index + 2}.`);
                     return true;
                 }
                 return false;
@@ -991,34 +245,19 @@
             '.duplicate-btn': (item, index, items) => {
                 const newItem = { ...item, id: crypto.randomUUID() };
                 items.splice(index + 1, 0, newItem);
-                const itemTitle = item.title || 'Untitled';
-                announceToScreenReader(`Duplicated "${itemTitle}". New item added in position ${index + 2}.`);
                 return true;
             }
         };
 
         function createDelegatedHandler(fieldName, actionMap) {
             return (event) => {
-                // Handle add button clicks using cached element
+                // Handle add button clicks
                 if (event.target.closest('#addItemBtn')) {
                     const currentItems = utils.getFieldValue(fieldName);
                     const newItems = [...currentItems, { id: crypto.randomUUID(), title: 'NEW TITLE', content: 'New content...' }];
                     state.blockData[fieldName] = newItems;
-                    
-                    // Announce addition to screen readers
-                    announceToScreenReader(`Added new accordion item. Now ${newItems.length} item${newItems.length === 1 ? '' : 's'} total.`);
-                    
                     renderItemsUI();
                     updateDataFromUI();
-                    
-                    // Focus the new item's title input for immediate editing
-                    setTimeout(() => {
-                        const newItemInput = elements.itemsContainer.querySelector('.item:last-child [data-field="title"]');
-                        if (newItemInput) {
-                            newItemInput.focus();
-                            newItemInput.select();
-                        }
-                    }, 100);
                     return;
                 }
 
@@ -1066,17 +305,20 @@
             elements.itemsContainer.addEventListener('click', accordionHandler);
             state.eventListeners.push({ element: elements.itemsContainer, event: 'click', handler: accordionHandler });
 
-            // Enhanced accessibility setup
-            enhanceAddButtonAccessibility();
-            
-            // Add keyboard navigation for main container
-            const mainContainer = elements.mainContainer;
-            if (mainContainer) {
-                mainContainer.setAttribute('role', 'application');
-                mainContainer.setAttribute('aria-label', 'Accordion editor interface');
-            }
-
-            // Note: Input validation is now handled in renderItemsUI for each individual input
+            elements.itemsContainer.addEventListener('input', e => {
+                if(e.target.matches('[data-field="title"]')) {
+                    updateDataFromUI();
+                }
+            });
+            state.eventListeners.push({ 
+                element: elements.itemsContainer, 
+                event: 'input', 
+                handler: (e) => {
+                    if(e.target.matches('[data-field="title"]')) {
+                        updateDataFromUI();
+                    }
+                }
+            });
         }
 
         function generateTemplate() {
@@ -1117,12 +359,12 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 @media screen and (max-width: 580px) { .content-outer { width: 100% !important; height: auto !important; } .side { width: 20px !important; } .content-inner { width: calc(100% - 40px) !important; } }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .fallback { display: none !important; }
-    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; width: 100% !important; max-width: 580px !important; }
-    .accordion-item { border-bottom: 1px solid #000000; width: 100% !important; box-sizing: border-box !important; }
-    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; width: 100% !important; box-sizing: border-box !important; }
+    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; }
+    .accordion-item { border-bottom: 1px solid #000000; }
+    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
     .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; width: 100% !important; box-sizing: border-box !important; }
-    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; width: 100% !important; box-sizing: border-box !important; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; }
+    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
     input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
     input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
     input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; /* THE FIX: Override with the opening transition. */ transition: padding 0.5s ease-in; }
@@ -1166,38 +408,21 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(async () => {
+            rafId = requestAnimationFrame(() => {
                 if (!state.sdk) return;
                 try {
                     const html = generateTemplate();
-                    
-                    // Use retry logic for SDK operations
-                    await utils.performSDKOperation(
-                        () => new Promise((resolve, reject) => {
-                            try {
-                                state.sdk.setContent(html);
-                                state.sdk.setData({ ...state.blockData, content: html });
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        }),
-                        'preview update'
-                    );
+                    state.sdk.setContent(html);
+                    state.sdk.setData({ ...state.blockData, content: html });
                 } catch (error) {
-                    console.error(`Preview update failed after retries: ${error.message}`);
+                    console.error(`Preview update failed: ${error.message}`);
                 }
             });
         }
 
-        // Enhanced cleanup function with advanced memory management
+        // Enhanced cleanup function with memory management
         function cleanup() {
             // Enhanced cleanup with memory management
-            for (const [id] of EditorManager.references) {
-                utils.cleanupEditor(id);
-            }
-            
-            // Legacy cleanup for backward compatibility
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
@@ -1214,14 +439,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                 rafId = null;
             }
 
-            // Clear DOM cache
-            DOMCache.clear();
-
-            // Final memory cleanup
-            EditorManager.cleanup();
-            
-            console.log('Accordion cleanup completed with enhanced memory management');
-            console.log('Final memory stats:', utils.getMemoryStats());
+            console.log('Accordion cleanup completed');
         }
 
         function initialize() {
@@ -1236,95 +454,16 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
                 initializeEventHandlers();
                 setLoadingState(true);
 
-                // Use retry logic for initial data loading
-                utils.performSDKOperation(
-                    () => new Promise((resolve, reject) => {
-                        state.sdk.getData((data) => {
-                            if (data === undefined && !state.sdk) {
-                                reject(new Error('Failed to load data - SDK unavailable'));
-                            } else {
-                                resolve(data);
-                            }
-                        });
-                    }),
-                    'initial data load',
-                    {
-                        maxRetries: 3,
-                        delay: 1000
-                    }
-                ).then(data => {
-                    state.blockData.accordionItems = (data && data.accordionItems && data.accordionItems.length > 0) ? 
-                        data.accordionItems : utils.getFieldValue('accordionItems');
-                    state.blockData.accordionItems.forEach(item => { 
-                        if (!item.id) item.id = crypto.randomUUID(); 
-                    });
+                state.sdk.getData((data) => {
+                    state.blockData.accordionItems = (data && data.accordionItems && data.accordionItems.length > 0) ? data.accordionItems : utils.getFieldValue('accordionItems');
+                    state.blockData.accordionItems.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
                     renderItemsUI();
                     refreshPreview();
-                }).catch(error => {
-                    console.error('Failed to load data after multiple attempts:', error.message);
-                    // Use default data if loading fails
-                    state.blockData.accordionItems = utils.getFieldValue('accordionItems');
-                    state.blockData.accordionItems.forEach(item => { 
-                        if (!item.id) item.id = crypto.randomUUID(); 
-                    });
-                    renderItemsUI();
-                    refreshPreview();
-                }).finally(() => {
                     setLoadingState(false);
-                    
-                    // Set up periodic memory cleanup (every 2 minutes)
-                    const memoryCleanupInterval = setInterval(() => {
-                        utils.performMemoryCleanup();
-                    }, 2 * 60 * 1000); // 2 minutes
-                    
-                    // Clean up interval on page unload
-                    window.addEventListener('beforeunload', () => {
-                        clearInterval(memoryCleanupInterval);
-                        cleanup();
-                    });
                 });
 
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
-
-                // Add automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Clear caches to free memory
-                        DOMCache.clear();
-                        
-                        // Perform memory cleanup
-                        const cleanupStats = utils.performMemoryCleanup();
-                        console.log('Visibility cleanup stats:', cleanupStats);
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            console.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        console.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.isInitialized && !elements.mainContainer.classList.contains('loading')) {
-                            // Recache elements after clearing
-                            cacheElements();
-                            
-                            // Refresh preview to ensure sync
-                            refreshPreview();
-                            
-                            console.log('Operations resumed, memory stats:', utils.getMemoryStats());
-                        }
-                    }
-                });
             } catch (error) {
                 console.error(`Initialization failed: ${error.message}`);
                 setLoadingState(false);

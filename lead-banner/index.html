@@ -6,27 +6,11 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:80px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
         .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
         .field-group-inline .field-label { margin-bottom: 0; }
         .field-group-inline .field-input { width: 80px; }
         .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
-        
-        /* Enhanced validation styles */
-        .field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}
-        .field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}
-        .field-error.show{display:block}
-        
-        /* Validation icons */
-        .field-input-wrapper{position:relative}
-        .field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}
-        .field-input.error + .validation-icon.error{opacity:1;color:#dc3545}
-        
-        /* Real-time feedback animations */
-        .field-input{transition:all 0.3s ease}
-        .field-input.error{animation:shake 0.5s ease-in-out}
-        
-        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
     </style>
 </head>
 <body>
@@ -38,14 +22,7 @@
 
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
-            <div class="field-group">
-                <label for="backgroundImage" class="field-label">Background Image URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg" aria-describedby="backgroundImage-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="backgroundImage-error" role="alert"></div>
-            </div>
+            <div class="field-group"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
         </div>
 
         <div class="section-divider">
@@ -56,14 +33,7 @@
 
             <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="field-group-inline"><label for="titleFontSize" class="field-label">Title Font Size (px)</label><input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4"></div></div>
             <div class="field-group"><label class="field-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
-            <div class="field-group">
-                <label for="contentUrl" class="field-label">Content Link URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/" aria-describedby="contentUrl-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="contentUrl-error" role="alert"></div>
-            </div>
+            <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
         </div>
     </div>
 
@@ -100,259 +70,13 @@
             retryCount: 0 
         };
         const elements = {};
-
-        // Enhanced memory management with weak references
-        const cleanupRegistry = new FinalizationRegistry((heldValue) => {
-            console.log('Cleanup registry triggered for editor:', heldValue);
-            EditorManager.cleanup();
-        });
-
-        // Enhanced memory management for editors
-        const EditorManager = {
-            editors: new WeakMap(),
-            references: new Map(),
-            metadata: new Map(),
-            
-            register(id, editor, metadata = {}) {
-                const ref = new WeakRef(editor);
-                this.references.set(id, ref);
-                this.editors.set(editor, {
-                    id,
-                    ...metadata,
-                    created: Date.now(),
-                    lastAccessed: Date.now()
-                });
-                this.metadata.set(id, {
-                    id,
-                    ...metadata,
-                    created: Date.now(),
-                    element: metadata.container
-                });
-                
-                // Register for cleanup
-                cleanupRegistry.register(editor, id);
-                
-                console.log(`Editor ${id} registered with enhanced memory management`);
-                return ref;
-            },
-            
-            get(id) {
-                const ref = this.references.get(id);
-                if (ref) {
-                    const editor = ref.deref();
-                    if (editor) {
-                        // Update last accessed time
-                        const editorData = this.editors.get(editor);
-                        if (editorData) {
-                            editorData.lastAccessed = Date.now();
-                        }
-                        return editor;
-                    } else {
-                        // Editor was garbage collected
-                        console.log(`Editor ${id} was garbage collected`);
-                        this.references.delete(id);
-                        this.metadata.delete(id);
-                    }
-                }
-                return null;
-            },
-            
-            has(id) {
-                const ref = this.references.get(id);
-                return ref && ref.deref() !== undefined;
-            },
-            
-            delete(id) {
-                const ref = this.references.get(id);
-                if (ref) {
-                    const editor = ref.deref();
-                    if (editor) {
-                        this.editors.delete(editor);
-                    }
-                }
-                this.references.delete(id);
-                this.metadata.delete(id);
-                console.log(`Editor ${id} removed from memory management`);
-            },
-            
-            cleanup() {
-                // Clean up dead references
-                let cleaned = 0;
-                for (const [id, ref] of this.references) {
-                    if (!ref.deref()) {
-                        this.references.delete(id);
-                        this.metadata.delete(id);
-                        cleaned++;
-                    }
-                }
-                if (cleaned > 0) {
-                    console.log(`Cleaned up ${cleaned} dead editor references`);
-                }
-                return cleaned;
-            },
-            
-            getStats() {
-                const alive = Array.from(this.references.values())
-                    .filter(ref => ref.deref()).length;
-                return {
-                    total: this.references.size,
-                    alive,
-                    dead: this.references.size - alive,
-                    metadata: this.metadata.size
-                };
-            }
-        };
         let rafId = null;
-
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        // This pattern improves performance by caching DOM element references
-        const DOMCache = {
-            cache: new Map(),
-            
-            // Get a single element by selector
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            
-            // Get all elements by selector
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            
-            // Clear all cached elements
-            clear() {
-                this.cache.clear();
-            },
-            
-            // Clear cache for dynamic content that changes frequently
-            clearDynamic() {
-                // Clear cache entries for dynamic selectors that might change
-                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
-                    key.includes('.field-') || key.includes('[data-')
-                );
-                dynamicKeys.forEach(key => this.cache.delete(key));
-            }
-        };
 
         // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
         });
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const {
-                    maxRetries = 3,
-                    delay = 1000,
-                    backoff = 2,
-                    onRetry = () => {}
-                } = options;
-                
-                let lastError;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => 
-                                setTimeout(resolve, delay * Math.pow(backoff, i))
-                            );
-                        }
-                    }
-                }
-                
-                throw lastError;
-            }
-        };
-
-        // Enhanced validation utility
-        const Validator = {
-            rules: {
-                url: (value) => !value || utils.isValidUrl(value),
-                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-                number: (min, max) => (value) => {
-                    const num = parseFloat(value);
-                    return !isNaN(num) && num >= min && num <= max;
-                },
-                length: (max) => (value) => !value || value.length <= max,
-                required: (value) => value && value.trim().length > 0,
-                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
-                noHtml: (value) => !value || !/[<>]/.test(value)
-            },
-            
-            validateField(input, rules, errorElement = null) {
-                const isValid = rules.every(rule => rule(input.value));
-                
-                // Visual feedback
-                input.classList.toggle('error', !isValid);
-                
-                // Add aria-invalid for accessibility
-                input.setAttribute('aria-invalid', !isValid);
-                
-                // Show/hide error message if error element provided
-                if (errorElement) {
-                    errorElement.style.display = isValid ? 'none' : 'block';
-                    if (!isValid) {
-                        errorElement.textContent = this.getErrorMessage(input, rules);
-                    }
-                }
-                
-                return isValid;
-            },
-            
-            getErrorMessage(input, rules) {
-                const value = input.value;
-                
-                if (rules.includes(this.rules.required) && !value.trim()) {
-                    return 'This field is required';
-                }
-                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
-                    return 'Please enter a valid URL (http:// or https://)';
-                }
-                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
-                    return 'Please enter a valid email address';
-                }
-                if (rules.some(rule => rule.toString().includes('number'))) {
-                    return 'Please enter a valid number within the specified range';
-                }
-                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
-                    return 'HTML tags are not allowed';
-                }
-                
-                return 'Invalid input';
-            },
-            
-            // Real-time validation setup
-            setupRealTimeValidation(input, rules, errorElement = null) {
-                const validateInput = () => {
-                    return this.validateField(input, rules, errorElement);
-                };
-                
-                // Validate on input (immediate feedback)
-                input.addEventListener('input', validateInput);
-                
-                // Validate on blur (final check)
-                input.addEventListener('blur', validateInput);
-                
-                // Initial validation if field has value
-                if (input.value) {
-                    validateInput();
-                }
-                
-                return validateInput;
-            }
-        };
 
         const utils = {
             debounce(func, wait) { 
@@ -402,21 +126,6 @@
                 return (value !== undefined && value !== null) ? (fieldConfig.type === 'number' ? parseFloat(value) : value) : fieldConfig.defaultValue; 
             },
 
-            // SDK operations with retry logic
-            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-                return RetryableOperation.execute(
-                    operation,
-                    {
-                        maxRetries: 2,
-                        delay: 500,
-                        onRetry: (attempt, error) => {
-                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                        },
-                        ...options
-                    }
-                );
-            },
-
             createEditor(container, id, content = '', config = {}) {
                 // Create editor using shared configuration
                 const editorType = config.type || 'description';
@@ -424,13 +133,16 @@
                     placeholder: config.placeholder || 'Enter text...'
                 }));
 
-                // Register with enhanced memory management
-                EditorManager.register(id, editor, {
+                // Track editor metadata
+                const metadata = {
+                    id,
+                    created: Date.now(),
                     container,
-                    hasContent: Boolean(content && content.trim()),
-                    type: 'lead-banner',
-                    editorType
-                });
+                    hasContent: Boolean(content && content.trim())
+                };
+
+                editorMetadata.set(editor, metadata);
+                cleanupRegistry.register(editor, id);
 
                 // Set content if provided
                 if (content && content.trim()) {
@@ -441,10 +153,10 @@
             },
 
             cleanupEditor(id) {
-                const editor = EditorManager.get(id);
+                const editor = state.editors[id];
                 if (editor) {
                     // Get metadata before cleanup
-                    const metadata = EditorManager.metadata.get(id);
+                    const metadata = editorMetadata.get(editor);
 
                     // Clean up event listeners
                     if (editor.off) {
@@ -458,47 +170,6 @@
                         hadListeners: Boolean(editor.off)
                     });
 
-                    // Remove from enhanced memory management
-                    EditorManager.delete(id);
-                }
-
-                // Also remove from legacy state (backward compatibility)
-                delete state.editors[id];
-            },
-
-            // Get editor with memory management
-            getEditor(id) {
-                // Try enhanced memory management first
-                const editor = EditorManager.get(id);
-                if (editor) {
-                    return editor;
-                }
-                
-                // Fallback to legacy state
-                return state.editors[id] || null;
-            },
-
-            // Memory management utilities
-            getMemoryStats() {
-                return {
-                    editorManager: EditorManager.getStats(),
-                    legacyEditors: Object.keys(state.editors).length
-                };
-            },
-
-            performMemoryCleanup() {
-                const deadRefs = EditorManager.cleanup();
-                
-                console.log('Memory cleanup completed:', {
-                    deadReferences: deadRefs,
-                    stats: this.getMemoryStats()
-                });
-                
-                return { deadRefs };
-            }
-                        hadListeners: Boolean(editor.off)
-                    });
-
                     // Remove from state
                     delete state.editors[id];
                 }
@@ -506,20 +177,19 @@
         };
 
         function cacheElements() {
-            // Use DOMCache for better performance
-            elements.mainContainer = DOMCache.get('#mainContainer');
-            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-            elements.errorBanner = DOMCache.get('#errorBanner');
-            elements.backgroundImage = DOMCache.get('#backgroundImage');
-            elements.backgroundImageError = DOMCache.get('#backgroundImage-error');
-            elements.verticalAlignSelector = DOMCache.get('#verticalAlignSelector');
-            elements.textAlignSelector = DOMCache.get('#textAlignSelector');
-            elements.titleEditor = DOMCache.get('#titleEditor');
-            elements.titleFontSize = DOMCache.get('#titleFontSize');
-            elements.subtitleEditor = DOMCache.get('#subtitleEditor');
-            elements.subtitleFontSize = DOMCache.get('#subtitleFontSize');
-            elements.contentUrl = DOMCache.get('#contentUrl');
-            elements.contentUrlError = DOMCache.get('#contentUrl-error');
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.backgroundImage = document.getElementById('backgroundImage');
+            elements.backgroundImageError = document.getElementById('backgroundImageError');
+            elements.verticalAlignSelector = document.getElementById('verticalAlignSelector');
+            elements.textAlignSelector = document.getElementById('textAlignSelector');
+            elements.titleEditor = document.getElementById('titleEditor');
+            elements.titleFontSize = document.getElementById('titleFontSize');
+            elements.subtitleEditor = document.getElementById('subtitleEditor');
+            elements.subtitleFontSize = document.getElementById('subtitleFontSize');
+            elements.contentUrl = document.getElementById('contentUrl');
+            elements.contentUrlError = document.getElementById('contentUrlError');
         }
 
         function setLoadingState(loading) {
@@ -614,56 +284,46 @@
         function refreshPreview() {
             if (rafId) cancelAnimationFrame(rafId);
 
-            rafId = requestAnimationFrame(async () => {
+            rafId = requestAnimationFrame(() => {
                 if (state.isLoading || !state.sdk) return;
                 try { 
                     const html = generateTemplate(); 
-                    
-                    // Use retry logic for SDK operations
-                    await utils.performSDKOperation(
-                        () => new Promise((resolve, reject) => {
-                            try {
-                                state.sdk.setContent(html);
-                                if (typeof state.sdk.setData === 'function') { 
-                                    state.sdk.setData({ ...state.blockData, content: html }); 
-                                }
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        }),
-                        'preview update'
-                    );
+                    state.sdk.setContent(html); 
+                    if (typeof state.sdk.setData === 'function') { 
+                        state.sdk.setData({ ...state.blockData, content: html }); 
+                    } 
                 } catch (error) { 
-                    console.error(`Preview update failed after retries: ${error.message}`);
                     utils.showError(`Preview update failed: ${error.message}`); 
                 }
             });
         }
 
+        function validateUrlInput(input, errorElement) { 
+            const value = input.value.trim(); 
+            const isValid = !value || utils.isValidUrl(value); 
+            input.classList.toggle('error', !isValid); 
+            if (errorElement) errorElement.style.display = isValid ? 'none' : 'block'; 
+            return isValid; 
+        }
+
         function initializeEventHandlers() {
             state.eventListeners = [];
 
-            // Set up validation for URL inputs
-            const urlFields = [
-                { element: elements.backgroundImage, rules: [Validator.rules.url], dataKey: 'backgroundImage' },
-                { element: elements.contentUrl, rules: [Validator.rules.url], dataKey: 'contentUrl' }
-            ];
-            
-            urlFields.forEach(({ element, rules, dataKey }) => {
-                const errorElement = element.closest('.field-group')?.querySelector('.field-error');
-                Validator.setupRealTimeValidation(element, rules, errorElement);
-                
-                const handler = (e) => {
-                    const isValid = Validator.validateField(e.target, rules, errorElement);
-                    if (isValid) {
-                        debouncedUpdateData(dataKey, e.target.value.trim());
-                    }
+            function setupUrlInput(inputEl, errorEl, dataKey) {
+                const handler = (e) => { 
+                    if (validateUrlInput(inputEl, errorEl)) { 
+                        debouncedUpdateData(dataKey, e.target.value.trim()); 
+                    } 
                 };
-                
-                element.addEventListener('input', handler);
-                state.eventListeners.push({ element, event: 'input', handler });
-            });
+                const blurHandler = () => validateUrlInput(inputEl, errorEl);
+                inputEl.addEventListener('input', handler);
+                inputEl.addEventListener('blur', blurHandler);
+                state.eventListeners.push({ element: inputEl, event: 'input', handler });
+                state.eventListeners.push({ element: inputEl, event: 'blur', handler: blurHandler });
+            }
+
+            setupUrlInput(elements.backgroundImage, elements.backgroundImageError, 'backgroundImage');
+            setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
 
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
@@ -702,80 +362,63 @@
             setupOptionSelector(elements.textAlignSelector, 'textAlign');
         }
 
-        async function loadData() {
+        function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') return utils.showError('SDK not available');
             setLoadingState(true);
 
-            try {
-                // Use retry logic for data loading
-                const data = await utils.performSDKOperation(
-                    () => new Promise((resolve, reject) => {
-                        state.sdk.getData((data) => {
-                            if (data === undefined && !state.sdk) {
-                                reject(new Error('Failed to load data - SDK unavailable'));
-                            } else {
-                                resolve(data);
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData = {};
+                    const fields = moduleConfig.fields;
+                    Object.keys(fields).forEach(key => { 
+                        state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : fields[key].defaultValue; 
+                        if (fields[key].type === 'richtext') { 
+                            state.blockData[key] = utils.sanitizeHtml(state.blockData[key]); 
+                        } 
+                    });
+
+                    elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
+                    elements.contentUrl.value = utils.getFieldValue('contentUrl');
+                    elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
+                    elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+
+                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+                    Object.keys(state.editors).forEach(key => {
+                        if (state.editors[key]) {
+                            const content = utils.getFieldValue(key);
+                            try {
+                                // Clear existing content first
+                                state.editors[key].setContents([]);
+                                // Use the new clipboard API to paste HTML content
+                                if (content && content.trim()) {
+                                    state.editors[key].clipboard.dangerouslyPasteHTML(content);
+                                }
+                            } catch (error) {
+                                // Fallback to root innerHTML for compatibility
+                                console.warn(`Using fallback method for editor ${key}:`, error);
+                                state.editors[key].root.innerHTML = content || '';
                             }
-                        });
-                    }),
-                    'data loading',
-                    {
-                        maxRetries: 3,
-                        delay: 1000
-                    }
-                );
-
-                state.blockData = {};
-                const fields = moduleConfig.fields;
-                Object.keys(fields).forEach(key => { 
-                    state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : fields[key].defaultValue; 
-                    if (fields[key].type === 'richtext') { 
-                        state.blockData[key] = utils.sanitizeHtml(state.blockData[key]); 
-                    } 
-                });
-
-                elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
-                elements.contentUrl.value = utils.getFieldValue('contentUrl');
-                elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
-                elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
-
-                // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
-                Object.keys(state.editors).forEach(key => {
-                    if (state.editors[key]) {
-                        const content = utils.getFieldValue(key);
-                        try {
-                            // Clear existing content first
-                            state.editors[key].setContents([]);
-                            // Use the new clipboard API to paste HTML content
-                            if (content && content.trim()) {
-                                state.editors[key].clipboard.dangerouslyPasteHTML(content);
-                            }
-                        } catch (error) {
-                            // Fallback to root innerHTML for compatibility
-                            console.warn(`Using fallback method for editor ${key}:`, error);
-                            state.editors[key].root.innerHTML = content || '';
                         }
+                    });
+
+                    function setSelectorState(el, key) { 
+                        const val = utils.getFieldValue(key); 
+                        if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
                     }
-                });
 
-                function setSelectorState(el, key) { 
-                    const val = utils.getFieldValue(key); 
-                    if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
+                    setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
+                    setSelectorState(elements.textAlignSelector, 'textAlign');
+
+                    refreshPreview();
+                    state.retryCount = 0;
+                } catch (error) { 
+                    utils.showError(`Failed to load data: ${error.message}`); 
+                    Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); 
+                    refreshPreview(); 
+                } finally { 
+                    setLoadingState(false); 
                 }
-
-                setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
-                setSelectorState(elements.textAlignSelector, 'textAlign');
-
-                refreshPreview();
-                state.retryCount = 0;
-            } catch (error) { 
-                console.error('Failed to load data after multiple attempts:', error.message);
-                utils.showError(`Failed to load data: ${error.message}`); 
-                Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); 
-                refreshPreview(); 
-            } finally { 
-                setLoadingState(false); 
-            }
+            });
         }
 
         function cleanup() { 
@@ -796,9 +439,6 @@
                 rafId = null;
             }
 
-            // Clear DOM cache
-            DOMCache.clear();
-
             console.log('Lead banner cleanup completed');
         }
 
@@ -816,46 +456,8 @@
                 loadData();
 
                 window.addEventListener('beforeunload', cleanup);
-                
-                // Enhanced automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Clear caches to free memory
-                        DOMCache.clear();
-                        
-                        // Perform memory cleanup if EditorManager exists
-                        if (typeof EditorManager !== 'undefined') {
-                            const cleanupStats = EditorManager.cleanup();
-                            console.log('Visibility cleanup - editors cleaned:', cleanupStats);
-                        }
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            console.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        console.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.isInitialized) {
-                            // Recache elements after clearing
-                            cacheElements();
-                            
-                            // Reload data to ensure sync
-                            loadData();
-                            
-                            console.log('Operations resumed');
-                        }
-                    }
+                document.addEventListener('visibilitychange', () => { 
+                    if (!document.hidden && state.isInitialized) loadData(); 
                 });
 
                 state.isInitialized = true;

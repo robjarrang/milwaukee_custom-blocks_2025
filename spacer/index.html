@@ -53,86 +53,17 @@
     const elements = {};
     let rafId = null;
 
-    // Create a DOM cache utility to consolidate repeated DOM queries
-    const DOMCache = {
-        cache: new Map(),
-        
-        get(selector) {
-            if (!this.cache.has(selector)) {
-                this.cache.set(selector, document.querySelector(selector));
-            }
-            return this.cache.get(selector);
-        },
-        
-        getAll(selector) {
-            if (!this.cache.has(selector + '_all')) {
-                this.cache.set(selector + '_all', document.querySelectorAll(selector));
-            }
-            return this.cache.get(selector + '_all');
-        },
-        
-        clear() {
-            this.cache.clear();
-        }
-    };
-
-    // Utility for retryable operations
-    const RetryableOperation = {
-        async execute(operation, options = {}) {
-            const {
-                maxRetries = 3,
-                delay = 1000,
-                backoff = 2,
-                onRetry = () => {}
-            } = options;
-            
-            let lastError;
-            
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    return await operation();
-                } catch (error) {
-                    lastError = error;
-                    if (i < maxRetries - 1) {
-                        onRetry(i + 1, error);
-                        await new Promise(resolve => 
-                            setTimeout(resolve, delay * Math.pow(backoff, i))
-                        );
-                    }
-                }
-            }
-            
-            throw lastError;
-        }
-    };
-
     const utils = {
         debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-        
-        // SDK operations with retry logic
-        async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-            return RetryableOperation.execute(
-                operation,
-                {
-                    maxRetries: 2,
-                    delay: 500,
-                    onRetry: (attempt, error) => {
-                        console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                    },
-                    ...options
-                }
-            );
-        },
-        
         getFieldValue(fieldName) { return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue; }
     };
 
     function cacheElements() {
-        elements.mainContainer = DOMCache.get('#mainContainer');
-        elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-        elements.backgroundColorSelector = DOMCache.get('#backgroundColorSelector');
-        elements.spacerHeight = DOMCache.get('#spacerHeight');
-        elements.spacerHeightValue = DOMCache.get('#spacerHeightValue');
+        elements.mainContainer = document.getElementById('mainContainer');
+        elements.loadingOverlay = document.getElementById('loadingOverlay');
+        elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+        elements.spacerHeight = document.getElementById('spacerHeight');
+        elements.spacerHeightValue = document.getElementById('spacerHeightValue');
     }
 
     function setLoadingState(loading) {
@@ -200,29 +131,17 @@
     function refreshPreview() {
         if (rafId) cancelAnimationFrame(rafId);
 
-        rafId = requestAnimationFrame(async () => {
+        rafId = requestAnimationFrame(() => {
             try {
                 const html = generateTemplate();
-                
-                // Use retry logic for SDK operations
-                await utils.performSDKOperation(
-                    () => new Promise((resolve, reject) => {
-                        try {
-                            state.sdk.setContent(html);
-                            // CRITICAL: ONLY set the state data, not the content itself.
-                            state.sdk.setData({
-                                backgroundColor: state.blockData.backgroundColor,
-                                spacerHeight: state.blockData.spacerHeight
-                            });
-                            resolve();
-                        } catch (error) {
-                            reject(error);
-                        }
-                    }),
-                    'preview update'
-                );
+                state.sdk.setContent(html);
+                // CRITICAL: ONLY set the state data, not the content itself.
+                state.sdk.setData({
+                    backgroundColor: state.blockData.backgroundColor,
+                    spacerHeight: state.blockData.spacerHeight
+                });
             } catch (error) {
-                console.error(`Preview update failed after retries: ${error.message}`);
+                console.error(`Preview update failed: ${error.message}`);
             }
         });
     }
@@ -249,68 +168,29 @@
         if (!state.sdk) return console.error('SDK not available');
         setLoadingState(true);
 
-        // Use retry logic for data loading
-        utils.performSDKOperation(
-            () => new Promise((resolve, reject) => {
-                state.sdk.getContent((content) => {
-                    state.sdk.getData((data) => {
-                        if (content === undefined && data === undefined) {
-                            reject(new Error('Failed to load data - SDK unavailable'));
-                        } else {
-                            resolve({ content, data });
-                        }
-                    });
-                });
-            }),
-            'initial data load',
-            {
-                maxRetries: 3,
-                delay: 1000
-            }
-        ).then(({ content, data }) => {
-            // CRITICAL: The HTML content is the source of truth.
-            const parsedState = parseContentForState(content);
+        // This function now uses sdk.getContent and sdk.getData to create one unified state.
+        state.sdk.getContent((content) => {
+            state.sdk.getData((data) => {
+                // CRITICAL: The HTML content is the source of truth.
+                const parsedState = parseContentForState(content);
 
-            if (parsedState) {
-                // If HTML is valid, use it to set the state.
-                state.blockData.backgroundColor = parsedState.backgroundColor;
-                state.blockData.spacerHeight = parsedState.spacerHeight;
-            } else {
-                // Fallback to saved data if parsing fails (e.g., new or empty block).
-                state.blockData.backgroundColor = data.backgroundColor || moduleConfig.fields.backgroundColor.defaultValue;
-                state.blockData.spacerHeight = data.spacerHeight || moduleConfig.fields.spacerHeight.defaultValue;
+                if (parsedState) {
+                    // If HTML is valid, use it to set the state.
+                    state.blockData.backgroundColor = parsedState.backgroundColor;
+                    state.blockData.spacerHeight = parsedState.spacerHeight;
+                } else {
+                    // Fallback to saved data if parsing fails (e.g., new or empty block).
+                    state.blockData.backgroundColor = data.backgroundColor || moduleConfig.fields.backgroundColor.defaultValue;
+                    state.blockData.spacerHeight = data.spacerHeight || moduleConfig.fields.spacerHeight.defaultValue;
 
-                // Since there was no valid content, generate it now. This happens for new blocks.
-                refreshPreview();
-            }
+                    // Since there was no valid content, generate it now. This happens for new blocks.
+                    refreshPreview();
+                }
 
-            updateUIFromState();
-        }).catch(error => {
-            console.error('Failed to load data after multiple attempts:', error.message);
-            // Use default data if loading fails
-            state.blockData.backgroundColor = moduleConfig.fields.backgroundColor.defaultValue;
-            state.blockData.spacerHeight = moduleConfig.fields.spacerHeight.defaultValue;
-            updateUIFromState();
-            refreshPreview();
-        }).finally(() => {
-            setLoadingState(false);
+                updateUIFromState();
+                setLoadingState(false);
+            });
         });
-    }
-
-    function cleanup() {
-        // Clean up event listeners
-        state.eventListeners.forEach(({ element, event, handler }) => { 
-            if (element && element.removeEventListener) element.removeEventListener(event, handler); 
-        }); 
-        state.eventListeners = [];
-
-        // Cancel any pending RAF
-        if (rafId) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-        }
-
-        console.log('Spacer cleanup completed');
     }
 
     function initialize() {
@@ -324,38 +204,6 @@
             cacheElements();
             initializeEventHandlers();
             loadData();
-
-            // Add cleanup on page unload
-            window.addEventListener('beforeunload', cleanup);
-
-            // Add automatic cleanup on visibility change
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    console.log('Tab hidden - pausing expensive operations');
-                    
-                    // Pause expensive operations
-                    if (rafId) {
-                        cancelAnimationFrame(rafId);
-                        rafId = null;
-                    }
-                    
-                    // Run garbage collection hint if available
-                    if (window.gc) {
-                        console.log('Running garbage collection hint');
-                        window.gc();
-                    }
-                } else {
-                    console.log('Tab visible - resuming operations');
-                    
-                    // Resume operations if needed
-                    if (state.sdk && !state.isLoading) {
-                        // Refresh preview to ensure sync
-                        refreshPreview();
-                        
-                        console.log('Operations resumed');
-                    }
-                }
-            });
         } catch (error) {
             console.error(`Initialization failed: ${error.message}`);
             setLoadingState(false);

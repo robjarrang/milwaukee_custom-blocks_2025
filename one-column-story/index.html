@@ -105,77 +105,11 @@
         const state = { sdk: null, editors: new Map(), blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
         const elements = {};
 
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        // This pattern improves performance by caching DOM element references
-        const DOMCache = {
-            cache: new Map(),
-            
-            // Get a single element by selector
-            get(selector) {
-                if (!this.cache.has(selector)) {
-                    this.cache.set(selector, document.querySelector(selector));
-                }
-                return this.cache.get(selector);
-            },
-            
-            // Get all elements by selector
-            getAll(selector) {
-                if (!this.cache.has(selector + '_all')) {
-                    this.cache.set(selector + '_all', document.querySelectorAll(selector));
-                }
-                return this.cache.get(selector + '_all');
-            },
-            
-            // Clear all cached elements
-            clear() {
-                this.cache.clear();
-            },
-            
-            // Clear cache for dynamic content that changes frequently
-            clearDynamic() {
-                // Clear cache entries for dynamic selectors that might change
-                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
-                    key.includes('.item') || key.includes('[data-')
-                );
-                dynamicKeys.forEach(key => this.cache.delete(key));
-            }
-        };
-
         // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
         });
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const {
-                    maxRetries = 3,
-                    delay = 1000,
-                    backoff = 2,
-                    onRetry = () => {}
-                } = options;
-                
-                let lastError;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => 
-                                setTimeout(resolve, delay * Math.pow(backoff, i))
-                            );
-                        }
-                    }
-                }
-                
-                throw lastError;
-            }
-        };
 
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
@@ -203,22 +137,6 @@
             showError(m, p = false) { if (elements.errorBanner) { elements.errorBanner.textContent = m; elements.errorBanner.classList.add('show'); if (!p) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } console.error(`${moduleConfig.name} Error:`, m); },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
             safeExecute(fn) { try { return fn(); } catch (error) { console.error('Operation failed:', error); utils.showError('An error occurred. Please try again.'); } },
-
-            // SDK operations with retry logic
-            async performSDKOperation(operation, operationName = 'SDK operation', options = {}) {
-                return RetryableOperation.execute(
-                    operation,
-                    {
-                        maxRetries: 2,
-                        delay: 500,
-                        onRetry: (attempt, error) => {
-                            console.log(`Retrying ${operationName}... Attempt ${attempt}:`, error.message);
-                        },
-                        ...options
-                    }
-                );
-            },
-
             cleanupEditor(id) {
                 const editor = state.editors.get(id);
                 if (editor) {
@@ -230,34 +148,33 @@
         };
 
         function cacheElements() {
-            // Use DOMCache for better performance
-            elements.mainContainer = DOMCache.get('#mainContainer');
-            elements.loadingOverlay = DOMCache.get('#loadingOverlay');
-            elements.errorBanner = DOMCache.get('#errorBanner');
-            elements.layoutSelector = DOMCache.get('#layoutSelector');
-            elements.imageUrl = DOMCache.get('#imageUrl');
-            elements.imageUrlError = DOMCache.get('#imageUrlError');
-            elements.imageAlt = DOMCache.get('#imageAlt');
-            elements.imageLink = DOMCache.get('#imageLink');
-            elements.imageLinkError = DOMCache.get('#imageLinkError');
-            elements.titleEditor = DOMCache.get('#titleEditor');
-            elements.titleFontSize = DOMCache.get('#titleFontSize');
-            elements.titleAlignmentSelector = DOMCache.get('#titleAlignmentSelector');
-            elements.contentTypeSelector = DOMCache.get('#contentTypeSelector');
-            elements.descriptionSection = DOMCache.get('#descriptionSection');
-            elements.descriptionEditor = DOMCache.get('#descriptionEditor');
-            elements.descriptionFontSize = DOMCache.get('#descriptionFontSize');
-            elements.descriptionAlignmentSelector = DOMCache.get('#descriptionAlignmentSelector');
-            elements.checklistSection = DOMCache.get('#checklistSection');
-            elements.itemsContainer = DOMCache.get('#itemsContainer');
-            elements.addItemBtn = DOMCache.get('#addItemBtn');
-            elements.itemTemplate = DOMCache.get('#itemTemplate');
-            elements.showButton = DOMCache.get('#showButton');
-            elements.buttonFieldsGroup = DOMCache.get('#buttonFieldsGroup');
-            elements.buttonText = DOMCache.get('#buttonText');
-            elements.buttonLink = DOMCache.get('#buttonLink');
-            elements.buttonLinkError = DOMCache.get('#buttonLinkError');
-            elements.buttonAlignmentSelector = DOMCache.get('#buttonAlignmentSelector');
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.layoutSelector = document.getElementById('layoutSelector');
+            elements.imageUrl = document.getElementById('imageUrl');
+            elements.imageUrlError = document.getElementById('imageUrlError');
+            elements.imageAlt = document.getElementById('imageAlt');
+            elements.imageLink = document.getElementById('imageLink');
+            elements.imageLinkError = document.getElementById('imageLinkError');
+            elements.titleEditor = document.getElementById('titleEditor');
+            elements.titleFontSize = document.getElementById('titleFontSize');
+            elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
+            elements.contentTypeSelector = document.getElementById('contentTypeSelector');
+            elements.descriptionSection = document.getElementById('descriptionSection');
+            elements.descriptionEditor = document.getElementById('descriptionEditor');
+            elements.descriptionFontSize = document.getElementById('descriptionFontSize');
+            elements.descriptionAlignmentSelector = document.getElementById('descriptionAlignmentSelector');
+            elements.checklistSection = document.getElementById('checklistSection');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
+            elements.showButton = document.getElementById('showButton');
+            elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
+            elements.buttonText = document.getElementById('buttonText');
+            elements.buttonLink = document.getElementById('buttonLink');
+            elements.buttonLinkError = document.getElementById('buttonLinkError');
+            elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
         }
 
         function setLoadingState(loading) {
@@ -680,42 +597,6 @@
                 await initializeEditors(); // Now properly await the async editor initialization
                 loadData();
                 window.addEventListener('beforeunload', cleanup);
-                
-                // Add automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Clear caches to free memory
-                        DOMCache.clear();
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            console.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        console.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.isInitialized && !state.isLoading) {
-                            // Recache elements after clearing
-                            cacheElements();
-                            
-                            // Refresh preview to ensure sync
-                            refreshPreview();
-                            
-                            console.log('Operations resumed');
-                        }
-                    }
-                });
-                
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`, true);
