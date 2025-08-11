@@ -5,6 +5,8 @@
     <title>Interactive Accordion Block (Milwaukee Style)</title>
     <!-- Quill.js CSS -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <!-- Shared styles for mobile responsiveness -->
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <!-- Basic styling for the editor UI -->
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px}.item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
@@ -330,9 +332,9 @@
             const interactiveItems = items.map((item, i) => `
           <div class="accordion-item">
             <input type="checkbox" id="accordion-${i + 1}" name="accordion-group">
-            <label class="accordion-title" for="accordion-${i + 1}">${item.title}</label>
+            <label class="accordion-title mobile-text-center" for="accordion-${i + 1}">${item.title}</label>
             <div class="accordion-content">
-              <div class="accordion-content-inner">
+              <div class="accordion-content-inner mobile-text-center">
                 ${item.content}
               </div>
             </div>
@@ -340,11 +342,11 @@
 
             const fallbackItems = items.map(item => `
             <tr>
-              <td style="padding-bottom: 30px;">
-                <h3 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; margin: 0 0 8px 0; text-transform: uppercase;">
+              <td class="mobile-text-center" style="padding-bottom: 30px;">
+                <h3 class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; margin: 0 0 8px 0; text-transform: uppercase;">
                   ${item.title}
                 </h3>
-                <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
+                <div class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
                   ${item.content}
                 </div>
               </td>
@@ -352,47 +354,83 @@
 
             return `<!--[if !mso]><!-->
 <style type="text/css">
-body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; max-width: 100%; height: auto; }
+/* Accordion-specific styles only - leveraging existing email template styles */
 input[type="checkbox"] { display: none !important; mso-hide: all !important; }
-* { box-sizing: border-box; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; }
-@media screen and (max-width: 580px) { 
-    .content-outer { width: 100% !important; height: auto !important; } 
-    .side { width: 20px !important; } 
-    .content-inner { width: calc(100% - 40px) !important; }
-    .accordion-wrapper { width: 100% !important; max-width: none !important; }
-    .accordion-item { width: 100% !important; }
-    .accordion-title { font-size: 18px !important; padding: 15px 0 !important; }
-    .accordion-content-inner { font-size: 14px !important; }
-}
+
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .fallback { display: none !important; }
-    .accordion-wrapper { display: block !important; max-height: none !important; overflow: visible !important; width: 100% !important; max-width: 580px !important; box-sizing: border-box !important; }
-    .accordion-item { border-bottom: 1px solid #000000; width: 100% !important; box-sizing: border-box !important; }
-    .accordion-title { display: block; cursor: pointer; padding: 20px 0; position: relative; color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 28px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; width: 100% !important; box-sizing: border-box !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-    .accordion-title::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: bold; color: #ffffff; transition: transform 0.3s ease; }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #000000; width: 100% !important; box-sizing: border-box !important; }
-    .accordion-content-inner { padding: 0; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; width: 100% !important; box-sizing: border-box !important; word-wrap: break-word !important; overflow-wrap: break-word !important; /* THE FIX: Apply a base transition for smooth closing. */ transition: padding 0.4s ease-out; }
-    input[type="checkbox"]:checked ~ .accordion-title::after { transform: translateY(-50%) rotate(45deg); }
-    input[type="checkbox"]:checked ~ .accordion-content { max-height: 500px; transition: max-height 0.5s ease-in; }
-    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { padding: 20px 0; /* THE FIX: Override with the opening transition. */ transition: padding 0.5s ease-in; }
+    .accordion-wrapper { 
+        display: block !important; 
+        max-height: none !important; 
+        overflow: visible !important; 
+        width: 100% !important; 
+    }
+    .accordion-item { 
+        border-bottom: 1px solid #000000; 
+    }
+    .accordion-title { 
+        display: block; 
+        cursor: pointer; 
+        padding: 20px 0; 
+        position: relative; 
+        color: #ffffff; 
+        font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif; 
+        font-size: 20px; 
+        font-weight: bold; 
+        line-height: 28px; 
+        text-transform: uppercase; 
+        -webkit-tap-highlight-color: transparent; 
+    }
+    .accordion-title::after { 
+        content: '+'; 
+        position: absolute; 
+        right: 0; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        font-size: 28px; 
+        font-weight: bold; 
+        color: #ffffff; 
+        transition: transform 0.3s ease; 
+    }
+    .accordion-content { 
+        max-height: 0; 
+        overflow: hidden; 
+        transition: max-height 0.4s ease-out; 
+        background-color: #000000; 
+    }
+    .accordion-content-inner { 
+        padding: 0; 
+        color: #ffffff; 
+        font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif; 
+        font-size: 16px; 
+        font-weight: normal; 
+        line-height: 28px; 
+        transition: padding 0.4s ease-out; 
+    }
+    input[type="checkbox"]:checked ~ .accordion-title::after { 
+        transform: translateY(-50%) rotate(45deg); 
+    }
+    input[type="checkbox"]:checked ~ .accordion-content { 
+        max-height: 500px; 
+        transition: max-height 0.5s ease-in; 
+    }
+    input[type="checkbox"]:checked ~ .accordion-content .accordion-content-inner { 
+        padding: 20px 0; 
+        transition: padding 0.5s ease-in; 
+    }
 }
-/* Additional email client specific rules */
+
+/* Email client specific rules */
 #MessageViewBody .fallback, body.MsgBody .fallback { display: block !important; }
 #MessageViewBody .accordion-wrapper, body.MsgBody .accordion-wrapper { display: none !important; }
 [class~="x_accordion-wrapper"] { display: none !important; }
 [class~="x_fallback"] { display: block !important; }
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
-/* Outlook specific width containment */
 @media screen yahoo {
     .fallback { display: block !important; max-height: none !important; }
     .accordion-wrapper { display: none !important; max-height: 0 !important; overflow: hidden !important; }
 }
-/* Additional content safety rules */
-.accordion-wrapper * { max-width: 100% !important; box-sizing: border-box !important; }
-.accordion-content-inner * { max-width: 100% !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
 </style>
 <!--<![endif]-->
 <style type="text/css">
@@ -402,9 +440,9 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
   <tr>
     <td class="side" style="width: 20px;"> </td>
-    <td align="center" class="content-inner" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
+    <td align="center" class="content-inner mobile-text-center" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
       <!--[if !mso]><!-->
-      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%; max-width: 100%; box-sizing: border-box;">
+      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
         ${interactiveItems}
       </div>
       <!--<![endif]-->
