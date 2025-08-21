@@ -180,6 +180,9 @@
             if (!state.sdk || !state.sdk.setContent) return;
             const template = generateInitialTemplate();
             state.sdk.setContent(template);
+            if (state.sdk.setData) {
+                state.sdk.setData({ ...state.blockData, content: template });
+            }
         }
 
         function renderStatsUI() {
