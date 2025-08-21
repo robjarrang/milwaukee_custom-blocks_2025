@@ -3,7 +3,40 @@
 <head>
     <meta charset="utf-8">
     <title>Stats Block</title>
-    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <link rel="styles        function createStatR        function generateInitialTemplate(d) {
+            const statsHtml = d.stats.map((stat, index) => {
+                const isLast = index === d.stats.length - 1;
+                return `
+                <tr><td class="mobile-text-center" style="text-align: center;">
+                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">${stat.title}</div>
+                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.subtitle}</div>
+                </td></tr>
+                ${!isLast ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}`;
+            }).join('');
+
+            const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle"><div><a href="${d.imageLink}" target="_blank"><img alt="${d.imageAlt}" class="fill no-hover" src="${d.imageUrl}" style="display: block; height: auto; outline: none; text-decoration: none; border: none; padding: 0px; text-align: center; width: 100%;" width="300"></a></div></td>`;
+            
+            const statsCell = `<td class="block" dir="ltr" style="width: 290px;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td><div style="clear: both; display: block; font-size: 8px; height: 0px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>${statsHtml}<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td>`;
+
+            if (d.layout === 'right') {
+                // Image right layout
+                return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${d.backgroundColor}; width: 620px;"><tr><td style="background-color: ${d.backgroundColor}; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: ${d.backgroundColor}; width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" dir="rtl" role="presentation" style="width: 100%;"><tr>${statsCell}${imageCell}</tr></table></td><td style="background-color: ${d.backgroundColor}; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .stats-image-block -->`;
+            } else {
+                // Image left layout (default)
+                return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${d.backgroundColor}; width: 620px;"><tr><td style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${imageCell}${statsCell}</tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .stats-image-block -->`;
+            }
+        }plate(stat = { title: '', subtitle: '' }) {
+            const spacerRow = '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>';
+            const statRow = `
+                <tr><td class="mobile-text-center" style="text-align: center;">
+                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">${stat.title}</div>
+                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.subtitle}</div>
+                </td></tr>`;
+            // We return a DocumentFragment to hold both rows if needed
+            const tpl = document.createElement('template');
+            tpl.innerHTML = statRow + spacerRow;
+            return tpl.content;
+        }https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.stats-container{display:flex;flex-direction:column;gap:15px}.stat-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.stat-title{font-weight:bold;font-size:16px}.stat-controls{display:flex;gap:8px}.stat-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.stat-control-btn:hover{color:#0074d9}.stat-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-stat-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
@@ -16,6 +49,13 @@
 
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">General Settings</div>
+            <div class="field-group">
+                <label class="field-label">Layout</label>
+                <div class="color-selector" id="layoutSelector">
+                    <div class="color-option" data-layout="left">Image Left</div>
+                    <div class="color-option" data-layout="right">Image Right</div>
+                </div>
+            </div>
             <div class="field-group">
                 <label class="field-label">Background Colour</label>
                 <div class="color-selector" id="backgroundColorSelector">
@@ -59,12 +99,12 @@
                 </div>
             </div>
             <div class="field-group">
-                <label class="field-label">Value</label>
-                <input type="text" class="field-input" data-field="value" placeholder="800+">
+                <label class="field-label">Title</label>
+                <input type="text" class="field-input" data-field="title" placeholder="TITLE">
             </div>
             <div class="field-group">
-                <label class="field-label">Label</label>
-                <input type="text" class="field-input" data-field="label" placeholder="NEW INNOVATIONS">
+                <label class="field-label">Subtitle</label>
+                <input type="text" class="field-input" data-field="subtitle" placeholder="SUBTITLE">
             </div>
         </div>
     </template>
@@ -77,14 +117,15 @@
         // --- Config and State ---
         const PRESET_COLORS = { RED: '#DB021D', BLACK: '#000000' };
         const DEFAULTS = {
+            layout: 'left',
             backgroundColor: PRESET_COLORS.RED,
             imageUrl: 'https://place-hold.it/300x300/ccc/333',
             imageLink: 'https://www.milwaukeetool.eu/',
             imageAlt: 'Milwaukee Tool Product',
             stats: [
-                { value: '800+', label: 'NEW INNOVATIONS' },
-                { value: '10', label: 'WORKSTATIONS' },
-                { value: '70+', label: 'COUNTRIES' }
+                { title: 'TITLE', subtitle: 'SUBTITLE' },
+                { title: 'TITLE', subtitle: 'SUBTITLE' },
+                { title: 'TITLE', subtitle: 'SUBTITLE' }
             ]
         };
         const state = { sdk: null, dom: null };
@@ -130,7 +171,8 @@
         let rafId = null;
         function renderStatsUI() {
             if (!state.dom) return;
-            const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+            const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
+                                  state.dom.querySelector('.block:first-child .sect > tbody');
             const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
             elements.statsContainer.replaceChildren();
 
@@ -138,14 +180,14 @@
             const fragment = document.createDocumentFragment();
 
             statRows.forEach((row, index) => {
-                const value = row.querySelector('div:first-child').textContent.trim();
-                const label = row.querySelector('div:last-child').textContent.trim();
+                const title = row.querySelector('div:first-child').textContent.trim();
+                const subtitle = row.querySelector('div:last-child').textContent.trim();
                 const itemFragment = elements.statTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.stat-item');
                 itemEl.dataset.index = index;
                 itemEl.querySelector('.stat-title').textContent = `Stat ${index + 1}`;
-                itemEl.querySelector('[data-field="value"]').value = value;
-                itemEl.querySelector('[data-field="label"]').value = label;
+                itemEl.querySelector('[data-field="title"]').value = title;
+                itemEl.querySelector('[data-field="subtitle"]').value = subtitle;
                 itemEl.querySelector('.move-up-btn').disabled = (index === 0);
                 itemEl.querySelector('.move-down-btn').disabled = (index === statRows.length - 1);
                 fragment.appendChild(itemFragment);
@@ -159,6 +201,11 @@
             if (!state.dom) return;
             const link = state.dom.querySelector('a');
             const img = state.dom.querySelector('img');
+
+            // Layout detection
+            const isRightLayout = state.dom.querySelector('table[dir="rtl"]') !== null;
+            elements.layoutSelector.querySelector('[data-layout="left"]').classList.toggle('selected', !isRightLayout);
+            elements.layoutSelector.querySelector('[data-layout="right"]').classList.toggle('selected', isRightLayout);
 
             // General settings
             const domColor = state.dom.style.backgroundColor;
@@ -191,12 +238,35 @@
 
         // --- Initialization and Event Handlers ---
         function cacheElements() {
-            for (const id of ['mainContainer', 'loadingOverlay', 'backgroundColorSelector', 'imageUrl', 'imageLink', 'imageAlt', 'statsContainer', 'addStatBtn', 'statTemplate']) {
+            for (const id of ['mainContainer', 'loadingOverlay', 'layoutSelector', 'backgroundColorSelector', 'imageUrl', 'imageLink', 'imageAlt', 'statsContainer', 'addStatBtn', 'statTemplate']) {
                 elements[id] = document.getElementById(id);
             }
         }
 
         function initializeEventHandlers() {
+            // Layout Settings
+            elements.layoutSelector.addEventListener('click', e => {
+                const button = e.target.closest('.color-option');
+                if (button && state.dom) {
+                    const newLayout = button.dataset.layout;
+                    // Regenerate template with new layout
+                    const currentData = {
+                        layout: newLayout,
+                        backgroundColor: state.dom.style.backgroundColor,
+                        imageUrl: state.dom.querySelector('img').src,
+                        imageLink: state.dom.querySelector('a').href,
+                        imageAlt: state.dom.querySelector('img').alt,
+                        stats: Array.from(state.dom.querySelectorAll('.mobile-text-center')).map(row => ({
+                            title: row.querySelector('div:first-child').textContent.trim(),
+                            subtitle: row.querySelector('div:last-child').textContent.trim()
+                        }))
+                    };
+                    state.dom = parseToDOM(generateInitialTemplate(currentData));
+                    updateUIFromDOM();
+                    updateBlock();
+                }
+            });
+
             // General Settings
             elements.backgroundColorSelector.addEventListener('click', e => {
                 const button = e.target.closest('.color-option');
@@ -215,9 +285,10 @@
             // Add Stat Button
             elements.addStatBtn.addEventListener('click', () => {
                 if (!state.dom) return;
-                const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
+                                      state.dom.querySelector('.block:first-child .sect > tbody');
                 const lastStatRow = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center')).pop();
-                const newStatFragment = createStatRowTemplate({ value: '123', label: 'NEW' });
+                const newStatFragment = createStatRowTemplate({ title: 'TITLE', subtitle: 'SUBTITLE' });
                 if (lastStatRow) {
                     lastStatRow.after(...newStatFragment.children); // Use spread to insert both rows
                 } else {
@@ -230,7 +301,8 @@
             // Optimized Event Delegation with Action Maps
             const statActions = {
                 '.remove-btn': (itemEl, index) => {
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
+                                          state.dom.querySelector('.block:first-child .sect > tbody');
                     const allRows = Array.from(statsTableBody.children);
                     const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
                     const targetRow = statRows[index];
@@ -244,7 +316,8 @@
                 '.move-up-btn': (itemEl, index) => {
                     if (index === 0) return false;
 
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
+                                          state.dom.querySelector('.block:first-child .sect > tbody');
                     const allRows = Array.from(statsTableBody.children);
                     const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
                     const targetRow = statRows[index];
@@ -257,7 +330,8 @@
                     return true;
                 },
                 '.move-down-btn': (itemEl, index) => {
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
+                                          state.dom.querySelector('.block:first-child .sect > tbody');
                     const allRows = Array.from(statsTableBody.children);
                     const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
 
@@ -312,12 +386,13 @@
                 if (e.target.matches('[data-field]')) {
                     const itemEl = e.target.closest('.stat-item');
                     const index = parseInt(itemEl.dataset.index, 10);
-                    const field = e.target.dataset.field; // 'value' or 'label'
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody');
+                    const field = e.target.dataset.field; // 'title' or 'subtitle'
+                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
+                                          state.dom.querySelector('.block:first-child .sect > tbody');
                     const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
                     const targetRow = statRows[index];
                     if(targetRow) {
-                        const targetDiv = targetRow.querySelector(field === 'value' ? 'div:first-child' : 'div:last-child');
+                        const targetDiv = targetRow.querySelector(field === 'title' ? 'div:first-child' : 'div:last-child');
                         targetDiv.textContent = e.target.value;
                         debouncedUpdateBlock();
                     }
