@@ -2,157 +2,44 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Interactive C            <div class="field-group">
-                <label class="field-label">Image URL (620x350px)</label>
-                <div class="field-input-wrapper">
-                    <input type="url" class="field-input" data-field="imageUrl" placeholder="https://placehold.co/620x350" required aria-describedby="imageUrl-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="imageUrl-error" role="alert"></div>
-            </div>
-            <div class="field-group">
-                <label class="field-label">Link URL</label>
-                <div class="field-input-wrapper">
-                    <input type="url" class="field-input" data-field="linkUrl" placeholder="https://example.com/product" aria-describedby="linkUrl-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="linkUrl-error" role="alert"></div>
-            </div>
-            <div class="field-group">
-                <label class="field-label">Alt Text</label>
-                <div class="field-input-wrapper">
-                    <input type="text" class="field-input" data-field="altText" placeholder="Descriptive text for accessibility" maxlength="100" aria-describedby="altText-error">
-                    <span class="validation-icon error">✗</span>
-                </div>
-                <div class="field-error" id="altText-error" role="alert"></div>
-            </div>/title>
+    <title>Interactive Carousel Block</title>
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.section-divider{margin-top:30px;padding-top:20px;border-top:2px solid #eee}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px;border-bottom:2px solid #eee;padding-bottom:10px}.slides-container{display:flex;flex-direction:column;gap:15px}.slide-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.slide-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.slide-title{font-weight:bold;font-size:16px;margin:0}.slide-controls{display:flex;gap:8px}.slide-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.slide-control-btn:hover{color:#0074d9}.slide-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-slide-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
-        
-        /* Enhanced validation styles */
-        .field-input.error{border-color:#dc3545;background-color:#fff5f5;box-shadow:0 0 0 2px rgba(220,53,69,0.2)}
-        .field-error{color:#dc3545;font-size:12px;margin-top:4px;display:none;font-weight:500}
-        .field-error.show{display:block}
-        
-        /* Validation icons */
-        .field-input-wrapper{position:relative}
-        .field-input-wrapper .validation-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:0;transition:opacity 0.3s ease}
-        .field-input.error + .validation-icon.error{opacity:1;color:#dc3545}
-        
-        /* Real-time feedback animations */
-        .field-input{transition:all 0.3s ease}
-        .field-input.error{animation:shake 0.5s ease-in-out}
-        
-        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-        /* Error banner and fallback field styles */
-        .error-banner {
-            background-color: #fee;
-            border: 1px solid #fcc;
-            color: #c00;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
-            font-weight: 500;
-        }
-        .error-banner.show {
-            display: block;
-        }
-        
-        /* Screen reader only content */
-        .sr-only {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            border: 0 !important;
-        }
-        
-        /* Debug container for visibility */
-        .debug-container {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 400px;
-            max-height: 300px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            font-family: monospace;
-            font-size: 12px;
-            padding: 10px;
-            border-radius: 4px;
-            z-index: 10000;
-            border: 2px solid #0074d9;
-        }
-        
-        .debug-entry {
-            margin-bottom: 2px;
-            word-wrap: break-word;
-        }
-        
-        .debug-entry.error {
-            color: #ff6b6b;
-        }
-        
-        .debug-entry.warning {
-            color: #ffd93d;
-        }
-        
-        .debug-entry.group {
-            color: #4ecdc4;
-            font-weight: bold;
-        }
+        body{margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.section-divider{margin-top:30px;padding-top:20px;border-top:2px solid #eee}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px;border-bottom:2px solid #eee;padding-bottom:10px}.slides-container{display:flex;flex-direction:column;gap:15px}.slide-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.slide-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.slide-title{font-weight:bold;font-size:16px;margin:0}.slide-controls{display:flex;gap:8px}.slide-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.slide-control-btn:hover{color:#0074d9}.slide-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-slide-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
-    <!-- Immediate JS test -->
-    <script>
-        document.write('<div style="background: red; color: white; padding: 10px; margin: 10px; font-weight: bold;">JavaScript is running - timestamp: ' + new Date().toLocaleTimeString() + '</div>');
-    </script>
-    
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-    <div class="container" id="mainContainer" role="main" aria-labelledby="main-heading">
-        <!-- Status indicators -->
-        <div id="status-indicator" style="background: blue; color: white; padding: 10px; margin: 10px;">
-            Status: HTML loaded, waiting for JavaScript initialization...
-        </div>
-        
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Interactive Carousel</h2>
         <div class="error-banner" id="errorBanner"></div>
-        
-        <h1 id="main-heading" class="section-title">Interactive Carousel Slides</h1>
-        
+
+        <div class="section-title">Slides</div>
+        <div id="slidesContainer" class="slides-container">
+            <!-- Slides will be dynamically inserted here -->
+        </div>
+        <button id="addSlideBtn" class="btn add-slide-btn">Add New Slide</button>
+
         <div class="section-divider">
-            <div class="section-title">Fallback Settings</div>
-            <div class="field-group">
+             <div class="section-title" style="border-bottom:none; margin-bottom:0;">Fallback Image Settings</div>
+             <p style="font-size:12px; color:#666; margin-top:0; margin-bottom:15px;">Optional: Provide a specific image for email clients that don't support carousels. If left blank, the first slide will be used as the fallback.</p>
+             <div class="field-group">
                 <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
-                <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://placehold.co/620x350">
+                <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://example.com/fallback-image.jpg">
                 <div class="field-error">Please enter a valid image URL.</div>
             </div>
             <div class="field-group">
                 <label for="fallbackLinkUrl" class="field-label">Fallback Link URL</label>
-                <input type="url" id="fallbackLinkUrl" class="field-input" placeholder="https://example.com">
+                <input type="url" id="fallbackLinkUrl" class="field-input" placeholder="https://example.com/fallback-link">
                 <div class="field-error">Please enter a valid link URL.</div>
             </div>
             <div class="field-group">
-                <label for="fallbackAltText" class="field-label">Fallback Alt Text</label>
-                <input type="text" id="fallbackAltText" class="field-input" placeholder="Default alt text">
+                <label for="fallbackAltText" class="field-label">Fallback Image Alt Text</label>
+                <input type="text" id="fallbackAltText" class="field-input" placeholder="Fallback image description">
             </div>
         </div>
-        
-        <div class="section-divider">
-            <div class="section-title">Carousel Slides</div>
-            <div id="slidesContainer" class="slides-container">
-                <!-- Slides will be dynamically inserted here -->
-            </div>
-            <button id="addSlideBtn" class="btn add-slide-btn" aria-describedby="add-slide-help">Add New Slide</button>
-            <div id="add-slide-help" class="sr-only">Adds a new slide to the end of the carousel</div>
-        </div>
+
     </div>
 
     <!-- Template for a single slide's UI -->
@@ -187,17 +74,6 @@
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
     <script>
         'use strict';
-        
-        // Immediate status update
-        try {
-            const statusEl = document.getElementById('status-indicator');
-            if (statusEl) {
-                statusEl.innerHTML = 'Status: JavaScript started executing...';
-                statusEl.style.background = 'green';
-            }
-        } catch (e) {
-            console.error('Status update failed:', e);
-        }
 
         const moduleConfig = {
             name: 'Interactive Carousel',
@@ -217,563 +93,20 @@
             maxRetries: 3
         };
 
-        // Debug logging utility
-        const Debug = {
-            enabled: true,
-            prefix: '[IMAGE-CAROUSEL]',
-            
-            log(...args) {
-                if (this.enabled) {
-                    console.log(this.prefix, ...args);
-                    this.addToPage('LOG', args.join(' '));
-                }
-            },
-            
-            error(...args) {
-                console.error(this.prefix + ' ERROR:', ...args);
-                this.addToPage('ERROR', args.join(' '), 'error');
-            },
-            
-            warn(...args) {
-                console.warn(this.prefix + ' WARNING:', ...args);
-                this.addToPage('WARN', args.join(' '), 'warning');
-            },
-            
-            group(title) {
-                if (this.enabled) {
-                    console.group(this.prefix + ' ' + title);
-                    this.addToPage('GROUP', title, 'group');
-                }
-            },
-            
-            groupEnd() {
-                if (this.enabled) {
-                    console.groupEnd();
-                }
-            },
-            
-            time(label) {
-                if (this.enabled) {
-                    console.time(this.prefix + ' ' + label);
-                }
-            },
-            
-            timeEnd(label) {
-                if (this.enabled) {
-                    console.timeEnd(this.prefix + ' ' + label);
-                }
-            },
-            
-            state() {
-                this.group('Current State');
-                this.log('State object:', JSON.parse(JSON.stringify(state)));
-                this.log('Elements cache:', Object.keys(elements).length > 0 ? elements : 'Empty');
-                this.log('DOM Cache entries:', DOMCache.cache.size);
-                this.log('Module config:', moduleConfig);
-                this.groupEnd();
-            },
-            
-            addToPage(type, message, className = '') {
-                // Add debug info to the page for visibility
-                try {
-                    const statusEl = document.getElementById('status-indicator');
-                    if (statusEl && type === 'ERROR') {
-                        statusEl.innerHTML = `Status: ERROR - ${message}`;
-                        statusEl.style.background = 'red';
-                    }
-                    
-                    let debugContainer = document.getElementById('debug-container');
-                    if (!debugContainer) {
-                        debugContainer = document.createElement('div');
-                        debugContainer.id = 'debug-container';
-                        debugContainer.className = 'debug-container';
-                        document.body.appendChild(debugContainer);
-                        
-                        // Update status
-                        if (statusEl) {
-                            statusEl.innerHTML = 'Status: Debug panel created...';
-                            statusEl.style.background = 'orange';
-                        }
-                    }
-                    
-                    const logEntry = document.createElement('div');
-                    logEntry.className = `debug-entry ${className}`;
-                    logEntry.textContent = `${new Date().toLocaleTimeString()} [${type}] ${message}`;
-                    debugContainer.appendChild(logEntry);
-                    
-                    // Limit to last 50 entries
-                    const entries = debugContainer.children;
-                    if (entries.length > 50) {
-                        debugContainer.removeChild(entries[0]);
-                    }
-                } catch (debugError) {
-                    console.error('Debug panel error:', debugError);
-                }
-            }
-        };
-
         const state = { sdk: null, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
         const elements = {};
-
-        Debug.log('Module initialization started');
-        Debug.state();
-        
-        // Update status
-        try {
-            const statusEl = document.getElementById('status-indicator');
-            if (statusEl) {
-                statusEl.innerHTML = 'Status: Debug system initialized...';
-                statusEl.style.background = 'purple';
-            }
-        } catch (e) {
-            console.error('Status update failed:', e);
-        }
-        
-        // Monitor for CSP violations
-        document.addEventListener('securitypolicyviolation', (e) => {
-            Debug.error('CSP Violation detected:', {
-                directive: e.violatedDirective,
-                blocked: e.blockedURI,
-                source: e.sourceFile,
-                line: e.lineNumber
-            });
-        });
-        
-        // Check if external scripts loaded
-        setTimeout(() => {
-            try {
-                const statusEl = document.getElementById('status-indicator');
-                if (typeof window.sfdc !== 'undefined') {
-                    Debug.log('✓ Salesforce SDK available');
-                    if (statusEl) {
-                        statusEl.innerHTML = 'Status: Salesforce SDK found...';
-                        statusEl.style.background = 'teal';
-                    }
-                } else {
-                    Debug.error('✗ Salesforce SDK not available');
-                    if (statusEl) {
-                        statusEl.innerHTML = 'Status: ERROR - Salesforce SDK not found';
-                        statusEl.style.background = 'red';
-                    }
-                }
-            } catch (e) {
-                Debug.error('SDK check failed:', e);
-            }
-        }, 1000);
-        
-        // Global error handler
-        window.addEventListener('error', (e) => {
-            Debug.error('Global error:', e.message, 'at', e.filename + ':' + e.lineno);
-        });
-        
-        // Unhandled promise rejection handler
-        window.addEventListener('unhandledrejection', (e) => {
-            Debug.error('Unhandled promise rejection:', e.reason);
-        });
-
-        // Global error handler for debugging
-        window.addEventListener('error', (event) => {
-            Debug.error('Global error caught:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno,
-                error: event.error
-            });
-        });
-
-        window.addEventListener('unhandledrejection', (event) => {
-            Debug.error('Unhandled promise rejection:', {
-                reason: event.reason,
-                promise: event.promise
-            });
-        });
-
-        // Create a DOM cache utility to consolidate repeated DOM queries
-        const DOMCache = {
-            cache: new Map(),
-            get(selector) {
-                Debug.log(`DOMCache.get('${selector}')`);
-                if (!this.cache.has(selector)) {
-                    const element = document.querySelector(selector);
-                    Debug.log(`Element found for '${selector}':`, element ? 'YES' : 'NO');
-                    this.cache.set(selector, element);
-                }
-                return this.cache.get(selector);
-            },
-            getAll(selector) {
-                Debug.log(`DOMCache.getAll('${selector}')`);
-                if (!this.cache.has(selector + '_all')) {
-                    const elements = document.querySelectorAll(selector);
-                    Debug.log(`Elements found for '${selector}':`, elements.length);
-                    this.cache.set(selector + '_all', elements);
-                }
-                return this.cache.get(selector + '_all');
-            },
-            clear() { 
-                Debug.log('DOMCache cleared');
-                this.cache.clear(); 
-            },
-            clearDynamic() {
-                const dynamicKeys = Array.from(this.cache.keys()).filter(key => 
-                    key.includes('.image-item') || key.includes('[data-')
-                );
-                Debug.log('Clearing dynamic cache entries:', dynamicKeys);
-                dynamicKeys.forEach(key => this.cache.delete(key));
-            }
-        };
-
-        // Utility for retryable operations
-        const RetryableOperation = {
-            async execute(operation, options = {}) {
-                const { maxRetries = 3, delay = 1000, backoff = 2, onRetry = () => {} } = options;
-                let lastError;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        return await operation();
-                    } catch (error) {
-                        lastError = error;
-                        if (i < maxRetries - 1) {
-                            onRetry(i + 1, error);
-                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(backoff, i)));
-                        }
-                    }
-                }
-                throw lastError;
-            }
-        };
-
-        // Enhanced validation utility
-        const Validator = {
-            rules: {
-                url: (value) => !value || utils.isValidUrl(value),
-                email: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-                number: (min, max) => (value) => {
-                    const num = parseFloat(value);
-                    return !isNaN(num) && num >= min && num <= max;
-                },
-                length: (max) => (value) => !value || value.length <= max,
-                required: (value) => value && value.trim().length > 0,
-                alphanumeric: (value) => !value || /^[a-zA-Z0-9\s]+$/.test(value),
-                noHtml: (value) => !value || !/[<>]/.test(value)
-            },
-            
-            validateField(input, rules, errorElement = null) {
-                const isValid = rules.every(rule => rule(input.value));
-                
-                // Visual feedback
-                input.classList.toggle('error', !isValid);
-                
-                // Add aria-invalid for accessibility
-                input.setAttribute('aria-invalid', !isValid);
-                
-                // Show/hide error message if error element provided
-                if (errorElement) {
-                    errorElement.classList.toggle('show', !isValid);
-                    if (!isValid) {
-                        errorElement.textContent = this.getErrorMessage(input, rules);
-                    }
-                }
-                
-                return isValid;
-            },
-            
-            getErrorMessage(input, rules) {
-                const value = input.value;
-                
-                if (rules.includes(this.rules.required) && !value.trim()) {
-                    return 'This field is required';
-                }
-                if (rules.includes(this.rules.url) && !this.rules.url(value)) {
-                    return 'Please enter a valid URL (http:// or https://)';
-                }
-                if (rules.includes(this.rules.email) && !this.rules.email(value)) {
-                    return 'Please enter a valid email address';
-                }
-                if (rules.some(rule => rule.toString().includes('length')) && value.length > 0) {
-                    const maxLength = input.getAttribute('maxlength') || '100';
-                    return `Maximum ${maxLength} characters allowed`;
-                }
-                if (rules.includes(this.rules.noHtml) && !this.rules.noHtml(value)) {
-                    return 'HTML tags are not allowed';
-                }
-                
-                return 'Invalid input';
-            },
-            
-            // Real-time validation setup
-            setupRealTimeValidation(input, rules, errorElement = null) {
-                const validateInput = () => {
-                    return this.validateField(input, rules, errorElement);
-                };
-                
-                // Validate on input (immediate feedback)
-                input.addEventListener('input', validateInput);
-                
-                // Validate on blur (final check)
-                input.addEventListener('blur', validateInput);
-                
-                // Initial validation if field has value
-                if (input.value) {
-                    validateInput();
-                }
-                
-                return validateInput;
-            },
-            
-            // Validate all form fields
-            validateAll(container = document) {
-                const inputs = container.querySelectorAll('.field-input[data-field]');
-                let allValid = true;
-                
-                inputs.forEach(input => {
-                    const rules = [];
-                    
-                    // Add rules based on input attributes and type
-                    if (input.hasAttribute('required') || input.dataset.field === 'imageUrl') {
-                        rules.push(this.rules.required);
-                    }
-                    if (input.type === 'url') {
-                        rules.push(this.rules.url);
-                    }
-                    if (input.type === 'email') {
-                        rules.push(this.rules.email);
-                    }
-                    if (input.hasAttribute('maxlength')) {
-                        const max = parseInt(input.getAttribute('maxlength'));
-                        rules.push(this.rules.length(max));
-                    }
-                    
-                    // Always check for HTML
-                    rules.push(this.rules.noHtml);
-                    
-                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
-                    const isValid = this.validateField(input, rules, errorElement);
-                    
-                    if (!isValid) {
-                        allValid = false;
-                    }
-                });
-                
-                return allValid;
-            }
-        };
-
         let rafId = null;
 
-        // Enhanced memory management with weak references for slides
+        // Advanced memory management
+        const slideMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for slide:', heldValue);
-            SlideManager.cleanup();
         });
-
-        // Lazy loading utility for performance optimization (images)
-        const LazyLoader = {
-            observer: null,
-            pendingElements: new Map(),
-            
-            init() {
-                if (!window.IntersectionObserver) {
-                    console.warn('IntersectionObserver not supported, images will load immediately');
-                    return false;
-                }
-                
-                this.observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            const src = img.dataset.src;
-                            
-                            if (src) {
-                                console.log(`Lazy loading image:`, src);
-                                img.src = src;
-                                img.removeAttribute('data-src');
-                                this.observer.unobserve(img);
-                                this.pendingElements.delete(img);
-                            }
-                        }
-                    });
-                }, {
-                    rootMargin: '50px',
-                    threshold: 0.1
-                });
-                
-                console.log('LazyLoader initialized for images');
-                return true;
-            },
-            
-            observe(img, src) {
-                if (!this.observer) {
-                    // Fallback to immediate loading
-                    img.src = src;
-                    return;
-                }
-                
-                img.dataset.src = src;
-                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjIwIiBoZWlnaHQ9IjM1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+'; // Loading placeholder
-                
-                this.pendingElements.set(img, {
-                    src,
-                    timestamp: Date.now()
-                });
-                
-                this.observer.observe(img);
-                console.log(`Image queued for lazy loading:`, src);
-            },
-            
-            disconnect() {
-                if (this.observer) {
-                    this.observer.disconnect();
-                    this.pendingElements.clear();
-                    console.log('LazyLoader disconnected');
-                }
-            },
-            
-            getStats() {
-                return {
-                    supported: Boolean(this.observer),
-                    pending: this.pendingElements.size
-                };
-            },
-            
-            // Force load all pending images (fallback)
-            forceLoadAll() {
-                const images = Array.from(this.pendingElements.keys());
-                images.forEach(img => {
-                    const src = img.dataset.src;
-                    if (src) {
-                        img.src = src;
-                        img.removeAttribute('data-src');
-                        if (this.observer) {
-                            this.observer.unobserve(img);
-                        }
-                        this.pendingElements.delete(img);
-                    }
-                });
-                console.log(`Force loaded ${images.length} pending images`);
-                return images.length;
-            }
-        };
-
-        // Enhanced memory management for slide elements
-        const SlideManager = {
-            slides: new WeakMap(),
-            references: new Map(),
-            metadata: new Map(),
-            
-            register(id, slideElement, metadata = {}) {
-                const ref = new WeakRef(slideElement);
-                this.references.set(id, ref);
-                this.slides.set(slideElement, {
-                    id,
-                    ...metadata,
-                    created: Date.now(),
-                    lastAccessed: Date.now()
-                });
-                this.metadata.set(id, {
-                    id,
-                    ...metadata,
-                    created: Date.now(),
-                    element: slideElement
-                });
-                
-                // Register for cleanup
-                cleanupRegistry.register(slideElement, id);
-                
-                console.log(`Slide ${id} registered with enhanced memory management`);
-                return ref;
-            },
-            
-            get(id) {
-                const ref = this.references.get(id);
-                if (ref) {
-                    const slide = ref.deref();
-                    if (slide) {
-                        // Update last accessed time
-                        const slideData = this.slides.get(slide);
-                        if (slideData) {
-                            slideData.lastAccessed = Date.now();
-                        }
-                        return slide;
-                    } else {
-                        // Slide was garbage collected
-                        console.log(`Slide ${id} was garbage collected`);
-                        this.references.delete(id);
-                        this.metadata.delete(id);
-                    }
-                }
-                return null;
-            },
-            
-            has(id) {
-                const ref = this.references.get(id);
-                return ref && ref.deref() !== undefined;
-            },
-            
-            delete(id) {
-                const ref = this.references.get(id);
-                if (ref) {
-                    const slide = ref.deref();
-                    if (slide) {
-                        this.slides.delete(slide);
-                    }
-                }
-                this.references.delete(id);
-                this.metadata.delete(id);
-                console.log(`Slide ${id} removed from memory management`);
-            },
-            
-            cleanup() {
-                // Clean up dead references
-                let cleaned = 0;
-                for (const [id, ref] of this.references) {
-                    if (!ref.deref()) {
-                        this.references.delete(id);
-                        this.metadata.delete(id);
-                        cleaned++;
-                    }
-                }
-                if (cleaned > 0) {
-                    console.log(`Cleaned up ${cleaned} dead slide references`);
-                }
-                return cleaned;
-            },
-            
-            getStats() {
-                const alive = Array.from(this.references.values())
-                    .filter(ref => ref.deref()).length;
-                return {
-                    total: this.references.size,
-                    alive,
-                    dead: this.references.size - alive,
-                    metadata: this.metadata.size
-                };
-            },
-            
-            // Clear all references
-            clear() {
-                this.references.clear();
-                this.metadata.clear();
-                this.slides = new WeakMap();
-                console.log('All slide references cleared');
-            }
-        };
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
             isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; } },
-            showError(msg, p = false) { 
-                Debug.error('Showing error:', msg);
-                console.error(msg); 
-                if(elements.errorBanner) { 
-                    Debug.log('Error banner element found - displaying error');
-                    elements.errorBanner.textContent=msg; 
-                    elements.errorBanner.classList.add('show'); 
-                    if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); 
-                } else {
-                    Debug.error('Error banner element not found - cannot display error visually');
-                }
-            },
+            showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
             getFieldValue(f) { const v = state.blockData[f]; return v !== undefined ? v : moduleConfig.fields[f].defaultValue; },
 
             addEventListenerTracked(element, event, handler) {
@@ -783,53 +116,17 @@
         };
 
         function cacheElements() {
-            Debug.group('Caching Elements');
-            Debug.time('Element Caching');
-            
-            const requiredElements = [
-                'mainContainer',
-                'loadingOverlay', 
-                'errorBanner',
-                'slidesContainer',
-                'addSlideBtn',
-                'slideTemplate',
-                'fallbackImageUrl',
-                'fallbackLinkUrl',
-                'fallbackAltText'
-            ];
-            
-            requiredElements.forEach(id => {
-                const element = document.getElementById(id);
-                elements[id] = element;
-                Debug.log(`${id}:`, element ? '✓ Found' : '✗ Missing');
-                if (!element) {
-                    Debug.error(`Critical element missing: #${id}`);
-                }
-            });
-            
-            // Cache error elements
-            if (elements.fallbackImageUrl) {
-                elements.fallbackImageUrlError = elements.fallbackImageUrl.nextElementSibling;
-                Debug.log('fallbackImageUrlError:', elements.fallbackImageUrlError ? '✓ Found' : '✗ Missing');
-            }
-            
-            if (elements.fallbackLinkUrl) {
-                elements.fallbackLinkUrlError = elements.fallbackLinkUrl.nextElementSibling;
-                Debug.log('fallbackLinkUrlError:', elements.fallbackLinkUrlError ? '✓ Found' : '✗ Missing');
-            }
-            
-            Debug.timeEnd('Element Caching');
-            Debug.log('Total elements cached:', Object.keys(elements).length);
-            Debug.groupEnd();
-            
-            // Check if any critical elements are missing
-            const missingElements = requiredElements.filter(id => !elements[id]);
-            if (missingElements.length > 0) {
-                Debug.error('Missing critical elements:', missingElements);
-                return false;
-            }
-            
-            return true;
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.slidesContainer = document.getElementById('slidesContainer');
+            elements.addSlideBtn = document.getElementById('addSlideBtn');
+            elements.slideTemplate = document.getElementById('slideTemplate');
+            elements.fallbackImageUrl = document.getElementById('fallbackImageUrl');
+            elements.fallbackLinkUrl = document.getElementById('fallbackLinkUrl');
+            elements.fallbackAltText = document.getElementById('fallbackAltText');
+            elements.fallbackImageUrlError = elements.fallbackImageUrl.nextElementSibling;
+            elements.fallbackLinkUrlError = elements.fallbackLinkUrl.nextElementSibling;
         }
 
         function setLoadingState(loading) {
@@ -839,24 +136,6 @@
         }
 
         function updateDataFromUI() {
-            // Validate all fields before updating
-            const isFormValid = Validator.validateAll(elements.slidesContainer);
-            
-            // Validate global fallback fields
-            const globalFields = [
-                { element: elements.fallbackImageUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackLinkUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackAltText, rules: [Validator.rules.length(100), Validator.rules.noHtml] }
-            ];
-            
-            let globalValid = true;
-            globalFields.forEach(({ element, rules }) => {
-                const errorElement = element.closest('.field-group')?.querySelector('.field-error');
-                if (!Validator.validateField(element, rules, errorElement)) {
-                    globalValid = false;
-                }
-            });
-            
             // Use DocumentFragment for efficient DOM operations and modern array methods
             const newSlides = Array.from(
                 elements.slidesContainer.querySelectorAll('.slide-item'),
@@ -865,56 +144,24 @@
                     const imageUrl = slideEl.querySelector('[data-field="imageUrl"]').value;
                     const linkUrl = slideEl.querySelector('[data-field="linkUrl"]').value;
                     const altText = slideEl.querySelector('[data-field="altText"]').value;
-                    
-                    // Only include valid slides
-                    const imageInput = slideEl.querySelector('[data-field="imageUrl"]');
-                    if (imageInput && !imageInput.classList.contains('error') && imageUrl.trim()) {
-                        return { id, imageUrl, linkUrl, altText };
-                    }
-                    return null;
+                    return { id, imageUrl, linkUrl, altText };
                 }
-            ).filter(Boolean); // Remove null entries
+            );
 
-            // Only update if valid
-            if (isFormValid && globalValid && newSlides.length > 0) {
-                state.blockData.slides = newSlides;
-                state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
-                state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
-                state.blockData.fallbackAltText = elements.fallbackAltText.value;
-                refreshPreview();
-            } else if (newSlides.length === 0 && isFormValid && globalValid) {
-                // Show empty state but don't break functionality
-                state.blockData.slides = [];
-                refreshPreview();
-            }
+            state.blockData.slides = newSlides;
+            state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
+            state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
+            state.blockData.fallbackAltText = elements.fallbackAltText.value;
+            refreshPreview();
         }
 
         const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
 
         function renderSlidesUI() {
-            Debug.group('Rendering Slides UI');
-            Debug.time('Slide Rendering');
-            
             const slides = utils.getFieldValue('slides');
-            Debug.log('Slides to render:', slides?.length || 0);
 
             if (!slides || slides.length === 0) {
-                Debug.warn('No slides to render - clearing container');
-                if (elements.slidesContainer) {
-                    elements.slidesContainer.replaceChildren();
-                } else {
-                    Debug.error('slidesContainer element not found!');
-                }
-                Debug.timeEnd('Slide Rendering');
-                Debug.groupEnd();
-                return;
-            }
-
-            Debug.log('Template element:', elements.slideTemplate ? '✓ Found' : '✗ Missing');
-            if (!elements.slideTemplate) {
-                Debug.error('slideTemplate element missing - cannot render slides');
-                Debug.timeEnd('Slide Rendering');
-                Debug.groupEnd();
+                elements.slidesContainer.replaceChildren();
                 return;
             }
 
@@ -922,120 +169,28 @@
             const fragment = document.createDocumentFragment();
 
             slides.forEach((slide, index) => {
-                Debug.log(`Rendering slide ${index + 1}:`, slide);
-                
                 const slideFragment = elements.slideTemplate.content.cloneNode(true);
                 const slideEl = slideFragment.querySelector('.slide-item');
-                
-                if (!slideEl) {
-                    Debug.error('slide-item element not found in template');
-                    return;
-                }
-                
                 slideEl.dataset.id = slide.id;
-                
-                const slideTitle = slideEl.querySelector('.slide-title');
-                if (slideTitle) {
-                    slideTitle.textContent = `Slide ${index + 1}`;
-                } else {
-                    Debug.warn('slide-title element not found');
-                }
-                
-                const imageInput = slideEl.querySelector('[data-field="imageUrl"]');
-                const linkInput = slideEl.querySelector('[data-field="linkUrl"]');
-                const altInput = slideEl.querySelector('[data-field="altText"]');
-                
-                Debug.log('Form inputs found:', {
-                    imageInput: !!imageInput,
-                    linkInput: !!linkInput,
-                    altInput: !!altInput
-                });
-                
-                if (imageInput) imageInput.value = slide.imageUrl || '';
-                if (linkInput) linkInput.value = slide.linkUrl || '';
-                if (altInput) altInput.value = slide.altText || '';
+                slideEl.querySelector('.slide-title').textContent = `Slide ${index + 1}`;
+                slideEl.querySelector('[data-field="imageUrl"]').value = slide.imageUrl || '';
+                slideEl.querySelector('[data-field="linkUrl"]').value = slide.linkUrl || '';
+                slideEl.querySelector('[data-field="altText"]').value = slide.altText || '';
 
-                // Set up validation for each field
-                const imageError = slideEl.querySelector('#imageUrl-error');
-                const linkError = slideEl.querySelector('#linkUrl-error');
-                const altError = slideEl.querySelector('#altText-error');
-
-                Debug.log('Error elements found:', {
-                    imageError: !!imageError,
-                    linkError: !!linkError,
-                    altError: !!altError
-                });
-
-                // Image URL validation (required)
-                if (imageInput) {
-                    const imageRules = [Validator.rules.required, Validator.rules.url];
-                    Validator.setupRealTimeValidation(imageInput, imageRules, imageError);
-                }
-                
-                // Link URL validation (optional)
-                if (linkInput) {
-                    const linkRules = [Validator.rules.url];
-                    Validator.setupRealTimeValidation(linkInput, linkRules, linkError);
-                }
-                
-                // Alt text validation
-                if (altInput) {
-                    const altRules = [Validator.rules.length(100), Validator.rules.noHtml];
-                    Validator.setupRealTimeValidation(altInput, altRules, altError);
-                }
-
-                // Enhanced input handlers with validation
-                [imageInput, linkInput, altInput].filter(Boolean).forEach(input => {
-                    const rules = input === imageInput ? [Validator.rules.required, Validator.rules.url] : 
-                                 input === linkInput ? [Validator.rules.url] : 
-                                 [Validator.rules.length(100), Validator.rules.noHtml];
-                    const errorElement = input.closest('.field-group')?.querySelector('.field-error');
-                    
-                    const handleInput = (e) => {
-                        const isValid = Validator.validateField(e.target, rules, errorElement);
-                        Debug.log(`Input validation for ${input.dataset.field}:`, isValid);
-                        
-                        // Only update data if valid
-                        if (isValid) {
-                            debouncedUpdateDataFromUI();
-                        }
-                    };
-
-                    input.addEventListener('input', handleInput);
-                    input.addEventListener('blur', handleInput);
-                });
-
-                // Control button states
-                const moveUpBtn = slideEl.querySelector('.move-up-btn');
-                const moveDownBtn = slideEl.querySelector('.move-down-btn');
-                
-                if (moveUpBtn && index === 0) moveUpBtn.disabled = true;
-                if (moveDownBtn && index === slides.length - 1) moveDownBtn.disabled = true;
+                if(index === 0) slideEl.querySelector('.move-up-btn').disabled = true;
+                if(index === slides.length - 1) slideEl.querySelector('.move-down-btn').disabled = true;
 
                 fragment.appendChild(slideFragment);
 
-                // Track slide metadata with enhanced memory management
-                SlideManager.register(slide.id, slideEl, {
-                    id: slide.id,
-                    index,
-                    element: slideEl
-                });
-                
-                Debug.log(`✓ Slide ${index + 1} rendered successfully`);
+                // Track slide metadata
+                const metadata = { id: slide.id, index, element: slideEl };
+                slideMetadata.set(slideEl, metadata);
+                cleanupRegistry.register(slideEl, slide.id);
             });
 
             // Single DOM update
-            Debug.log('Updating DOM with rendered slides...');
-            if (elements.slidesContainer) {
-                elements.slidesContainer.replaceChildren();
-                elements.slidesContainer.appendChild(fragment);
-                Debug.log('✓ DOM updated with', slides.length, 'slides');
-            } else {
-                Debug.error('slidesContainer not available for DOM update');
-            }
-            
-            Debug.timeEnd('Slide Rendering');
-            Debug.groupEnd();
+            elements.slidesContainer.replaceChildren();
+            elements.slidesContainer.appendChild(fragment);
         }
 
         // Optimized Event Delegation with Action Maps
@@ -1111,17 +266,19 @@
         }
 
         function initializeEventHandlers() {
-            // Set up validation for global fallback fields
-            const globalFields = [
-                { element: elements.fallbackImageUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackLinkUrl, rules: [Validator.rules.url] },
-                { element: elements.fallbackAltText, rules: [Validator.rules.length(100), Validator.rules.noHtml] }
-            ];
-            
-            globalFields.forEach(({ element, rules }) => {
-                const errorElement = element.closest('.field-group')?.querySelector('.field-error');
-                Validator.setupRealTimeValidation(element, rules, errorElement);
-                element.addEventListener('input', debouncedUpdateDataFromUI);
+            // Use tracked event listeners
+            utils.addEventListenerTracked(elements.mainContainer, 'input', (e) => {
+                if(e.target.classList.contains('field-input')) {
+                    const input = e.target;
+                    const errorEl = input.nextElementSibling;
+                    if(input.type === 'url') {
+                        const isValid = utils.isValidUrl(input.value);
+                        input.classList.toggle('error', !isValid);
+                        if(errorEl) errorEl.style.display = isValid ? 'none' : 'block';
+                        if(!isValid) return;
+                    }
+                    debouncedUpdateDataFromUI();
+                }
             });
 
             // Optimized event delegation for slide items
@@ -1440,59 +597,28 @@ input[type="radio"] {
         }
 
         function loadData() {
-            Debug.group('Loading Data');
-            Debug.time('Data Loading');
-            
-            if (!state.sdk) {
-                Debug.error('SDK not available for data loading');
-                return utils.showError('SDK not available');
-            }
-            
-            Debug.log('Setting loading state...');
+            if (!state.sdk) return utils.showError('SDK not available');
             setLoadingState(true);
 
-            Debug.log('Requesting data from SDK...');
             state.sdk.getData((data) => {
                 try {
-                    Debug.log('Raw data received:', data);
-                    
                     // When loading, prioritize the structured 'slides' data over saved 'content'
                     state.blockData.slides = (data && data.slides && data.slides.length > 0) ? data.slides : utils.getFieldValue('slides');
-                    Debug.log('Slides data processed:', state.blockData.slides.length, 'slides');
-                    
                     state.blockData.slides.forEach(s => { if (!s.id) s.id = crypto.randomUUID(); });
 
                     state.blockData.fallbackImageUrl = data?.fallbackImageUrl || '';
                     state.blockData.fallbackLinkUrl = data?.fallbackLinkUrl || '';
                     state.blockData.fallbackAltText = data?.fallbackAltText || '';
-                    
-                    Debug.log('Fallback data:', {
-                        imageUrl: state.blockData.fallbackImageUrl,
-                        linkUrl: state.blockData.fallbackLinkUrl,
-                        altText: state.blockData.fallbackAltText
-                    });
 
-                    Debug.log('Rendering slides UI...');
                     renderSlidesUI();
 
-                    Debug.log('Setting fallback field values...');
-                    if (elements.fallbackImageUrl) elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl;
-                    if (elements.fallbackLinkUrl) elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl;
-                    if (elements.fallbackAltText) elements.fallbackAltText.value = state.blockData.fallbackAltText;
+                    elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl;
+                    elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl;
+                    elements.fallbackAltText.value = state.blockData.fallbackAltText;
 
-                    Debug.log('Refreshing preview...');
                     refreshPreview();
                     state.retryCount = 0;
-                    
-                    Debug.log('✓ Data loading completed successfully');
-                    Debug.timeEnd('Data Loading');
-                    Debug.groupEnd();
-                    
                 } catch (error) {
-                    Debug.error('Data loading failed:', error);
-                    Debug.timeEnd('Data Loading');
-                    Debug.groupEnd();
-                    
                     utils.showError(`Failed to load data: ${error.message}`);
                     state.blockData = {}; // Reset to defaults on error
                     renderSlidesUI();
@@ -1517,145 +643,40 @@ input[type="radio"] {
                 rafId = null;
             }
 
-            // Clean up slide manager and all references
-            SlideManager.clear();
+            // Clear slide metadata
+            slideMetadata.clear();
 
-            // Cleanup lazy loader
-            LazyLoader.disconnect();
-
-            console.log('Image Carousel cleanup completed with enhanced memory management');
+            console.log('Image Carousel cleanup completed');
         }
 
         function initializeWithRetry() {
-            Debug.group('Initialization Started');
-            Debug.time('Total Initialization');
-            
             try {
-                Debug.log('Checking BlockSDK availability...');
-                if (!window.sfdc || !window.sfdc.BlockSDK) {
-                    throw new Error('BlockSDK not loaded');
-                }
-                Debug.log('✓ BlockSDK is available');
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
 
-                Debug.log('Creating BlockSDK instance...');
                 state.sdk = new window.sfdc.BlockSDK({
                     tabs: ['htmlblock']
                 });
-                Debug.log('✓ BlockSDK instance created');
-                
-                // Initialize lazy loading for images
-                Debug.log('Initializing LazyLoader...');
-                const lazySupported = LazyLoader.init();
-                Debug.log('LazyLoader supported:', lazySupported);
-                
-                Debug.log('Caching elements...');
-                const elementsCached = cacheElements();
-                if (!elementsCached) {
-                    throw new Error('Failed to cache required elements');
-                }
-                Debug.log('✓ Elements cached successfully');
-                
-                Debug.log('Initializing event handlers...');
+                cacheElements();
                 initializeEventHandlers();
-                Debug.log('✓ Event handlers initialized');
-                
-                Debug.log('Loading initial data...');
                 loadData();
-                Debug.log('✓ Data loading initiated');
 
                 // Add cleanup on page unload
                 window.addEventListener('beforeunload', cleanup);
 
-                // Add automatic cleanup on visibility change
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        Debug.log('Tab hidden - pausing expensive operations');
-                        
-                        // Pause expensive operations
-                        if (rafId) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
-                        
-                        // Clear caches to free memory (if DOMCache exists)
-                        if (typeof DOMCache !== 'undefined') {
-                            DOMCache.clear();
-                        }
-                        
-                        // Perform memory cleanup with SlideManager
-                        const cleanupStats = SlideManager.cleanup();
-                        Debug.log('Visibility cleanup - slides cleaned:', cleanupStats);
-                        
-                        // Run garbage collection hint if available
-                        if (window.gc) {
-                            Debug.log('Running garbage collection hint');
-                            window.gc();
-                        }
-                    } else {
-                        Debug.log('Tab visible - resuming operations');
-                        
-                        // Resume operations if needed
-                        if (state.isInitialized && !state.isLoading) {
-                            // Recache elements if DOMCache exists
-                            if (typeof cacheElements === 'function') {
-                                cacheElements();
-                            }
-                            
-                            // Refresh preview to ensure sync
-                            refreshPreview();
-                            
-                            Debug.log('Operations resumed, slide stats:', SlideManager.getStats());
-                        }
-                    }
-                });
-
-                // Start periodic memory cleanup
-                setInterval(() => {
-                    const stats = SlideManager.getStats();
-                    const cleaned = SlideManager.cleanup();
-                    Debug.log('Periodic memory cleanup:', {
-                        cleaned,
-                        stats,
-                        timestamp: new Date().toISOString()
-                    });
-                }, 120000); // Every 2 minutes
-
                 state.isInitialized = true;
-                Debug.log('✓ Initialization completed successfully');
-                Debug.timeEnd('Total Initialization');
-                Debug.state();
-                Debug.groupEnd();
-                
             } catch (error) {
-                Debug.error('Initialization failed:', error);
-                Debug.timeEnd('Total Initialization');
-                Debug.groupEnd();
-                
                 utils.showError(`Initialization failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
-                    Debug.warn(`Retrying initialization... Attempt ${state.retryCount}/${moduleConfig.maxRetries}`);
                     setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
                 } else {
-                    Debug.error('Failed to initialize after multiple attempts');
                     utils.showError('Failed to initialize after multiple attempts. Please refresh.', true);
                 }
                 setLoadingState(false);
             }
         }
 
-        // Initialize when DOM is ready
-        Debug.log('Document ready state:', document.readyState);
-        if (document.readyState === 'loading') {
-            Debug.log('Waiting for DOMContentLoaded...');
-            document.addEventListener('DOMContentLoaded', () => {
-                Debug.log('DOMContentLoaded fired - starting initialization');
-                initializeWithRetry();
-            });
-        } else {
-            Debug.log('DOM already ready - starting initialization immediately');
-            initializeWithRetry();
-        }
+        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initializeWithRetry) : initializeWithRetry();
     </script>
 </body>
 </html>
