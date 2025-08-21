@@ -27,6 +27,17 @@
         .style-control-group .option-selector {
             width: 110px; /* Give alignment buttons a fixed width */
         }
+
+        /* -- CHECKLIST STYLES -- */
+        .items-container{display:flex;flex-direction:column;gap:15px;contain:layout}
+        .item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative;contain:layout style paint}
+        .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .item-title{font-weight:bold;font-size:16px;margin:0}
+        .item-controls{display:flex;gap:8px}
+        .item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}
+        .item-control-btn:hover{color:#0074d9}
+        .item-control-btn:disabled{color:#ccc;cursor:not-allowed}
+        .btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}
     </style>
 </head>
 <body>
@@ -56,13 +67,31 @@
                     <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
+
+            <!-- Content Type Selection -->
             <div class="field-group">
+                <label class="field-label">Content Type</label>
+                <div class="option-selector" id="contentTypeSelector">
+                    <div class="option-button selected" data-value="text">Body Text</div>
+                    <div class="option-button" data-value="checklist">Checklist</div>
+                </div>
+            </div>
+
+            <!-- Body Text Content -->
+            <div class="field-group" id="bodyTextGroup">
                 <label class="field-label">Body Text</label>
                 <div id="bodyEditor" class="quill-container"></div>
                 <div class="style-controls-wrapper">
                     <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4"></div>
                     <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="bodyAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
+            </div>
+
+            <!-- Checklist Content -->
+            <div class="field-group" id="checklistGroup" style="display: none;">
+                <label class="field-label">Checklist Items</label>
+                <div id="itemsContainer" class="items-container"></div>
+                <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
             </div>
         </div>
 
@@ -80,6 +109,20 @@
         </div>
     </div>
 
+    <template id="itemTemplate">
+        <div class="item">
+            <div class="item-header">
+                <h3 class="item-title">Item</h3>
+                <div class="item-controls">
+                    <button class="item-control-btn move-up-btn" title="Move Up">▲</button>
+                    <button class="item-control-btn move-down-btn" title="Move Down">▼</button>
+                    <button class="item-control-btn remove-btn" title="Remove Item">×</button>
+                </div>
+            </div>
+            <div class="quill-container limited-toolbar"></div>
+        </div>
+    </template>
+
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
@@ -95,9 +138,18 @@
                 title: { type: 'richtext', defaultValue: 'Lorem ipsum dolor sit amet', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 24 },
                 titleAlignment: { type: 'text', defaultValue: 'left' },
+                contentType: { type: 'text', defaultValue: 'text' },
                 bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.', maxLength: 400 },
                 bodyFontSize: { type: 'number', defaultValue: 16 },
                 bodyAlignment: { type: 'text', defaultValue: 'left' },
+                checklistItems: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), text: '<strong>Lorem ipsum odor amet</strong>' },
+                        { id: crypto.randomUUID(), text: '<strong>Consectetur adipiscing elit</strong>' },
+                        { id: crypto.randomUUID(), text: '<strong>Donec a diam lectus</strong>' }
+                    ]
+                },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
@@ -150,13 +202,21 @@
                 const t = document.createElement('div'); 
                 t.innerHTML = h; 
                 t.querySelectorAll('script, style').forEach(e => e.remove()); 
+                
+                // Handle Quill's <p> tags and also allow our <sup> and <a> tags through.
+                t.querySelectorAll('a').forEach(link => {
+                    if (!link.style.color) link.style.color = '#ffffff';
+                    if (!link.style.textDecoration) link.style.textDecoration = 'underline';
+                    if (!link.getAttribute('href')) link.setAttribute('href', '#');
+                });
+                
                 const a = t.getElementsByTagName('*'); 
                 for (let e of a) { 
                     for (let r of e.attributes) { 
                         if (r.name.startsWith('on')) e.removeAttribute(r.name); 
                     } 
                 } 
-                return t.innerHTML; 
+                return t.innerHTML.replace(/<p>/g, '').replace(/<\/p>/g, ''); 
             },
             showError(m, p = false) { 
                 if (elements.errorBanner) { 
@@ -219,6 +279,43 @@
                     // Remove from state
                     delete state.editors[id];
                 }
+            },
+
+            createChecklistEditor(container, id, content = '') {
+                // Create editor with simple configuration for checklist items
+                const editor = new Quill(container, {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [['bold', { 'script': 'super' }], ['link']],
+                        clipboard: { matchVisual: false }
+                    },
+                    formats: ['bold', 'script', 'link'],
+                    placeholder: 'List item text...'
+                });
+
+                // Track editor metadata
+                const metadata = {
+                    id,
+                    created: Date.now(),
+                    container,
+                    hasContent: Boolean(content && content.trim())
+                };
+
+                editorMetadata.set(editor, metadata);
+                cleanupRegistry.register(editor, id);
+
+                // Set content if provided
+                if (content && content.trim()) {
+                    editor.setContents([]);
+                    editor.clipboard.dangerouslyPasteHTML(content);
+                }
+
+                return editor;
+            },
+
+            addEventListenerTracked(element, event, handler) {
+                element.addEventListener(event, handler);
+                state.eventListeners.push({ element, event, handler });
             }
         };
 
@@ -232,9 +329,15 @@
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
+            elements.contentTypeSelector = document.getElementById('contentTypeSelector');
+            elements.bodyTextGroup = document.getElementById('bodyTextGroup');
             elements.bodyEditor = document.getElementById('bodyEditor');
             elements.bodyFontSize = document.getElementById('bodyFontSize');
             elements.bodyAlignmentSelector = document.getElementById('bodyAlignmentSelector');
+            elements.checklistGroup = document.getElementById('checklistGroup');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
@@ -318,6 +421,7 @@
             const bgColorHex = backgroundColor === 'red' ? '#DB021D' : '#000000';
             const showTitle = utils.getFieldValue('showTitle');
             const showButton = utils.getFieldValue('showButton');
+            const contentType = utils.getFieldValue('contentType');
 
             let titleHtml = '';
             if (showTitle) {
@@ -328,11 +432,30 @@
                 titleHtml = `<tr><td class="mobile-text-left" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>`;
             }
 
-            const processedBody = processRichText(utils.getFieldValue('bodyText'));
-            const bodySize = utils.getFieldValue('bodyFontSize');
-            const bodyAlign = utils.getFieldValue('bodyAlignment');
-            const bodyLineHeight = bodySize + 12;
-            const bodyHtml = `<tr><td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${bodyAlign}; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
+            let contentHtml = '';
+            if (contentType === 'checklist') {
+                // Generate checklist content
+                const items = utils.getFieldValue('checklistItems');
+                const itemRowsHtml = items.map(item => `
+                    <tr>
+                       <td valign="top" style="padding-bottom: 8px;">
+                        <img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none;" width="20"></td>
+                       <td valign="top" style="width: 12px; padding-bottom: 8px;"> </td>
+                       <td class="story-intro mobile-text-left" valign="top" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; margin: 0; mso-line-height-rule: exactly; text-align: left; padding-bottom: 8px;">
+                        ${item.text}
+                       </td>
+                    </tr>
+                `).join('');
+                
+                contentHtml = `<tr><td><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">${itemRowsHtml}</table></td></tr>`;
+            } else {
+                // Generate body text content
+                const processedBody = processRichText(utils.getFieldValue('bodyText'));
+                const bodySize = utils.getFieldValue('bodyFontSize');
+                const bodyAlign = utils.getFieldValue('bodyAlignment');
+                const bodyLineHeight = bodySize + 12;
+                contentHtml = `<tr><td class="mobile-text-left" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${bodyAlign}; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
+            }
 
             let buttonHtml = '';
             if (showButton) {
@@ -345,7 +468,7 @@
                 buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
-            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}${titleHtml}${bodyHtml}${buttonHtml}<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .fw-lead -->`;
+            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}${titleHtml}${contentHtml}${buttonHtml}<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .fw-lead -->`;
         }
 
         function refreshPreview() {
@@ -363,6 +486,140 @@
                     utils.showError(`Preview update failed: ${error.message}`); 
                 }
             });
+        }
+
+        function updateDataFromUI() {
+            const contentType = utils.getFieldValue('contentType');
+            
+            // Update checklist items if in checklist mode
+            if (contentType === 'checklist') {
+                const newItems = [];
+                document.querySelectorAll('#itemsContainer .item').forEach(itemEl => {
+                    const id = itemEl.dataset.id;
+                    const editor = state.editors[id];
+                    if (editor) {
+                        // Use Quill 2.0 API for getting content
+                        const content = editor.getSemanticHTML ? 
+                            editor.getSemanticHTML() : 
+                            editor.root.innerHTML;
+                        newItems.push({ id: id, text: utils.sanitizeHtml(content) });
+                    }
+                });
+                state.blockData.checklistItems = newItems;
+            }
+
+            refreshPreview();
+        }
+
+        const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
+
+        function renderItemsUI() {
+            const items = utils.getFieldValue('checklistItems');
+
+            // Clean up existing editors first
+            const currentIds = new Set(items.map(i => i.id));
+            Object.keys(state.editors).forEach(id => {
+                if (!currentIds.has(id) && !['title', 'bodyText', 'buttonText'].includes(id)) {
+                    utils.cleanupEditor(id);
+                }
+            });
+
+            // Use DocumentFragment for batch DOM operations
+            const fragment = document.createDocumentFragment();
+
+            items.forEach((item, index) => {
+                const itemFragment = elements.itemTemplate.content.cloneNode(true);
+                const itemEl = itemFragment.querySelector('.item');
+                const editorDiv = itemFragment.querySelector('.quill-container');
+
+                itemEl.dataset.id = item.id;
+                itemEl.querySelector('.item-title').textContent = `Item ${index + 1}`;
+
+                if(index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
+                if(index === items.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
+
+                fragment.appendChild(itemFragment);
+
+                // Create editor with memory management
+                const editor = utils.createChecklistEditor(editorDiv, item.id, item.text);
+                editor.on('text-change', debouncedUpdateDataFromUI);
+                state.editors[item.id] = editor;
+            });
+
+            // Single DOM update
+            elements.itemsContainer.replaceChildren();
+            elements.itemsContainer.appendChild(fragment);
+        }
+
+        // Optimized Event Delegation with Action Maps
+        const itemActions = {
+            '.remove-btn': (item, index, items, context) => {
+                items.splice(index, 1);
+                if (context.hasQuill && item.id) {
+                    utils.cleanupEditor(item.id);
+                }
+                return true;
+            },
+            '.move-up-btn': (item, index, items) => {
+                if (index > 0) {
+                    [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                    return true;
+                }
+                return false;
+            },
+            '.move-down-btn': (item, index, items) => {
+                if (index < items.length - 1) {
+                    [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        function createDelegatedHandler(fieldName, actionMap) {
+            return (event) => {
+                // Handle add button clicks
+                if (event.target.closest('#addItemBtn')) {
+                    const currentItems = utils.getFieldValue(fieldName);
+                    const newItems = [...currentItems, { id: crypto.randomUUID(), text: '<strong>New Item</strong>' }];
+                    state.blockData[fieldName] = newItems;
+                    renderItemsUI();
+                    updateDataFromUI();
+                    return;
+                }
+
+                // Find the closest item element
+                const itemEl = event.target.closest('.item');
+                if (!itemEl) return;
+
+                const id = itemEl.dataset.id;
+                const currentItems = state.blockData[fieldName];
+                const itemIndex = currentItems.findIndex(i => i.id === id);
+
+                if (itemIndex === -1) return;
+
+                const item = currentItems[itemIndex];
+                let actionExecuted = false;
+
+                // Execute action using action map
+                for (const [selector, action] of Object.entries(actionMap)) {
+                    if (event.target.closest(selector)) {
+                        const context = { hasQuill: true, fieldName };
+                        const result = action(item, itemIndex, currentItems, context);
+
+                        if (result) {
+                            actionExecuted = true;
+                            renderItemsUI();
+                            updateDataFromUI();
+                        }
+                        break;
+                    }
+                }
+
+                if (!actionExecuted) {
+                    console.log('No matching action found for selector');
+                }
+            };
         }
 
         function initializeEventHandlers() {
@@ -387,6 +644,34 @@
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
             setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment');
 
+            // Special handler for content type selector to toggle UI
+            function setupContentTypeSelector() {
+                if (!elements.contentTypeSelector) return;
+                elements.contentTypeSelector.querySelectorAll('.option-button').forEach(option => {
+                    const handler = (e) => {
+                        const button = e.currentTarget;
+                        const contentType = button.dataset.value;
+                        
+                        updateData('contentType', contentType);
+                        elements.contentTypeSelector.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
+                        button.classList.add('selected');
+                        
+                        // Toggle content groups
+                        elements.bodyTextGroup.style.display = contentType === 'text' ? 'block' : 'none';
+                        elements.checklistGroup.style.display = contentType === 'checklist' ? 'block' : 'none';
+                        
+                        // Render checklist items if switching to checklist
+                        if (contentType === 'checklist') {
+                            renderItemsUI();
+                        }
+                    };
+                    option.addEventListener('click', handler);
+                    state.eventListeners.push({ element: option, event: 'click', handler });
+                });
+            }
+
+            setupContentTypeSelector();
+
             function setupToggle(toggleElement, groupElement, dataKey) { 
                 const handler = (e) => { 
                     const isChecked = e.target.checked; 
@@ -399,6 +684,12 @@
 
             setupToggle(elements.showTitle, elements.titleGroup, 'showTitle');
             setupToggle(elements.showButton, elements.buttonFieldsGroup, 'showButton');
+
+            // Optimized event delegation for checklist items
+            const checklistHandler = createDelegatedHandler('checklistItems', itemActions);
+            
+            utils.addEventListenerTracked(elements.addItemBtn, 'click', checklistHandler);
+            utils.addEventListenerTracked(elements.itemsContainer, 'click', checklistHandler);
 
             function setupNumberInput(inputElement, dataKey) { 
                 const step = 4; 
@@ -465,6 +756,19 @@
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
                     setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
                     setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment');
+                    setSelectorState(elements.contentTypeSelector, 'contentType');
+
+                    // Handle content type specific UI
+                    const contentType = utils.getFieldValue('contentType');
+                    elements.bodyTextGroup.style.display = contentType === 'text' ? 'block' : 'none';
+                    elements.checklistGroup.style.display = contentType === 'checklist' ? 'block' : 'none';
+
+                    // Ensure checklist items have IDs
+                    const checklistItems = utils.getFieldValue('checklistItems');
+                    checklistItems.forEach(item => { 
+                        if (!item.id) item.id = crypto.randomUUID(); 
+                    });
+                    state.blockData.checklistItems = checklistItems;
 
                     function setToggleState(toggleEl, groupEl, dataKey) { 
                         const isChecked = utils.getFieldValue(dataKey); 
@@ -497,6 +801,11 @@
                             }
                         }
                     });
+
+                    // Render checklist items if in checklist mode
+                    if (contentType === 'checklist') {
+                        renderItemsUI();
+                    }
 
                     refreshPreview();
                     state.retryCount = 0;
