@@ -265,10 +265,8 @@
             const buttonUrl = utils.getFieldValue('buttonUrl');
 
             const subtitleHtml = showSubtitle ? `<!-- Subtitle --><p class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; margin: 0; text-align: center; font-size: ${subtitleSize}px; line-height: ${subtitleLineHeight}px; mso-hyphenate: none; hyphens: none;">${subtitle}</p>` : '';
-            // Only set margin to 0 when there's a subtitle (to remove default spacing between subtitle and title)
-            // When no subtitle but there's a button, let natural h2 margin provide spacing
-            // When no subtitle and no button, add bottom margin for spacing
-            const titleMargin = showSubtitle ? '0' : (!showButton ? '0 0 20px 0' : '');
+            // Simple logic: if there's a button, use natural h2 margin for spacing. If no button, add bottom margin.
+            const titleMargin = showButton ? '' : '0 0 20px 0';
             const titleMarginStyle = titleMargin ? ` margin: ${titleMargin};` : '';
             const buttonHtml = showButton ? `<!-- Button --><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="center" class="block" style="padding: 0; width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table>` : '';
             
