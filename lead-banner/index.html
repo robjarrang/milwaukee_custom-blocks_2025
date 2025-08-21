@@ -27,12 +27,22 @@
 
         <div class="section-divider">
             <div class="section-title">Content</div>
+            <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="text">Text</div><div class="option-button" data-value="image">Image</div></div></div>
             <div class="field-group"><label class="field-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
             <div class="field-group"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
             <div class="section-divider" style="margin:20px 0; padding-top:15px;"></div>
 
-            <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="field-group-inline"><label for="titleFontSize" class="field-label">Title Font Size (px)</label><input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4"></div></div>
-            <div class="field-group"><label class="field-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
+            <div id="textContent">
+                <div class="field-group"><label class="field-label">Title</label><div id="titleEditor" class="quill-container limited-toolbar"></div><div class="field-group-inline"><label for="titleFontSize" class="field-label">Title Font Size (px)</label><input type="number" id="titleFontSize" class="field-input" min="20" max="60" step="4"></div></div>
+                <div class="field-group"><label class="field-label">Subtitle</label><div id="subtitleEditor" class="quill-container"></div><div class="field-group-inline"><label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label><input type="number" id="subtitleFontSize" class="field-input" min="12" max="32" step="4"></div></div>
+            </div>
+
+            <div id="imageContent" style="display: none;">
+                <div class="field-group"><label for="titleImage" class="field-label">Title/Subtitle Image URL (Transparent PNG)</label><input type="url" id="titleImage" class="field-input" placeholder="https://example.com/title-image.png"><div class="field-error" id="titleImageError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="titleImageAlt" class="field-label">Image Alt Text</label><input type="text" id="titleImageAlt" class="field-input" placeholder="Descriptive text for the image" maxlength="100"></div>
+                <div class="field-group-inline"><label for="titleImageWidth" class="field-label">Image Width (px)</label><input type="number" id="titleImageWidth" class="field-input" min="100" max="500" step="10"></div>
+            </div>
+
             <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
         </div>
     </div>
@@ -48,12 +58,16 @@
             name: 'Lead Banner',
             fields: {
                 backgroundImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/56a309bc-df67-4b80-a64c-cd19ed07769c.jpg', validator: 'url' },
+                contentType: { type: 'text', defaultValue: 'text' },
                 verticalAlign: { type: 'text', defaultValue: 'middle' },
                 textAlign: { type: 'text', defaultValue: 'center' },
                 title: { type: 'richtext', defaultValue: 'Title goes here', maxLength: 200 },
                 titleFontSize: { type: 'number', defaultValue: 28 },
                 subtitle: { type: 'richtext', defaultValue: 'Subtitle goes here', maxLength: 300 },
                 subtitleFontSize: { type: 'number', defaultValue: 18 },
+                titleImage: { type: 'url', defaultValue: '', validator: 'url' },
+                titleImageAlt: { type: 'text', defaultValue: '' },
+                titleImageWidth: { type: 'number', defaultValue: 300 },
                 contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
             },
             debounceDelay: 300, 
@@ -182,12 +196,19 @@
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundImage = document.getElementById('backgroundImage');
             elements.backgroundImageError = document.getElementById('backgroundImageError');
+            elements.contentTypeSelector = document.getElementById('contentTypeSelector');
             elements.verticalAlignSelector = document.getElementById('verticalAlignSelector');
             elements.textAlignSelector = document.getElementById('textAlignSelector');
+            elements.textContent = document.getElementById('textContent');
+            elements.imageContent = document.getElementById('imageContent');
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.subtitleEditor = document.getElementById('subtitleEditor');
             elements.subtitleFontSize = document.getElementById('subtitleFontSize');
+            elements.titleImage = document.getElementById('titleImage');
+            elements.titleImageError = document.getElementById('titleImageError');
+            elements.titleImageAlt = document.getElementById('titleImageAlt');
+            elements.titleImageWidth = document.getElementById('titleImageWidth');
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
         }
@@ -256,14 +277,9 @@
         function generateTemplate() {
             const bgImage = utils.getFieldValue('backgroundImage');
             const contentUrl = utils.getFieldValue('contentUrl');
-            const processedTitle = processRichText(utils.getFieldValue('title'));
-            const processedSubtitle = processRichText(utils.getFieldValue('subtitle'));
-            const titleSize = utils.getFieldValue('titleFontSize');
-            const subtitleSize = utils.getFieldValue('subtitleFontSize');
+            const contentType = utils.getFieldValue('contentType');
             const verticalAlign = utils.getFieldValue('verticalAlign');
             const textAlign = utils.getFieldValue('textAlign');
-            const titleLineHeight = titleSize + 16;
-            const subtitleLineHeight = subtitleSize + 8;
             const logoImage = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/a3a77919-71b9-4b9d-b1ad-90f327487e3f.png';
             const logoUrl = 'https://%%CountryCode%%.milwaukeetool.eu/';
             const fallbackColor = '#DB021D';
@@ -278,7 +294,32 @@
 
             const logoHtml = `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="left" style="padding:0 0 0 12px;" valign="top"><a href="${logoUrl}" target="_blank"><img alt="Logo" src="${logoImage}" style="border:0;display:block;height:auto;outline:none;text-decoration:none;" width="180"></a></td></tr></table>`;
 
-            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}"><h1 class="leadbanner-title" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',sans-serif,'Open Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0 0 10px 0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:${subtitleSize}px;font-stretch:condensed;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedSubtitle}</a></p></td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
+            let contentHtml = '';
+            
+            if (contentType === 'image') {
+                // Image mode
+                const titleImage = utils.getFieldValue('titleImage');
+                const titleImageAlt = utils.getFieldValue('titleImageAlt');
+                const titleImageWidth = utils.getFieldValue('titleImageWidth');
+                
+                if (titleImage) {
+                    contentHtml = `<img alt="${titleImageAlt}" src="${titleImage}" style="width: ${titleImageWidth}px; max-width: 100%;" width="${titleImageWidth}">`;
+                } else {
+                    contentHtml = '<p style="color:#ffffff;font-family:\'Helvetica Neue LT W05_55 Roman\',sans-serif,\'Open Sans\';font-size:18px;margin:0;padding:0;">Please add an image URL</p>';
+                }
+            } else {
+                // Text mode
+                const processedTitle = processRichText(utils.getFieldValue('title'));
+                const processedSubtitle = processRichText(utils.getFieldValue('subtitle'));
+                const titleSize = utils.getFieldValue('titleFontSize');
+                const subtitleSize = utils.getFieldValue('subtitleFontSize');
+                const titleLineHeight = titleSize + 16;
+                const subtitleLineHeight = subtitleSize + 8;
+                
+                contentHtml = `<h1 class="leadbanner-title" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',sans-serif,'Open Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0 0 10px 0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:${subtitleSize}px;font-stretch:condensed;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedSubtitle}</a></p>`;
+            }
+
+            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}">${contentType === 'image' ? `<a href="${contentUrl}" target="_blank">` : ''}${contentHtml}${contentType === 'image' ? '</a>' : ''}</td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
         }
 
         function refreshPreview() {
@@ -323,7 +364,13 @@
             }
 
             setupUrlInput(elements.backgroundImage, elements.backgroundImageError, 'backgroundImage');
+            setupUrlInput(elements.titleImage, elements.titleImageError, 'titleImage');
             setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
+
+            // Text input handler for image alt text
+            const altTextHandler = (e) => debouncedUpdateData('titleImageAlt', e.target.value.trim());
+            elements.titleImageAlt.addEventListener('input', altTextHandler);
+            state.eventListeners.push({ element: elements.titleImageAlt, event: 'input', handler: altTextHandler });
 
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
@@ -344,6 +391,20 @@
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.subtitleFontSize, 'subtitleFontSize');
 
+            // Special handling for image width (step of 10)
+            const imageWidthHandler = (e) => {
+                const input = e.target;
+                let value = parseInt(input.value, 10);
+                const min = parseInt(input.min, 10), max = parseInt(input.max, 10);
+                if (isNaN(value)) value = moduleConfig.fields.titleImageWidth.defaultValue;
+                value = Math.max(min, Math.min(value, max));
+                const correctedValue = Math.round(value / 10) * 10;
+                input.value = correctedValue;
+                updateData('titleImageWidth', correctedValue);
+            };
+            elements.titleImageWidth.addEventListener('blur', imageWidthHandler);
+            state.eventListeners.push({ element: elements.titleImageWidth, event: 'blur', handler: imageWidthHandler });
+
             function setupOptionSelector(el, key) { 
                 if (!el) return; 
                 el.querySelectorAll('.option-button').forEach(opt => { 
@@ -352,14 +413,30 @@
                         updateData(key, btn.dataset.value); 
                         el.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected')); 
                         btn.classList.add('selected'); 
+                        
+                        // Handle content type switching
+                        if (key === 'contentType') {
+                            toggleContentType(btn.dataset.value);
+                        }
                     }; 
                     opt.addEventListener('click', handler); 
                     state.eventListeners.push({ element: opt, event: 'click', handler }); 
                 }); 
             }
 
+            setupOptionSelector(elements.contentTypeSelector, 'contentType');
             setupOptionSelector(elements.verticalAlignSelector, 'verticalAlign');
             setupOptionSelector(elements.textAlignSelector, 'textAlign');
+        }
+
+        function toggleContentType(contentType) {
+            if (contentType === 'image') {
+                elements.textContent.style.display = 'none';
+                elements.imageContent.style.display = 'block';
+            } else {
+                elements.textContent.style.display = 'block';
+                elements.imageContent.style.display = 'none';
+            }
         }
 
         function loadData() {
@@ -378,6 +455,9 @@
                     });
 
                     elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
+                    elements.titleImage.value = utils.getFieldValue('titleImage');
+                    elements.titleImageAlt.value = utils.getFieldValue('titleImageAlt');
+                    elements.titleImageWidth.value = utils.getFieldValue('titleImageWidth');
                     elements.contentUrl.value = utils.getFieldValue('contentUrl');
                     elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
@@ -406,8 +486,12 @@
                         if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
                     }
 
+                    setSelectorState(elements.contentTypeSelector, 'contentType');
                     setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
                     setSelectorState(elements.textAlignSelector, 'textAlign');
+
+                    // Initialize content type display
+                    toggleContentType(utils.getFieldValue('contentType'));
 
                     refreshPreview();
                     state.retryCount = 0;
