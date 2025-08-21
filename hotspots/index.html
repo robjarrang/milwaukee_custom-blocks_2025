@@ -5,6 +5,24 @@
     <title>Interactive Hotspots Block</title>
     <style>
         body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /* Visual Editor Styles */
         #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
         /* Tooltip Position Selector Styles */
@@ -21,6 +39,15 @@
         <div class="field-group"><label for="backgroundImageUrl" class="field-label">Interactive Background Image URL</label><input type="url" id="backgroundImageUrl" class="field-input"></div>
         <div class="field-group"><label for="fallbackImageUrl" class="field-label">Fallback Image URL</label><input type="url" id="fallbackImageUrl" class="field-input"></div>
         <div class="field-group"><label for="fallbackLinkUrl" class="field-label">Fallback Image Link URL</label><input type="url" id="fallbackLinkUrl" class="field-input"></div>
+
+
+
+
+
+
+
+
+
 
         <div class="section-title">Visual Editor</div>
         <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
@@ -46,6 +73,10 @@
             </div>
             <div class="field-group"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text"></div>
             <div class="field-group" style="margin-bottom:0;"><label class="field-label">Tooltip Position</label>
+
+
+
+
                 <div class="position-selector">
                     <button class="position-button" data-position="top-left"><div class="dot"></div></button>
                     <button class="position-button" data-position="top"><div class="dot"></div></button>
