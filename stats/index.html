@@ -148,31 +148,17 @@
                 '<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 '</table></td>';
 
-            if (layout === 'right') {
-                // Image right layout
-                return '<!-- START .stats-image-block -->' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
-                    '<tr><td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
-                    '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td>' +
-                    '<td align="center" class="content-inner" style="background-color: ' + backgroundColor + '; width: 580px;" valign="middle">' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" dir="rtl" role="presentation" style="width: 100%;">' +
-                    '<tr>' + statsCell + imageCell + '</tr></table></td>' +
-                    '<td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
-                    '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td></tr></table>' +
-                    '<!-- END .stats-image-block -->';
-            } else {
-                // Image left layout (default)
-                return '<!-- START .stats-image-block -->' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
-                    '<tr><td style="width: 20px;">&nbsp;</td>' +
-                    '<td align="center" class="content-inner" style="width: 580px;" valign="middle">' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">' +
-                    '<tr>' + imageCell + statsCell + '</tr></table></td>' +
-                    '<td class="side" style="width: 20px;">&nbsp;</td></tr></table>' +
-                    '<!-- END .stats-image-block -->';
-            }
+            // Determine cell order based on layout
+            const mainContent = layout === 'right' ? statsCell + imageCell : imageCell + statsCell;
+            
+            return '<!-- START .stats-image-block -->' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
+                '<tr><td style="width: 20px;">&nbsp;</td>' +
+                '<td align="center" class="content-inner" style="width: 580px;" valign="middle">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">' +
+                '<tr>' + mainContent + '</tr></table></td>' +
+                '<td class="side" style="width: 20px;">&nbsp;</td></tr></table>' +
+                '<!-- END .stats-image-block -->';
         }
 
         function updateData(field, value) {
