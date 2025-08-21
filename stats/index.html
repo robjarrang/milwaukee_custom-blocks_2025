@@ -3,40 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Stats Block</title>
-    <link rel="styles        function createStatR        function generateInitialTemplate(d) {
-            const statsHtml = d.stats.map((stat, index) => {
-                const isLast = index === d.stats.length - 1;
-                return `
-                <tr><td class="mobile-text-center" style="text-align: center;">
-                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">${stat.title}</div>
-                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.subtitle}</div>
-                </td></tr>
-                ${!isLast ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>' : ''}`;
-            }).join('');
-
-            const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle"><div><a href="${d.imageLink}" target="_blank"><img alt="${d.imageAlt}" class="fill no-hover" src="${d.imageUrl}" style="display: block; height: auto; outline: none; text-decoration: none; border: none; padding: 0px; text-align: center; width: 100%;" width="300"></a></div></td>`;
-            
-            const statsCell = `<td class="block" dir="ltr" style="width: 290px;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td><div style="clear: both; display: block; font-size: 8px; height: 0px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>${statsHtml}<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr></table></td>`;
-
-            if (d.layout === 'right') {
-                // Image right layout
-                return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${d.backgroundColor}; width: 620px;"><tr><td style="background-color: ${d.backgroundColor}; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 20px;"> </td></tr></table></td><td align="center" class="content-inner" style="background-color: ${d.backgroundColor}; width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" dir="rtl" role="presentation" style="width: 100%;"><tr>${statsCell}${imageCell}</tr></table></td><td style="background-color: ${d.backgroundColor}; width: 20px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 20px;"> </td></tr></table></td></tr></table><!-- END .stats-image-block -->`;
-            } else {
-                // Image left layout (default)
-                return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${d.backgroundColor}; width: 620px;"><tr><td style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr>${imageCell}${statsCell}</tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .stats-image-block -->`;
-            }
-        }plate(stat = { title: '', subtitle: '' }) {
-            const spacerRow = '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;"> </div></td></tr>';
-            const statRow = `
-                <tr><td class="mobile-text-center" style="text-align: center;">
-                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">${stat.title}</div>
-                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.subtitle}</div>
-                </td></tr>`;
-            // We return a DocumentFragment to hold both rows if needed
-            const tpl = document.createElement('template');
-            tpl.innerHTML = statRow + spacerRow;
-            return tpl.content;
-        }https://cloud.mail.milwaukeetool.eu/customblock-styles">
+    <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.stats-container{display:flex;flex-direction:column;gap:15px}.stat-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.stat-title{font-weight:bold;font-size:16px}.stat-controls{display:flex;gap:8px}.stat-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.stat-control-btn:hover{color:#0074d9}.stat-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-stat-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
@@ -140,13 +107,12 @@
             return doc.body.firstChild;
         }
 
-        function createStatRowTemplate(stat = { value: '', label: '' }) {
-            const spacerRow = '<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>';
-            const statRow = `
-                <tr><td class="mobile-text-center" style="text-align: center;">
-                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 44px; font-weight: bold; line-height: 48px; margin: 0; text-transform: uppercase;">${stat.value}</div>
-                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.label}</div>
-                </td></tr>`;
+        function createStatRowTemplate(stat = { title: '', subtitle: '' }) {
+            const spacerRow = '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>';
+            const statRow = '<tr><td class="mobile-text-center" style="text-align: center;">' +
+                '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
+                '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
+                '</td></tr>';
             // We return a DocumentFragment to hold both rows if needed
             const tpl = document.createElement('template');
             tpl.innerHTML = statRow + spacerRow;
@@ -156,15 +122,51 @@
         function generateInitialTemplate(d) {
             const statsHtml = d.stats.map((stat, index) => {
                 const isLast = index === d.stats.length - 1;
-                return `
-                <tr><td class="mobile-text-center" style="text-align: center;">
-                    <div style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 44px; font-weight: bold; line-height: 48px; margin: 0; text-transform: uppercase;">${stat.value}</div>
-                    <div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans';">${stat.label}</div>
-                </td></tr>
-                ${!isLast ? '<tr><td><div style="font-size: 20px; height: 20px; line-height: 20px;"> </div></td></tr>' : ''}`;
+                const statRow = '<tr><td class="mobile-text-center" style="text-align: center;">' +
+                    '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
+                    '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
+                    '</td></tr>';
+                const spacer = !isLast ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : '';
+                return statRow + spacer;
             }).join('');
 
-            return `<!-- START .stats-image-block --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${d.backgroundColor}; width: 620px;"><tr><td class="side" style="width: 20px;"> </td><td align="center" class="content-inner" style="width: 580px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td class="block" style="width: 290px;" valign="middle"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td><a href="${d.imageLink}" target="_blank"><img align="top" alt="${d.imageAlt}" class="fill" src="${d.imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="300"></a></td></tr></table></td><td class="block" style="width: 290px;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr>${statsHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;"> </div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;"> </td></tr></table><!-- END .stats-image-block -->`;
+            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle">' +
+                '<div><a href="' + d.imageLink + '" target="_blank">' +
+                '<img alt="' + d.imageAlt + '" class="fill no-hover" src="' + d.imageUrl + '" style="display: block; height: auto; outline: none; text-decoration: none; border: none; padding: 0px; text-align: center; width: 100%;" width="300">' +
+                '</a></div></td>';
+            
+            const statsCell = '<td class="block" dir="ltr" style="width: 290px;" valign="middle">' +
+                '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">' +
+                '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 0px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
+                statsHtml +
+                '<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
+                '</table></td>';
+
+            if (d.layout === 'right') {
+                // Image right layout
+                return '<!-- START .stats-image-block -->' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + d.backgroundColor + '; width: 620px;">' +
+                    '<tr><td style="background-color: ' + d.backgroundColor + '; width: 20px;" valign="top">' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
+                    '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td>' +
+                    '<td align="center" class="content-inner" style="background-color: ' + d.backgroundColor + '; width: 580px;" valign="middle">' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" dir="rtl" role="presentation" style="width: 100%;">' +
+                    '<tr>' + statsCell + imageCell + '</tr></table></td>' +
+                    '<td style="background-color: ' + d.backgroundColor + '; width: 20px;" valign="top">' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
+                    '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td></tr></table>' +
+                    '<!-- END .stats-image-block -->';
+            } else {
+                // Image left layout (default)
+                return '<!-- START .stats-image-block -->' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + d.backgroundColor + '; width: 620px;">' +
+                    '<tr><td style="width: 20px;">&nbsp;</td>' +
+                    '<td align="center" class="content-inner" style="width: 580px;" valign="middle">' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">' +
+                    '<tr>' + imageCell + statsCell + '</tr></table></td>' +
+                    '<td class="side" style="width: 20px;">&nbsp;</td></tr></table>' +
+                    '<!-- END .stats-image-block -->';
+            }
         }
 
         // --- UI Sync and Rendering ---
