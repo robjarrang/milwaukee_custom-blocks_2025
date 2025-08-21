@@ -136,28 +136,34 @@
                 return statRow + spacer;
             }).join('');
 
-            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle">' +
+            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="top">' +
                 '<div><a href="' + imageLink + '" target="_blank">' +
-                '<img alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="display: block; height: auto; outline: none; text-decoration: none; border: none; padding: 0px; text-align: center; width: 100%;" width="300">' +
+                '<img align="top" alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290">' +
                 '</a></div></td>';
             
-            const statsCell = '<td class="block" dir="ltr" style="width: 290px;" valign="middle">' +
+            const statsCell = '<td class="block" dir="ltr" style="width: 290px;" valign="top">' +
                 '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">' +
-                '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 0px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
+                '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 statsHtml +
                 '<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 '</table></td>';
 
-            // Determine cell order based on layout
-            const mainContent = layout === 'right' ? statsCell + imageCell : imageCell + statsCell;
+            // For mobile compatibility, image always comes first in HTML source order
+            // RTL direction on desktop will visually swap them for "right" layout
+            const tableDirection = layout === 'right' ? 'dir="rtl"' : '';
+            const mainContent = imageCell + statsCell;
             
             return '<!-- START .stats-image-block -->' +
                 '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
-                '<tr><td style="width: 20px;">&nbsp;</td>' +
-                '<td align="center" class="content-inner" style="width: 580px;" valign="middle">' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">' +
+                '<tr><td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
+                '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td>' +
+                '<td align="center" class="content-inner" style="background-color: ' + backgroundColor + '; width: 580px;" valign="middle">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" ' + tableDirection + ' role="presentation" style="width: 100%;">' +
                 '<tr>' + mainContent + '</tr></table></td>' +
-                '<td class="side" style="width: 20px;">&nbsp;</td></tr></table>' +
+                '<td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
+                '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td></tr></table>' +
                 '<!-- END .stats-image-block -->';
         }
 
