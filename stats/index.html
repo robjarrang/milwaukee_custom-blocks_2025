@@ -5,7 +5,7 @@
     <title>Stats Block</title>
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.color-selector{display:flex;gap:10px}.color-option{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.color-option:hover{border-color:#0074d9;background-color:#f0f8ff}.color-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.stats-container{display:flex;flex-direction:column;gap:15px}.stat-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.stat-title{font-weight:bold;font-size:16px}.stat-controls{display:flex;gap:8px}.stat-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.stat-control-btn:hover{color:#0074d9}.stat-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-stat-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.option-button svg { display: block; margin: 0 auto; fill: currentColor; }.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.stats-container{display:flex;flex-direction:column;gap:15px}.stat-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.stat-title{font-weight:bold;font-size:16px}.stat-controls{display:flex;gap:8px}.stat-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.stat-control-btn:hover{color:#0074d9}.stat-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-stat-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
     </style>
 </head>
 <body>
@@ -18,16 +18,20 @@
             <div class="section-title">General Settings</div>
             <div class="field-group">
                 <label class="field-label">Layout</label>
-                <div class="color-selector" id="layoutSelector">
-                    <div class="color-option" data-layout="left">Image Left</div>
-                    <div class="color-option" data-layout="right">Image Right</div>
+                <div class="option-selector" id="layoutSelector">
+                    <div class="option-button selected" data-value="left" title="Image on Left">
+                        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 18h6V6H4v12zm8 0h8V6h-8v12zM4 4h16v2H4V4z"/></svg>
+                    </div>
+                    <div class="option-button" data-value="right" title="Image on Right">
+                        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M14 18h6V6h-6v12zM4 18h8V6H4v12zM4 4h16v2H4V4z"/></svg>
+                    </div>
                 </div>
             </div>
             <div class="field-group">
                 <label class="field-label">Background Colour</label>
-                <div class="color-selector" id="backgroundColorSelector">
-                    <div class="color-option" data-color="red">Red</div>
-                    <div class="color-option" data-color="black">Black</div>
+                <div class="option-selector" id="backgroundColorSelector">
+                    <div class="option-button selected" data-value="red">Red</div>
+                    <div class="option-button" data-value="black">Black</div>
                 </div>
             </div>
         </div>
@@ -81,24 +85,31 @@
     <script>
         'use strict';
 
+        const moduleConfig = {
+            name: 'Stats Block',
+            fields: {
+                layout: { type: 'text', defaultValue: 'left' },
+                backgroundColor: { type: 'text', defaultValue: '#DB021D' },
+                imageUrl: { type: 'url', defaultValue: 'https://place-hold.it/300x300/ccc/333' },
+                imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
+                imageAlt: { type: 'text', defaultValue: 'Milwaukee Tool Product', maxLength: 150 },
+                stats: { type: 'list', defaultValue: [
+                    { title: 'TITLE', subtitle: 'SUBTITLE' },
+                    { title: 'TITLE', subtitle: 'SUBTITLE' },
+                    { title: 'TITLE', subtitle: 'SUBTITLE' }
+                ]}
+            },
+            debounceDelay: 300,
+            maxRetries: 3
+        };
+
         // --- Config and State ---
         const PRESET_COLORS = { RED: '#DB021D', BLACK: '#000000' };
-        const DEFAULTS = {
-            layout: 'left',
-            backgroundColor: PRESET_COLORS.RED,
-            imageUrl: 'https://place-hold.it/300x300/ccc/333',
-            imageLink: 'https://www.milwaukeetool.eu/',
-            imageAlt: 'Milwaukee Tool Product',
-            stats: [
-                { title: 'TITLE', subtitle: 'SUBTITLE' },
-                { title: 'TITLE', subtitle: 'SUBTITLE' },
-                { title: 'TITLE', subtitle: 'SUBTITLE' }
-            ]
-        };
-        const state = { sdk: null, dom: null };
+        const state = { sdk: null, dom: null, blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
         const elements = {};
         const utils = {
-            debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; }
+            debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
+            getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; }
         };
 
         // --- DOM and Template Generation ---
@@ -107,21 +118,16 @@
             return doc.body.firstChild;
         }
 
-        function createStatRowTemplate(stat = { title: '', subtitle: '' }) {
-            const spacerRow = '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>';
-            const statRow = '<tr><td class="mobile-text-center" style="text-align: center;">' +
-                '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
-                '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
-                '</td></tr>';
-            // We return a DocumentFragment to hold both rows if needed
-            const tpl = document.createElement('template');
-            tpl.innerHTML = statRow + spacerRow;
-            return tpl.content;
-        }
-
         function generateInitialTemplate(d) {
-            const statsHtml = d.stats.map((stat, index) => {
-                const isLast = index === d.stats.length - 1;
+            const layout = utils.getFieldValue('layout');
+            const backgroundColor = utils.getFieldValue('backgroundColor');
+            const imageUrl = utils.getFieldValue('imageUrl');
+            const imageLink = utils.getFieldValue('imageLink');
+            const imageAlt = utils.getFieldValue('imageAlt');
+            const stats = utils.getFieldValue('stats');
+
+            const statsHtml = stats.map((stat, index) => {
+                const isLast = index === stats.length - 1;
                 const statRow = '<tr><td class="mobile-text-center" style="text-align: center;">' +
                     '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
                     '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
@@ -131,8 +137,8 @@
             }).join('');
 
             const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle">' +
-                '<div><a href="' + d.imageLink + '" target="_blank">' +
-                '<img alt="' + d.imageAlt + '" class="fill no-hover" src="' + d.imageUrl + '" style="display: block; height: auto; outline: none; text-decoration: none; border: none; padding: 0px; text-align: center; width: 100%;" width="300">' +
+                '<div><a href="' + imageLink + '" target="_blank">' +
+                '<img alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="display: block; height: auto; outline: none; text-decoration: none; border: none; padding: 0px; text-align: center; width: 100%;" width="300">' +
                 '</a></div></td>';
             
             const statsCell = '<td class="block" dir="ltr" style="width: 290px;" valign="middle">' +
@@ -142,24 +148,24 @@
                 '<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 '</table></td>';
 
-            if (d.layout === 'right') {
+            if (layout === 'right') {
                 // Image right layout
                 return '<!-- START .stats-image-block -->' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + d.backgroundColor + '; width: 620px;">' +
-                    '<tr><td style="background-color: ' + d.backgroundColor + '; width: 20px;" valign="top">' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
+                    '<tr><td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
                     '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
                     '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td>' +
-                    '<td align="center" class="content-inner" style="background-color: ' + d.backgroundColor + '; width: 580px;" valign="middle">' +
+                    '<td align="center" class="content-inner" style="background-color: ' + backgroundColor + '; width: 580px;" valign="middle">' +
                     '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" dir="rtl" role="presentation" style="width: 100%;">' +
                     '<tr>' + statsCell + imageCell + '</tr></table></td>' +
-                    '<td style="background-color: ' + d.backgroundColor + '; width: 20px;" valign="top">' +
+                    '<td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
                     '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
                     '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td></tr></table>' +
                     '<!-- END .stats-image-block -->';
             } else {
                 // Image left layout (default)
                 return '<!-- START .stats-image-block -->' +
-                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + d.backgroundColor + '; width: 620px;">' +
+                    '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
                     '<tr><td style="width: 20px;">&nbsp;</td>' +
                     '<td align="center" class="content-inner" style="width: 580px;" valign="middle">' +
                     '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">' +
@@ -169,60 +175,81 @@
             }
         }
 
-        // --- UI Sync and Rendering ---
-        let rafId = null;
+        function updateData(field, value) {
+            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+
+        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+
+        function refreshPreview() {
+            if (!state.sdk || !state.sdk.setContent) return;
+            const template = generateInitialTemplate();
+            state.sdk.setContent(template);
+        }
+
         function renderStatsUI() {
-            if (!state.dom) return;
-            const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
-                                  state.dom.querySelector('.block:first-child .sect > tbody');
-            const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
+            const stats = utils.getFieldValue('stats');
             elements.statsContainer.replaceChildren();
 
-            // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
 
-            statRows.forEach((row, index) => {
-                const title = row.querySelector('div:first-child').textContent.trim();
-                const subtitle = row.querySelector('div:last-child').textContent.trim();
+            stats.forEach((stat, index) => {
                 const itemFragment = elements.statTemplate.content.cloneNode(true);
                 const itemEl = itemFragment.querySelector('.stat-item');
                 itemEl.dataset.index = index;
                 itemEl.querySelector('.stat-title').textContent = `Stat ${index + 1}`;
-                itemEl.querySelector('[data-field="title"]').value = title;
-                itemEl.querySelector('[data-field="subtitle"]').value = subtitle;
+                itemEl.querySelector('[data-field="title"]').value = stat.title;
+                itemEl.querySelector('[data-field="subtitle"]').value = stat.subtitle;
                 itemEl.querySelector('.move-up-btn').disabled = (index === 0);
-                itemEl.querySelector('.move-down-btn').disabled = (index === statRows.length - 1);
+                itemEl.querySelector('.move-down-btn').disabled = (index === stats.length - 1);
                 fragment.appendChild(itemFragment);
             });
 
-            // Single DOM update with all stats
             elements.statsContainer.appendChild(fragment);
         }
 
-        function updateUIFromDOM() {
-            if (!state.dom) return;
-            const link = state.dom.querySelector('a');
-            const img = state.dom.querySelector('img');
+        function updateUIFromData() {
+            const setSelectorState = (el, key) => {
+                const value = utils.getFieldValue(key);
+                Array.from(el.querySelectorAll('.option-button')).forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.value === value);
+                });
+            };
 
-            // Layout detection
-            const isRightLayout = state.dom.querySelector('table[dir="rtl"]') !== null;
-            elements.layoutSelector.querySelector('[data-layout="left"]').classList.toggle('selected', !isRightLayout);
-            elements.layoutSelector.querySelector('[data-layout="right"]').classList.toggle('selected', isRightLayout);
+            setSelectorState(elements.layoutSelector, 'layout');
+            
+            // Handle background color mapping
+            const bgColor = utils.getFieldValue('backgroundColor');
+            const colorValue = bgColor === PRESET_COLORS.RED ? 'red' : 'black';
+            Array.from(elements.backgroundColorSelector.querySelectorAll('.option-button')).forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.value === colorValue);
+            });
 
-            // General settings
-            const domColor = state.dom.style.backgroundColor;
-            const redRgb = 'rgb(219, 2, 29)';
-            const blackRgb = 'rgb(0, 0, 0)';
-            elements.backgroundColorSelector.querySelector('[data-color="red"]').classList.toggle('selected', domColor === PRESET_COLORS.RED.toLowerCase() || domColor === redRgb);
-            elements.backgroundColorSelector.querySelector('[data-color="black"]').classList.toggle('selected', domColor === PRESET_COLORS.BLACK || domColor === blackRgb);
+            // Update form fields
+            elements.imageUrl.value = utils.getFieldValue('imageUrl');
+            elements.imageLink.value = utils.getFieldValue('imageLink');
+            elements.imageAlt.value = utils.getFieldValue('imageAlt');
 
-            // Image settings
-            elements.imageUrl.value = img ? img.src : '';
-            elements.imageLink.value = link ? link.href : '';
-            elements.imageAlt.value = img ? img.alt : '';
-
-            // Stats list
+            // Render stats
             renderStatsUI();
+        }
+
+        function loadData() {
+            if (!state.sdk || !state.sdk.getData) return;
+            state.sdk.getData((data) => {
+                state.blockData = data || {};
+                // Ensure we have default values
+                Object.keys(moduleConfig.fields).forEach(key => {
+                    if (state.blockData[key] === undefined) {
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                    }
+                });
+                updateUIFromData();
+                refreshPreview();
+            });
         }
 
         // --- SDK Interaction ---
@@ -246,109 +273,75 @@
         }
 
         function initializeEventHandlers() {
-            // Layout Settings
-            elements.layoutSelector.addEventListener('click', e => {
-                const button = e.target.closest('.color-option');
-                if (button && state.dom) {
-                    const newLayout = button.dataset.layout;
-                    // Regenerate template with new layout
-                    const currentData = {
-                        layout: newLayout,
-                        backgroundColor: state.dom.style.backgroundColor,
-                        imageUrl: state.dom.querySelector('img').src,
-                        imageLink: state.dom.querySelector('a').href,
-                        imageAlt: state.dom.querySelector('img').alt,
-                        stats: Array.from(state.dom.querySelectorAll('.mobile-text-center')).map(row => ({
-                            title: row.querySelector('div:first-child').textContent.trim(),
-                            subtitle: row.querySelector('div:last-child').textContent.trim()
-                        }))
-                    };
-                    state.dom = parseToDOM(generateInitialTemplate(currentData));
-                    updateUIFromDOM();
-                    updateBlock();
-                }
+            state.eventListeners.forEach(({ element, event, handler }) => element.removeEventListener(event, handler));
+            state.eventListeners = [];
+            const addListener = (el, event, handler) => { if (el) { el.addEventListener(event, handler); state.eventListeners.push({ element: el, event, handler }); }};
+
+            const setupOptionSelector = (el, key, callback) => {
+                Array.from(el.querySelectorAll('.option-button')).forEach(opt => 
+                    addListener(opt, 'click', e => { 
+                        const btn = e.currentTarget; 
+                        const value = btn.dataset.value; 
+                        updateData(key, value); 
+                        Array.from(el.querySelectorAll('.selected')).forEach(o => o.classList.remove('selected')); 
+                        btn.classList.add('selected'); 
+                        if(callback) callback(value); 
+                    })
+                );
+            };
+
+            const setupTextInput = (el, key) => {
+                addListener(el, 'input', e => {
+                    debouncedUpdateData(key, e.target.value.trim());
+                });
+            };
+
+            // Setup selectors
+            setupOptionSelector(elements.layoutSelector, 'layout');
+            setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor', (value) => {
+                updateData('backgroundColor', value === 'red' ? PRESET_COLORS.RED : PRESET_COLORS.BLACK);
             });
 
-            // General Settings
-            elements.backgroundColorSelector.addEventListener('click', e => {
-                const button = e.target.closest('.color-option');
-                if (button && state.dom) {
-                    state.dom.style.backgroundColor = (button.dataset.color === 'red') ? PRESET_COLORS.RED : PRESET_COLORS.BLACK;
-                    updateUIFromDOM();
-                    updateBlock();
-                }
-            });
-
-            // Image Settings
-            elements.imageUrl.addEventListener('input', () => { if (state.dom) state.dom.querySelector('img').src = elements.imageUrl.value; debouncedUpdateBlock(); });
-            elements.imageLink.addEventListener('input', () => { if (state.dom) state.dom.querySelector('a').href = elements.imageLink.value; debouncedUpdateBlock(); });
-            elements.imageAlt.addEventListener('input', () => { if (state.dom) state.dom.querySelector('img').alt = elements.imageAlt.value; debouncedUpdateBlock(); });
+            // Setup text inputs
+            setupTextInput(elements.imageUrl, 'imageUrl');
+            setupTextInput(elements.imageLink, 'imageLink');
+            setupTextInput(elements.imageAlt, 'imageAlt');
 
             // Add Stat Button
-            elements.addStatBtn.addEventListener('click', () => {
-                if (!state.dom) return;
-                const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
-                                      state.dom.querySelector('.block:first-child .sect > tbody');
-                const lastStatRow = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center')).pop();
-                const newStatFragment = createStatRowTemplate({ title: 'TITLE', subtitle: 'SUBTITLE' });
-                if (lastStatRow) {
-                    lastStatRow.after(...newStatFragment.children); // Use spread to insert both rows
-                } else {
-                    statsTableBody.append(...newStatFragment.children);
-                }
-                updateUIFromDOM();
-                updateBlock();
+            addListener(elements.addStatBtn, 'click', () => {
+                const currentStats = utils.getFieldValue('stats');
+                const newStats = [...currentStats, { title: 'TITLE', subtitle: 'SUBTITLE' }];
+                updateData('stats', newStats);
+                renderStatsUI();
             });
 
-            // Optimized Event Delegation with Action Maps
+            // Stats management
             const statActions = {
                 '.remove-btn': (itemEl, index) => {
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
-                                          state.dom.querySelector('.block:first-child .sect > tbody');
-                    const allRows = Array.from(statsTableBody.children);
-                    const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
-                    const targetRow = statRows[index];
-                    const targetRowIndex = allRows.indexOf(targetRow);
-                    const spacerRow = allRows[targetRowIndex + 1];
-
-                    targetRow.remove();
-                    if (spacerRow && spacerRow.textContent.trim() === '') spacerRow.remove();
+                    const currentStats = utils.getFieldValue('stats');
+                    if (currentStats.length > 1) {
+                        const newStats = currentStats.filter((_, i) => i !== index);
+                        updateData('stats', newStats);
+                        renderStatsUI();
+                    }
                     return true;
                 },
                 '.move-up-btn': (itemEl, index) => {
                     if (index === 0) return false;
-
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
-                                          state.dom.querySelector('.block:first-child .sect > tbody');
-                    const allRows = Array.from(statsTableBody.children);
-                    const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
-                    const targetRow = statRows[index];
-                    const targetRowIndex = allRows.indexOf(targetRow);
-                    const spacerRow = allRows[targetRowIndex + 1];
-                    const prevRow = statRows[index - 1];
-
-                    prevRow.before(targetRow);
-                    targetRow.after(spacerRow);
+                    const currentStats = utils.getFieldValue('stats');
+                    const newStats = [...currentStats];
+                    [newStats[index - 1], newStats[index]] = [newStats[index], newStats[index - 1]];
+                    updateData('stats', newStats);
+                    renderStatsUI();
                     return true;
                 },
                 '.move-down-btn': (itemEl, index) => {
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
-                                          state.dom.querySelector('.block:first-child .sect > tbody');
-                    const allRows = Array.from(statsTableBody.children);
-                    const statRows = allRows.filter(tr => tr.querySelector('.mobile-text-center'));
-
-                    if (index >= statRows.length - 1) return false;
-
-                    const targetRow = statRows[index];
-                    const targetRowIndex = allRows.indexOf(targetRow);
-                    const spacerRow = allRows[targetRowIndex + 1];
-                    const nextRow = statRows[index + 1];
-                    const nextSpacer = allRows[allRows.indexOf(nextRow) + 1];
-
-                    if (nextSpacer) {
-                        nextSpacer.after(targetRow);
-                        targetRow.after(spacerRow);
-                    }
+                    const currentStats = utils.getFieldValue('stats');
+                    if (index >= currentStats.length - 1) return false;
+                    const newStats = [...currentStats];
+                    [newStats[index], newStats[index + 1]] = [newStats[index + 1], newStats[index]];
+                    updateData('stats', newStats);
+                    renderStatsUI();
                     return true;
                 }
             };
@@ -356,64 +349,47 @@
             function createStatDelegatedHandler(actionMap) {
                 return (event) => {
                     const btn = event.target.closest('.stat-control-btn');
-                    if (!btn || !state.dom) return;
+                    if (!btn) return;
 
                     const itemEl = btn.closest('.stat-item');
                     const index = parseInt(itemEl.dataset.index, 10);
 
-                    let actionExecuted = false;
-
-                    // Execute action using action map
                     for (const [selector, action] of Object.entries(actionMap)) {
                         if (btn.matches(selector)) {
-                            const result = action(itemEl, index);
-
-                            if (result) {
-                                actionExecuted = true;
-                                updateUIFromDOM();
-                                updateBlock();
-                            }
+                            action(itemEl, index);
                             break;
                         }
-                    }
-
-                    if (!actionExecuted) {
-                        console.log('No matching action found for selector');
                     }
                 };
             }
 
-            // Handle Stat Item changes (input, move, remove)
-            elements.statsContainer.addEventListener('input', e => {
+            // Handle stat input changes
+            addListener(elements.statsContainer, 'input', e => {
                 if (e.target.matches('[data-field]')) {
                     const itemEl = e.target.closest('.stat-item');
                     const index = parseInt(itemEl.dataset.index, 10);
-                    const field = e.target.dataset.field; // 'title' or 'subtitle'
-                    const statsTableBody = state.dom.querySelector('.block:last-child .sect > tbody') || 
-                                          state.dom.querySelector('.block:first-child .sect > tbody');
-                    const statRows = Array.from(statsTableBody.children).filter(tr => tr.querySelector('.mobile-text-center'));
-                    const targetRow = statRows[index];
-                    if(targetRow) {
-                        const targetDiv = targetRow.querySelector(field === 'title' ? 'div:first-child' : 'div:last-child');
-                        targetDiv.textContent = e.target.value;
-                        debouncedUpdateBlock();
-                    }
+                    const field = e.target.dataset.field;
+                    const currentStats = utils.getFieldValue('stats');
+                    const newStats = [...currentStats];
+                    newStats[index] = { ...newStats[index], [field]: e.target.value };
+                    debouncedUpdateData('stats', newStats);
                 }
             });
 
-            elements.statsContainer.addEventListener('click', createStatDelegatedHandler(statActions));
+            addListener(elements.statsContainer, 'click', createStatDelegatedHandler(statActions));
         }
 
-        function loadData() {
-            state.sdk.getContent(content => {
-                if (content && content.trim() !== '') {
-                    state.dom = parseToDOM(content);
-                } else {
-                    state.dom = parseToDOM(generateInitialTemplate(DEFAULTS));
-                    updateBlock();
-                }
-                updateUIFromDOM();
-            });
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.layoutSelector = document.getElementById('layoutSelector');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.imageUrl = document.getElementById('imageUrl');
+            elements.imageLink = document.getElementById('imageLink');
+            elements.imageAlt = document.getElementById('imageAlt');
+            elements.statsContainer = document.getElementById('statsContainer');
+            elements.addStatBtn = document.getElementById('addStatBtn');
+            elements.statTemplate = document.getElementById('statTemplate');
         }
 
         function initialize() {
