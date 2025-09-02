@@ -220,28 +220,40 @@
             max-height: none !important;
             overflow: visible !important;
             }
-            /* Outlook Mac + Outlook Android - force fallback */
-            #converted-body .hotspots-interactive{
-            display:none !important; max-height:0 !important; overflow:hidden !important;
+            /* Outlook.com (webmail) - force fallback */
+            [class~="x_hotspots-interactive"] {
+            display: none !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
             }
-            #converted-body .hotspots-fallback{
-            display:block !important; max-height:none !important; overflow:visible !important;
-            }
-
-            /* Outlook.com web (OWA) - force fallback */
-            .ExternalClass .hotspots-interactive{
-            display:none !important; max-height:0 !important; overflow:hidden !important;
-            }
-            .ExternalClass .hotspots-fallback{
-            display:block !important; max-height:none !important; overflow:visible !important;
+            [class~="x_hotspots-fallback"] {
+            display: block !important;
+            max-height: none !important;
+            overflow: visible !important;
             }
 
-            /* Optional legacy safety net for very old OWA */
-            .ReadMsgBody .hotspots-interactive{
-            display:none !important; max-height:0 !important; overflow:hidden !important;
+            /* Outlook Mac & Outlook Android apps - force fallback */
+            #converted-body .hotspots-interactive {
+            display: none !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
             }
-            .ReadMsgBody .hotspots-fallback{
-            display:block !important; max-height:none !important; overflow:visible !important;
+            #converted-body .hotspots-fallback {
+            display: block !important;
+            max-height: none !important;
+            overflow: visible !important;
+            }
+
+            /* Legacy Hotmail/Outlook.com wrapper - belt and braces */
+            .ExternalClass .hotspots-interactive {
+            display: none !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            }
+            .ExternalClass .hotspots-fallback {
+            display: block !important;
+            max-height: none !important;
+            overflow: visible !important;
             }
         </style>
 
