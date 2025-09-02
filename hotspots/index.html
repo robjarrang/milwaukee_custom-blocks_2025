@@ -173,43 +173,73 @@
         }
 
         function generateTemplate() {
-            const bgImg = utils.getFieldValue('backgroundImageUrl');
-            const fallbackImg = utils.getFieldValue('fallbackImageUrl');
-            const fallbackLink = utils.getFieldValue('fallbackLinkUrl');
-            const hotspots = utils.getFieldValue('hotspots');
+        const bgImg = utils.getFieldValue('backgroundImageUrl');
+        const fallbackImg = utils.getFieldValue('fallbackImageUrl');
+        const fallbackLink = utils.getFieldValue('fallbackLinkUrl');
+        const hotspots = utils.getFieldValue('hotspots');
 
-            const interactiveHotspots = hotspots.map((h, i) => `
-            <div class="hot-tool-wrapper" style="position: absolute; left: ${h.posX}%; top: ${h.posY}%; z-index: ${i+1};">
-              <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display: block; width: 36px; height: 36px;" width="36">
-              <div class="tooltip-wrapper" style="position: absolute; width: 200px; z-index: 99; background-color: rgba(0, 0, 0, 0.8); display: none; max-height: 0; opacity: 0; overflow: hidden; padding: 10px; text-align: center; transition: all 0.3s ease; border-radius: 4px; ${getTooltipCss(h.tooltipPosition)}">
-                <span style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 20px; font-weight: bold; line-height: 26px; text-transform: uppercase;">${h.text}</span>
-              </div>
-            </div>`).join('');
+        const interactiveHotspots = hotspots.map((h, i) => `
+            <div class="hot-tool-wrapper" style="position:absolute; left:${h.posX}%; top:${h.posY}%; z-index:${i+1};">
+            <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display:block; width:36px; height:36px;" width="36">
+            <div class="tooltip-wrapper" style="position:absolute; width:200px; z-index:99; background-color:rgba(0,0,0,0.8); display:none; max-height:0; opacity:0; overflow:hidden; padding:10px; text-align:center; transition:all .3s ease; border-radius:4px; ${getTooltipCss(h.tooltipPosition)}">
+                <span style="color:#ffffff; font-family:'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size:20px; font-weight:bold; line-height:26px; text-transform:uppercase;">${h.text}</span>
+            </div>
+            </div>
+        `).join('');
 
-            const fallbackItems = hotspots.map(h => `
-                   <tr>
-                    <td valign="top" style="padding-bottom: 8px; width: 20px;"><img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display: block; height: auto;" width="20"></td>
-                    <td style="width: 12px; padding-bottom: 8px;"> </td>
-                    <td style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 24px; text-align: left;">${h.text}</td>
-                   </tr>`).join('');
+        const fallbackItems = hotspots.map(h => `
+            <tr>
+            <td valign="top" style="padding-bottom:8px; width:20px;">
+                <img alt="" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/06914a54-6462-4ecd-a8bf-74c46518351d.png" style="display:block; height:auto;" width="20">
+            </td>
+            <td style="width:12px; padding-bottom:8px;">&nbsp;</td>
+            <td style="color:#ffffff; font-family:'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size:16px; line-height:24px; text-align:left;">${h.text}</td>
+            </tr>
+        `).join('');
 
-            return `<style type="text/css">
-              .hot-tool-wrapper:hover .tooltip-wrapper { display: block !important; max-height: 200px !important; opacity: 1 !important; }
-              .hotspots-fallback { display: none; max-height: 0; overflow: hidden; }
-              @media screen and (max-width: 580px) {
-                .hotspots-interactive { display: none !important; }
-                .hotspots-fallback { display: block !important; max-height: none !important; overflow: visible !important; }
-              }
-            </style>
-            <!--[if !mso]><!-->
-            <div class="hotspots-interactive" style="background-color: #DB021d;"><div style="background-image: url('${bgImg}'); background-position: center; background-repeat: no-repeat; background-size: contain; height: 500px; position: relative; max-width: 620px; margin: 0 auto;">${interactiveHotspots}</div></div>
-            <!--<![endif]-->
-            <div class="hotspots-fallback">
-              <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; max-width: 620px; background-color: #DB021d;">
-                <tr><td align="center"><a href="${fallbackLink}" target="_blank"><img alt="" src="${fallbackImg}" style="display: block; width: 100%; max-width: 620px; height: auto;" width="620"></a></td></tr>
-                <tr><td style="padding: 0 20px;"><div style="font-size: 20px; height: 20px;"> </div><table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table><div style="font-size: 20px; height: 20px;"> </div></td></tr>
-              </table>
-            </div>`;
+        return `
+        <style type="text/css">
+            /* Reveal interactivity in clients that honour styles */
+            .hot-tool-wrapper:hover .tooltip-wrapper{display:block !important; max-height:200px !important; opacity:1 !important;}
+            @media screen and (min-width:581px){
+            .hotspots-interactive{display:block !important; max-height:none !important; overflow:visible !important;}
+            .hotspots-fallback{display:none !important; max-height:0 !important; overflow:hidden !important;}
+            }
+            @media screen and (max-width:580px){
+            .hotspots-interactive{display:none !important; max-height:0 !important; overflow:hidden !important;}
+            .hotspots-fallback{display:block !important; max-height:none !important; overflow:visible !important;}
+            }
+        </style>
+
+        <!--[if !mso]><!-->
+        <div class="hotspots-interactive"
+            style="display:none; max-height:0; overflow:hidden; mso-hide:all; background-color:#DB021D;">
+            <div style="position:relative; max-width:620px; margin:0 auto;">
+            <!-- use an IMG so the base visual doesn’t rely on CSS backgrounds -->
+            <img src="${bgImg}" alt="" width="620" style="display:block; width:100%; height:auto; border:0;">
+            ${interactiveHotspots}
+            </div>
+        </div>
+        <!--<![endif]-->
+
+        <div class="hotspots-fallback" style="display:block; max-height:none; overflow:visible;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%; max-width:620px; background-color:#DB021D;">
+            <tr>
+                <td align="center">
+                <a href="${fallbackLink}" target="_blank">
+                    <img alt="" src="${fallbackImg}" style="display:block; width:100%; max-width:620px; height:auto;" width="620">
+                </a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:0 20px;">
+                <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">${fallbackItems}</table>
+                <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
+                </td>
+            </tr>
+            </table>
+        </div>`;
         }
 
         function refreshPreview() {
