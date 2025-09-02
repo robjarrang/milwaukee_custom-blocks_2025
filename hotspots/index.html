@@ -269,25 +269,26 @@
         <!--<![endif]-->
 
         <div class="hotspots-fallback" style="display:block; max-height:none; overflow:visible;">
-            <!-- Fallback (locked to 620px everywhere, including Outlook desktop) -->
-            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+            <!-- Fallback (fluid mobile + fixed desktop Outlook) -->
+            <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" align="center" 
+                   style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
               <tr>
                 <td align="center">
-                  <!-- Inner fixed-width table is the key -->
-                  <table role="presentation" width="620" border="0" cellspacing="0" cellpadding="0" align="center"
-                         style="width:620px; border-collapse:collapse; background-color:#DB021D; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                  <!-- Inner table: width attribute fixes Outlook, CSS keeps it fluid -->
+                  <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="620" align="center"
+                         style="width:100%; max-width:620px; border-collapse:collapse; background-color:#DB021D; mso-table-lspace:0pt; mso-table-rspace:0pt;">
                     <tr>
                       <td align="center" style="padding:0;">
                         <a href="${fallbackLink}" target="_blank">
                           <img src="${fallbackImg}" alt="" width="620"
-                               style="display:block; width:620px; height:auto; border:0; line-height:0; font-size:0;">
+                               style="display:block; width:100%; max-width:620px; height:auto; border:0; line-height:0; font-size:0;">
                         </a>
                       </td>
                     </tr>
                     <tr>
                       <td style="padding:0 20px;">
                         <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
-                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;">
                           ${fallbackItems}
                         </table>
                         <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
