@@ -209,6 +209,17 @@
             .hotspots-interactive{display:none !important; max-height:0 !important; overflow:hidden !important;}
             .hotspots-fallback{display:block !important; max-height:none !important; overflow:visible !important;}
             }
+            /* Outlook Mac and Outlook Android - force fallback */
+            #converted-body .hotspots-interactive {
+            display: none !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            }
+            #converted-body .hotspots-fallback {
+            display: block !important;
+            max-height: none !important;
+            overflow: visible !important;
+            }
         </style>
 
         <!--[if !mso]><!-->
