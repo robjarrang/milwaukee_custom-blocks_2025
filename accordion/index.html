@@ -437,6 +437,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
 </style>
+<!-- START .accordion using Milwaukee pattern -->
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#DB021D; width:620px;">
   <tr>
     <td class="side" style="width:20px;"> </td>
@@ -444,7 +445,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
       <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
         <tr><td style="font-size:30px; height:30px; line-height:30px;"> </td></tr>
         <tr>
-          <td align="center" class="block mobile-text-center" style="width:100%;" valign="top">
+          <td class="mobile-text-center" style="padding:0;" valign="top">
             <!--[if !mso]><!-->
             <div class="accordion-wrapper" style="display:none; max-height:0; overflow:hidden; width:100%;">
               ${interactiveItems}
@@ -462,7 +463,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
     </td>
     <td class="side" style="width:20px;"> </td>
   </tr>
-</table>`;
+</table><!-- END .accordion -->`;
         }
 
         function refreshPreview() {
