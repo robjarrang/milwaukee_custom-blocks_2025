@@ -347,7 +347,7 @@
                   ${item.title}
                 </h3>
                 <div class="mobile-text-center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 28px; margin: 0; mso-line-height-rule: exactly;">
-                  ${item.content}
+                  ${utils.sanitizeHtml(item.content)}
                 </div>
               </td>
             </tr>`).join('');
@@ -356,6 +356,15 @@
 <style type="text/css">
 /* Accordion-specific styles only - leveraging existing email template styles */
 input[type="checkbox"] { display: none !important; mso-hide: all !important; }
+
+/* Force white links in accordion content */
+.accordion-content-inner a,
+.accordion-content-inner a:visited,
+.accordion-content-inner a:hover,
+.accordion-content-inner a:active {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .fallback { display: none !important; }
@@ -447,8 +456,29 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
 </style>
 <!--<![endif]-->
 <style type="text/css">
+/* Outlook-specific link styling */
 .accordion-wrapper\\0 { display: none !important; }
 .fallback\\0 { display: block !important; }
+
+/* Force white links in fallback content for all email clients */
+.fallback a,
+.fallback a:visited,
+.fallback a:hover,
+.fallback a:active {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
+
+/* MSO-specific link styling */
+span.MsoHyperlink {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
+
+span.MsoHyperlinkFollowed {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
 </style>
 <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
   <tr>
