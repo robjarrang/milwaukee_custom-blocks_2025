@@ -4,26 +4,7 @@
     <meta charset="utf-8">
     <title>Interactive Hotspots Block</title>
     <style>
-        body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background            .ExternalClass .hotspots-fallback {
-            display: block !important;
-            max-height: none !important;
-            overflow: visible !important;
-            }
-
-            /* Mobile responsive overrides for fixed-width fallback */
-            @media screen and (max-width: 640px) {
-                .hotspots-fallback table[width="620"] {
-                    width: 100% !important;
-                }
-                .hotspots-fallback img[width="620"] {
-                    width: 100% !important;
-                    height: auto !important;
-                }
-                .hotspots-fallback table[width="580"] {
-                    width: 100% !important;
-                }
-            }
-        </style>;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        body{margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.section-title{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #eee}.items-container{display:flex;flex-direction:column;gap:15px;max-height:400px;overflow-y:auto;padding-right:10px}.item{background-color:#fafafa;padding:15px;border:2px solid #ddd;border-radius:6px;position:relative;cursor:pointer;transition:border-color .2s, background-color .2s}.item.selected{border-color:#0074d9;background-color:#f0f8ff}.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.item-title{font-weight:bold;font-size:16px;margin:0}.item-controls{display:flex;gap:8px}.item-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.item-control-btn:hover{color:#0074d9}.item-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-item-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         /* Visual Editor Styles */
         #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
         /* Tooltip Position Selector Styles */
@@ -287,27 +268,25 @@
         </div>
         <!--<![endif]-->
 
-        <div class="hotspots-fallback" style="display:block; max-height:none; overflow:visible;">
-            <!-- Fallback (fluid mobile + fixed desktop Outlook) -->
-            <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" align="center" 
-                   style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                <div class="hotspots-fallback" style="display:block; max-height:none; overflow:visible;">
+            <!--[if mso]>
+            <!-- Outlook-specific version: bulletproof structure matching other blocks -->
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#DB021D; width:620px;">
               <tr>
-                <td align="center">
-                  <!-- Inner table: ONLY fixed widths for Outlook -->
-                  <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="620" align="center"
-                         style="width:620px; border-collapse:collapse; background-color:#DB021D; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                <td class="side" style="width:20px;"> </td>
+                <td align="center" class="content-inner" style="width:580px;" valign="top">
+                  <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
                     <tr>
                       <td align="center" style="padding:0;">
                         <a href="${fallbackLink}" target="_blank">
-                          <img src="${fallbackImg}" alt="" width="620"
-                               style="display:block; width:620px; height:auto; border:0; line-height:0; font-size:0;">
+                          <img src="${fallbackImg}" alt="" width="580" border="0" style="display:block; width:580px; height:auto; border:0;">
                         </a>
                       </td>
                     </tr>
                     <tr>
                       <td style="padding:0 20px;">
                         <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
-                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="580" style="width:580px; border-collapse:collapse;">
+                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="540" style="border-collapse:collapse;">
                           ${fallbackItems}
                         </table>
                         <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
@@ -315,9 +294,40 @@
                     </tr>
                   </table>
                 </td>
+                <td class="side" style="width:20px;"> </td>
               </tr>
             </table>
-        </div>`;
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <!-- Non-Outlook version: responsive structure matching other blocks -->
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#DB021D; width:620px; max-width:620px;">
+              <tr>
+                <td class="side" style="width:20px;"> </td>
+                <td align="center" class="content-inner" style="width:580px; max-width:580px;" valign="top">
+                  <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                    <tr>
+                      <td align="center" style="padding:0;">
+                        <a href="${fallbackLink}" target="_blank">
+                          <img src="${fallbackImg}" alt="" width="580" style="display:block; width:100%; max-width:580px; height:auto; border:0;">
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 20px;">
+                        <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
+                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="540" style="width:100%; max-width:540px; border-collapse:collapse;">
+                          ${fallbackItems}
+                        </table>
+                        <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td class="side" style="width:20px;"> </td>
+              </tr>
+            </table>
+            <!--<![endif]-->
+        </div>`;`;
         }
 
         function refreshPreview() {
