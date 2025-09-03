@@ -442,8 +442,14 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
     <td class="side" style="width: 20px;">&nbsp;</td>
     <td align="center" class="content-inner mobile-text-center" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
       <!--[if !mso]><!-->
-      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden; width: 100%;">
-        ${interactiveItems}
+      <div class="accordion-wrapper" style="display: none; max-height: 0; overflow: hidden;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%;">
+          <tr>
+            <td style="width: 100%;">
+              ${interactiveItems}
+            </td>
+          </tr>
+        </table>
       </div>
       <!--<![endif]-->
       <div class="fallback">
