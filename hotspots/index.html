@@ -269,24 +269,23 @@
         <!--<![endif]-->
 
                 <div class="hotspots-fallback" style="display:block; max-height:none; overflow:visible;">
-            <!--[if mso]>
-            <!-- Outlook-specific version: bulletproof structure matching other blocks -->
+            <!-- Fallback using proven Milwaukee pattern -->
             <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#DB021D; width:620px;">
               <tr>
                 <td class="side" style="width:20px;"> </td>
                 <td align="center" class="content-inner" style="width:580px;" valign="top">
                   <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
                     <tr>
-                      <td align="center" style="padding:0;">
-                        <a href="${fallbackLink}" target="_blank">
-                          <img src="${fallbackImg}" alt="" width="580" border="0" style="display:block; width:580px; height:auto; border:0;">
+                      <td align="center" class="block" style="width:100%;" valign="top">
+                        <a href="${fallbackLink}" target="_blank" style="text-decoration:none; color:#000001;">
+                          <img align="top" alt="" src="${fallbackImg}" style="border:none; display:block; height:auto; outline:none; text-decoration:none; width:100%; max-width:580px;" width="580">
                         </a>
                       </td>
                     </tr>
                     <tr>
                       <td style="padding:0 20px;">
                         <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
-                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="540" style="border-collapse:collapse;">
+                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse:collapse;">
                           ${fallbackItems}
                         </table>
                         <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
@@ -297,36 +296,6 @@
                 <td class="side" style="width:20px;"> </td>
               </tr>
             </table>
-            <![endif]-->
-            <!--[if !mso]><!-->
-            <!-- Non-Outlook version: responsive structure matching other blocks -->
-            <table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#DB021D; width:620px; max-width:620px;">
-              <tr>
-                <td class="side" style="width:20px;"> </td>
-                <td align="center" class="content-inner" style="width:580px; max-width:580px;" valign="top">
-                  <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
-                    <tr>
-                      <td align="center" style="padding:0;">
-                        <a href="${fallbackLink}" target="_blank">
-                          <img src="${fallbackImg}" alt="" width="580" style="display:block; width:100%; max-width:580px; height:auto; border:0;">
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding:0 20px;">
-                        <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
-                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="540" style="width:100%; max-width:540px; border-collapse:collapse;">
-                          ${fallbackItems}
-                        </table>
-                        <div style="font-size:20px; height:20px; line-height:20px;">&nbsp;</div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-                <td class="side" style="width:20px;"> </td>
-              </tr>
-            </table>
-            <!--<![endif]-->
         </div>`;`;
         }
 
