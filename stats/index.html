@@ -77,6 +77,10 @@
                 <label class="field-label">Subtitle</label>
                 <input type="text" class="field-input" data-field="subtitle" placeholder="SUBTITLE">
             </div>
+            <div class="field-group">
+                <label class="field-label">Title Font Size (px)</label>
+                <input type="number" class="field-input" data-field="fontSize" min="12" max="48" value="24">
+            </div>
         </div>
     </template>
 
@@ -94,9 +98,9 @@
                 imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 imageAlt: { type: 'text', defaultValue: 'Milwaukee Tool Product', maxLength: 150 },
                 stats: { type: 'list', defaultValue: [
-                    { title: 'TITLE', subtitle: 'SUBTITLE' },
-                    { title: 'TITLE', subtitle: 'SUBTITLE' },
-                    { title: 'TITLE', subtitle: 'SUBTITLE' }
+                    { title: 'TITLE', subtitle: 'SUBTITLE', fontSize: 24 },
+                    { title: 'TITLE', subtitle: 'SUBTITLE', fontSize: 24 },
+                    { title: 'TITLE', subtitle: 'SUBTITLE', fontSize: 24 }
                 ]}
             },
             debounceDelay: 300,
@@ -128,8 +132,10 @@
 
             const statsHtml = stats.map((stat, index) => {
                 const isLast = index === stats.length - 1;
+                const fontSize = stat.fontSize || 24;
+                const lineHeight = fontSize + 8;
                 const statRow = '<tr><td class="mobile-text-center" style="text-align: center;">' +
-                    '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: 24px; font-weight: bold; line-height: 32px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
+                    '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: ' + fontSize + 'px; font-weight: bold; line-height: ' + lineHeight + 'px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
                     '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
                     '</td></tr>';
                 const spacer = !isLast ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : '';
@@ -198,6 +204,7 @@
                 itemEl.querySelector('.stat-title').textContent = `Stat ${index + 1}`;
                 itemEl.querySelector('[data-field="title"]').value = stat.title;
                 itemEl.querySelector('[data-field="subtitle"]').value = stat.subtitle;
+                itemEl.querySelector('[data-field="fontSize"]').value = stat.fontSize || 24;
                 itemEl.querySelector('.move-up-btn').disabled = (index === 0);
                 itemEl.querySelector('.move-down-btn').disabled = (index === stats.length - 1);
                 fragment.appendChild(itemFragment);
@@ -305,7 +312,7 @@
             // Add Stat Button
             addListener(elements.addStatBtn, 'click', () => {
                 const currentStats = utils.getFieldValue('stats');
-                const newStats = [...currentStats, { title: 'TITLE', subtitle: 'SUBTITLE' }];
+                const newStats = [...currentStats, { title: 'TITLE', subtitle: 'SUBTITLE', fontSize: 24 }];
                 updateData('stats', newStats);
                 renderStatsUI();
             });
@@ -366,7 +373,11 @@
                     const field = e.target.dataset.field;
                     const currentStats = utils.getFieldValue('stats');
                     const newStats = [...currentStats];
-                    newStats[index] = { ...newStats[index], [field]: e.target.value };
+                    let value = e.target.value;
+                    if (field === 'fontSize') {
+                        value = parseInt(value) || 24;
+                    }
+                    newStats[index] = { ...newStats[index], [field]: value };
                     debouncedUpdateData('stats', newStats);
                 }
             });
