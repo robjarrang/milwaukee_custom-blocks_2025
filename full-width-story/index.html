@@ -108,6 +108,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Spacer Settings -->
+        <div class="section-divider">
+            <div class="section-title">Spacer Settings</div>
+            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showSpacerAboveHeading" checked><span class="toggle-slider"></span></label><label for="showSpacerAboveHeading" class="checkbox-label">Show Spacer Above Heading</label></div>
+        </div>
     </div>
 
     <template id="itemTemplate">
@@ -155,7 +161,8 @@
                 showButtonSpacer: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                buttonAlignment: { type: 'text', defaultValue: 'center' }
+                buttonAlignment: { type: 'text', defaultValue: 'center' },
+                showSpacerAboveHeading: { type: 'boolean', defaultValue: true }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -348,6 +355,7 @@
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
+            elements.showSpacerAboveHeading = document.getElementById('showSpacerAboveHeading');
         }
 
         function setLoadingState(loading) {
@@ -479,7 +487,13 @@
                 '<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : 
                 '';
 
-            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;">&nbsp;</td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : ''}${titleHtml}${contentHtml}${buttonHtml}${bottomSpacerHtml}</table></td></tr></table></td><td class="side" style="width: 20px;">&nbsp;</td></tr></table><!-- END .fw-lead -->`;
+            // Generate top spacer - controlled by the new "Show Spacer Above Heading" option
+            const showSpacerAboveHeading = utils.getFieldValue('showSpacerAboveHeading');
+            const topSpacerHtml = showSpacerAboveHeading ? 
+                '<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : 
+                '';
+
+            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;">&nbsp;</td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : ''}${topSpacerHtml}${titleHtml}${contentHtml}${buttonHtml}${bottomSpacerHtml}</table></td></tr></table></td><td class="side" style="width: 20px;">&nbsp;</td></tr></table><!-- END .fw-lead -->`;
         }
 
         function refreshPreview() {
@@ -814,6 +828,9 @@
                     
                     // Handle button spacer toggle
                     elements.showButtonSpacer.checked = utils.getFieldValue('showButtonSpacer');
+
+                    // Handle spacer above heading toggle
+                    elements.showSpacerAboveHeading.checked = utils.getFieldValue('showSpacerAboveHeading');
 
                     if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
