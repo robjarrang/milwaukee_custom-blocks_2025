@@ -39,15 +39,15 @@
         </div>
 
         <div class="section-divider">
-            <div class="section-title">Spacing Settings</div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showTopSpacer" checked><span class="toggle-slider"></span></label><label for="showTopSpacer" class="checkbox-label">Show Top Spacer</label></div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showBottomSpacer" checked><span class="toggle-slider"></span></label><label for="showBottomSpacer" class="checkbox-label">Show Bottom Spacer</label></div>
-        </div>
-
-        <div class="section-divider">
             <div class="section-title">Checklist Items</div>
             <div id="itemsContainer" class="items-container"></div>
             <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
+        </div>
+
+        <div class="section-divider">
+            <div class="section-title">Spacing Settings</div>
+            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showTopSpacer" checked><span class="toggle-slider"></span></label><label for="showTopSpacer" class="checkbox-label">Show Top Spacer</label></div>
+            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showBottomSpacer" checked><span class="toggle-slider"></span></label><label for="showBottomSpacer" class="checkbox-label">Show Bottom Spacer</label></div>
         </div>
     </div>
 
@@ -316,6 +316,7 @@
 
             // Use DocumentFragment for batch DOM operations
             const fragment = document.createDocumentFragment();
+            const editorConfigs = []; // Store editor configs to create after DOM attachment
 
             items.forEach((item, index) => {
                 const itemFragment = elements.itemTemplate.content.cloneNode(true);
@@ -330,15 +331,23 @@
 
                 fragment.appendChild(itemFragment);
 
-                // Create editor with memory management
-                const editor = utils.createEditor(editorDiv, item.id, item.text);
-                editor.on('text-change', debouncedUpdateDataFromUI);
-                state.editors[item.id] = editor;
+                // Store editor config for later creation
+                editorConfigs.push({ editorDiv, id: item.id, text: item.text });
             });
 
             // Single DOM update
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
+
+            // Now create editors after DOM attachment
+            editorConfigs.forEach(({ id, text }) => {
+                const editorDiv = elements.itemsContainer.querySelector(`[data-id="${id}"] .quill-container`);
+                if (editorDiv) {
+                    const editor = utils.createEditor(editorDiv, id, text);
+                    editor.on('text-change', debouncedUpdateDataFromUI);
+                    state.editors[id] = editor;
+                }
+            });
         }
 
         // Optimized Event Delegation with Action Maps
