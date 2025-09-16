@@ -13,13 +13,23 @@
         /* Quill-specific styles */
         .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:4em;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
         .field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}
+        .option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
     <div class="container" id="mainContainer">
-        <div class="section-title">Accordion Items</div>
+        <div class="section-title">General Settings</div>
+        <div class="field-group">
+            <label class="field-label">Background Color</label>
+            <div class="option-selector" id="backgroundColorSelector">
+                <div class="option-button" data-value="red">Red</div>
+                <div class="option-button selected" data-value="black">Black</div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 30px;">Accordion Items</div>
         <div id="itemsContainer" class="items-container">
             <!-- Accordion items will be dynamically inserted here -->
         </div>
@@ -60,6 +70,7 @@
         const moduleConfig = {
             name: 'Interactive Accordion',
             fields: {
+                backgroundColor: { type: 'text', defaultValue: 'black' },
                 accordionItems: {
                     type: 'list',
                     defaultValue: [
@@ -151,6 +162,7 @@
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.itemsContainer = document.getElementById('itemsContainer');
             elements.addItemBtn = document.getElementById('addItemBtn');
             elements.itemTemplate = document.getElementById('itemTemplate');
@@ -298,6 +310,21 @@
         }
 
         function initializeEventHandlers() {
+            // Background color selector
+            Array.from(elements.backgroundColorSelector.querySelectorAll('.option-button')).forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const value = e.currentTarget.dataset.value;
+                    state.blockData.backgroundColor = value;
+                    
+                    // Update UI
+                    Array.from(elements.backgroundColorSelector.querySelectorAll('.option-button')).forEach(b => b.classList.remove('selected'));
+                    e.currentTarget.classList.add('selected');
+                    
+                    refreshPreview();
+                });
+                state.eventListeners.push({ element: btn, event: 'click', handler: btn.onclick });
+            });
+
             // Optimized event delegation for accordion items
             const accordionHandler = createDelegatedHandler('accordionItems', itemActions);
 
@@ -325,8 +352,10 @@
 
         function generateTemplate() {
             const items = utils.getFieldValue('accordionItems');
+            const backgroundColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
+            
             if (!items || items.length === 0) {
-                return '<table align="center" style="width:620px; background-color:#DB021D;"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
+                return '<table align="center" style="width:620px; background-color:' + backgroundColor + ';"><tr><td style="padding:20px;text-align:center;font-family:Arial,sans-serif;color:#fff;">Add items to build your accordion.</td></tr></table>';
             }
 
             const interactiveItems = items.map((item, i) => `
@@ -376,7 +405,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         max-width: 580px !important;
     }
     .accordion-item { 
-        border-bottom: 1px solid #000000; 
+        border-bottom: 1px solid ${backgroundColor}; 
         width: 100%;
         box-sizing: border-box;
     }
@@ -412,7 +441,7 @@ input[type="checkbox"] { display: none !important; mso-hide: all !important; }
         max-height: 0; 
         overflow: hidden; 
         transition: max-height 0.4s ease-out; 
-        background-color: #000000;
+        background-color: ${backgroundColor};
         width: 100%;
         box-sizing: border-box;
     }
@@ -480,7 +509,7 @@ span.MsoHyperlinkFollowed {
     text-decoration: underline !important;
 }
 </style>
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${backgroundColor}; width: 620px;">
   <tr>
     <td class="side" style="width: 20px;">&nbsp;</td>
     <td align="center" class="content-inner mobile-text-center" style="padding-top: 30px; padding-bottom: 30px; width: 580px;" valign="top">
@@ -550,6 +579,15 @@ span.MsoHyperlinkFollowed {
                 setLoadingState(true);
 
                 state.sdk.getData((data) => {
+                    // Set backgroundColor
+                    state.blockData.backgroundColor = (data && data.backgroundColor) ? data.backgroundColor : utils.getFieldValue('backgroundColor');
+                    
+                    // Update background color UI
+                    const colorValue = state.blockData.backgroundColor;
+                    Array.from(elements.backgroundColorSelector.querySelectorAll('.option-button')).forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.value === colorValue);
+                    });
+
                     state.blockData.accordionItems = (data && data.accordionItems && data.accordionItems.length > 0) ? data.accordionItems : utils.getFieldValue('accordionItems');
                     state.blockData.accordionItems.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
                     renderItemsUI();
