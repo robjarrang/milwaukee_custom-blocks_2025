@@ -727,6 +727,8 @@
             elements.showButtonSpacer.addEventListener('change', spacerHandler); 
             state.eventListeners.push({ element: elements.showButtonSpacer, event: 'change', handler: spacerHandler });
 
+
+
             // Optimized event delegation for checklist items
             const checklistHandler = createDelegatedHandler('checklistItems', itemActions);
             
@@ -829,8 +831,8 @@
                     // Handle button spacer toggle
                     elements.showButtonSpacer.checked = utils.getFieldValue('showButtonSpacer');
 
-                    // Handle spacer above heading toggle
-                    elements.showSpacerAboveHeading.checked = utils.getFieldValue('showSpacerAboveHeading');
+            // Handle spacer above heading toggle
+            elements.showSpacerAboveHeading.checked = utils.getFieldValue('showSpacerAboveHeading');
 
                     if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
