@@ -724,6 +724,14 @@
             elements.showButtonSpacer.addEventListener('change', spacerHandler); 
             state.eventListeners.push({ element: elements.showButtonSpacer, event: 'change', handler: spacerHandler });
 
+            // Set up spacer above heading toggle
+            const spacerAboveHandler = (e) => { 
+                const isChecked = e.target.checked; 
+                updateData('showSpacerAboveHeading', isChecked); 
+            }; 
+            elements.showSpacerAboveHeading.addEventListener('change', spacerAboveHandler); 
+            state.eventListeners.push({ element: elements.showSpacerAboveHeading, event: 'change', handler: spacerAboveHandler });
+
             // Optimized event delegation for checklist items
             const checklistHandler = createDelegatedHandler('checklistItems', itemActions);
             
