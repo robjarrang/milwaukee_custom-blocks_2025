@@ -139,53 +139,53 @@
             }
 
             const topSpacerHtml = showTopSpacer ? 
-                '<tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>' : 
+                '<tr><td style="font-size: 28px; line-height: 28px;">&nbsp;</td></tr>' : 
                 '';
             
             const bottomSpacerHtml = showBottomSpacer ? 
-                '<tr><td style="font-size: 28px; line-height: 28px;"> </td></tr>' : 
+                '<tr><td style="font-size: 28px; line-height: 28px;">&nbsp;</td></tr>' : 
                 '';
 
             if (!showSidePadding) {
                 // Full width image without side padding - spans full 620px
                 return `<!-- START .fw-image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
-                    <tr>
-                        <td align="center" class="content-inner" style="width: 100%;" valign="top">
-                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                                ${topSpacerHtml}
-                                <tr>
-                                    <td align="center" class="block" style="width: 100%;" valign="top">
-                                        <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
-                                          <img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 620px;" width="620">
-                                        </a>
-                                    </td>
-                                </tr>
-                                ${bottomSpacerHtml}
-                            </table>
-                        </td>
-                    </tr>
-                </table><!-- END .fw-image -->`;
+<tr>
+<td align="center" class="content-inner" style="width: 100%;" valign="top">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+${topSpacerHtml}
+<tr>
+<td align="center" class="block" style="width: 100%;" valign="top">
+<a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
+<img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 620px;" width="620">
+</a>
+</td>
+</tr>
+${bottomSpacerHtml}
+</table>
+</td>
+</tr>
+</table><!-- END .fw-image -->`;
             } else {
                 // Standard layout with side padding
                 return `<!-- START .fw-image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
-                <tr>
-                    <td class="side" style="width: 20px;"> </td>
-                    <td align="center" class="content-inner" style="width: 580px;" valign="top">
-                        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
-                            ${topSpacerHtml}
-                            <tr>
-                                <td align="center" class="block" style="width: 100%;" valign="top">
-                                    <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
-                                      <img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580">
-                                    </a>
-                                </td>
-                            </tr>
-                            ${bottomSpacerHtml}
-                        </table>
-                    </td>
-                    <td class="side" style="width: 20px;"> </td>
-                </tr>
-            </table><!-- END .fw-image -->`;
+<tr>
+<td class="side" style="width: 20px;">&nbsp;</td>
+<td align="center" class="content-inner" style="width: 580px;" valign="top">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
+${topSpacerHtml}
+<tr>
+<td align="center" class="block" style="width: 100%;" valign="top">
+<a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
+<img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580">
+</a>
+</td>
+</tr>
+${bottomSpacerHtml}
+</table>
+</td>
+<td class="side" style="width: 20px;">&nbsp;</td>
+</tr>
+</table><!-- END .fw-image -->`;
             }
         }
 
