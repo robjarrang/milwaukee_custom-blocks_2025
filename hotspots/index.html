@@ -45,6 +45,7 @@
                 </div>
             </div>
             <div class="field-group"><label class="field-label">Tooltip Text</label><input type="text" class="field-input" data-field="text"></div>
+            <div class="field-group"><label class="field-label">Font Size (px)</label><input type="number" class="field-input" data-field="fontSize" min="10" max="40" value="20"></div>
             <div class="field-group" style="margin-bottom:0;"><label class="field-label">Tooltip Position</label>
                 <div class="position-selector">
                     <button class="position-button" data-position="top-left"><div class="dot"></div></button>
@@ -75,8 +76,8 @@
                 hotspots: {
                     type: 'list',
                     defaultValue: [
-                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosition: 'right' },
-                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosition: 'top-left' },
+                        { text: 'Mechanical Clutch', posX: 35, posY: 18, tooltipPosition: 'right', fontSize: 20 },
+                        { text: 'REDLINK™ Intelligence', posX: 57, posY: 70, tooltipPosition: 'top-left', fontSize: 20 },
                     ]
                 }
             },
@@ -135,6 +136,7 @@
                 el.classList.toggle('selected', hotspot.id === state.selectedHotspotId);
                 el.querySelector('.item-title').textContent = `Hotspot ${index + 1}`;
                 el.querySelector('[data-field="text"]').value = hotspot.text;
+                el.querySelector('[data-field="fontSize"]').value = hotspot.fontSize || 20;
 
                 const posButton = el.querySelector(`.position-button[data-position="${hotspot.tooltipPosition}"]`);
                 if (posButton) posButton.classList.add('selected');
@@ -182,7 +184,7 @@
             <div class="hot-tool-wrapper" style="position:absolute; left:${h.posX}%; top:${h.posY}%; z-index:${i+1};">
             <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display:block; width:36px; height:36px;" width="36">
             <div class="tooltip-wrapper" style="position:absolute; width:200px; z-index:99; background-color:rgba(0,0,0,0.8); display:none; max-height:0; opacity:0; overflow:hidden; padding:10px; text-align:center; transition:all .3s ease; border-radius:4px; ${getTooltipCss(h.tooltipPosition)}">
-                <span style="color:#ffffff; font-family:'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size:20px; font-weight:bold; line-height:26px; text-transform:uppercase;">${h.text}</span>
+                <span style="color:#ffffff; font-family:'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size:${h.fontSize || 20}px; font-weight:bold; line-height:${(h.fontSize || 20) + 6}px; text-transform:uppercase;">${h.text}</span>
             </div>
             </div>
         `).join('');
@@ -380,7 +382,8 @@
                             text: 'New Hotspot', 
                             posX: 50, 
                             posY: 50, 
-                            tooltipPosition: 'top' 
+                            tooltipPosition: 'top',
+                            fontSize: 20
                         };
                         state.blockData.hotspots.push(newHotspot);
                         state.selectedHotspotId = newHotspot.id;
@@ -473,7 +476,11 @@
                 const id = itemEl.dataset.id;
                 const hotspot = state.blockData.hotspots.find(h => h.id === id);
                 if(hotspot) {
-                    hotspot.text = itemEl.querySelector('[data-field="text"]').value;
+                    if (e.target.dataset.field === 'text') {
+                        hotspot.text = e.target.value;
+                    } else if (e.target.dataset.field === 'fontSize') {
+                        hotspot.fontSize = parseInt(e.target.value) || 20;
+                    }
                     refreshPreview();
                 }
             }, moduleConfig.debounceDelay));
