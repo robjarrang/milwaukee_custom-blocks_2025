@@ -254,7 +254,7 @@
 
             const spacers = utils.getFieldValue(prefix + 'spacers');
             const spacersHtml = spacers.map(spacer => {
-                const spacerContent = '<br class="mobile-hide"> ';
+                const spacerContent = '<br class="mobile-hide">&nbsp;';
                 switch(spacer.type) {
                     case 'mso': return `<!--[if mso]>${spacerContent}<![endif]-->`;
                     case 'not_mso': return `<!--[if !mso]><!-->${spacerContent}<!--<![endif]-->`;
