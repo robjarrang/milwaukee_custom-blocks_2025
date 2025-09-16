@@ -59,6 +59,7 @@
         <div class="section-divider">
             <div class="section-title">Content Settings</div>
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showTitle" checked><span class="toggle-slider"></span></label><label for="showTitle" class="checkbox-label">Show Title</label></div>
+            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showSpacerAboveHeading" checked><span class="toggle-slider"></span></label><label for="showSpacerAboveHeading" class="checkbox-label">Show Spacer Above Heading</label></div>
             <div class="field-group" id="titleGroup">
                 <label class="field-label">Title</label>
                 <div id="titleEditor" class="quill-container limited-toolbar"></div>
@@ -109,11 +110,7 @@
             </div>
         </div>
 
-        <!-- Spacer Settings -->
-        <div class="section-divider">
-            <div class="section-title">Spacer Settings</div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showSpacerAboveHeading" checked><span class="toggle-slider"></span></label><label for="showSpacerAboveHeading" class="checkbox-label">Show Spacer Above Heading</label></div>
-        </div>
+
     </div>
 
     <template id="itemTemplate">
@@ -727,8 +724,6 @@
             elements.showButtonSpacer.addEventListener('change', spacerHandler); 
             state.eventListeners.push({ element: elements.showButtonSpacer, event: 'change', handler: spacerHandler });
 
-
-
             // Optimized event delegation for checklist items
             const checklistHandler = createDelegatedHandler('checklistItems', itemActions);
             
@@ -828,13 +823,11 @@
                     elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButtonValue);
                     elements.buttonSpacerToggle.style.display = showButtonValue ? 'flex' : 'none';
                     
-                    // Handle button spacer toggle
-                    elements.showButtonSpacer.checked = utils.getFieldValue('showButtonSpacer');
+            // Handle button spacer toggle
+            elements.showButtonSpacer.checked = utils.getFieldValue('showButtonSpacer');
 
             // Handle spacer above heading toggle
-            elements.showSpacerAboveHeading.checked = utils.getFieldValue('showSpacerAboveHeading');
-
-                    if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
+            elements.showSpacerAboveHeading.checked = utils.getFieldValue('showSpacerAboveHeading');                    if (elements.titleFontSize) elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     if (elements.bodyFontSize) elements.bodyFontSize.value = utils.getFieldValue('bodyFontSize');
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
 
