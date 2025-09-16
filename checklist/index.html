@@ -39,6 +39,22 @@
         </div>
 
         <div class="section-divider">
+            <div class="section-title">Spacing Settings</div>
+            <div class="field-group">
+                <div style="display: flex; gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="showTopSpacer" checked>
+                        <span>Show Top Spacer</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="showBottomSpacer" checked>
+                        <span>Show Bottom Spacer</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider">
             <div class="section-title">Checklist Items</div>
             <div id="itemsContainer" class="items-container"></div>
             <button id="addItemBtn" class="btn add-item-btn">Add New Item</button>
@@ -69,6 +85,8 @@
             name: 'Checklist Block',
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'red' },
+                showTopSpacer: { type: 'boolean', defaultValue: true },
+                showBottomSpacer: { type: 'boolean', defaultValue: true },
                 items: {
                     type: 'list',
                     defaultValue: [
@@ -191,6 +209,8 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
+            elements.showTopSpacer = document.getElementById('showTopSpacer');
+            elements.showBottomSpacer = document.getElementById('showBottomSpacer');
             elements.itemsContainer = document.getElementById('itemsContainer');
             elements.addItemBtn = document.getElementById('addItemBtn');
             elements.itemTemplate = document.getElementById('itemTemplate');
@@ -207,6 +227,9 @@
         function updateDataFromUI() {
             const selectedColorEl = elements.backgroundColorSelector.querySelector('.selected');
             state.blockData.backgroundColor = selectedColorEl ? selectedColorEl.dataset.color : 'red';
+            
+            state.blockData.showTopSpacer = elements.showTopSpacer.checked;
+            state.blockData.showBottomSpacer = elements.showBottomSpacer.checked;
 
             const newItems = [];
             document.querySelectorAll('#itemsContainer .item').forEach(itemEl => {
@@ -230,6 +253,8 @@
         function generateTemplate() {
             const bgColor = utils.getFieldValue('backgroundColor') === 'red' ? '#DB021D' : '#000000';
             const items = utils.getFieldValue('items');
+            const showTopSpacer = utils.getFieldValue('showTopSpacer');
+            const showBottomSpacer = utils.getFieldValue('showBottomSpacer');
 
             const itemRowsHtml = items.map(item => `
                 <tr>
@@ -242,6 +267,14 @@
                 </tr>
             `).join('');
 
+            const topSpacerHtml = showTopSpacer ? 
+                '<tr><td colspan="3"><div style="font-size: 28px; height: 28px; line-height: 28px;">&nbsp;</div></td></tr>' : 
+                '';
+            
+            const bottomSpacerHtml = showBottomSpacer ? 
+                '<tr><td colspan="3"><div style="font-size: 20px; height: 20px; line-height: 20px;">&nbsp;</div></td></tr>' : 
+                '';
+
             return `<!-- START .checklist --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
               <tr>
                <td class="side" style="width: 20px;">&nbsp;</td>
@@ -250,9 +283,9 @@
                   <tr>
                    <td align="left" class="block" style="width: 100%;">
                     <table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                      <tr><td colspan="3"><div style="font-size: 28px; height: 28px; line-height: 28px;">&nbsp;</div></td></tr>
+                      ${topSpacerHtml}
                       ${itemRowsHtml}
-                      <tr><td colspan="3"><div style="font-size: 20px; height: 20px; line-height: 20px;">&nbsp;</div></td></tr>
+                      ${bottomSpacerHtml}
                     </table>
                    </td>
                   </tr>
@@ -403,6 +436,10 @@
                 }
             });
 
+            // Add spacer toggle handlers
+            utils.addEventListenerTracked(elements.showTopSpacer, 'change', updateDataFromUI);
+            utils.addEventListenerTracked(elements.showBottomSpacer, 'change', updateDataFromUI);
+
             // Optimized event delegation for checklist items
             const checklistHandler = createDelegatedHandler('items', itemActions);
 
@@ -417,10 +454,14 @@
             state.sdk.getData((data) => {
                 try {
                     state.blockData.backgroundColor = (data && data.backgroundColor) ? data.backgroundColor : moduleConfig.fields.backgroundColor.defaultValue;
+                    state.blockData.showTopSpacer = (data && data.hasOwnProperty('showTopSpacer')) ? data.showTopSpacer : moduleConfig.fields.showTopSpacer.defaultValue;
+                    state.blockData.showBottomSpacer = (data && data.hasOwnProperty('showBottomSpacer')) ? data.showBottomSpacer : moduleConfig.fields.showBottomSpacer.defaultValue;
                     state.blockData.items = (data && data.items && data.items.length > 0) ? data.items : moduleConfig.fields.items.defaultValue;
                     state.blockData.items.forEach(item => { if (!item.id) item.id = crypto.randomUUID(); });
 
                     document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
+                    elements.showTopSpacer.checked = state.blockData.showTopSpacer;
+                    elements.showBottomSpacer.checked = state.blockData.showBottomSpacer;
                     renderItemsUI();
                     refreshPreview();
 
