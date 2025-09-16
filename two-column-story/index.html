@@ -238,22 +238,8 @@
         function processRichText(html, isDescription = false) {
             return QuillConfigManager.sanitizeForEmail(html || '');
         }
-        function updateData(field, value, forceImmediate = false) {
-            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { 
-                state.blockData[field] = value; 
-                if (forceImmediate) {
-                    // Force immediate preview update for critical changes like spacers
-                    if (state.sdk && !state.isLoading) {
-                        const html = generateTemplate();
-                        state.sdk.setContent(html);
-                        if (state.sdk.setData) {
-                            state.sdk.setData({ ...state.blockData, content: html });
-                        }
-                    }
-                } else {
-                    refreshPreview();
-                }
-            }
+        function updateData(field, value) {
+            if (JSON.stringify(state.blockData[field]) !== JSON.stringify(value)) { state.blockData[field] = value; refreshPreview(); }
         }
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
         function generateColumnHtml(prefix) {
@@ -490,8 +476,10 @@
         };
 
         const spacerActions = {
-            '.remove-btn': (spacer, index, spacers) => {
+            '.remove-btn': (spacer, index, spacers, context) => {
                 spacers.splice(index, 1);
+                // Force preview refresh after spacer removal
+                setTimeout(() => refreshPreview(), 50);
                 return true;
             }
         };
@@ -525,9 +513,7 @@
 
                         if (result) {
                             actionExecuted = true;
-                            // Use immediate update for spacer changes to ensure visual feedback
-                            const forceImmediate = listType === 'spacers';
-                            updateData(prefix + listType, currentItems, forceImmediate);
+                            updateData(prefix + listType, currentItems);
                             renderList(prefix, listType, templateId, hasQuill);
                         }
                         break;
