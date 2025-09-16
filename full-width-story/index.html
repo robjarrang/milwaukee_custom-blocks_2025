@@ -463,7 +463,6 @@
 
             let buttonHtml = '';
             if (showButton) {
-                const showButtonSpacer = utils.getFieldValue('showButtonSpacer');
                 const buttonAlign = utils.getFieldValue('buttonAlignment');
                 const buttonUrl = utils.getFieldValue('buttonUrl');
                 const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
@@ -471,14 +470,16 @@
                     `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;` : 
                     `background-color: #000000; border-radius: 4px !important;`;
                 
-                const spacerHtml = showButtonSpacer ? 
-                    `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>` : 
-                    '';
-                
-                buttonHtml = `${spacerHtml}<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
+                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
-            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;">&nbsp;</td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : ''}${titleHtml}${contentHtml}${buttonHtml}<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr></table></td></tr></table></td><td class="side" style="width: 20px;">&nbsp;</td></tr></table><!-- END .fw-lead -->`;
+            // Generate bottom spacer - only show if button spacer is enabled or if no button is shown
+            const showButtonSpacer = utils.getFieldValue('showButtonSpacer');
+            const bottomSpacerHtml = (!showButton || showButtonSpacer) ? 
+                '<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : 
+                '';
+
+            return `<!-- START .fw-lead --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;"><tr><td class="side" style="width: 20px;">&nbsp;</td><td align="center" class="content-inner" style="width: 580px;"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="left" class="block" style="width: 100%;"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">${!showTitle ? '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : ''}${titleHtml}${contentHtml}${buttonHtml}${bottomSpacerHtml}</table></td></tr></table></td><td class="side" style="width: 20px;">&nbsp;</td></tr></table><!-- END .fw-lead -->`;
         }
 
         function refreshPreview() {
