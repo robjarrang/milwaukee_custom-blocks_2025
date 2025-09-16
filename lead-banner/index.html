@@ -14,14 +14,6 @@
         .help-banner { background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%); border: 1px solid #b3d9ff; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; text-align: center; }
         .help-banner a { color: #0074d9; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s ease; }
         .help-banner a:hover { color: #005bb5; text-decoration: underline; }
-        .toggle-container { display: flex; align-items: center; margin-bottom: 15px; }
-        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 24px; margin-right: 12px; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
-        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .toggle-slider { background-color: #0074d9; }
-        input:checked + .toggle-slider:before { transform: translateX(26px); }
-        .checkbox-label { font-weight: bold; color: #333; font-size: 14px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -60,17 +52,6 @@
 
             <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
         </div>
-
-        <!-- Button Settings -->
-        <div class="section-divider">
-            <div class="section-title">Button Settings</div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
-            <div id="buttonFieldsGroup">
-                <div class="field-group"><label class="field-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div>
-                <div class="field-group"><label for="buttonUrl" class="field-label">Button Link URL</label><input type="url" id="buttonUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="buttonUrlError">Please enter a valid URL.</div></div>
-                <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="buttonSpacer" checked><span class="toggle-slider"></span></label><label for="buttonSpacer" class="checkbox-label">Show Vertical Spacer Under Button</label></div>
-            </div>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
@@ -94,11 +75,7 @@
                 titleImage: { type: 'url', defaultValue: '', validator: 'url' },
                 titleImageAlt: { type: 'text', defaultValue: '' },
                 titleImageWidth: { type: 'number', defaultValue: 300 },
-                contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                showButton: { type: 'boolean', defaultValue: true },
-                buttonText: { type: 'richtext', defaultValue: 'SHOP NOW', maxLength: 50 },
-                buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                buttonSpacer: { type: 'boolean', defaultValue: true }
+                contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
             },
             debounceDelay: 300, 
             maxRetries: 3
@@ -241,12 +218,6 @@
             elements.titleImageWidth = document.getElementById('titleImageWidth');
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
-            elements.showButton = document.getElementById('showButton');
-            elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
-            elements.buttonTextEditor = document.getElementById('buttonTextEditor');
-            elements.buttonUrl = document.getElementById('buttonUrl');
-            elements.buttonUrlError = document.getElementById('buttonUrlError');
-            elements.buttonSpacer = document.getElementById('buttonSpacer');
         }
 
         function setLoadingState(loading) {
@@ -278,15 +249,6 @@
                     {
                         placeholder: 'Enter subtitle...',
                         maxLength: moduleConfig.fields.subtitle.maxLength
-                    }
-                );
-
-                state.editors.buttonText = await QuillConfigManager.initializeEditor(
-                    elements.buttonTextEditor, 
-                    'title', 
-                    {
-                        placeholder: 'Enter button text...',
-                        maxLength: moduleConfig.fields.buttonText.maxLength
                     }
                 );
 
@@ -364,27 +326,7 @@
                 contentHtml = `<h1 class="leadbanner-title" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',sans-serif,'Open Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0 0 10px 0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:${subtitleSize}px;font-stretch:condensed;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedSubtitle}</a></p>`;
             }
 
-            // Button generation
-            const showButton = utils.getFieldValue('showButton');
-            const buttonSpacer = utils.getFieldValue('buttonSpacer');
-            let buttonHtml = '';
-            
-            if (showButton) {
-                const buttonUrl = utils.getFieldValue('buttonUrl');
-                const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
-                
-                // Button spacer before button (20px if enabled, 0px if disabled)
-                const preButtonSpacer = '<div style="font-size:20px;height:20px;line-height:20px;"></div>';
-                
-                // Button spacer after button (20px if enabled, 0px if disabled)
-                const postButtonSpacer = buttonSpacer ? 
-                    '<div style="font-size:20px;height:20px;line-height:20px;"></div>' : 
-                    '<div style="font-size:0px;height:0px;line-height:0px;"></div>';
-                
-                buttonHtml = `<tr><td class="block" style="width:100%;">${preButtonSpacer}</td></tr><tr><td align="${textAlign}" class="block" style="width:100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="background-color:#ffffff;border-radius:4px !important;margin:0 auto;"><tr><td align="center" style="color:#DB021D;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:16px;font-weight:bold;line-height:28px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:12px 20px;text-align:center;text-transform:uppercase;width:100%;border-radius:4px !important;"><a href="${buttonUrl}" style="color:#DB021D;text-decoration:none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr><tr><td class="block" style="width:100%;">${postButtonSpacer}</td></tr>`;
-            }
-
-            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}">${contentType === 'image' ? `<a href="${contentUrl}" target="_blank">` : ''}${contentHtml}${contentType === 'image' ? '</a>' : ''}</td></tr>${buttonHtml}<tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
+            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}">${contentType === 'image' ? `<a href="${contentUrl}" target="_blank">` : ''}${contentHtml}${contentType === 'image' ? '</a>' : ''}</td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
         }
 
         function refreshPreview() {
@@ -431,7 +373,6 @@
             setupUrlInput(elements.backgroundImage, elements.backgroundImageError, 'backgroundImage');
             setupUrlInput(elements.titleImage, elements.titleImageError, 'titleImage');
             setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
-            setupUrlInput(elements.buttonUrl, elements.buttonUrlError, 'buttonUrl');
 
             // Text input handler for image alt text
             const altTextHandler = (e) => debouncedUpdateData('titleImageAlt', e.target.value.trim());
@@ -493,31 +434,6 @@
             setupOptionSelector(elements.contentTypeSelector, 'contentType');
             setupOptionSelector(elements.verticalAlignSelector, 'verticalAlign');
             setupOptionSelector(elements.textAlignSelector, 'textAlign');
-
-            // Toggle functionality for show button
-            function setupToggle(toggleElement, fieldsGroup, dataKey) {
-                if (!toggleElement) return;
-                const handler = (e) => {
-                    const isChecked = e.target.checked;
-                    updateData(dataKey, isChecked);
-                    if (fieldsGroup) fieldsGroup.style.display = isChecked ? 'block' : 'none';
-                };
-                toggleElement.addEventListener('change', handler);
-                state.eventListeners.push({ element: toggleElement, event: 'change', handler });
-            }
-
-            // Toggle functionality for button spacer (no fields group to toggle)
-            function setupSimpleToggle(toggleElement, dataKey) {
-                if (!toggleElement) return;
-                const handler = (e) => {
-                    updateData(dataKey, e.target.checked);
-                };
-                toggleElement.addEventListener('change', handler);
-                state.eventListeners.push({ element: toggleElement, event: 'change', handler });
-            }
-
-            setupToggle(elements.showButton, elements.buttonFieldsGroup, 'showButton');
-            setupSimpleToggle(elements.buttonSpacer, 'buttonSpacer');
         }
 
         function toggleContentType(contentType) {
@@ -552,7 +468,6 @@
                     elements.contentUrl.value = utils.getFieldValue('contentUrl');
                     elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
-                    elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
 
                     // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     Object.keys(state.editors).forEach(key => {
@@ -581,24 +496,6 @@
                     setSelectorState(elements.contentTypeSelector, 'contentType');
                     setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
                     setSelectorState(elements.textAlignSelector, 'textAlign');
-
-                    // Set toggle states
-                    function setToggleState(toggleElement, fieldsGroup, dataKey) {
-                        if (toggleElement) {
-                            const isChecked = utils.getFieldValue(dataKey);
-                            toggleElement.checked = isChecked;
-                            if (fieldsGroup) fieldsGroup.style.display = isChecked ? 'block' : 'none';
-                        }
-                    }
-
-                    function setSimpleToggleState(toggleElement, dataKey) {
-                        if (toggleElement) {
-                            toggleElement.checked = utils.getFieldValue(dataKey);
-                        }
-                    }
-
-                    setToggleState(elements.showButton, elements.buttonFieldsGroup, 'showButton');
-                    setSimpleToggleState(elements.buttonSpacer, 'buttonSpacer');
 
                     // Initialize content type display
                     toggleContentType(utils.getFieldValue('contentType'));
