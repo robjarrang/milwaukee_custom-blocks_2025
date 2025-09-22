@@ -34,7 +34,7 @@
 
         <div class="section-divider">
             <div class="section-title">Content</div>
-            <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="text">Text</div><div class="option-button" data-value="image">Image</div><div class="option-button" data-value="imageswap">Image Swap</div></div></div>
+            <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button" data-value="text">Text</div><div class="option-button" data-value="image">Image Title</div><div class="option-button selected" data-value="imageswap">Image Swap</div></div></div>
             <div class="field-group" id="verticalAlignGroup"><label class="field-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
             <div class="field-group" id="textAlignGroup"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
             <div class="section-divider" style="margin:20px 0; padding-top:15px;"></div>
@@ -71,7 +71,7 @@
             name: 'Lead Banner',
             fields: {
                 backgroundImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/56a309bc-df67-4b80-a64c-cd19ed07769c.jpg', validator: 'url' },
-                contentType: { type: 'text', defaultValue: 'text' },
+                contentType: { type: 'text', defaultValue: 'imageswap' },
                 verticalAlign: { type: 'text', defaultValue: 'middle' },
                 textAlign: { type: 'text', defaultValue: 'center' },
                 title: { type: 'richtext', defaultValue: 'Title goes here', maxLength: 200 },
