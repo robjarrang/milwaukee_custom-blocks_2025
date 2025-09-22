@@ -29,14 +29,14 @@
 
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
-            <div class="field-group"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
+            <div class="field-group" id="backgroundImageGroup"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
         </div>
 
         <div class="section-divider">
             <div class="section-title">Content</div>
-            <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="text">Text</div><div class="option-button" data-value="image">Image</div></div></div>
-            <div class="field-group"><label class="field-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
-            <div class="field-group"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
+            <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="text">Text</div><div class="option-button" data-value="image">Image</div><div class="option-button" data-value="imageswap">Image Swap</div></div></div>
+            <div class="field-group" id="verticalAlignGroup"><label class="field-label">Vertical Position</label><div class="option-selector" id="verticalAlignSelector"><div class="option-button" data-value="top">Top</div><div class="option-button selected" data-value="middle">Middle</div><div class="option-button" data-value="bottom">Bottom</div></div></div>
+            <div class="field-group" id="textAlignGroup"><label class="field-label">Horizontal Position</label><div class="option-selector" id="textAlignSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div>
             <div class="section-divider" style="margin:20px 0; padding-top:15px;"></div>
 
             <div id="textContent">
@@ -48,6 +48,12 @@
                 <div class="field-group"><label for="titleImage" class="field-label">Title/Subtitle Image URL (Transparent PNG)</label><input type="url" id="titleImage" class="field-input" placeholder="https://example.com/title-image.png"><div class="field-error" id="titleImageError">Please enter a valid image URL.</div></div>
                 <div class="field-group"><label for="titleImageAlt" class="field-label">Image Alt Text</label><input type="text" id="titleImageAlt" class="field-input" placeholder="Descriptive text for the image" maxlength="100"></div>
                 <div class="field-group-inline"><label for="titleImageWidth" class="field-label">Image Width (px)</label><input type="number" id="titleImageWidth" class="field-input" min="100" max="500" step="10"></div>
+            </div>
+
+            <div id="imageSwapContent" style="display: none;">
+                <div class="field-group"><label for="heroDesktopImage" class="field-label">Desktop Hero Image URL (620x484px recommended)</label><input type="url" id="heroDesktopImage" class="field-input" placeholder="https://example.com/desktop-hero.jpg"><div class="field-error" id="heroDesktopImageError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="heroMobileImage" class="field-label">Mobile Hero Image URL (620x700px recommended)</label><input type="url" id="heroMobileImage" class="field-input" placeholder="https://example.com/mobile-hero.jpg"><div class="field-error" id="heroMobileImageError">Please enter a valid image URL.</div></div>
+                <div class="field-group"><label for="heroAlt" class="field-label">Hero Images Alt Text</label><input type="text" id="heroAlt" class="field-input" placeholder="Descriptive text for the hero images" maxlength="100"></div>
             </div>
 
             <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
@@ -75,6 +81,9 @@
                 titleImage: { type: 'url', defaultValue: '', validator: 'url' },
                 titleImageAlt: { type: 'text', defaultValue: '' },
                 titleImageWidth: { type: 'number', defaultValue: 300 },
+                heroDesktopImage: { type: 'url', defaultValue: 'https://via.placeholder.com/620x484/DB011C/FFFFFF?text=Desktop+Hero', validator: 'url' },
+                heroMobileImage: { type: 'url', defaultValue: 'https://via.placeholder.com/620x700/DB011C/FFFFFF?text=Mobile+Hero', validator: 'url' },
+                heroAlt: { type: 'text', defaultValue: 'Hero banner' },
                 contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
             },
             debounceDelay: 300, 
@@ -206,8 +215,12 @@
             elements.contentTypeSelector = document.getElementById('contentTypeSelector');
             elements.verticalAlignSelector = document.getElementById('verticalAlignSelector');
             elements.textAlignSelector = document.getElementById('textAlignSelector');
+            elements.backgroundImageGroup = document.getElementById('backgroundImageGroup');
+            elements.verticalAlignGroup = document.getElementById('verticalAlignGroup');
+            elements.textAlignGroup = document.getElementById('textAlignGroup');
             elements.textContent = document.getElementById('textContent');
             elements.imageContent = document.getElementById('imageContent');
+            elements.imageSwapContent = document.getElementById('imageSwapContent');
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.subtitleEditor = document.getElementById('subtitleEditor');
@@ -216,6 +229,11 @@
             elements.titleImageError = document.getElementById('titleImageError');
             elements.titleImageAlt = document.getElementById('titleImageAlt');
             elements.titleImageWidth = document.getElementById('titleImageWidth');
+            elements.heroDesktopImage = document.getElementById('heroDesktopImage');
+            elements.heroDesktopImageError = document.getElementById('heroDesktopImageError');
+            elements.heroMobileImage = document.getElementById('heroMobileImage');
+            elements.heroMobileImageError = document.getElementById('heroMobileImageError');
+            elements.heroAlt = document.getElementById('heroAlt');
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
         }
@@ -290,6 +308,15 @@
             const logoImage = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/a3a77919-71b9-4b9d-b1ad-90f327487e3f.png';
             const logoUrl = 'https://%%CountryCode%%.milwaukeetool.eu/';
             const fallbackColor = '#DB021D';
+
+            // Handle Image Swap mode separately
+            if (contentType === 'imageswap') {
+                const heroDesktopImage = utils.getFieldValue('heroDesktopImage');
+                const heroMobileImage = utils.getFieldValue('heroMobileImage');
+                const heroAlt = utils.getFieldValue('heroAlt');
+                
+                return `<!-- START .leadbanner - Image Swap --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td align="center" style="padding:0;" valign="top"><!-- Desktop image (hidden on mobile) --><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill mobile-hide" src="${heroDesktopImage}" style="display:block;width:620px;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a><!-- Mobile image (revealed on mobile via .swap-content) --><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill swap-content" src="${heroMobileImage}" style="display:none;width:100%;max-height:0;overflow:hidden;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;mso-hide:all;" width="620"></a></td></tr></table></td></tr></table><!-- END .leadbanner - Image Swap -->`;
+            }
 
             // --- FIX: Dynamic Padding Logic ---
             let paddingTop = 20, paddingBottom = 20, paddingLeft = 40, paddingRight = 40;
@@ -372,12 +399,18 @@
 
             setupUrlInput(elements.backgroundImage, elements.backgroundImageError, 'backgroundImage');
             setupUrlInput(elements.titleImage, elements.titleImageError, 'titleImage');
+            setupUrlInput(elements.heroDesktopImage, elements.heroDesktopImageError, 'heroDesktopImage');
+            setupUrlInput(elements.heroMobileImage, elements.heroMobileImageError, 'heroMobileImage');
             setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
 
-            // Text input handler for image alt text
+            // Text input handlers for alt text fields
             const altTextHandler = (e) => debouncedUpdateData('titleImageAlt', e.target.value.trim());
             elements.titleImageAlt.addEventListener('input', altTextHandler);
             state.eventListeners.push({ element: elements.titleImageAlt, event: 'input', handler: altTextHandler });
+
+            const heroAltHandler = (e) => debouncedUpdateData('heroAlt', e.target.value.trim());
+            elements.heroAlt.addEventListener('input', heroAltHandler);
+            state.eventListeners.push({ element: elements.heroAlt, event: 'input', handler: heroAltHandler });
 
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
@@ -437,12 +470,29 @@
         }
 
         function toggleContentType(contentType) {
-            if (contentType === 'image') {
-                elements.textContent.style.display = 'none';
-                elements.imageContent.style.display = 'block';
+            // Hide all content sections first
+            elements.textContent.style.display = 'none';
+            elements.imageContent.style.display = 'none';
+            elements.imageSwapContent.style.display = 'none';
+            
+            // Show/hide UI elements based on content type
+            if (contentType === 'imageswap') {
+                // Image Swap mode - hide background image and positioning controls
+                elements.backgroundImageGroup.style.display = 'none';
+                elements.verticalAlignGroup.style.display = 'none';
+                elements.textAlignGroup.style.display = 'none';
+                elements.imageSwapContent.style.display = 'block';
             } else {
-                elements.textContent.style.display = 'block';
-                elements.imageContent.style.display = 'none';
+                // Text or Image mode - show all controls
+                elements.backgroundImageGroup.style.display = 'block';
+                elements.verticalAlignGroup.style.display = 'block';
+                elements.textAlignGroup.style.display = 'block';
+                
+                if (contentType === 'image') {
+                    elements.imageContent.style.display = 'block';
+                } else {
+                    elements.textContent.style.display = 'block';
+                }
             }
         }
 
@@ -465,6 +515,9 @@
                     elements.titleImage.value = utils.getFieldValue('titleImage');
                     elements.titleImageAlt.value = utils.getFieldValue('titleImageAlt');
                     elements.titleImageWidth.value = utils.getFieldValue('titleImageWidth');
+                    elements.heroDesktopImage.value = utils.getFieldValue('heroDesktopImage');
+                    elements.heroMobileImage.value = utils.getFieldValue('heroMobileImage');
+                    elements.heroAlt.value = utils.getFieldValue('heroAlt');
                     elements.contentUrl.value = utils.getFieldValue('contentUrl');
                     elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
