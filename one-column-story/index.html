@@ -245,8 +245,9 @@
                     const id = itemEl.dataset.id;
                     const editor = state.editors.get(id);
                     if (editor) {
+                        // getCleanContent already sanitizes for email, no need to double-sanitize
                         const content = QuillConfigManager.getCleanContent(editor, true);
-                        return { id, text: utils.sanitizeHtml(content) };
+                        return { id, text: content };
                     }
                     return null;
                 }

@@ -244,7 +244,8 @@
                     const content = editor.getSemanticHTML ? 
                         editor.getSemanticHTML() : 
                         editor.root.innerHTML;
-                    newItems.push({ id: id, text: utils.sanitizeHtml(content) });
+                    // Use QuillConfigManager to properly preserve line breaks
+                    newItems.push({ id: id, text: QuillConfigManager.sanitizeForEmail(content) });
                 }
             });
             state.blockData.items = newItems;
