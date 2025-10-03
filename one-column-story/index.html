@@ -255,11 +255,9 @@
         }, moduleConfig.debounceDelay + 100);
 
         function processRichText(html) {
-            if (!html) return '';
-            const temp = document.createElement('div');
-            temp.innerHTML = utils.sanitizeHtml(html);
-            return temp.innerHTML.replace(/<p>|<\/p>|<br>/g, '');
+            return QuillConfigManager.sanitizeForEmail(html || '');
         }
+
 
         function generateTemplate() {
             const layout = utils.getFieldValue('layout');
