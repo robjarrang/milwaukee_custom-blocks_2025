@@ -288,12 +288,25 @@
             },
 
             createChecklistEditor(container, id, content = '') {
-                // Create editor with simple configuration for checklist items
+                // Create editor using shared configuration with line break support
                 const editor = new Quill(container, {
                     theme: 'snow',
                     modules: {
                         toolbar: [['bold', { 'script': 'super' }], ['link']],
-                        clipboard: { matchVisual: false }
+                        clipboard: { 
+                            matchVisual: false,
+                            // Preserve line breaks in clipboard
+                            matchers: [
+                                // Convert non-breaking spaces to regular spaces
+                                [Node.TEXT_NODE, function(node, delta) {
+                                    if (typeof node.data === 'string') {
+                                        const text = node.data.replace(/\u00A0/g, ' ').replace(/&nbsp;/g, ' ');
+                                        return new (window.Quill.import('delta'))().insert(text);
+                                    }
+                                    return delta;
+                                }]
+                            ]
+                        }
                     },
                     formats: ['bold', 'script', 'link'],
                     placeholder: 'List item text...'

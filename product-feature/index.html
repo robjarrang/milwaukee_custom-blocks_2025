@@ -236,14 +236,28 @@
                 return fieldConfig.defaultValue;
             },
             createChecklistEditor(container, id, content = '') {
-                // Create editor with simple configuration for checklist items
+                // Create editor with line break support for checklist items
                 const editor = new Quill(container, {
                     theme: 'snow',
                     modules: {
                         toolbar: [
                             ['bold', 'italic'],
                             ['link']
-                        ]
+                        ],
+                        clipboard: { 
+                            matchVisual: false,
+                            // Preserve line breaks in clipboard
+                            matchers: [
+                                // Convert non-breaking spaces to regular spaces
+                                [Node.TEXT_NODE, function(node, delta) {
+                                    if (typeof node.data === 'string') {
+                                        const text = node.data.replace(/\u00A0/g, ' ').replace(/&nbsp;/g, ' ');
+                                        return new (window.Quill.import('delta'))().insert(text);
+                                    }
+                                    return delta;
+                                }]
+                            ]
+                        }
                     },
                     placeholder: 'List item text...'
                 });
