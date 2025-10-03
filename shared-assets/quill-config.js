@@ -298,11 +298,12 @@ class QuillConfigManager {
         // Clean up email-incompatible formatting and non-breaking spaces
         return temp.innerHTML
             .replace(/<p>/g, '')
-            .replace(/<\/p>/g, '')
-            .replace(/<br\s*\/?>/g, '')
+            .replace(/<\/p>/g, '<br>')        // Convert closing </p> to <br> for line breaks
             .replace(/<div[^>]*>/g, '')
-            .replace(/<\/div>/g, '')
-            .replace(/&nbsp;/g, ' ')           // Replace HTML non-breaking spaces
+            .replace(/<\/div>/g, '<br>')      // Convert closing </div> to <br> for line breaks
+            .replace(/^<br\s*\/?>/g, '')      // Remove leading <br>
+            .replace(/<br\s*\/?>$/g, '')      // Remove trailing <br>
+            .replace(/&nbsp;/g, ' ')          // Replace HTML non-breaking spaces
             .replace(/\u00A0/g, ' ')          // Replace Unicode non-breaking spaces
             .replace(/\s{2,}/g, ' ')          // Replace multiple spaces with single space
             .trim();
