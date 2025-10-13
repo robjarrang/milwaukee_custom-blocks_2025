@@ -54,6 +54,10 @@
 
         <div class="section-divider">
             <div class="section-title">Right Column Stats</div>
+            <div class="field-group">
+                <label class="field-label">Space Between Stats (px)</label>
+                <input type="number" class="field-input" id="statSpacing" min="0" max="60" step="4" value="20">
+            </div>
             <div id="statsContainer" class="stats-container"></div>
             <button id="addStatBtn" class="btn add-stat-btn">Add Stat</button>
         </div>
@@ -97,6 +101,7 @@
                 imageUrl: { type: 'url', defaultValue: 'https://place-hold.it/300x300/ccc/333' },
                 imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
                 imageAlt: { type: 'text', defaultValue: 'Milwaukee Tool Product', maxLength: 150 },
+                statSpacing: { type: 'number', defaultValue: 20 },
                 stats: { type: 'list', defaultValue: [
                     { title: 'TITLE', subtitle: 'SUBTITLE', fontSize: 24 },
                     { title: 'TITLE', subtitle: 'SUBTITLE', fontSize: 24 },
@@ -129,6 +134,7 @@
             const imageLink = utils.getFieldValue('imageLink');
             const imageAlt = utils.getFieldValue('imageAlt');
             const stats = utils.getFieldValue('stats');
+            const statSpacing = utils.getFieldValue('statSpacing');
 
             const statsHtml = stats.map((stat, index) => {
                 const isLast = index === stats.length - 1;
@@ -138,7 +144,7 @@
                     '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: ' + fontSize + 'px; font-weight: bold; line-height: ' + lineHeight + 'px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
                     '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
                     '</td></tr>';
-                const spacer = !isLast ? '<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : '';
+                const spacer = !isLast ? '<tr><td><div style="clear: both; display: block; font-size: ' + statSpacing + 'px; height: ' + statSpacing + 'px; line-height: ' + statSpacing + 'px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : '';
                 return statRow + spacer;
             }).join('');
 
@@ -234,6 +240,7 @@
             elements.imageUrl.value = utils.getFieldValue('imageUrl');
             elements.imageLink.value = utils.getFieldValue('imageLink');
             elements.imageAlt.value = utils.getFieldValue('imageAlt');
+            elements.statSpacing.value = utils.getFieldValue('statSpacing');
 
             // Render stats
             renderStatsUI();
@@ -269,7 +276,7 @@
 
         // --- Initialization and Event Handlers ---
         function cacheElements() {
-            for (const id of ['mainContainer', 'loadingOverlay', 'layoutSelector', 'backgroundColorSelector', 'imageUrl', 'imageLink', 'imageAlt', 'statsContainer', 'addStatBtn', 'statTemplate']) {
+            for (const id of ['mainContainer', 'loadingOverlay', 'layoutSelector', 'backgroundColorSelector', 'imageUrl', 'imageLink', 'imageAlt', 'statSpacing', 'statsContainer', 'addStatBtn', 'statTemplate']) {
                 elements[id] = document.getElementById(id);
             }
         }
@@ -308,6 +315,26 @@
             setupTextInput(elements.imageUrl, 'imageUrl');
             setupTextInput(elements.imageLink, 'imageLink');
             setupTextInput(elements.imageAlt, 'imageAlt');
+
+            // Setup number input for stat spacing
+            addListener(elements.statSpacing, 'input', e => {
+                const value = parseInt(e.target.value, 10);
+                if (!isNaN(value)) {
+                    debouncedUpdateData('statSpacing', value);
+                }
+            });
+            addListener(elements.statSpacing, 'blur', e => {
+                const step = 4;
+                let value = parseInt(e.target.value, 10);
+                const min = parseInt(e.target.min, 10), max = parseInt(e.target.max, 10);
+                if (isNaN(value)) {
+                    value = moduleConfig.fields.statSpacing.defaultValue;
+                }
+                value = Math.max(min, Math.min(value, max));
+                const correctedValue = Math.round(value / step) * step;
+                e.target.value = correctedValue;
+                updateData('statSpacing', correctedValue);
+            });
 
             // Add Stat Button
             addListener(elements.addStatBtn, 'click', () => {
@@ -393,6 +420,7 @@
             elements.imageUrl = document.getElementById('imageUrl');
             elements.imageLink = document.getElementById('imageLink');
             elements.imageAlt = document.getElementById('imageAlt');
+            elements.statSpacing = document.getElementById('statSpacing');
             elements.statsContainer = document.getElementById('statsContainer');
             elements.addStatBtn = document.getElementById('addStatBtn');
             elements.statTemplate = document.getElementById('statTemplate');
