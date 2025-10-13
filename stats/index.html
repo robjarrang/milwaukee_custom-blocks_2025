@@ -142,12 +142,12 @@
                 return statRow + spacer;
             }).join('');
 
-            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="top">' +
+            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle">' +
                 '<div><a href="' + imageLink + '" target="_blank">' +
                 '<img align="top" alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290">' +
                 '</a></div></td>';
             
-            const statsCell = '<td class="block" dir="ltr" style="width: 290px;" valign="top">' +
+            const statsCell = '<td class="block" dir="ltr" style="width: 290px;" valign="middle">' +
                 '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">' +
                 '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 statsHtml +
@@ -161,13 +161,13 @@
             
             return '<!-- START .stats-image-block -->' +
                 '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
-                '<tr><td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
+                '<tr><td style="background-color: ' + backgroundColor + '; width: 20px;" valign="middle">' +
                 '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
                 '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td>' +
                 '<td align="center" class="content-inner" style="background-color: ' + backgroundColor + '; width: 580px;" valign="middle">' +
                 '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" ' + tableDirection + ' role="presentation" style="width: 100%;">' +
                 '<tr>' + mainContent + '</tr></table></td>' +
-                '<td style="background-color: ' + backgroundColor + '; width: 20px;" valign="top">' +
+                '<td style="background-color: ' + backgroundColor + '; width: 20px;" valign="middle">' +
                 '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
                 '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td></tr></table>' +
                 '<!-- END .stats-image-block -->';
