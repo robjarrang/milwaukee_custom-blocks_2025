@@ -97,7 +97,6 @@
         const elements = {};
         let rafId = null;
 
-        // Advanced memory management
         const slideMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for slide:', heldValue);
@@ -193,7 +192,6 @@
             elements.slidesContainer.appendChild(fragment);
         }
 
-        // Optimized Event Delegation with Action Maps
         const slideActions = {
             '.remove-btn': (slide, index, slides) => {
                 slides.splice(index, 1);
@@ -281,7 +279,6 @@
                 }
             });
 
-            // Optimized event delegation for slide items
             const slideHandler = createDelegatedHandler('slides', slideActions);
 
             utils.addEventListenerTracked(elements.addSlideBtn, 'click', slideHandler);
@@ -308,7 +305,6 @@
 
             const slideCount = slides.length;
             const carouselSlidesWidth = slideCount * 100;
-            // FIX 1: Use the raw calculation for better precision, matching AMPscript's output more closely.
             const carouselSlideWidth = 100 / slideCount; 
 
             const radioInputs = slides.map((s, i) => `<input type="radio" name="carousel" id="slide${i + 1}" ${i === 0 ? 'checked="checked"' : ''} style="display: none !important; mso-hide: all !important;">`).join('\n        ');
@@ -629,15 +625,12 @@ input[type="radio"] {
             });
         }
 
-        // Enhanced cleanup function with memory management
         function cleanup() {
-            // Clean up event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 
             state.eventListeners = [];
 
-            // Cancel any pending RAF
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;

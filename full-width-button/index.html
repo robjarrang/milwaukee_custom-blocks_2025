@@ -271,8 +271,6 @@
                     // Updates the view in the editor
                     state.sdk.setContent(html);
 
-                    // **THE FIX IS HERE:** Saves the data for persistence and for the Preview tab.
-                    // The key MUST be 'content', not 'html'.
                     if (state.sdk.setData) {
                         state.sdk.setData({ ...state.blockData, content: html });
                     }
@@ -360,22 +358,17 @@
 
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
                     
-                    // Set spacer toggle states
                     elements.showTopSpacer.checked = utils.getFieldValue('showTopSpacer');
                     elements.showBottomSpacer.checked = utils.getFieldValue('showBottomSpacer');
 
-                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     if (state.editors.buttonText) {
                         const content = utils.getFieldValue('buttonText');
                         try {
-                            // Clear existing content first
                             state.editors.buttonText.setContents([]);
-                            // Use the new clipboard API to paste HTML content
                             if (content && content.trim()) {
                                 state.editors.buttonText.clipboard.dangerouslyPasteHTML(content);
                             }
                         } catch (error) {
-                            // Fallback to root innerHTML for compatibility
                             console.warn(`Using fallback method for buttonText editor:`, error);
                             state.editors.buttonText.root.innerHTML = content || '';
                         }

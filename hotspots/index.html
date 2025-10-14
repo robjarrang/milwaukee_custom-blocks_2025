@@ -26,7 +26,6 @@
         <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
         <div id="visualEditorWrapper"><div id="visualEditor"><img id="previewImage" src="" alt="Image Preview"></div></div>
 
-        <!-- THE FIX: The "Add New Hotspot" button has been moved here -->
         <button id="addItemBtn" class="btn add-item-btn">Add New Hotspot</button>
 
         <div class="section-title" style="margin-top: 20px;">Hotspots</div>
@@ -343,7 +342,8 @@
 
 
 
-            // Optimized Event Delegation with Action Maps
+            });
+
             const hotspotActions = {
                 '.remove-btn': (hotspot, index, hotspots) => {
                     const newHotspots = hotspots.filter(h => h.id !== hotspot.id);

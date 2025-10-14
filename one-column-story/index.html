@@ -43,7 +43,6 @@
             <div class="section-title">Content Settings</div>
             <div class="field-group">
                 <label class="field-label">Title</label>
-                <!-- FIX: Added data-lpignore -->
                 <div id="titleEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
                 <div class="style-controls-wrapper">
                     <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div>
@@ -54,7 +53,6 @@
             <div id="descriptionSection">
                 <div class="field-group">
                     <label class="field-label">Description</label>
-                    <!-- FIX: Added data-lpignore -->
                     <div id="descriptionEditor" class="quill-container" data-lpignore="true"></div>
                     <div class="style-controls-wrapper">
                         <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div>
@@ -105,7 +103,6 @@
         const state = { sdk: null, editors: new Map(), blockData: {}, isLoading: false, isInitialized: false, eventListeners: [] };
         const elements = {};
 
-        // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
@@ -344,11 +341,9 @@
                     placeholder: 'Enter item text...'
                 }));
 
-                // Apply email-optimized formatting and space cleanup
                 QuillConfigManager.addEmailFormatting(editor);
                 QuillConfigManager.addSpaceCleanupMonitor(editor);
 
-                // Set content if provided
                 if (item.text && item.text.trim()) {
                     QuillConfigManager.setContent(editor, item.text);
                 }
@@ -362,7 +357,9 @@
             elements.itemsContainer.appendChild(fragment);
         }
 
-        // Optimized Event Delegation with Action Maps
+        });
+        }
+
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
                 items.splice(index, 1);
@@ -570,11 +567,9 @@
         }
 
         function cleanup() {
-            // Enhanced cleanup using QuillConfigManager
             QuillConfigManager.cleanup(Array.from(state.editors.values()));
             state.editors.clear();
 
-            // Clean up tracked event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 

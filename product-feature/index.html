@@ -6,17 +6,14 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}.disabled-field{opacity:0.5;pointer-events:none}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}        .error-banner.show{display:block}
 
-        /* -- NEW STYLES FOR FONT-SIZE CONTROL -- */
         .field-group-inline { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 10px; }
         .field-group-inline .field-label { margin-bottom: 0; }
         .field-group-inline .field-input { width: 80px; }
 
-        /* -- CONTENT TYPE SELECTOR -- */
         .option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}
 
-        /* -- CHECKLIST STYLES -- */
         .items-container{display:flex;flex-direction:column;gap:15px;contain:layout}
         .item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative;contain:layout style paint}
         .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -70,7 +67,6 @@
             <div class="field-group" id="subtitleGroup">
                 <label for="subtitle" class="field-label">Subtitle</label>
                 <input type="text" id="subtitle" class="field-input" placeholder="M12 FHAC16-502X">
-                 <!-- NEW: Subtitle Font Size Control -->
                 <div class="field-group-inline">
                     <label for="subtitleFontSize" class="field-label">Subtitle Font Size (px)</label>
                     <input type="number" id="subtitleFontSize" class="field-input" min="12" max="28" step="4">
@@ -79,7 +75,6 @@
             <div class="field-group">
                 <label class="field-label">Product Title</label>
                 <div id="productTitleEditor" class="quill-container limited-toolbar"></div>
-                 <!-- NEW: Product Title Font Size Control -->
                 <div class="field-group-inline">
                     <label for="productTitleFontSize" class="field-label">Title Font Size (px)</label>
                     <input type="number" id="productTitleFontSize" class="field-input" min="16" max="48" step="4">
@@ -157,9 +152,9 @@
                 productUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 showSubtitle: { type: 'boolean', defaultValue: true },
                 subtitle: { type: 'text', defaultValue: 'M12 FHAC16-502X', maxLength: 50 },
-                subtitleFontSize: { type: 'number', defaultValue: 16 }, // NEW
+                subtitleFontSize: { type: 'number', defaultValue: 16 },
                 productTitle: { type: 'richtext', defaultValue: 'M12™ FUEL COMPACT 16 MM SDS-PLUS HAMMER', maxLength: 200 },
-                productTitleFontSize: { type: 'number', defaultValue: 24 }, // NEW
+                productTitleFontSize: { type: 'number', defaultValue: 24 },
                 contentType: { type: 'text', defaultValue: 'none' },
                 checklistItems: {
                     type: 'list',
@@ -292,9 +287,9 @@
             elements.showSubtitle = document.getElementById('showSubtitle');
             elements.subtitle = document.getElementById('subtitle');
             elements.subtitleGroup = document.getElementById('subtitleGroup');
-            elements.subtitleFontSize = document.getElementById('subtitleFontSize'); // NEW
+            elements.subtitleFontSize = document.getElementById('subtitleFontSize');
             elements.productTitleEditor = document.getElementById('productTitleEditor');
-            elements.productTitleFontSize = document.getElementById('productTitleFontSize'); // NEW
+            elements.productTitleFontSize = document.getElementById('productTitleFontSize');
             elements.contentTypeSelector = document.getElementById('contentTypeSelector');
             elements.checklistGroup = document.getElementById('checklistGroup');
             elements.itemsContainer = document.getElementById('itemsContainer');
@@ -422,11 +417,11 @@
             const productUrl = utils.getFieldValue('productUrl');
             const showSubtitle = utils.getFieldValue('showSubtitle');
             const subtitle = utils.getFieldValue('subtitle');
-            const subtitleSize = utils.getFieldValue('subtitleFontSize'); // UPDATED
-            const subtitleLineHeight = subtitleSize + 12; // UPDATED
+            const subtitleSize = utils.getFieldValue('subtitleFontSize');
+            const subtitleLineHeight = subtitleSize + 12;
             const processedTitle = processRichText(utils.getFieldValue('productTitle'));
-            const titleSize = utils.getFieldValue('productTitleFontSize'); // UPDATED
-            const titleLineHeight = titleSize + 8; // UPDATED
+            const titleSize = utils.getFieldValue('productTitleFontSize');
+            const titleLineHeight = titleSize + 8;
             const contentType = utils.getFieldValue('contentType');
             const showButton = utils.getFieldValue('showButton');
             const buttonText = utils.getFieldValue('buttonText');
@@ -673,23 +668,19 @@
                     if (elements.productImageAlt) elements.productImageAlt.value = utils.getFieldValue('productImageAlt');
                     if (elements.productUrl) elements.productUrl.value = utils.getFieldValue('productUrl');
                     if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
-                    if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize'); // NEW
-                    if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize'); // NEW
+                    if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+                    if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize');
                     if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
 
-                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     if (state.editors.productTitle) {
                         const content = utils.getFieldValue('productTitle');
                         try {
-                            // Clear existing content first
                             state.editors.productTitle.setContents([]);
-                            // Use the new clipboard API to paste HTML content
                             if (content && content.trim()) {
                                 state.editors.productTitle.clipboard.dangerouslyPasteHTML(content);
                             }
                         } catch (error) {
-                            // Fallback to root innerHTML for compatibility
                             console.warn(`Using fallback method for productTitle editor:`, error);
                             state.editors.productTitle.root.innerHTML = content || '';
                         }
@@ -732,7 +723,6 @@
         }
 
         function cleanup() {
-            // Updated cleanup for Quill 2.0
             Object.keys(state.editors).forEach(editorId => {
                 if (state.editors[editorId] && state.editors[editorId].off) {
                     state.editors[editorId].off('text-change');

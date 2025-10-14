@@ -94,7 +94,6 @@
         const state = { sdk: null, editors: {}, blockData: {}, isLoading: false, isInitialized: false, retryCount: 0, eventListeners: [] };
         const elements = {};
 
-        // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
@@ -114,7 +113,6 @@
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
                 temp.querySelectorAll('script, style').forEach(el => el.remove());
-                // Handle Quill's <p> tags and also allow our <sup> and <a> tags through.
                 temp.querySelectorAll('a').forEach(link => {
                     if (!link.style.color) link.style.color = '#ffffff';
                     if (!link.style.textDecoration) link.style.textDecoration = 'underline';
@@ -371,7 +369,6 @@
             });
         }
 
-        // Optimized Event Delegation with Action Maps
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
                 items.splice(index, 1);
@@ -460,10 +457,9 @@
             utils.addEventListenerTracked(elements.showTopSpacer, 'change', updateDataFromUI);
             utils.addEventListenerTracked(elements.showBottomSpacer, 'change', updateDataFromUI);
 
-            // Optimized event delegation for checklist items
-            const checklistHandler = createDelegatedHandler('items', itemActions);
+            }
 
-            utils.addEventListenerTracked(elements.addItemBtn, 'click', checklistHandler);
+            const checklistHandler = createDelegatedHandler('items', itemActions);            utils.addEventListenerTracked(elements.addItemBtn, 'click', checklistHandler);
             utils.addEventListenerTracked(elements.itemsContainer, 'click', checklistHandler);
         }
 
@@ -494,14 +490,11 @@
             });
         }
 
-        // Enhanced cleanup function with memory management
         function cleanup() {
-            // Enhanced cleanup with memory management
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
 
-            // Clean up event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 

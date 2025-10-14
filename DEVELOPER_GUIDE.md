@@ -1,7 +1,85 @@
 # Milwaukee Custom Blocks - Developer Guide
 
+## What Are Custom Blocks?
+
+Custom blocks are reusable content components that integrate directly into Salesforce Marketing Cloud (SFMC) Content Builder. They allow marketers to drag and drop sophisticated email components without writing code, while maintaining brand consistency and email client compatibility.
+
+### How It Works
+
+1. **Development** - Developers create self-contained HTML modules (each in its own folder)
+2. **Deployment** - Modules are published to GitHub Pages, generating a unique URL for each module
+3. **Integration** - Each module's URL is registered as a Custom Block in SFMC Content Builder
+4. **Usage** - Marketers drag the custom block into emails and configure it using a user-friendly interface
+5. **Output** - The block generates email-safe HTML that renders correctly across all email clients
+
+### Project Structure
+
+```
+milwaukee_custom-blocks_2025/
+├── DEVELOPER_GUIDE.md          ← You are here
+├── _base-template/             ← Starting point for new modules
+│   ├── index.html              ← Module code
+│   ├── README.md               ← Template usage guide
+│   └── icon.png, dragIcon.png  ← Content Builder icons
+├── shared-assets/              ← Shared utilities
+│   └── quill-config.js         ← Text editor configuration
+└── [module-name]/              ← Individual modules
+    ├── index.html              ← Module code (published to GitHub Pages)
+    ├── icon.png                ← Module icon in Content Builder
+    └── dragIcon.png            ← Drag handle icon
+```
+
+### GitHub Pages Integration
+
+When this repository is published to GitHub Pages:
+- Each module's `index.html` is accessible via a URL like:  
+  `https://[username].github.io/milwaukee_custom-blocks_2025/[module-name]/`
+- This URL is used as the Custom Block endpoint in SFMC
+- Updates to the repository automatically update the live blocks
+- Marketers always get the latest version when dragging blocks into emails
+
+### Module Types
+
+This collection includes various block types:
+- **Content Blocks** - Text and image layouts (one-column-story, two-column-story, full-width-story)
+- **Interactive Elements** - Buttons, carousels, hotspots
+- **Structured Content** - Checklists, stats, product features
+- **Layout Components** - Spacers, banners, accordions, event lists
+
 ## Overview
-This collection contains custom email blocks for Salesforce Marketing Cloud Content Builder, designed specifically for Milwaukee Tool's email campaigns. Each block follows a consistent structure and commenting pattern to ensure maintainability and ease of modification.
+This collection contains custom email blocks for Salesforce Marketing Cloud Content Builder, designed specifically for Milwaukee Tool's email campaigns. Each block follows a consistent structure and uses shared utilities to ensure maintainability and ease of modification.
+
+## Technology Stack
+
+### Core Libraries
+- **Salesforce Marketing Cloud BlockSDK** - Integration with Content Builder
+- **Quill 2.0.3** - Rich text editor for formatted content
+- **QuillConfigManager** - Custom configuration manager for email-optimized text editing
+
+### Shared Utilities
+All modules use centralized utilities located in `shared-assets/`:
+
+#### quill-config.js
+Provides consistent Quill editor configuration across all modules:
+- **QuillConfigManager.getEditorConfig(type)** - Returns editor configuration for different use cases:
+  - `'minimal'` - Bold only (for titles)
+  - `'basic'` - Bold, Italic, Link (for descriptions)
+  - `'title'` - Bold, Superscript (for branded titles)
+  - `'description'` - Bold, Italic, Link (general content)
+- **QuillConfigManager.sanitizeForEmail(html)** - Converts editor HTML to email-safe markup:
+  - Preserves line breaks (`<br>` tags) when Enter key is pressed
+  - Converts block elements (`</p>`, `</div>`) to `<br>` tags
+  - Removes non-breaking spaces (`&nbsp;`) that prevent text wrapping
+  - Cleans up excessive line breaks
+- **QuillConfigManager.getCleanContent(editor, type)** - Gets optimized content from editor instance
+- **QuillConfigManager.cleanup(editor)** - Properly destroys editor instances and removes event listeners
+
+### Key Features
+- **HTML Editor Tab** - All modules include `tabs: ['htmlblock']` in BlockSDK initialization for raw HTML editing
+- **Line Break Preservation** - Rich text editors properly handle Enter key presses, converting them to `<br>` tags
+- **Memory Management** - Advanced cleanup using WeakMap and FinalizationRegistry patterns
+- **Debounced Updates** - 300-400ms debouncing for smooth UX without excessive saves
+- **URL Validation** - Built-in validation for URL fields with visual feedback
 
 ## File Structure
 Each block contains:
@@ -114,12 +192,67 @@ Always test changes in:
 - Thunderbird
 - Mobile email apps
 
+## Creating New Modules
+
+### Using the Base Template
+A comprehensive base template is available at `_base-template/` that includes all modern patterns and best practices:
+
+1. **Copy the template:**
+   ```bash
+   cp -r _base-template your-new-module-name
+   ```
+
+2. **Customize the module** - See `_base-template/README.md` for detailed instructions
+
+3. **Key files to modify:**
+   - `index.html` - Update moduleConfig, UI elements, and generateTemplate()
+   - `icon.png` - Main icon for Content Builder (update with your design)
+   - `dragIcon.png` - Drag handle icon (update with your design)
+
+### Module Checklist
+Before deploying any module:
+- [ ] Include `shared-assets/quill-config.js` script tag
+- [ ] Initialize BlockSDK with `tabs: ['htmlblock']` for HTML Editor access
+- [ ] Use QuillConfigManager for all rich text fields
+- [ ] Implement proper editor cleanup (WeakMap pattern)
+- [ ] Add debouncing to all user input handlers (300-400ms)
+- [ ] Validate URLs with built-in validators
+- [ ] Test in all major email clients (see Email Client Testing section)
+- [ ] Verify line breaks work correctly (Enter key creates visible breaks)
+- [ ] Ensure data persists after page refresh
+- [ ] Check mobile responsiveness
+
 ## Best Practices
+
+### Rich Text Editing
+1. **Always use QuillConfigManager** - Don't create Quill instances manually
+2. **Call sanitizeForEmail()** - Use this function in updateDataFromUI() to ensure proper email formatting
+3. **Preserve line breaks** - Avoid double-sanitization that strips `<br>` tags
+4. **Clean up editors** - Use QuillConfigManager.cleanup() when destroying editors
+
+### Email Compatibility
 1. **Always provide fallback content** for email clients that don't support interactive elements
 2. **Use inline styles** for critical styling that must work across all clients
 3. **Test thoroughly** - email clients have vastly different capabilities
-4. **Keep accessibility in mind** - use proper alt text and semantic markup
-5. **Follow Milwaukee brand guidelines** for colors, fonts, and styling
+4. **Avoid non-breaking spaces** - They prevent text wrapping on mobile devices
+5. **Use table-based layouts** - Most reliable structure for email HTML
+
+### Code Organization
+1. **Keep accessibility in mind** - use proper alt text and semantic markup
+2. **Follow Milwaukee brand guidelines** - for colors, fonts, and styling
+3. **Track event listeners** - Store references for proper cleanup
+4. **Use WeakMap for editor references** - Prevents memory leaks
+5. **Implement retry logic** - For BlockSDK initialization failures
+
+### Data Management
+1. **Debounce user input** - 300-400ms prevents excessive saves
+2. **Use type-safe getters** - Always validate field values with fallbacks
+3. **Sanitize once, use everywhere** - Avoid processing content multiple times
+4. **Handle visibility changes** - Refresh data when Content Builder tab becomes visible
 
 ## Support
-For questions about these blocks or email development best practices, consult the Milwaukee Tool brand guidelines and email development documentation.
+For questions about these blocks or email development best practices:
+- See `_base-template/README.md` for template-specific guidance
+- Consult Milwaukee Tool brand guidelines
+- Review existing module implementations for patterns
+- Check `shared-assets/quill-config.js` for text editing utilities

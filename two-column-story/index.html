@@ -349,11 +349,9 @@
                         placeholder: 'Enter item text...'
                     }));
 
-                    // Apply email-optimized formatting and space cleanup
                     QuillConfigManager.addEmailFormatting(editor);
                     QuillConfigManager.addSpaceCleanupMonitor(editor);
 
-                    // Set content using shared method
                     if (item.text && item.text.trim()) {
                         QuillConfigManager.setContent(editor, item.text);
                     }
@@ -410,11 +408,9 @@
                 ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setupOptionSelector(elements[p + type + 'Selector'], p + type));
                 setupOptionSelector(elements[p + 'contentTypeSelector'], p + 'contentType', (val) => toggleContentTypeView(p, val));
 
-                // Optimized event delegation for list items
                 const itemsHandler = createDelegatedHandler(p, 'items', 'itemTemplate', true, itemActions);
                 const spacersHandler = createDelegatedHandler(p, 'spacers', 'spacerTemplate', false, spacerActions);
 
-                // Single event listener for items container and add buttons
                 const itemsContainer = elements[p + 'itemsContainer'];
                 const addItemBtn = elements[p + 'addItemBtn'];
                 if (itemsContainer) {
@@ -444,7 +440,7 @@
                 });
             });
         }
-        // Optimized Event Delegation with Action Maps
+
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
                 items.splice(index, 1);
@@ -570,17 +566,14 @@
             });
         }
         function cleanup() { 
-            // Enhanced cleanup with memory management
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
 
-            // Clear QuillConfigManager editors if available
             if (typeof QuillConfigManager !== 'undefined' && QuillConfigManager.cleanup) {
                 QuillConfigManager.cleanup(Object.values(state.editors));
             }
 
-            // Clean up event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 

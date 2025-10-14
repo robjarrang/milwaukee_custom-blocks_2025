@@ -102,7 +102,6 @@
         const elements = {};
         let rafId = null;
 
-        // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
@@ -318,7 +317,6 @@
                 return `<!-- START .leadbanner - Image Swap --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><!-- Desktop row - hidden on mobile --><tr class="mobile-hide"><td align="center" style="padding:0;"><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill" src="${heroDesktopImage}" style="display:block;width:620px;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a></td></tr><!-- Mobile row - revealed on mobile via .swap-content --><tr class="swap-content" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><td align="center" style="padding:0;"><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill" src="${heroMobileImage}" style="display:block;width:100%;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a></td></tr></table></td></tr></table><!-- END .leadbanner - Image Swap -->`;
             }
 
-            // --- FIX: Dynamic Padding Logic ---
             let paddingTop = 20, paddingBottom = 20, paddingLeft = 40, paddingRight = 40;
             if (verticalAlign === 'top') paddingTop = 40;
             if (verticalAlign === 'bottom') paddingBottom = 40;
@@ -522,19 +520,15 @@
                     elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
                     elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
 
-                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
                     Object.keys(state.editors).forEach(key => {
                         if (state.editors[key]) {
                             const content = utils.getFieldValue(key);
                             try {
-                                // Clear existing content first
                                 state.editors[key].setContents([]);
-                                // Use the new clipboard API to paste HTML content
                                 if (content && content.trim()) {
                                     state.editors[key].clipboard.dangerouslyPasteHTML(content);
                                 }
                             } catch (error) {
-                                // Fallback to root innerHTML for compatibility
                                 console.warn(`Using fallback method for editor ${key}:`, error);
                                 state.editors[key].root.innerHTML = content || '';
                             }
@@ -565,19 +559,16 @@
             });
         }
 
-        function cleanup() { 
-            // Enhanced cleanup with memory management
+        function cleanup() {
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
 
-            // Clean up tracked event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && typeof element.removeEventListener === 'function') element.removeEventListener(event, handler); 
             }); 
             state.eventListeners = [];
 
-            // Cancel any pending RAF
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
