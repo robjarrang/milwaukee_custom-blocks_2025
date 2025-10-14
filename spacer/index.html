@@ -175,12 +175,15 @@
                 const parsedState = parseContentForState(content);
 
                 if (parsedState) {
+                    // If HTML is valid, use it to set the state.
                     state.blockData.backgroundColor = parsedState.backgroundColor;
                     state.blockData.spacerHeight = parsedState.spacerHeight;
                 } else {
+                    // Fallback to saved data if parsing fails (e.g., new or empty block).
                     state.blockData.backgroundColor = data.backgroundColor || moduleConfig.fields.backgroundColor.defaultValue;
                     state.blockData.spacerHeight = data.spacerHeight || moduleConfig.fields.spacerHeight.defaultValue;
 
+                    // Since there was no valid content, generate it now. This happens for new blocks.
                     refreshPreview();
                 }
 

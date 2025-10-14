@@ -85,6 +85,7 @@
         const state = { sdk: null, editors: {}, blockData: {}, eventListeners: [] };
         const elements = {};
 
+        // Advanced memory management
         const editorMetadata = new WeakMap();
         const cleanupRegistry = new FinalizationRegistry((heldValue) => {
             console.log('Cleanup registry triggered for editor:', heldValue);
@@ -232,6 +233,7 @@
             elements.itemsContainer.appendChild(fragment);
         }
 
+        // Optimized Event Delegation with Action Maps
         const itemActions = {
             '.remove-btn': (item, index, items, context) => {
                 items.splice(index, 1);
@@ -323,6 +325,7 @@
                 state.eventListeners.push({ element: btn, event: 'click', handler: btn.onclick });
             });
 
+            // Optimized event delegation for accordion items
             const accordionHandler = createDelegatedHandler('accordionItems', itemActions);
 
             elements.addItemBtn.addEventListener('click', accordionHandler);
@@ -545,11 +548,14 @@ span.MsoHyperlinkFollowed {
             });
         }
 
+        // Enhanced cleanup function with memory management
         function cleanup() {
+            // Enhanced cleanup with memory management
             Object.keys(state.editors).forEach(editorId => {
                 utils.cleanupEditor(editorId);
             });
 
+            // Clean up event listeners
             state.eventListeners.forEach(({ element, event, handler }) => { 
                 if (element && element.removeEventListener) element.removeEventListener(event, handler); 
             }); 

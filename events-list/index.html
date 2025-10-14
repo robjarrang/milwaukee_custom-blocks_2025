@@ -232,6 +232,7 @@
             elements.eventsContainer.appendChild(fragment);
         }
 
+        // Optimized Event Delegation with Action Maps
         const eventActions = {
             '.remove-btn': (event, index, events) => {
                 events.splice(index, 1);
@@ -321,6 +322,7 @@
 
             utils.addEventListenerTracked(elements.showButtonsToggle, 'change', updateDataFromUI);
 
+            // Optimized event delegation for events
             const eventsHandler = createDelegatedHandler('events', eventActions);
 
             utils.addEventListenerTracked(elements.addEventBtn, 'click', eventsHandler);
@@ -362,11 +364,13 @@
                     renderEventsUI();
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
+                    // Fallback to defaults if data processing fails
                     Object.keys(moduleConfig.fields).forEach(key => {
                         state.blockData[key] = moduleConfig.fields[key].defaultValue;
                     });
                     renderEventsUI();
                 } finally {
+                    // **THE FIX IS HERE:** Unset loading state BEFORE refreshing the preview.
                     setLoadingState(false);
                     refreshPreview();
                 }
