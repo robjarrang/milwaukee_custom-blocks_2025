@@ -292,106 +292,220 @@ ${bottomSpacerHtml}
         function copyConfiguration() {
             const configData = {
                 version: '1.0',
-                module: 'full-width-image',
+                module: moduleConfig.name,
                 timestamp: new Date().toISOString(),
-                data: {
-                    backgroundColor: utils.getFieldValue('backgroundColor'),
-                    imageUrl: utils.getFieldValue('imageUrl'),
-                    imageLink: utils.getFieldValue('imageLink'),
-                    imageAlt: utils.getFieldValue('imageAlt'),
-                    showTopSpacer: utils.getFieldValue('showTopSpacer'),
-                    showBottomSpacer: utils.getFieldValue('showBottomSpacer'),
-                    showSidePadding: utils.getFieldValue('showSidePadding')
-                }
+                data: state.blockData
             };
             
+            const copyBtn = document.getElementById('copyConfigBtn');
             const jsonString = JSON.stringify(configData, null, 2);
-            const tempTextarea = document.getElementById('tempCopyArea');
-            tempTextarea.value = jsonString;
-            tempTextarea.select();
+            
+            // Fallback method using textarea (works in iframes)
+            const textarea = document.createElement('textarea');
+            textarea.value = jsonString;
+            textarea.style.position = 'fixed';
+            textarea.style.top = '0';
+            textarea.style.left = '0';
+            textarea.style.width = '1px';
+            textarea.style.height = '1px';
+            textarea.style.padding = '0';
+            textarea.style.border = 'none';
+            textarea.style.outline = 'none';
+            textarea.style.boxShadow = 'none';
+            textarea.style.background = 'transparent';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
             
             try {
-                document.execCommand('copy');
-                const copyBtn = document.getElementById('copyConfigBtn');
-                copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
-                setTimeout(() => {
-                    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-                }, 1500);
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                if (successful) {
+                    // Visual feedback - green check
+                    copyBtn.classList.add('success');
+                    copyBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+                    
+                    setTimeout(() => {
+                        copyBtn.classList.add('fade-out');
+                        setTimeout(() => {
+                            copyBtn.classList.remove('success', 'fade-out');
+                            copyBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+                        }, 500);
+                    }, 1500);
+                    
+                    console.log('Block configuration copied to clipboard');
+                } else {
+                    throw new Error('Copy command failed');
+                }
             } catch (err) {
-                console.error('Failed to copy:', err);
+                document.body.removeChild(textarea);
+                utils.showError(`Failed to copy: ${err.message}`);
+                console.error('Copy error:', err);
             }
-            tempTextarea.value = '';
         }
 
         function pasteConfiguration() {
             const modal = document.getElementById('pasteModal');
-            const hintBox = document.getElementById('pasteHint');
-            const tempTextarea = document.getElementById('tempPasteArea');
+            const hiddenTextarea = document.getElementById('pasteHiddenTextarea');
+            const cancelBtn = document.getElementById('pasteModalCancel');
+            const pasteBtn = document.getElementById('pasteConfigBtn');
+            const hintBox = document.getElementById('pasteModalHint');
+            const defaultHintText = 'The block will automatically update with the pasted settings';
             
-            modal.style.display = 'flex';
-            tempTextarea.value = '';
-            tempTextarea.focus();
-            hintBox.textContent = 'Press Cmd+V (Mac) or Ctrl+V (Windows) to paste';
-            hintBox.className = 'paste-hint';
+            // Show modal
+            modal.classList.add('show');
+            hintBox.classList.remove('error');
+            hintBox.textContent = defaultHintText;
             
+            // Focus hidden textarea to capture paste
+            setTimeout(() => {
+                hiddenTextarea.value = '';
+                hiddenTextarea.focus();
+            }, 100);
+            
+            // Close modal function
+            const closeModal = () => {
+                modal.classList.remove('show');
+                hiddenTextarea.value = '';
+                hiddenTextarea.blur();
+                hintBox.classList.remove('error');
+                hintBox.textContent = defaultHintText;
+            };
+            
+            // Close on background click
+            const handleBackgroundClick = (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                    cleanup();
+                }
+            };
+            modal.addEventListener('click', handleBackgroundClick);
+            
+            // Close on Cancel
+            const handleCancel = () => {
+                closeModal();
+                cleanup();
+            };
+            cancelBtn.addEventListener('click', handleCancel);
+            
+            // Close on Escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    cleanup();
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+            
+            // Cleanup function
+            const cleanup = () => {
+                document.removeEventListener('keydown', handleEscape);
+                document.removeEventListener('keydown', handlePaste);
+                cancelBtn.removeEventListener('click', handleCancel);
+                modal.removeEventListener('click', handleBackgroundClick);
+            };
+            
+            // Handle paste event
             const handlePaste = (e) => {
-                setTimeout(() => {
-                    try {
-                        const pastedData = tempTextarea.value;
-                        if (!pastedData.trim()) {
-                            hintBox.textContent = 'No data pasted. Please try again.';
-                            hintBox.className = 'paste-hint error';
+                // Only process if Ctrl/Cmd+V
+                if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                    // Reset hint to default on new paste attempt
+                    hintBox.classList.remove('error');
+                    hintBox.textContent = defaultHintText;
+                    
+                    // Small delay to let paste complete
+                    setTimeout(() => {
+                        const text = hiddenTextarea.value.trim();
+                        
+                        if (!text) {
+                            hintBox.textContent = 'No configuration found in clipboard. Please copy a block configuration first.';
+                            hintBox.classList.add('error');
                             return;
                         }
                         
-                        const configData = JSON.parse(pastedData);
-                        
-                        if (!configData.version || !configData.module || !configData.data) {
-                            throw new Error('Invalid configuration format');
+                        try {
+                            const importData = JSON.parse(text);
+                            
+                            // Validation checks
+                            if (!importData.data) {
+                                throw new Error('Invalid configuration format: missing data');
+                            }
+                            
+                            if (!importData.module) {
+                                throw new Error('Invalid configuration format: missing module name');
+                            }
+                            
+                            if (importData.module !== moduleConfig.name) {
+                                throw new Error(`Configuration mismatch: This is for "${importData.module}", but you're using "${moduleConfig.name}"`);
+                            }
+                            
+                            if (!importData.version) {
+                                throw new Error('Invalid configuration format: missing version');
+                            }
+                            
+                            // Validate that imported data has valid fields
+                            const validFields = Object.keys(moduleConfig.fields);
+                            const importedFields = Object.keys(importData.data);
+                            const hasValidFields = importedFields.some(field => validFields.includes(field));
+                            
+                            if (!hasValidFields) {
+                                throw new Error('Configuration contains no valid fields for this module');
+                            }
+                            
+                            // Merge imported data (only valid fields)
+                            validFields.forEach(key => {
+                                if (importData.data.hasOwnProperty(key)) {
+                                    state.blockData[key] = importData.data[key];
+                                }
+                            });
+                            
+                            // Reload UI with imported data
+                            updateUIFromState();
+                            
+                            // Refresh the preview
+                            refreshPreview();
+                            
+                            // Close modal
+                            closeModal();
+                            cleanup();
+                            
+                            // Visual feedback - green check
+                            pasteBtn.classList.add('success');
+                            pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+                            
+                            setTimeout(() => {
+                                pasteBtn.classList.add('fade-out');
+                                setTimeout(() => {
+                                    pasteBtn.classList.remove('success', 'fade-out');
+                                    pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>';
+                                }, 500);
+                            }, 1500);
+                            
+                            console.log('Block configuration pasted successfully');
+                            
+                        } catch (error) {
+                            // Show user-friendly error message in hint box
+                            let errorMsg = 'Failed to paste configuration';
+                            if (error.message.includes('mismatch')) {
+                                errorMsg = error.message;
+                            } else if (error.message.includes('Invalid configuration')) {
+                                errorMsg = error.message;
+                            } else if (error.message.includes('JSON')) {
+                                errorMsg = 'Clipboard does not contain valid block configuration. Please copy a block configuration first.';
+                            } else {
+                                errorMsg = error.message || 'An error occurred while pasting';
+                            }
+                            
+                            hintBox.textContent = errorMsg;
+                            hintBox.classList.add('error');
+                            console.error('Paste configuration error:', error);
                         }
-                        
-                        if (configData.module !== 'full-width-image') {
-                            throw new Error(`This configuration is for '${configData.module}' module, not 'full-width-image'`);
-                        }
-                        
-                        const data = configData.data;
-                        
-                        if (data.backgroundColor !== undefined) utils.setFieldValue('backgroundColor', data.backgroundColor);
-                        if (data.imageUrl !== undefined) utils.setFieldValue('imageUrl', data.imageUrl);
-                        if (data.imageLink !== undefined) utils.setFieldValue('imageLink', data.imageLink);
-                        if (data.imageAlt !== undefined) utils.setFieldValue('imageAlt', data.imageAlt);
-                        if (data.showTopSpacer !== undefined) utils.setFieldValue('showTopSpacer', data.showTopSpacer);
-                        if (data.showBottomSpacer !== undefined) utils.setFieldValue('showBottomSpacer', data.showBottomSpacer);
-                        if (data.showSidePadding !== undefined) utils.setFieldValue('showSidePadding', data.showSidePadding);
-                        
-                        updateUIFromState();
-                        refreshPreview();
-                        
-                        hintBox.textContent = '✓ Configuration applied successfully!';
-                        hintBox.className = 'paste-hint success';
-                        
-                        const pasteBtn = document.getElementById('pasteConfigBtn');
-                        pasteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
-                        setTimeout(() => {
-                            pasteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>';
-                            modal.style.display = 'none';
-                        }, 1500);
-                        
-                    } catch (err) {
-                        hintBox.textContent = `Error: ${err.message}`;
-                        hintBox.className = 'paste-hint error';
-                    }
-                }, 10);
-            };
-            
-            tempTextarea.addEventListener('paste', handlePaste, { once: true });
-            
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    tempTextarea.removeEventListener('paste', handlePaste);
+                    }, 50);
                 }
             };
+            
+            document.addEventListener('keydown', handlePaste);
         }
 
         function loadData() {
