@@ -14,18 +14,34 @@
         .help-banner { background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%); border: 1px solid #b3d9ff; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; text-align: center; }
         .help-banner a { color: #0074d9; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s ease; }
         .help-banner a:hover { color: #005bb5; text-decoration: underline; }
+        .config-tools{position:absolute;top:20px;right:20px;display:flex;gap:8px;z-index:100}.config-tools button{width:36px;height:36px;padding:0;background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease}.config-tools button:hover{border-color:#0074d9;background-color:#f0f8ff}.config-tools button svg{width:20px;height:20px}.paste-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:10000;animation:fadeIn .2s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.paste-content{background:white;border-radius:12px;padding:40px;max-width:500px;width:90%;position:relative;animation:slideIn .3s ease}@keyframes slideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}.paste-icon{width:64px;height:64px;margin:0 auto 24px;background:#f0f8ff;border-radius:50%;display:flex;align-items:center;justify-content:center}.paste-icon svg{width:32px;height:32px;stroke:#0074d9}.paste-content h3{margin:0 0 12px;text-align:center;color:#333;font-size:20px}.paste-content p{margin:0 0 20px;text-align:center;color:#666;font-size:14px;line-height:1.5}.paste-hint{padding:12px;background:#f0f8ff;border:1px solid #b3d9ff;border-radius:6px;text-align:center;color:#0074d9;font-size:13px;margin-top:16px}.paste-hint.success{background:#e8f5e9;border-color:#a5d6a7;color:#2e7d32}.paste-hint.error{background:#ffebee;border-color:#ef9a9a;color:#c62828}#tempPasteArea{position:absolute;opacity:0;pointer-events:none}
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-    <div class="container" id="mainContainer">
+        <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Lead Banner</h2>
         <div class="error-banner" id="errorBanner"></div>
         
+        <div class="config-tools">
+            <button id="copyConfigBtn" title="Copy Configuration">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+            </button>
+            <button id="pasteConfigBtn" title="Paste Configuration">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+            </button>
+        </div>
+        
         <div class="help-banner">
             <a href="https://milwaukee-overlay.vercel.app/" target="_blank" rel="noopener noreferrer">Click here to open the Image Overlay Tool →</a>
-        </div>
+```
 
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
@@ -56,7 +72,28 @@
                 <div class="field-group"><label for="heroAlt" class="field-label">Hero Images Alt Text</label><input type="text" id="heroAlt" class="field-input" placeholder="Descriptive text for the hero images" maxlength="100"></div>
             </div>
 
-            <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
+                        <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
+        </div>
+    </div>
+
+    <div class="paste-modal" id="pasteModal">
+        <div class="paste-content">
+            <div class="paste-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+            </div>
+            <h3>Paste Configuration</h3>
+            <p>Click in the area below and paste your copied configuration</p>
+            <textarea id="tempPasteArea" style="width:100%;height:60px;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:12px;resize:vertical"></textarea>
+            <div class="paste-hint" id="pasteHint">Press Cmd+V (Mac) or Ctrl+V (Windows) to paste</div>
+        </div>
+    </div>
+    <textarea id="tempCopyArea" style="position:absolute;left:-9999px"></textarea>
+
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+```
         </div>
     </div>
 
@@ -467,6 +504,18 @@
             setupOptionSelector(elements.contentTypeSelector, 'contentType');
             setupOptionSelector(elements.verticalAlignSelector, 'verticalAlign');
             setupOptionSelector(elements.textAlignSelector, 'textAlign');
+            
+            // Copy/Paste configuration buttons
+            const copyConfigBtn = document.getElementById('copyConfigBtn');
+            const pasteConfigBtn = document.getElementById('pasteConfigBtn');
+            
+            if (copyConfigBtn) {
+                copyConfigBtn.addEventListener('click', () => copyConfiguration());
+            }
+            
+            if (pasteConfigBtn) {
+                pasteConfigBtn.addEventListener('click', () => pasteConfiguration());
+            }
         }
 
         function toggleContentType(contentType) {
@@ -496,6 +545,171 @@
             }
         }
 
+        function updateUIFromData() {
+            elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
+            elements.titleImage.value = utils.getFieldValue('titleImage');
+            elements.titleImageAlt.value = utils.getFieldValue('titleImageAlt');
+            elements.titleImageWidth.value = utils.getFieldValue('titleImageWidth');
+            elements.heroDesktopImage.value = utils.getFieldValue('heroDesktopImage');
+            elements.heroMobileImage.value = utils.getFieldValue('heroMobileImage');
+            elements.heroAlt.value = utils.getFieldValue('heroAlt');
+            elements.contentUrl.value = utils.getFieldValue('contentUrl');
+            elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
+            elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+
+            // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
+            Object.keys(state.editors).forEach(key => {
+                if (state.editors[key]) {
+                    const content = utils.getFieldValue(key);
+                    try {
+                        // Clear existing content first
+                        state.editors[key].setContents([]);
+                        // Use the new clipboard API to paste HTML content
+                        if (content && content.trim()) {
+                            state.editors[key].clipboard.dangerouslyPasteHTML(content);
+                        }
+                    } catch (error) {
+                        // Fallback to root innerHTML for compatibility
+                        console.warn(`Using fallback method for editor ${key}:`, error);
+                        state.editors[key].root.innerHTML = content || '';
+                    }
+                }
+            });
+
+            function setSelectorState(el, key) { 
+                const val = utils.getFieldValue(key); 
+                if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
+            }
+
+            setSelectorState(elements.contentTypeSelector, 'contentType');
+            setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
+            setSelectorState(elements.textAlignSelector, 'textAlign');
+
+            // Initialize content type display
+            toggleContentType(utils.getFieldValue('contentType'));
+        }
+
+        function copyConfiguration() {
+            const configData = {
+                version: '1.0',
+                module: 'lead-banner',
+                timestamp: new Date().toISOString(),
+                data: {
+                    backgroundImage: utils.getFieldValue('backgroundImage'),
+                    contentType: utils.getFieldValue('contentType'),
+                    verticalAlign: utils.getFieldValue('verticalAlign'),
+                    textAlign: utils.getFieldValue('textAlign'),
+                    title: utils.getFieldValue('title'),
+                    titleFontSize: utils.getFieldValue('titleFontSize'),
+                    subtitle: utils.getFieldValue('subtitle'),
+                    subtitleFontSize: utils.getFieldValue('subtitleFontSize'),
+                    titleImage: utils.getFieldValue('titleImage'),
+                    titleImageAlt: utils.getFieldValue('titleImageAlt'),
+                    titleImageWidth: utils.getFieldValue('titleImageWidth'),
+                    heroDesktopImage: utils.getFieldValue('heroDesktopImage'),
+                    heroMobileImage: utils.getFieldValue('heroMobileImage'),
+                    heroAlt: utils.getFieldValue('heroAlt'),
+                    contentUrl: utils.getFieldValue('contentUrl')
+                }
+            };
+            
+            const jsonString = JSON.stringify(configData, null, 2);
+            const tempTextarea = document.getElementById('tempCopyArea');
+            tempTextarea.value = jsonString;
+            tempTextarea.select();
+            
+            try {
+                document.execCommand('copy');
+                const copyBtn = document.getElementById('copyConfigBtn');
+                copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+                }, 1500);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+            tempTextarea.value = '';
+        }
+
+        function pasteConfiguration() {
+            const modal = document.getElementById('pasteModal');
+            const hintBox = document.getElementById('pasteHint');
+            const tempTextarea = document.getElementById('tempPasteArea');
+            
+            modal.style.display = 'flex';
+            tempTextarea.value = '';
+            tempTextarea.focus();
+            hintBox.textContent = 'Press Cmd+V (Mac) or Ctrl+V (Windows) to paste';
+            hintBox.className = 'paste-hint';
+            
+            const handlePaste = (e) => {
+                setTimeout(() => {
+                    try {
+                        const pastedData = tempTextarea.value;
+                        if (!pastedData.trim()) {
+                            hintBox.textContent = 'No data pasted. Please try again.';
+                            hintBox.className = 'paste-hint error';
+                            return;
+                        }
+                        
+                        const configData = JSON.parse(pastedData);
+                        
+                        if (!configData.version || !configData.module || !configData.data) {
+                            throw new Error('Invalid configuration format');
+                        }
+                        
+                        if (configData.module !== 'lead-banner') {
+                            throw new Error(`This configuration is for '${configData.module}' module, not 'lead-banner'`);
+                        }
+                        
+                        const data = configData.data;
+                        
+                        if (data.backgroundImage !== undefined) utils.setFieldValue('backgroundImage', data.backgroundImage);
+                        if (data.contentType !== undefined) utils.setFieldValue('contentType', data.contentType);
+                        if (data.verticalAlign !== undefined) utils.setFieldValue('verticalAlign', data.verticalAlign);
+                        if (data.textAlign !== undefined) utils.setFieldValue('textAlign', data.textAlign);
+                        if (data.title !== undefined) utils.setFieldValue('title', data.title);
+                        if (data.titleFontSize !== undefined) utils.setFieldValue('titleFontSize', data.titleFontSize);
+                        if (data.subtitle !== undefined) utils.setFieldValue('subtitle', data.subtitle);
+                        if (data.subtitleFontSize !== undefined) utils.setFieldValue('subtitleFontSize', data.subtitleFontSize);
+                        if (data.titleImage !== undefined) utils.setFieldValue('titleImage', data.titleImage);
+                        if (data.titleImageAlt !== undefined) utils.setFieldValue('titleImageAlt', data.titleImageAlt);
+                        if (data.titleImageWidth !== undefined) utils.setFieldValue('titleImageWidth', data.titleImageWidth);
+                        if (data.heroDesktopImage !== undefined) utils.setFieldValue('heroDesktopImage', data.heroDesktopImage);
+                        if (data.heroMobileImage !== undefined) utils.setFieldValue('heroMobileImage', data.heroMobileImage);
+                        if (data.heroAlt !== undefined) utils.setFieldValue('heroAlt', data.heroAlt);
+                        if (data.contentUrl !== undefined) utils.setFieldValue('contentUrl', data.contentUrl);
+                        
+                        updateUIFromData();
+                        refreshPreview();
+                        
+                        hintBox.textContent = '✓ Configuration applied successfully!';
+                        hintBox.className = 'paste-hint success';
+                        
+                        const pasteBtn = document.getElementById('pasteConfigBtn');
+                        pasteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+                        setTimeout(() => {
+                            pasteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>';
+                            modal.style.display = 'none';
+                        }, 1500);
+                        
+                    } catch (err) {
+                        hintBox.textContent = `Error: ${err.message}`;
+                        hintBox.className = 'paste-hint error';
+                    }
+                }, 10);
+            };
+            
+            tempTextarea.addEventListener('paste', handlePaste, { once: true });
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    tempTextarea.removeEventListener('paste', handlePaste);
+                }
+            };
+        }
+
         function loadData() {
             if (!state.sdk || typeof state.sdk.getData !== 'function') return utils.showError('SDK not available');
             setLoadingState(true);
@@ -511,47 +725,7 @@
                         } 
                     });
 
-                    elements.backgroundImage.value = utils.getFieldValue('backgroundImage');
-                    elements.titleImage.value = utils.getFieldValue('titleImage');
-                    elements.titleImageAlt.value = utils.getFieldValue('titleImageAlt');
-                    elements.titleImageWidth.value = utils.getFieldValue('titleImageWidth');
-                    elements.heroDesktopImage.value = utils.getFieldValue('heroDesktopImage');
-                    elements.heroMobileImage.value = utils.getFieldValue('heroMobileImage');
-                    elements.heroAlt.value = utils.getFieldValue('heroAlt');
-                    elements.contentUrl.value = utils.getFieldValue('contentUrl');
-                    elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
-                    elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
-
-                    // Updated for Quill 2.0 - use clipboard.dangerouslyPasteHTML for setting HTML content
-                    Object.keys(state.editors).forEach(key => {
-                        if (state.editors[key]) {
-                            const content = utils.getFieldValue(key);
-                            try {
-                                // Clear existing content first
-                                state.editors[key].setContents([]);
-                                // Use the new clipboard API to paste HTML content
-                                if (content && content.trim()) {
-                                    state.editors[key].clipboard.dangerouslyPasteHTML(content);
-                                }
-                            } catch (error) {
-                                // Fallback to root innerHTML for compatibility
-                                console.warn(`Using fallback method for editor ${key}:`, error);
-                                state.editors[key].root.innerHTML = content || '';
-                            }
-                        }
-                    });
-
-                    function setSelectorState(el, key) { 
-                        const val = utils.getFieldValue(key); 
-                        if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); 
-                    }
-
-                    setSelectorState(elements.contentTypeSelector, 'contentType');
-                    setSelectorState(elements.verticalAlignSelector, 'verticalAlign');
-                    setSelectorState(elements.textAlignSelector, 'textAlign');
-
-                    // Initialize content type display
-                    toggleContentType(utils.getFieldValue('contentType'));
+                    updateUIFromData();
 
                     refreshPreview();
                     state.retryCount = 0;
