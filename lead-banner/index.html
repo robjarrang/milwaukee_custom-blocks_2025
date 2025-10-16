@@ -17,7 +17,8 @@
         .config-tools{position:absolute;top:20px;right:20px;display:flex;gap:8px;z-index:100}
         .config-btn{width:36px;height:36px;background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease}
         .config-btn:hover{border-color:#0074d9;background-color:#f0f8ff}
-        .config-btn svg{width:20px;height:20px}
+        .config-btn svg{width:20px;height:20px;stroke:#666}
+        .config-btn:hover svg{stroke:#0074d9}
         .paste-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:10000;animation:fadeIn 0.2s ease}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
         .paste-modal-content{background:white;border-radius:12px;padding:40px;max-width:500px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.15);animation:slideIn 0.3s ease;position:relative}

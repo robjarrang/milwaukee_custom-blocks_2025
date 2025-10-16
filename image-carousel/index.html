@@ -6,6 +6,22 @@
     <link rel="stylesheet" href="https://cloud.mail.milwaukeetool.eu/customblock-styles">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:15px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.section-divider{margin-top:30px;padding-top:20px;border-top:2px solid #eee}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px;border-bottom:2px solid #eee;padding-bottom:10px}.slides-container{display:flex;flex-direction:column;gap:15px}.slide-item{background-color:#fafafa;padding:20px;border:1px solid #ddd;border-radius:6px;position:relative}.slide-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.slide-title{font-weight:bold;font-size:16px;margin:0}.slide-controls{display:flex;gap:8px}.slide-control-btn{background:none;border:none;cursor:pointer;padding:5px;font-size:18px;line-height:1;color:#555;transition:color .2s}.slide-control-btn:hover{color:#0074d9}.slide-control-btn:disabled{color:#ccc;cursor:not-allowed}.btn{display:inline-block;padding:10px 15px;background-color:#0074d9;color:white;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}.btn:hover{background-color:#005a9e}.add-slide-btn{margin-top:20px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+        .config-tools{position:absolute;top:20px;right:20px;display:flex;gap:8px;z-index:100}
+        .config-btn{width:36px;height:36px;background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease}
+        .config-btn:hover{border-color:#0074d9;background-color:#f0f8ff}
+        .config-btn svg{width:20px;height:20px;stroke:#666}
+        .config-btn:hover svg{stroke:#0074d9}
+        .paste-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:10000;animation:fadeIn 0.2s ease}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .paste-modal-content{background:white;border-radius:12px;padding:40px;max-width:500px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.15);animation:slideIn 0.3s ease;position:relative}
+        @keyframes slideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .paste-modal h3{margin:0 0 20px 0;color:#333;font-size:20px;text-align:center}
+        .paste-modal-icon{width:64px;height:64px;margin:0 auto 20px;background:#f0f8ff;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .paste-modal-icon svg{width:32px;height:32px;stroke:#0074d9}
+        .paste-hint{background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;padding:12px;text-align:center;color:#666;font-size:14px;margin-top:16px}
+        .paste-hint.success{background:#d4edda;border-color:#c3e6cb;color:#155724}
+        .paste-hint.error{background:#f8d7da;border-color:#f5c6cb;color:#721c24}
+        #tempPasteArea,#tempCopyArea{position:absolute;left:-9999px;opacity:0}
     </style>
 </head>
 <body>
@@ -14,6 +30,15 @@
     <div class="container" id="mainContainer">
         <h2 style="margin-top: 0; color: #333;">Image Carousel</h2>
         <div class="error-banner" id="errorBanner"></div>
+        
+        <div class="config-tools">
+            <button id="copyConfigBtn" class="config-btn" title="Copy Configuration">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button id="pasteConfigBtn" class="config-btn" title="Paste Configuration">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            </button>
+        </div>
 
         <div class="section-title">Slides</div>
         <div id="slidesContainer" class="slides-container">
@@ -69,6 +94,19 @@
             </div>
         </div>
     </template>
+
+    <div id="pasteModal" class="paste-modal">
+        <div class="paste-modal-content">
+            <div class="paste-modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            </div>
+            <h3>Paste Configuration</h3>
+            <p style="text-align:center;color:#666;margin:0 0 16px 0;">Paste your copied block configuration below</p>
+            <textarea id="tempPasteArea" rows="1"></textarea>
+            <div id="pasteHint" class="paste-hint">Press Cmd+V (Mac) or Ctrl+V (Windows) to paste</div>
+        </div>
+    </div>
+    <textarea id="tempCopyArea" rows="1"></textarea>
 
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-blocksdk"></script>
@@ -286,6 +324,140 @@
 
             utils.addEventListenerTracked(elements.addSlideBtn, 'click', slideHandler);
             utils.addEventListenerTracked(elements.slidesContainer, 'click', slideHandler);
+
+            // Copy/Paste configuration buttons
+            const copyConfigBtn = document.getElementById('copyConfigBtn');
+            const pasteConfigBtn = document.getElementById('pasteConfigBtn');
+            
+            if (copyConfigBtn) {
+                copyConfigBtn.addEventListener('click', () => copyConfiguration());
+            }
+            
+            if (pasteConfigBtn) {
+                pasteConfigBtn.addEventListener('click', () => pasteConfiguration());
+            }
+        }
+
+        function updateUIFromData() {
+            // Ensure slides have IDs
+            if (state.blockData.slides) {
+                state.blockData.slides.forEach(s => { if (!s.id) s.id = crypto.randomUUID(); });
+            }
+
+            // Update fallback fields
+            elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl || '';
+            elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl || '';
+            elements.fallbackAltText.value = state.blockData.fallbackAltText || '';
+
+            // Render slides UI
+            renderSlidesUI();
+        }
+
+        function copyConfiguration() {
+            const configData = {
+                version: '1.0',
+                module: 'image-carousel',
+                timestamp: new Date().toISOString(),
+                data: {
+                    slides: utils.getFieldValue('slides'),
+                    fallbackImageUrl: utils.getFieldValue('fallbackImageUrl'),
+                    fallbackLinkUrl: utils.getFieldValue('fallbackLinkUrl'),
+                    fallbackAltText: utils.getFieldValue('fallbackAltText')
+                }
+            };
+            
+            const jsonString = JSON.stringify(configData, null, 2);
+            const tempTextarea = document.getElementById('tempCopyArea');
+            tempTextarea.value = jsonString;
+            tempTextarea.select();
+            
+            try {
+                document.execCommand('copy');
+                const copyBtn = document.getElementById('copyConfigBtn');
+                copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+                }, 1500);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+            tempTextarea.value = '';
+        }
+
+        function pasteConfiguration() {
+            const modal = document.getElementById('pasteModal');
+            const hintBox = document.getElementById('pasteHint');
+            const tempTextarea = document.getElementById('tempPasteArea');
+            
+            modal.style.display = 'flex';
+            tempTextarea.value = '';
+            tempTextarea.focus();
+            hintBox.textContent = 'Press Cmd+V (Mac) or Ctrl+V (Windows) to paste';
+            hintBox.className = 'paste-hint';
+            
+            const handlePaste = (e) => {
+                setTimeout(() => {
+                    try {
+                        const pastedData = tempTextarea.value;
+                        if (!pastedData.trim()) {
+                            hintBox.textContent = 'No data pasted. Please try again.';
+                            hintBox.className = 'paste-hint error';
+                            return;
+                        }
+                        
+                        const configData = JSON.parse(pastedData);
+                        
+                        if (!configData.version || !configData.module || !configData.data) {
+                            throw new Error('Invalid configuration format');
+                        }
+                        
+                        if (configData.module !== 'image-carousel') {
+                            throw new Error(`This configuration is for '${configData.module}' module, not 'image-carousel'`);
+                        }
+                        
+                        const data = configData.data;
+                        
+                        // Update slides - ensure each slide has an ID
+                        if (data.slides !== undefined) {
+                            state.blockData.slides = data.slides.map(slide => ({
+                                ...slide,
+                                id: slide.id || crypto.randomUUID()
+                            }));
+                        }
+                        
+                        // Update fallback fields
+                        if (data.fallbackImageUrl !== undefined) state.blockData.fallbackImageUrl = data.fallbackImageUrl;
+                        if (data.fallbackLinkUrl !== undefined) state.blockData.fallbackLinkUrl = data.fallbackLinkUrl;
+                        if (data.fallbackAltText !== undefined) state.blockData.fallbackAltText = data.fallbackAltText;
+                        
+                        updateUIFromData();
+                        refreshPreview();
+                        
+                        hintBox.textContent = '✓ Configuration applied successfully!';
+                        hintBox.className = 'paste-hint success';
+                        
+                        const pasteBtn = document.getElementById('pasteConfigBtn');
+                        pasteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+                        setTimeout(() => {
+                            pasteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>';
+                            modal.style.display = 'none';
+                        }, 1500);
+                        
+                    } catch (err) {
+                        hintBox.textContent = `Error: ${err.message}`;
+                        hintBox.className = 'paste-hint error';
+                    }
+                }, 10);
+            };
+            
+            tempTextarea.addEventListener('paste', handlePaste, { once: true });
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    tempTextarea.removeEventListener('paste', handlePaste);
+                }
+            };
         }
 
         function generateTemplate() {
@@ -604,18 +776,11 @@ input[type="radio"] {
                 try {
                     // When loading, prioritize the structured 'slides' data over saved 'content'
                     state.blockData.slides = (data && data.slides && data.slides.length > 0) ? data.slides : utils.getFieldValue('slides');
-                    state.blockData.slides.forEach(s => { if (!s.id) s.id = crypto.randomUUID(); });
-
                     state.blockData.fallbackImageUrl = data?.fallbackImageUrl || '';
                     state.blockData.fallbackLinkUrl = data?.fallbackLinkUrl || '';
                     state.blockData.fallbackAltText = data?.fallbackAltText || '';
 
-                    renderSlidesUI();
-
-                    elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl;
-                    elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl;
-                    elements.fallbackAltText.value = state.blockData.fallbackAltText;
-
+                    updateUIFromData();
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
