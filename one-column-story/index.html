@@ -31,6 +31,24 @@
         .config-tool-btn.success svg{fill:#28a745}
         @keyframes fadeSuccess{0%{opacity:1}100%{opacity:0}}
         .config-tool-btn.fade-out{animation:fadeSuccess 0.5s ease-out forwards}
+        .paste-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center}
+        .paste-modal.show{display:flex}
+        .paste-modal-content{background:white;border-radius:8px;padding:30px;max-width:600px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:modalSlideIn 0.3s ease-out}
+        @keyframes modalSlideIn{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .paste-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .paste-modal-title{font-size:20px;font-weight:bold;color:#333;margin:0}
+        .paste-modal-close{background:none;border:none;font-size:28px;color:#999;cursor:pointer;padding:0;width:30px;height:30px;line-height:1;transition:color 0.2s}
+        .paste-modal-close:hover{color:#333}
+        .paste-modal-body{margin-bottom:20px}
+        .paste-modal-textarea{width:100%;min-height:200px;padding:12px;border:2px solid #ddd;border-radius:4px;font-family:monospace;font-size:12px;resize:vertical;transition:border-color 0.3s}
+        .paste-modal-textarea:focus{outline:none;border-color:#0074d9}
+        .paste-modal-instructions{color:#666;font-size:14px;margin-bottom:12px}
+        .paste-modal-footer{display:flex;gap:10px;justify-content:flex-end}
+        .paste-modal-btn{padding:10px 20px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color 0.2s}
+        .paste-modal-btn.primary{background-color:#0074d9;color:white}
+        .paste-modal-btn.primary:hover{background-color:#005a9e}
+        .paste-modal-btn.secondary{background-color:#f0f0f0;color:#333}
+        .paste-modal-btn.secondary:hover{background-color:#e0e0e0}
     </style>
 </head>
 <body>
@@ -87,6 +105,25 @@
             <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><input type="text" id="buttonText" class="field-input"></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
         </div>
     </div>
+    
+    <!-- Paste Modal -->
+    <div id="pasteModal" class="paste-modal">
+        <div class="paste-modal-content">
+            <div class="paste-modal-header">
+                <h3 class="paste-modal-title">Paste Block Configuration</h3>
+                <button id="pasteModalClose" class="paste-modal-close">&times;</button>
+            </div>
+            <div class="paste-modal-body">
+                <p class="paste-modal-instructions">Paste your copied block configuration below (Ctrl+V or Cmd+V):</p>
+                <textarea id="pasteModalTextarea" class="paste-modal-textarea" placeholder='Paste JSON configuration here...'></textarea>
+            </div>
+            <div class="paste-modal-footer">
+                <button id="pasteModalCancel" class="paste-modal-btn secondary">Cancel</button>
+                <button id="pasteModalImport" class="paste-modal-btn primary">Import</button>
+            </div>
+        </div>
+    </div>
+    
     <template id="itemTemplate"><div class="item"><div class="item-header"><h2 class="item-title">Item</h2><div class="item-controls"><button class="item-control-btn move-up-btn" title="Move Up">▲</button><button class="item-control-btn move-down-btn" title="Move Down">▼</button><button class="item-control-btn remove-btn" title="Remove Item">×</button></div></div><div class="quill-container limited-toolbar" data-lpignore="true"></div></div></template>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://cloud.mail.milwaukeetool.eu/customblock-base"></script>
@@ -578,104 +615,176 @@
         }
 
         function pasteConfiguration() {
-            const pasteBtn = document.getElementById('pasteConfigBtn');
+            const modal = document.getElementById('pasteModal');
+            const textarea = document.getElementById('pasteModalTextarea');
+            const closeBtn = document.getElementById('pasteModalClose');
+            const cancelBtn = document.getElementById('pasteModalCancel');
+            const importBtn = document.getElementById('pasteModalImport');
             
-            // Use prompt dialog since clipboard API is blocked in iframe
-            const text = prompt('Paste your block configuration here:\n\n(Use Ctrl+V or Cmd+V to paste)');
+            // Show modal
+            modal.classList.add('show');
+            textarea.value = '';
             
-            if (!text) {
-                // User cancelled or entered nothing
-                return;
-            }
+            // Auto-focus textarea after animation
+            setTimeout(() => {
+                textarea.focus();
+            }, 100);
             
-            try {
-                const importData = JSON.parse(text);
+            // Close modal function
+            const closeModal = () => {
+                modal.classList.remove('show');
+                textarea.value = '';
+            };
+            
+            // Close on background click
+            const handleBackgroundClick = (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                    modal.removeEventListener('click', handleBackgroundClick);
+                }
+            };
+            modal.addEventListener('click', handleBackgroundClick);
+            
+            // Close on X button or Cancel
+            const handleClose = () => {
+                closeModal();
+                closeBtn.removeEventListener('click', handleClose);
+                cancelBtn.removeEventListener('click', handleClose);
+                modal.removeEventListener('click', handleBackgroundClick);
+            };
+            closeBtn.addEventListener('click', handleClose);
+            cancelBtn.addEventListener('click', handleClose);
+            
+            // Close on Escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', handleEscape);
+                    closeBtn.removeEventListener('click', handleClose);
+                    cancelBtn.removeEventListener('click', handleClose);
+                    modal.removeEventListener('click', handleBackgroundClick);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+            
+            // Import button handler
+            const handleImport = () => {
+                const text = textarea.value.trim();
+                const pasteBtn = document.getElementById('pasteConfigBtn');
                 
-                // Validation checks
-                if (!importData.data) {
-                    throw new Error('Invalid configuration format: missing data');
+                if (!text) {
+                    utils.showError('Please paste configuration data first');
+                    return;
                 }
                 
-                if (!importData.module) {
-                    throw new Error('Invalid configuration format: missing module name');
-                }
-                
-                if (importData.module !== moduleConfig.name) {
-                    throw new Error(`Configuration mismatch: This is for "${importData.module}", but you're using "${moduleConfig.name}"`);
-                }
-                
-                if (!importData.version) {
-                    throw new Error('Invalid configuration format: missing version');
-                }
-                
-                // Validate that imported data has valid fields
-                const validFields = Object.keys(moduleConfig.fields);
-                const importedFields = Object.keys(importData.data);
-                const hasValidFields = importedFields.some(field => validFields.includes(field));
-                
-                if (!hasValidFields) {
-                    throw new Error('Configuration contains no valid fields for this module');
-                }
-                
-                // Merge imported data (only valid fields)
-                validFields.forEach(key => {
-                    if (importData.data.hasOwnProperty(key)) {
-                        let value = importData.data[key];
-                        
-                        // Ensure items array has proper IDs
-                        if (key === 'items' && Array.isArray(value)) {
-                            value = value.map(item => ({
-                                ...item,
-                                id: item.id || crypto.randomUUID()
-                            }));
-                        }
-                        
-                        state.blockData[key] = value;
+                try {
+                    const importData = JSON.parse(text);
+                    
+                    // Validation checks
+                    if (!importData.data) {
+                        throw new Error('Invalid configuration format: missing data');
                     }
-                });
-                
-                // Reload UI with imported data
-                updateUIFromData();
-                
-                // Rebuild checklist items if needed
-                const contentType = utils.getFieldValue('contentType');
-                if (contentType === 'checklist') {
-                    renderItemsUI();
-                }
-                
-                // Refresh the preview
-                refreshPreview();
-                
-                // Visual feedback - green check
-                pasteBtn.classList.add('success');
-                pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-                
-                setTimeout(() => {
-                    pasteBtn.classList.add('fade-out');
+                    
+                    if (!importData.module) {
+                        throw new Error('Invalid configuration format: missing module name');
+                    }
+                    
+                    if (importData.module !== moduleConfig.name) {
+                        throw new Error(`Configuration mismatch: This is for "${importData.module}", but you're using "${moduleConfig.name}"`);
+                    }
+                    
+                    if (!importData.version) {
+                        throw new Error('Invalid configuration format: missing version');
+                    }
+                    
+                    // Validate that imported data has valid fields
+                    const validFields = Object.keys(moduleConfig.fields);
+                    const importedFields = Object.keys(importData.data);
+                    const hasValidFields = importedFields.some(field => validFields.includes(field));
+                    
+                    if (!hasValidFields) {
+                        throw new Error('Configuration contains no valid fields for this module');
+                    }
+                    
+                    // Merge imported data (only valid fields)
+                    validFields.forEach(key => {
+                        if (importData.data.hasOwnProperty(key)) {
+                            let value = importData.data[key];
+                            
+                            // Ensure items array has proper IDs
+                            if (key === 'items' && Array.isArray(value)) {
+                                value = value.map(item => ({
+                                    ...item,
+                                    id: item.id || crypto.randomUUID()
+                                }));
+                            }
+                            
+                            state.blockData[key] = value;
+                        }
+                    });
+                    
+                    // Reload UI with imported data
+                    updateUIFromData();
+                    
+                    // Rebuild checklist items if needed
+                    const contentType = utils.getFieldValue('contentType');
+                    if (contentType === 'checklist') {
+                        renderItemsUI();
+                    }
+                    
+                    // Refresh the preview
+                    refreshPreview();
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Visual feedback - green check
+                    pasteBtn.classList.add('success');
+                    pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+                    
                     setTimeout(() => {
-                        pasteBtn.classList.remove('success', 'fade-out');
-                        pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>';
-                    }, 500);
-                }, 1500);
-                
-                console.log('Block configuration pasted successfully');
-                
-            } catch (error) {
-                // Show user-friendly error message
-                let errorMsg = 'Failed to paste configuration';
-                if (error.message.includes('mismatch')) {
-                    errorMsg = error.message;
-                } else if (error.message.includes('Invalid configuration')) {
-                    errorMsg = error.message;
-                } else if (error.message.includes('JSON')) {
-                    errorMsg = 'Clipboard does not contain valid configuration data';
-                } else {
-                    errorMsg = `Paste failed: ${error.message}`;
+                        pasteBtn.classList.add('fade-out');
+                        setTimeout(() => {
+                            pasteBtn.classList.remove('success', 'fade-out');
+                            pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>';
+                        }, 500);
+                    }, 1500);
+                    
+                    console.log('Block configuration pasted successfully');
+                    
+                    // Clean up event listeners
+                    document.removeEventListener('keydown', handleEscape);
+                    closeBtn.removeEventListener('click', handleClose);
+                    cancelBtn.removeEventListener('click', handleClose);
+                    importBtn.removeEventListener('click', handleImport);
+                    modal.removeEventListener('click', handleBackgroundClick);
+                    
+                } catch (error) {
+                    // Show user-friendly error message
+                    let errorMsg = 'Failed to paste configuration';
+                    if (error.message.includes('mismatch')) {
+                        errorMsg = error.message;
+                    } else if (error.message.includes('Invalid configuration')) {
+                        errorMsg = error.message;
+                    } else if (error.message.includes('JSON')) {
+                        errorMsg = 'Clipboard does not contain valid configuration data';
+                    } else {
+                        errorMsg = `Paste failed: ${error.message}`;
+                    }
+                    
+                    utils.showError(errorMsg);
+                    console.error('Paste configuration error:', error);
                 }
-                
-                utils.showError(errorMsg);
-                console.error('Paste configuration error:', error);
-            }
+            };
+            
+            importBtn.addEventListener('click', handleImport);
+            
+            // Allow Enter key in textarea to add import (Ctrl/Cmd+Enter)
+            textarea.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    handleImport();
+                }
+            });
         }
 
         function updateUIFromData() {
