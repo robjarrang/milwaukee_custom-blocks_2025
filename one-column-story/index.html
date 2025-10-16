@@ -602,7 +602,11 @@
                 try {
                     const successful = document.execCommand('paste');
                     const text = textarea.value;
-                    document.body.removeChild(textarea);
+                    
+                    // Remove textarea safely
+                    if (textarea.parentNode) {
+                        document.body.removeChild(textarea);
+                    }
                     
                     if (!text) {
                         throw new Error('No text found in clipboard. Please copy configuration first, then try pasting again.');
@@ -678,7 +682,10 @@
                         console.error('Paste configuration error:', error);
                     }
                 } catch (err) {
-                    document.body.removeChild(textarea);
+                    // Remove textarea safely on error
+                    if (textarea.parentNode) {
+                        document.body.removeChild(textarea);
+                    }
                     utils.showError('Paste is not supported in this browser context. Please manually copy/paste the configuration.');
                     console.error('Paste command error:', err);
                 }
