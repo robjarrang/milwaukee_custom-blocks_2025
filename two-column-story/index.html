@@ -730,9 +730,9 @@
                             COLUMN_PREFIXES.forEach(prefix => {
                                 const contentType = utils.getFieldValue(prefix + 'contentType');
                                 if (contentType === 'checklist') {
-                                    renderItemsUI(prefix);
+                                    renderList(prefix, 'items', 'itemTemplate', true);
                                 }
-                                renderSpacersUI(prefix);
+                                renderList(prefix, 'spacers', 'spacerTemplate', false);
                             });
                             
                             // Refresh the preview
@@ -851,6 +851,53 @@
             updateData(prefix + listType, newItems);
             renderList(prefix, listType, templateId, hasQuill);
         }
+
+        function updateUIFromData() {
+            // Update background color selector
+            document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => 
+                o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor'))
+            );
+            
+            // Helper function to update selector states
+            function setSelectorState(el, key) { 
+                const val = utils.getFieldValue(key); 
+                if (el) el.querySelectorAll('.option-button').forEach(o => 
+                    o.classList.toggle('selected', o.dataset.value === val)
+                ); 
+            }
+            
+            // Update all column fields
+            COLUMN_PREFIXES.forEach(p => {
+                // Update text inputs
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { 
+                    if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); 
+                });
+                
+                // Update Quill editors
+                ['title', 'description'].forEach(type => { 
+                    if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); 
+                });
+                
+                // Update checkboxes and their associated field groups
+                ['showSubtitle', 'showButton'].forEach(type => { 
+                    const isChecked = utils.getFieldValue(p + type); 
+                    elements[p + type].checked = isChecked; 
+                    elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); 
+                });
+                
+                // Update alignment selectors
+                ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => 
+                    setSelectorState(elements[p + type + 'Selector'], p + type)
+                );
+                
+                // Update content type view
+                toggleContentTypeView(p, utils.getFieldValue(p + 'contentType'));
+                
+                // Render spacers list
+                renderList(p, 'spacers', 'spacerTemplate', false);
+            });
+        }
+
         function loadData() {
             if (!state.sdk) return;
             setLoadingState(true);
@@ -859,16 +906,10 @@
                     state.blockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => { state.blockData[key] = (data && data.hasOwnProperty(key)) ? data[key] : moduleConfig.fields[key].defaultValue; });
                     COLUMN_PREFIXES.forEach(p => { ['items', 'spacers'].forEach(listType => { if (state.blockData[p + listType]) state.blockData[p + listType].forEach(item => { if (!item.id) item.id = crypto.randomUUID(); }); }); });
-                    document.querySelectorAll('#backgroundColorSelector .color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === utils.getFieldValue('backgroundColor')));
-                    function setSelectorState(el, key) { const val = utils.getFieldValue(key); if (el) el.querySelectorAll('.option-button').forEach(o => o.classList.toggle('selected', o.dataset.value === val)); }
-                    COLUMN_PREFIXES.forEach(p => {
-                        ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); });
-                        ['title', 'description'].forEach(type => { if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); });
-                        ['showSubtitle', 'showButton'].forEach(type => { const isChecked = utils.getFieldValue(p + type); elements[p + type].checked = isChecked; elements[p + (type === 'showSubtitle' ? 'subtitleGroup' : 'buttonFieldsGroup')].classList.toggle('disabled-field', !isChecked); });
-                        ['subtitleAlignment', 'titleAlignment', 'descriptionAlignment', 'buttonAlignment'].forEach(type => setSelectorState(elements[p + type + 'Selector'], p + type));
-                        toggleContentTypeView(p, utils.getFieldValue(p + 'contentType'));
-                        renderList(p, 'spacers', 'spacerTemplate', false);
-                    });
+                    
+                    // Use the centralized UI update function
+                    updateUIFromData();
+                    
                     refreshPreview();
                 } catch (error) { utils.showError(`Failed to load data: ${error.message}`); Object.keys(moduleConfig.fields).forEach(key => state.blockData[key] = moduleConfig.fields[key].defaultValue); refreshPreview(); } 
                 finally { setLoadingState(false); }
