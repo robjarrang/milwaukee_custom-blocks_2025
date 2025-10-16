@@ -40,6 +40,8 @@
         .paste-modal-title{font-size:22px;font-weight:bold;color:#333;margin:0 0 12px 0}
         .paste-modal-instructions{color:#666;font-size:15px;line-height:1.5;margin-bottom:24px}
         .paste-modal-hint{background:#f9f9f9;padding:12px;border-radius:6px;color:#888;font-size:13px;margin-bottom:24px}
+        .paste-modal-error{background:#fee;border:1px solid #fcc;color:#c00;padding:12px;border-radius:6px;font-size:14px;margin-bottom:20px;display:none}
+        .paste-modal-error.show{display:block}
         .paste-modal-footer{display:flex;gap:10px;justify-content:center}
         .paste-modal-btn{padding:12px 24px;border:none;border-radius:6px;cursor:pointer;font-size:15px;font-weight:bold;transition:all 0.2s;min-width:100px}
         .paste-modal-btn.primary{background-color:#0074d9;color:white;box-shadow:0 2px 8px rgba(0,116,217,0.3)}
@@ -112,6 +114,7 @@
             </div>
             <h3 class="paste-modal-title">Ready to Paste</h3>
             <p class="paste-modal-instructions">Press <strong>Ctrl+V</strong> (or <strong>Cmd+V</strong> on Mac) to paste your copied block configuration.</p>
+            <div class="paste-modal-error" id="pasteModalError"></div>
             <div class="paste-modal-hint">The block will automatically update with the pasted settings</div>
             <div class="paste-modal-footer">
                 <button id="pasteModalCancel" class="paste-modal-btn secondary">Cancel</button>
@@ -615,9 +618,12 @@
             const hiddenTextarea = document.getElementById('pasteHiddenTextarea');
             const cancelBtn = document.getElementById('pasteModalCancel');
             const pasteBtn = document.getElementById('pasteConfigBtn');
+            const errorBox = document.getElementById('pasteModalError');
             
             // Show modal
             modal.classList.add('show');
+            errorBox.classList.remove('show');
+            errorBox.textContent = '';
             
             // Focus hidden textarea to capture paste
             setTimeout(() => {
@@ -630,6 +636,8 @@
                 modal.classList.remove('show');
                 hiddenTextarea.value = '';
                 hiddenTextarea.blur();
+                errorBox.classList.remove('show');
+                errorBox.textContent = '';
             };
             
             // Close on background click
@@ -669,12 +677,17 @@
             const handlePaste = (e) => {
                 // Only process if Ctrl/Cmd+V
                 if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                    // Clear any previous errors
+                    errorBox.classList.remove('show');
+                    errorBox.textContent = '';
+                    
                     // Small delay to let paste complete
                     setTimeout(() => {
                         const text = hiddenTextarea.value.trim();
                         
                         if (!text) {
-                            utils.showError('No configuration found in clipboard');
+                            errorBox.textContent = 'No configuration found in clipboard. Please copy a block configuration first.';
+                            errorBox.classList.add('show');
                             return;
                         }
                         
@@ -755,19 +768,20 @@
                             console.log('Block configuration pasted successfully');
                             
                         } catch (error) {
-                            // Show user-friendly error message
+                            // Show user-friendly error message in modal
                             let errorMsg = 'Failed to paste configuration';
                             if (error.message.includes('mismatch')) {
                                 errorMsg = error.message;
                             } else if (error.message.includes('Invalid configuration')) {
                                 errorMsg = error.message;
                             } else if (error.message.includes('JSON')) {
-                                errorMsg = 'Clipboard does not contain valid configuration data';
+                                errorMsg = 'Clipboard does not contain valid block configuration. Please copy a block configuration first.';
                             } else {
-                                errorMsg = `Paste failed: ${error.message}`;
+                                errorMsg = error.message || 'An error occurred while pasting';
                             }
                             
-                            utils.showError(errorMsg);
+                            errorBox.textContent = errorMsg;
+                            errorBox.classList.add('show');
                             console.error('Paste configuration error:', error);
                         }
                     }, 50);
