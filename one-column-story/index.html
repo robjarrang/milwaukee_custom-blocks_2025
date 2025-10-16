@@ -580,116 +580,83 @@
         function pasteConfiguration() {
             const pasteBtn = document.getElementById('pasteConfigBtn');
             
-            // Fallback method using textarea (works in iframes)
-            const textarea = document.createElement('textarea');
-            textarea.style.position = 'fixed';
-            textarea.style.top = '0';
-            textarea.style.left = '0';
-            textarea.style.width = '1px';
-            textarea.style.height = '1px';
-            textarea.style.padding = '0';
-            textarea.style.border = 'none';
-            textarea.style.outline = 'none';
-            textarea.style.boxShadow = 'none';
-            textarea.style.background = 'transparent';
-            document.body.appendChild(textarea);
-            textarea.focus();
+            // Use prompt dialog since clipboard API is blocked in iframe
+            const text = prompt('Paste your block configuration here:\n\n(Use Ctrl+V or Cmd+V to paste)');
             
-            // Small delay to ensure focus
-            setTimeout(() => {
-                textarea.select();
+            if (!text) {
+                // User cancelled or entered nothing
+                return;
+            }
+            
+            try {
+                const importData = JSON.parse(text);
                 
-                try {
-                    const successful = document.execCommand('paste');
-                    const text = textarea.value;
-                    
-                    // Remove textarea safely
-                    if (textarea.parentNode) {
-                        document.body.removeChild(textarea);
-                    }
-                    
-                    if (!text) {
-                        throw new Error('No text found in clipboard. Please copy configuration first, then try pasting again.');
-                    }
-                    
-                    try {
-                        const importData = JSON.parse(text);
-                        
-                        // Validation checks
-                        if (!importData.data) {
-                            throw new Error('Invalid configuration format: missing data');
-                        }
-                        
-                        if (!importData.module) {
-                            throw new Error('Invalid configuration format: missing module name');
-                        }
-                        
-                        if (importData.module !== moduleConfig.name) {
-                            throw new Error(`Configuration mismatch: This is for "${importData.module}", but you're using "${moduleConfig.name}"`);
-                        }
-                        
-                        if (!importData.version) {
-                            throw new Error('Invalid configuration format: missing version');
-                        }
-                        
-                        // Validate that imported data has valid fields
-                        const validFields = Object.keys(moduleConfig.fields);
-                        const importedFields = Object.keys(importData.data);
-                        const hasValidFields = importedFields.some(field => validFields.includes(field));
-                        
-                        if (!hasValidFields) {
-                            throw new Error('Configuration contains no valid fields for this module');
-                        }
-                        
-                        // Merge imported data (only valid fields)
-                        validFields.forEach(key => {
-                            if (importData.data.hasOwnProperty(key)) {
-                                state.blockData[key] = importData.data[key];
-                            }
-                        });
-                        
-                        // Reload UI with imported data
-                        updateUIFromData();
-                        
-                        // Visual feedback - green check
-                        pasteBtn.classList.add('success');
-                        pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-                        
-                        setTimeout(() => {
-                            pasteBtn.classList.add('fade-out');
-                            setTimeout(() => {
-                                pasteBtn.classList.remove('success', 'fade-out');
-                                pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>';
-                            }, 500);
-                        }, 1500);
-                        
-                        console.log('Block configuration pasted successfully');
-                        
-                    } catch (error) {
-                        // Show user-friendly error message
-                        let errorMsg = 'Failed to paste configuration';
-                        if (error.message.includes('mismatch')) {
-                            errorMsg = error.message;
-                        } else if (error.message.includes('Invalid configuration')) {
-                            errorMsg = error.message;
-                        } else if (error.message.includes('JSON')) {
-                            errorMsg = 'Clipboard does not contain valid configuration data';
-                        } else {
-                            errorMsg = `Paste failed: ${error.message}`;
-                        }
-                        
-                        utils.showError(errorMsg);
-                        console.error('Paste configuration error:', error);
-                    }
-                } catch (err) {
-                    // Remove textarea safely on error
-                    if (textarea.parentNode) {
-                        document.body.removeChild(textarea);
-                    }
-                    utils.showError('Paste is not supported in this browser context. Please manually copy/paste the configuration.');
-                    console.error('Paste command error:', err);
+                // Validation checks
+                if (!importData.data) {
+                    throw new Error('Invalid configuration format: missing data');
                 }
-            }, 100);
+                
+                if (!importData.module) {
+                    throw new Error('Invalid configuration format: missing module name');
+                }
+                
+                if (importData.module !== moduleConfig.name) {
+                    throw new Error(`Configuration mismatch: This is for "${importData.module}", but you're using "${moduleConfig.name}"`);
+                }
+                
+                if (!importData.version) {
+                    throw new Error('Invalid configuration format: missing version');
+                }
+                
+                // Validate that imported data has valid fields
+                const validFields = Object.keys(moduleConfig.fields);
+                const importedFields = Object.keys(importData.data);
+                const hasValidFields = importedFields.some(field => validFields.includes(field));
+                
+                if (!hasValidFields) {
+                    throw new Error('Configuration contains no valid fields for this module');
+                }
+                
+                // Merge imported data (only valid fields)
+                validFields.forEach(key => {
+                    if (importData.data.hasOwnProperty(key)) {
+                        state.blockData[key] = importData.data[key];
+                    }
+                });
+                
+                // Reload UI with imported data
+                updateUIFromData();
+                
+                // Visual feedback - green check
+                pasteBtn.classList.add('success');
+                pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+                
+                setTimeout(() => {
+                    pasteBtn.classList.add('fade-out');
+                    setTimeout(() => {
+                        pasteBtn.classList.remove('success', 'fade-out');
+                        pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>';
+                    }, 500);
+                }, 1500);
+                
+                console.log('Block configuration pasted successfully');
+                
+            } catch (error) {
+                // Show user-friendly error message
+                let errorMsg = 'Failed to paste configuration';
+                if (error.message.includes('mismatch')) {
+                    errorMsg = error.message;
+                } else if (error.message.includes('Invalid configuration')) {
+                    errorMsg = error.message;
+                } else if (error.message.includes('JSON')) {
+                    errorMsg = 'Clipboard does not contain valid configuration data';
+                } else {
+                    errorMsg = `Paste failed: ${error.message}`;
+                }
+                
+                utils.showError(errorMsg);
+                console.error('Paste configuration error:', error);
+            }
         }
 
         function updateUIFromData() {
