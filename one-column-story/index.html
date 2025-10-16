@@ -620,12 +620,31 @@
                 // Merge imported data (only valid fields)
                 validFields.forEach(key => {
                     if (importData.data.hasOwnProperty(key)) {
-                        state.blockData[key] = importData.data[key];
+                        let value = importData.data[key];
+                        
+                        // Ensure items array has proper IDs
+                        if (key === 'items' && Array.isArray(value)) {
+                            value = value.map(item => ({
+                                ...item,
+                                id: item.id || crypto.randomUUID()
+                            }));
+                        }
+                        
+                        state.blockData[key] = value;
                     }
                 });
                 
                 // Reload UI with imported data
                 updateUIFromData();
+                
+                // Rebuild checklist items if needed
+                const contentType = utils.getFieldValue('contentType');
+                if (contentType === 'checklist') {
+                    renderItemsUI();
+                }
+                
+                // Refresh the preview
+                refreshPreview();
                 
                 // Visual feedback - green check
                 pasteBtn.classList.add('success');
