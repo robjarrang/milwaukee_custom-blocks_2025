@@ -153,8 +153,8 @@
             </div>
             <div id="buttonFieldsGroup">
                 <div class="field-group">
-                    <label for="buttonText" class="field-label">Button Text</label>
-                    <input type="text" id="buttonText" class="field-input" placeholder="Learn More">
+                    <label for="buttonTextEditor" class="field-label">Button Text</label>
+                    <div id="buttonTextEditor" class="quill-container limited-toolbar"></div>
                 </div>
                 <div class="field-group">
                     <label for="buttonUrl" class="field-label">Button Link URL</label>
@@ -356,7 +356,7 @@
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
-            elements.buttonText = document.getElementById('buttonText');
+            elements.buttonTextEditor = document.getElementById('buttonTextEditor');
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
         }
@@ -380,12 +380,28 @@
                     }
                 );
 
-                const updateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                const productTitleUpdateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
                     const content = QuillConfigManager.getCleanContent(state.editors.productTitle, true);
                     updateData('productTitle', content);
                 }, moduleConfig.debounceDelay);
 
-                state.editors.productTitle.on('text-change', updateHandler);
+                state.editors.productTitle.on('text-change', productTitleUpdateHandler);
+
+                state.editors.buttonText = await QuillConfigManager.initializeEditor(
+                    elements.buttonTextEditor, 
+                    'button', 
+                    {
+                        placeholder: 'Enter button text...',
+                        maxLength: moduleConfig.fields.buttonText.maxLength
+                    }
+                );
+
+                const buttonTextUpdateHandler = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                    const content = QuillConfigManager.getCleanContent(state.editors.buttonText, true);
+                    updateData('buttonText', content);
+                }, moduleConfig.debounceDelay);
+
+                state.editors.buttonText.on('text-change', buttonTextUpdateHandler);
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
             }
@@ -566,7 +582,6 @@
             setupInputHandler(elements.productImageAlt, 'productImageAlt', moduleConfig.fields.productImageAlt.maxLength);
             setupInputHandler(elements.productUrl, 'productUrl', null, true, elements.productUrlError);
             setupInputHandler(elements.subtitle, 'subtitle', moduleConfig.fields.subtitle.maxLength);
-            setupInputHandler(elements.buttonText, 'buttonText', moduleConfig.fields.buttonText.maxLength);
             setupInputHandler(elements.buttonUrl, 'buttonUrl', null, true, elements.buttonUrlError);
 
             // Toggle handlers
@@ -963,10 +978,9 @@
             if (elements.subtitle) elements.subtitle.value = utils.getFieldValue('subtitle');
             if (elements.subtitleFontSize) elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
             if (elements.productTitleFontSize) elements.productTitleFontSize.value = utils.getFieldValue('productTitleFontSize');
-            if (elements.buttonText) elements.buttonText.value = utils.getFieldValue('buttonText');
             if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
 
-            // Update Quill editor
+            // Update Quill editors
             if (state.editors.productTitle) {
                 const content = utils.getFieldValue('productTitle');
                 try {
@@ -977,6 +991,19 @@
                 } catch (error) {
                     console.warn(`Using fallback method for productTitle editor:`, error);
                     state.editors.productTitle.root.innerHTML = content || '';
+                }
+            }
+
+            if (state.editors.buttonText) {
+                const content = utils.getFieldValue('buttonText');
+                try {
+                    state.editors.buttonText.setContents([]);
+                    if (content && content.trim()) {
+                        state.editors.buttonText.clipboard.dangerouslyPasteHTML(content);
+                    }
+                } catch (error) {
+                    console.warn(`Using fallback method for buttonText editor:`, error);
+                    state.editors.buttonText.root.innerHTML = content || '';
                 }
             }
 

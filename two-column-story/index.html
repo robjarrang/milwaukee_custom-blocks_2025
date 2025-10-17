@@ -91,7 +91,7 @@
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="left_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="left_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="left_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="left_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="left_showButton" checked><span class="toggle-slider"></span></label><label for="left_showButton" class="checkbox-label">Show Button</label></div>
-                <div id="left_buttonFieldsGroup"><div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><input type="text" id="left_buttonText" class="field-input"></div><div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div id="left_buttonFieldsGroup"><div class="field-group"><label for="left_buttonText" class="field-label">Button Text</label><div id="left_buttonTextEditor" class="quill-container limited-toolbar"></div></div><div class="field-group"><label for="left_buttonLink" class="field-label">Button Link URL</label><input type="url" id="left_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="left_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
             </div>
             <!-- Right Column -->
             <div class="column">
@@ -110,7 +110,7 @@
                 <div class="field-group" style="margin-top:20px;"><label class="field-label" style="font-weight:bold; color:#555;">Vertical Spacers</label><div id="right_spacersContainer" class="spacers-container"></div><div class="add-spacer-controls"><button id="right_addSpacerAllBtn" class="btn add-spacer-btn">Add (All)</button><button id="right_addSpacerMsoBtn" class="btn add-spacer-btn">Add (Outlook)</button><button id="right_addSpacerNotMsoBtn" class="btn add-spacer-btn">Add (Non-Outlook)</button></div></div>
                 <div class="section-divider" style="margin:20px 0; padding-top: 15px;"></div>
                 <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="right_showButton" checked><span class="toggle-slider"></span></label><label for="right_showButton" class="checkbox-label">Show Button</label></div>
-                <div id="right_buttonFieldsGroup"><div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><input type="text" id="right_buttonText" class="field-input"></div><div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
+                <div id="right_buttonFieldsGroup"><div class="field-group"><label for="right_buttonText" class="field-label">Button Text</label><div id="right_buttonTextEditor" class="quill-container limited-toolbar"></div></div><div class="field-group"><label for="right_buttonLink" class="field-label">Button Link URL</label><input type="url" id="right_buttonLink" class="field-input"></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="right_buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div><div class="option-button" data-value="right"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm6-4h10v-2H10v2zM4 9h16V7H4v2zm6-4h10V3H10v2z"/></svg></div></div></div></div></div>
             </div>
         </div>
     </div>
@@ -239,7 +239,7 @@
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.spacerTemplate = document.getElementById('spacerTemplate');
             COLUMN_PREFIXES.forEach(p => {
-                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonText', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
+                const keys = ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'subtitleFontSize', 'subtitleAlignmentSelector', 'titleEditor', 'titleFontSize', 'titleAlignmentSelector', 'descriptionEditor', 'descriptionFontSize', 'descriptionAlignmentSelector', 'buttonTextEditor', 'buttonLink', 'buttonAlignmentSelector', 'showSubtitle', 'subtitleGroup', 'showButton', 'buttonFieldsGroup', 'contentTypeSelector', 'descriptionSection', 'checklistSection', 'itemsContainer', 'addItemBtn', 'spacersContainer', 'addSpacerAllBtn', 'addSpacerMsoBtn', 'addSpacerNotMsoBtn'];
                 keys.forEach(k => { elements[p + k] = document.getElementById(p + k); });
             });
         }
@@ -267,6 +267,20 @@
                             });
                         }
                     });
+
+                    // Add buttonText editor for each column
+                    const buttonTextElement = elements[`${prefix}buttonTextEditor`];
+                    if (buttonTextElement) {
+                        editorConfigs.push({
+                            id: `${prefix}buttonText`,
+                            element: buttonTextElement,
+                            type: 'button',
+                            options: {
+                                placeholder: 'Enter button text...',
+                                maxLength: 50
+                            }
+                        });
+                    }
                 });
 
                 // Initialize all editors at once
@@ -869,12 +883,12 @@
             // Update all column fields
             COLUMN_PREFIXES.forEach(p => {
                 // Update text inputs
-                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonText', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { 
+                ['imageUrl', 'imageAlt', 'imageLink', 'subtitle', 'buttonLink', 'subtitleFontSize', 'titleFontSize', 'descriptionFontSize'].forEach(type => { 
                     if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); 
                 });
                 
                 // Update Quill editors
-                ['title', 'description'].forEach(type => { 
+                ['title', 'description', 'buttonText'].forEach(type => { 
                     if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); 
                 });
                 

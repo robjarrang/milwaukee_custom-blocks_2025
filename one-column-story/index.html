@@ -101,7 +101,7 @@
         <div class="section-divider">
             <div class="section-title">Button Settings</div>
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
-            <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><input type="text" id="buttonText" class="field-input"></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
+            <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
         </div>
     </div>
     
@@ -222,7 +222,7 @@
             elements.itemTemplate = document.getElementById('itemTemplate');
             elements.showButton = document.getElementById('showButton');
             elements.buttonFieldsGroup = document.getElementById('buttonFieldsGroup');
-            elements.buttonText = document.getElementById('buttonText');
+            elements.buttonTextEditor = document.getElementById('buttonTextEditor');
             elements.buttonLink = document.getElementById('buttonLink');
             elements.buttonLinkError = document.getElementById('buttonLinkError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
@@ -273,6 +273,24 @@
                 descriptionEditor.on('text-change', descriptionDebouncedUpdate);
 
                 state.editors.set('description', descriptionEditor);
+
+                // Create button text editor using shared configuration
+                const buttonTextEditor = await QuillConfigManager.initializeEditor(
+                    elements.buttonTextEditor, 
+                    'button', 
+                    {
+                        placeholder: 'Enter button text...',
+                        maxLength: moduleConfig.fields.buttonText.maxLength
+                    }
+                );
+
+                const buttonTextDebouncedUpdate = QuillConfigManager.createUpdateHandler((delta, oldDelta, source) => {
+                    const content = QuillConfigManager.getCleanContent(buttonTextEditor, true);
+                    updateData('buttonText', utils.sanitizeHtml(content));
+                }, moduleConfig.debounceDelay);
+                buttonTextEditor.on('text-change', buttonTextDebouncedUpdate);
+
+                state.editors.set('buttonText', buttonTextEditor);
 
             } catch (error) { 
                 throw new Error(`Failed to initialize editors: ${error.message}`); 
@@ -803,13 +821,13 @@
             setSelectorState(elements.layoutSelector, 'layout');
 
             // Optimize field updates using modern array methods
-            const fieldKeys = ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonText', 'buttonLink'];
+            const fieldKeys = ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonLink'];
             fieldKeys.forEach(key => { 
                 if (elements[key]) elements[key].value = utils.getFieldValue(key); 
             });
 
             // Optimize editor updates using QuillConfigManager
-            const editorFields = ['title', 'description'];
+            const editorFields = ['title', 'description', 'buttonText'];
             editorFields.forEach(fieldName => { 
                 const editor = state.editors.get(fieldName); 
                 if (editor) { 
