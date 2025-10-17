@@ -13,7 +13,7 @@ class QuillConfigManager {
         basic: [['bold', 'italic'], ['link']],
         title: [['bold'], [{ 'script': 'super' }]],
         button: [[{ 'script': 'super' }]],
-        description: [['bold', 'italic'], ['link']]
+        description: [['bold', 'italic'], [{ 'script': 'super' }], ['link']]
     };
 
     // Format configurations optimized for email
@@ -22,7 +22,7 @@ class QuillConfigManager {
         basic: ['bold', 'italic', 'link'],
         title: ['bold', 'script'],
         button: ['script'],
-        description: ['bold', 'italic', 'link']
+        description: ['bold', 'italic', 'script', 'link']
     };
 
     // Email-optimized Quill configurations
