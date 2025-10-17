@@ -237,13 +237,15 @@
             const showTopSpacer = utils.getFieldValue('showTopSpacer');
             const showBottomSpacer = utils.getFieldValue('showBottomSpacer');
 
-            let buttonTableStyle;
+            let buttonTableStyle, buttonClass;
 
             if (backgroundColor === 'black') {
                 // White bordered button for black background, matching Product Feature style
+                buttonClass = 'button-2-white';
                 buttonTableStyle = `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`;
             } else {
                 // Black solid button for red background
+                buttonClass = 'button-1-black';
                 buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
             }
 
@@ -272,7 +274,7 @@
                                                 <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;">
                                                     <tr>
                                                         <td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle">
-                                                            <table border="0" cellpadding="0" cellspacing="0" class="button" role="presentation" style="${buttonTableStyle}">
+                                                            <table border="0" cellpadding="0" cellspacing="0" class="${buttonClass}" role="presentation" style="${buttonTableStyle}">
                                                                 <tr>
                                                                     <td align="center" style="${buttonCellStyle}">
                                                                         <a href="${buttonUrl}" style="${buttonLinkStyle}" target="_blank">${processedButtonText}</a>
