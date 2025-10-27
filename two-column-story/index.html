@@ -889,19 +889,7 @@
                 
                 // Update Quill editors
                 ['title', 'description', 'buttonText'].forEach(type => { 
-                    const editor = state.editors[p + type];
-                    if (editor) {
-                        const content = utils.getFieldValue(p + type);
-                        try {
-                            editor.setContents([]);
-                            if (content && content.trim()) {
-                                editor.clipboard.dangerouslyPasteHTML(content);
-                            }
-                        } catch (error) {
-                            console.warn(`Using fallback method for ${p}${type} editor:`, error);
-                            editor.root.innerHTML = content || '';
-                        }
-                    }
+                    if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); 
                 });
                 
                 // Update checkboxes and their associated field groups
