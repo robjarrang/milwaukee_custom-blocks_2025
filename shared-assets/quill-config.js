@@ -318,10 +318,23 @@ class QuillConfigManager {
         if (!editor || !content) return;
 
         try {
-            // Clean content before setting
-            const cleanContent = content
+            // Clean content before setting - convert <br> tags to proper paragraph structure
+            // This prevents duplicate line breaks when content is saved and reloaded
+            let cleanContent = content
                 .replace(/&nbsp;/g, ' ')
-                .replace(/\u00A0/g, ' ');
+                .replace(/\u00A0/g, ' ')
+                .replace(/<br\s*\/?>/gi, '</p><p>');  // Convert <br> to paragraph breaks
+            
+            // Wrap in paragraph tags if not already wrapped
+            if (!cleanContent.trim().startsWith('<p>')) {
+                cleanContent = '<p>' + cleanContent + '</p>';
+            }
+            
+            // Clean up empty paragraphs and normalize
+            cleanContent = cleanContent
+                .replace(/<p><\/p>/g, '')           // Remove empty paragraphs
+                .replace(/<p>\s*<\/p>/g, '')        // Remove whitespace-only paragraphs
+                .replace(/<\/p>\s*<p>/g, '</p><p>'); // Normalize paragraph spacing
 
             // Clear existing content first
             editor.setText('');
