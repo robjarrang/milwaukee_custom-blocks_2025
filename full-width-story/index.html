@@ -197,7 +197,7 @@
                 titleFontSize: { type: 'number', defaultValue: 24 },
                 titleAlignment: { type: 'text', defaultValue: 'left' },
                 contentType: { type: 'text', defaultValue: 'text' },
-                bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.', maxLength: 400 },
+                bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.' },
                 bodyFontSize: { type: 'number', defaultValue: 16 },
                 bodyAlignment: { type: 'text', defaultValue: 'left' },
                 checklistItems: {
@@ -449,8 +449,7 @@
                     elements.bodyEditor, 
                     'description', 
                     {
-                        placeholder: 'Enter body text...',
-                        maxLength: moduleConfig.fields.bodyText.maxLength
+                        placeholder: 'Enter body text...'
                     }
                 );
 

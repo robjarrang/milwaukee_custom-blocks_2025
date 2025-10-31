@@ -140,7 +140,7 @@
                 titleFontSize: { type: 'number', defaultValue: 20 },
                 titleAlignment: { type: 'text', defaultValue: 'center' },
                 contentType: { type: 'text', defaultValue: 'description' },
-                description: { type: 'richtext', defaultValue: 'Vestibulum condimentum tempus euismod. Phasellus ligula nibh, ornare at ligula a.', maxLength: 250 },
+                description: { type: 'richtext', defaultValue: 'Vestibulum condimentum tempus euismod. Phasellus ligula nibh, ornare at ligula a.' },
                 descriptionFontSize: { type: 'number', defaultValue: 16 },
                 descriptionAlignment: { type: 'text', defaultValue: 'center' },
                 items: { type: 'list', defaultValue: [{ id: 'item1', text: '<strong>Lorem ipsum odor amet</strong>' }, { id: 'item2', text: '<strong>Consectetur adipiscing elit</strong>' }] },
@@ -261,8 +261,7 @@
                     elements.descriptionEditor, 
                     'description', 
                     {
-                        placeholder: 'Enter description...',
-                        maxLength: moduleConfig.fields.description.maxLength
+                        placeholder: 'Enter description...'
                     }
                 );
 
