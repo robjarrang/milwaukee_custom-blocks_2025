@@ -887,9 +887,11 @@
                     if (elements[p + type]) elements[p + type].value = utils.getFieldValue(p + type); 
                 });
                 
-                // Update Quill editors
+                // Update Quill editors using QuillConfigManager for proper content handling
                 ['title', 'description', 'buttonText'].forEach(type => { 
-                    if(state.editors[p + type]) state.editors[p + type].root.innerHTML = utils.getFieldValue(p + type); 
+                    if(state.editors[p + type]) {
+                        QuillConfigManager.setContent(state.editors[p + type], utils.getFieldValue(p + type));
+                    }
                 });
                 
                 // Update checkboxes and their associated field groups
