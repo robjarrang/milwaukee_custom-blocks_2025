@@ -557,6 +557,7 @@
 
             // Use consolidated delegated event handler for items
             const itemHandler = createDelegatedHandler('items', itemActions);
+            addListener(elements.addItemBtn, 'click', itemHandler);
             addListener(elements.itemsContainer, 'click', itemHandler);
 
             // Config copy/paste buttons
