@@ -32,7 +32,10 @@
         .paste-modal-btn.secondary:hover{background-color:#e0e0e0}
         .paste-hidden-textarea{position:absolute;left:-9999px;opacity:0}
         /* Visual Editor Styles */
-        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
+        #visualEditorWrapper{margin-top:20px}#visualEditor{position:relative;cursor:crosshair;background-color:#f0f0f0;border:1px solid #ccc;min-height:200px}#previewImage{display:block;width:100%;height:auto}#visualEditor .hotspot-marker{position:absolute;width:24px;height:24px;background-image:url('https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png');background-size:cover;transform:translate(-50%, -50%);border-radius:50%;box-shadow:0 0 0 3px rgba(255,0,0,0.7);cursor:pointer;transition:left 0.1s ease, top 0.1s ease}#visualEditor .hotspot-marker.selected{box-shadow:0 0 0 3px rgba(0,116,217,1);z-index:10}
+        .keyboard-hint{font-size:12px;color:#666;margin-top:8px;padding:8px;background-color:#f9f9f9;border-radius:4px;display:none}
+        .keyboard-hint.show{display:block}
+        .keyboard-hint strong{color:#0074d9}
         /* Tooltip Position Selector Styles */
         .position-selector{display:grid;grid-template-columns:repeat(3, 1fr);gap:5px;width:100px;margin-top:5px}.position-button{width:30px;height:30px;border:1px solid #ccc;border-radius:4px;background-color:#fff;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}.position-button:hover{background-color:#e9e9e9}.position-button.selected{background-color:#0074d9;border-color:#005a9e}.position-button .dot{width:6px;height:6px;background-color:#333;border-radius:50%}.position-button.selected .dot{background-color:#fff}
     </style>
@@ -59,7 +62,12 @@
 
         <div class="section-title">Visual Editor</div>
         <p style="font-size:13px; color:#666; margin-top:-10px; margin-bottom:15px;">Select a hotspot from the list below, then click on the image to set its position.</p>
-        <div id="visualEditorWrapper"><div id="visualEditor"><img id="previewImage" src="" alt="Image Preview"></div></div>
+        <div id="visualEditorWrapper">
+            <div id="visualEditor"><img id="previewImage" src="" alt="Image Preview"></div>
+            <div id="keyboardHint" class="keyboard-hint">
+                💡 <strong>Tip:</strong> Use arrow keys to fine-tune position (hold <strong>Shift</strong> for micro-adjustments)
+            </div>
+        </div>
 
         <!-- THE FIX: The "Add New Hotspot" button has been moved here -->
         <button id="addItemBtn" class="btn add-item-btn">Add New Hotspot</button>
@@ -138,7 +146,8 @@
                 previewImage: document.getElementById('previewImage'),
                 itemsContainer: document.getElementById('itemsContainer'),
                 addItemBtn: document.getElementById('addItemBtn'),
-                itemTemplate: document.getElementById('itemTemplate')
+                itemTemplate: document.getElementById('itemTemplate'),
+                keyboardHint: document.getElementById('keyboardHint')
             });
         }
 
@@ -348,6 +357,18 @@
             });
         }
 
+        function showKeyboardHint() {
+            if (!elements.keyboardHint) return;
+            
+            elements.keyboardHint.classList.add('show');
+            
+            // Auto-hide after 4 seconds
+            clearTimeout(state.keyboardHintTimeout);
+            state.keyboardHintTimeout = setTimeout(() => {
+                elements.keyboardHint.classList.remove('show');
+            }, 4000);
+        }
+
         function initializeEventHandlers() {
 
 
@@ -485,6 +506,7 @@
                 if (targetIsMarker) {
                     state.selectedHotspotId = e.target.dataset.id;
                     updateUI();
+                    showKeyboardHint();
                     return;
                 }
                 if (!state.selectedHotspotId) {
@@ -501,6 +523,52 @@
                     updateUI();
                     refreshPreview();
                 }
+            });
+
+            // Keyboard arrow key controls for fine-tuning hotspot position
+            document.addEventListener('keydown', (e) => {
+                // Only handle arrow keys
+                if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    return;
+                }
+
+                // Only handle if a hotspot is selected
+                if (!state.selectedHotspotId) {
+                    return;
+                }
+
+                // Don't interfere with text input fields
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const hotspot = state.blockData.hotspots.find(h => h.id === state.selectedHotspotId);
+                if (!hotspot) return;
+
+                // Shift key for micro-adjustments (0.1%), normal for regular adjustments (0.5%)
+                const step = e.shiftKey ? 0.1 : 0.5;
+
+                // Update position based on arrow key
+                switch (e.key) {
+                    case 'ArrowUp':
+                        hotspot.posY = Math.max(0, parseFloat((hotspot.posY - step).toFixed(2)));
+                        break;
+                    case 'ArrowDown':
+                        hotspot.posY = Math.min(100, parseFloat((hotspot.posY + step).toFixed(2)));
+                        break;
+                    case 'ArrowLeft':
+                        hotspot.posX = Math.max(0, parseFloat((hotspot.posX - step).toFixed(2)));
+                        break;
+                    case 'ArrowRight':
+                        hotspot.posX = Math.min(100, parseFloat((hotspot.posX + step).toFixed(2)));
+                        break;
+                }
+
+                updateUI();
+                refreshPreview();
+                showKeyboardHint();
             });
 
             elements.itemsContainer.addEventListener('click', createHotspotDelegatedHandler(hotspotActions));
