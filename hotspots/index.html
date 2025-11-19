@@ -228,7 +228,7 @@
         const hotspots = utils.getFieldValue('hotspots');
 
         const interactiveHotspots = hotspots.map((h, i) => `
-            <div class="hot-tool-wrapper" style="position:absolute; left:${h.posX}%; top:${h.posY}%; z-index:${i+1};">
+            <div class="hot-tool-wrapper" style="position:absolute; left:${h.posX}%; top:${h.posY}%; transform:translate(-50%, -50%); z-index:${i+1};">
             <img alt="" border="0" height="36" src="https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/ba4b84d2-b601-42a6-a8e3-e2f32eb1100c.png" style="display:block; width:36px; height:36px;" width="36">
             <div class="tooltip-wrapper" style="position:absolute; width:200px; z-index:99; background-color:rgba(0,0,0,0.8); display:none; max-height:0; opacity:0; overflow:hidden; padding:10px; text-align:center; transition:all .3s ease; border-radius:4px; ${getTooltipCss(h.tooltipPosition)}">
                 <span style="color:#ffffff; font-family:'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size:${h.fontSize || 20}px; font-weight:bold; line-height:${(h.fontSize || 20) + 6}px; text-transform:uppercase;">${h.text}</span>
