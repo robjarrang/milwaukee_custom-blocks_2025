@@ -92,7 +92,7 @@
         const backgroundColorValue = utils.getFieldValue('backgroundColor');
         const spacerHeightValue = utils.getFieldValue('spacerHeight');
 
-        const bgColor = backgroundColorValue === 'red' ? '#DB021D' : '#000000';
+        const bgColor = backgroundColorValue === 'red' ? '#DB011C' : '#000000';
         const height = `${spacerHeightValue}px`;
 
         return `<!-- START .fw-spacer --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColor}; width: 620px;">
@@ -120,7 +120,7 @@
         const spacerHeight = parseInt(heightMatch[1], 10);
         const bgColorHex = colorMatch[1].trim().toUpperCase();
 
-        const backgroundColor = (bgColorHex === '#DB021D') ? 'red' : 'black';
+        const backgroundColor = (bgColorHex === '#DB011C') ? 'red' : 'black';
 
         return { backgroundColor, spacerHeight };
     }

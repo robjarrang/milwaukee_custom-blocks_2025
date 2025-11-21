@@ -149,7 +149,7 @@ The template includes inline font-size controls. You can:
 ### Change Background Colors
 Update the preset colors in `generateTemplate()`:
 ```javascript
-const bgColorHex = backgroundColor === 'red' ? '#DB021D' : '#000000';
+const bgColorHex = backgroundColor === 'red' ? '#DB011C' : '#000000';
 ```
 
 ### Add More Editor Types
@@ -174,7 +174,7 @@ validateCustomField(value) {
 
 ### Quick Reference
 - **Total width:** 620px (20px gutters + 580px content)
-- **Milwaukee Red:** `#DB021D`
+- **Milwaukee Red:** `#DB011C`
 - **Milwaukee Black:** `#000000`
 - **Use table-based layouts** for email compatibility
 - **Include mobile responsive classes** for proper mobile rendering

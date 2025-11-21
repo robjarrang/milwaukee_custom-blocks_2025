@@ -158,7 +158,7 @@ All blocks use 620px total width:
 - 20px right gutter
 
 #### Brand Colors
-- Primary Red: `#DB021D` (Milwaukee brand red)
+- Primary Red: `#DB011C` (Milwaukee brand red)
 - Secondary Black: `#000000` or `#313131`
 
 #### Typography
