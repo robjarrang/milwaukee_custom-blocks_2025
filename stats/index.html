@@ -525,13 +525,29 @@
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return;
             state.sdk.getData((data) => {
+                // Guard against empty data overwriting existing state
+                // If we already have initialized data and getData returns empty, keep existing
+                if (state.isInitialized && (!data || Object.keys(data).length === 0)) {
+                    console.warn('getData returned empty after initialization - keeping existing state');
+                    return;
+                }
+                
+                // If data is null/undefined but we have existing blockData with user content, preserve it
+                if (!data && Object.keys(state.blockData).length > 0) {
+                    console.warn('getData returned null - preserving existing blockData');
+                    return;
+                }
+                
                 state.blockData = data || {};
-                // Ensure we have default values
+                
+                // Only apply defaults for truly missing fields
                 Object.keys(moduleConfig.fields).forEach(key => {
                     if (state.blockData[key] === undefined) {
                         state.blockData[key] = moduleConfig.fields[key].defaultValue;
                     }
                 });
+                
+                state.isInitialized = true;
                 updateUIFromData();
                 refreshPreview();
             });
@@ -723,6 +739,14 @@
             });
             initializeEventHandlers();
             loadData();
+            
+            // Prevent data loss on tab visibility changes
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && state.isInitialized) {
+                    // Don't reload data - just ensure current state is saved
+                    refreshPreview();
+                }
+            });
         }
 
         document.addEventListener('DOMContentLoaded', initialize);

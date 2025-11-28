@@ -852,6 +852,21 @@
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
             state.sdk.getData((data) => {
+                // Guard against empty data overwriting existing state
+                // If we already have initialized data and getData returns empty, keep existing
+                if (state.isInitialized && (!data || Object.keys(data).length === 0)) {
+                    console.warn('getData returned empty after initialization - keeping existing state');
+                    setLoadingState(false);
+                    return;
+                }
+                
+                // If data is null/undefined but we have existing blockData with user content, preserve it
+                if (!data && Object.keys(state.blockData).length > 0) {
+                    console.warn('getData returned null - preserving existing blockData');
+                    setLoadingState(false);
+                    return;
+                }
+
                 utils.safeExecute(() => {
                     state.blockData = {};
                     // Use Object.entries for more efficient key-value processing
@@ -867,6 +882,7 @@
                     initializeEventHandlers();
                     updateUIFromData();
                     refreshPreview();
+                    state.isInitialized = true;
                 });
                 setLoadingState(false);
             });
@@ -916,6 +932,15 @@
                 await initializeEditors(); // Now properly await the async editor initialization
                 loadData();
                 window.addEventListener('beforeunload', cleanup);
+                
+                // Prevent data loss on tab visibility changes
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible' && state.isInitialized) {
+                        // Don't reload data - just ensure current state is saved
+                        refreshPreview();
+                    }
+                });
+                
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`, true);
