@@ -58,9 +58,15 @@
 
         <div class="section-divider">
              <div class="section-title" style="border-bottom:none; margin-bottom:0;">Fallback Image Settings</div>
-             <p style="font-size:12px; color:#666; margin-top:0; margin-bottom:15px;">Optional: Provide a specific image for email clients that don't support carousels. If left blank, the first slide will be used as the fallback.</p>
-             <div class="field-group">
-                <label for="fallbackImageUrl" class="field-label">Fallback Image URL</label>
+             <p style="font-size:12px; color:#666; margin-top:0; margin-bottom:15px;">Configure the fallback image for email clients that don't support interactive carousels.</p>
+             <div class="field-group" style="margin-bottom:20px;">
+                <label style="display:flex; align-items:flex-start; cursor:pointer; user-select:none;">
+                    <input type="checkbox" id="useFirstSlideAsFallback" style="margin-right:10px; margin-top:3px; width:18px; height:18px; cursor:pointer;">
+                    <span style="font-size:14px; color:#333;">Use the first slide image as the fallback<br><span style="font-size:12px; color:#666; font-weight:normal;">When checked, the first slide's image URL will automatically be used as the fallback</span></span>
+                </label>
+            </div>
+             <div class="field-group" id="fallbackImageUrlGroup">
+                <label for="fallbackImageUrl" class="field-label">Fallback Image URL <span id="fallbackRequiredIndicator" style="color:#DB011C;">*</span></label>
                 <input type="url" id="fallbackImageUrl" class="field-input" placeholder="https://example.com/fallback-image.jpg">
                 <div class="field-error">Please enter a valid image URL.</div>
             </div>
@@ -137,7 +143,8 @@
                 },
                 fallbackImageUrl: { type: 'url', defaultValue: '' },
                 fallbackLinkUrl: { type: 'url', defaultValue: '' },
-                fallbackAltText: { type: 'text', defaultValue: '' }
+                fallbackAltText: { type: 'text', defaultValue: '' },
+                useFirstSlideAsFallback: { type: 'boolean', defaultValue: false }
             },
             debounceDelay: 400,
             maxRetries: 3
@@ -177,6 +184,9 @@
             elements.fallbackAltText = document.getElementById('fallbackAltText');
             elements.fallbackImageUrlError = elements.fallbackImageUrl.nextElementSibling;
             elements.fallbackLinkUrlError = elements.fallbackLinkUrl.nextElementSibling;
+            elements.useFirstSlideAsFallback = document.getElementById('useFirstSlideAsFallback');
+            elements.fallbackImageUrlGroup = document.getElementById('fallbackImageUrlGroup');
+            elements.fallbackRequiredIndicator = document.getElementById('fallbackRequiredIndicator');
         }
 
         function setLoadingState(loading) {
@@ -199,13 +209,65 @@
             );
 
             state.blockData.slides = newSlides;
+            state.blockData.useFirstSlideAsFallback = elements.useFirstSlideAsFallback.checked;
             state.blockData.fallbackImageUrl = elements.fallbackImageUrl.value;
             state.blockData.fallbackLinkUrl = elements.fallbackLinkUrl.value;
             state.blockData.fallbackAltText = elements.fallbackAltText.value;
+            
+            // Update UI to reflect checkbox state
+            updateFallbackFieldState();
+            
             refreshPreview();
         }
 
         const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
+
+        function updateFallbackFieldState() {
+            const useFirstSlide = elements.useFirstSlideAsFallback.checked;
+            const fallbackInput = elements.fallbackImageUrl;
+            const requiredIndicator = elements.fallbackRequiredIndicator;
+            const fieldGroup = elements.fallbackImageUrlGroup;
+            
+            if (useFirstSlide) {
+                // Checkbox is checked - field is optional, show disabled state
+                fallbackInput.disabled = true;
+                fallbackInput.style.backgroundColor = '#f5f5f5';
+                fallbackInput.style.color = '#999';
+                fallbackInput.placeholder = 'Using first slide image as fallback';
+                requiredIndicator.style.display = 'none';
+                fallbackInput.classList.remove('error');
+                if (elements.fallbackImageUrlError) {
+                    elements.fallbackImageUrlError.style.display = 'none';
+                }
+            } else {
+                // Checkbox is unchecked - field is required
+                fallbackInput.disabled = false;
+                fallbackInput.style.backgroundColor = '';
+                fallbackInput.style.color = '';
+                fallbackInput.placeholder = 'https://example.com/fallback-image.jpg';
+                requiredIndicator.style.display = 'inline';
+                
+                // Validate that fallback URL is provided
+                if (!fallbackInput.value.trim()) {
+                    fallbackInput.classList.add('error');
+                    if (elements.fallbackImageUrlError) {
+                        elements.fallbackImageUrlError.textContent = 'Fallback image URL is required when not using first slide.';
+                        elements.fallbackImageUrlError.style.display = 'block';
+                    }
+                } else if (!utils.isValidUrl(fallbackInput.value)) {
+                    fallbackInput.classList.add('error');
+                    if (elements.fallbackImageUrlError) {
+                        elements.fallbackImageUrlError.textContent = 'Please enter a valid image URL.';
+                        elements.fallbackImageUrlError.style.display = 'block';
+                    }
+                } else {
+                    fallbackInput.classList.remove('error');
+                    if (elements.fallbackImageUrlError) {
+                        elements.fallbackImageUrlError.style.display = 'none';
+                    }
+                }
+            }
+        }
 
         function renderSlidesUI() {
             const slides = utils.getFieldValue('slides');
@@ -337,6 +399,11 @@
             utils.addEventListenerTracked(elements.addSlideBtn, 'click', slideHandler);
             utils.addEventListenerTracked(elements.slidesContainer, 'click', slideHandler);
 
+            // Handle "Use first slide as fallback" checkbox
+            utils.addEventListenerTracked(elements.useFirstSlideAsFallback, 'change', () => {
+                updateDataFromUI();
+            });
+
             // Copy/Paste configuration buttons
             const copyConfigBtn = document.getElementById('copyConfigBtn');
             const pasteConfigBtn = document.getElementById('pasteConfigBtn');
@@ -357,9 +424,13 @@
             }
 
             // Update fallback fields
+            elements.useFirstSlideAsFallback.checked = state.blockData.useFirstSlideAsFallback || false;
             elements.fallbackImageUrl.value = state.blockData.fallbackImageUrl || '';
             elements.fallbackLinkUrl.value = state.blockData.fallbackLinkUrl || '';
             elements.fallbackAltText.value = state.blockData.fallbackAltText || '';
+            
+            // Update fallback field state based on checkbox
+            updateFallbackFieldState();
 
             // Render slides UI
             renderSlidesUI();
@@ -603,13 +674,14 @@
             let fallbackImageUrl = utils.getFieldValue('fallbackImageUrl');
             let fallbackLinkUrl = utils.getFieldValue('fallbackLinkUrl');
             let fallbackAltText = utils.getFieldValue('fallbackAltText');
+            const useFirstSlideAsFallback = utils.getFieldValue('useFirstSlideAsFallback');
 
-            // Fallback logic remains the same: default to the first slide if fields are empty
-            if (!fallbackImageUrl && slides.length > 0) {
+            // Only use the first slide as fallback if explicitly opted in via checkbox
+            if (useFirstSlideAsFallback && slides.length > 0) {
                 const firstSlide = slides[0];
                 fallbackImageUrl = firstSlide.imageUrl || '';
-                fallbackLinkUrl = firstSlide.linkUrl || '#';
-                fallbackAltText = firstSlide.altText || '';
+                fallbackLinkUrl = fallbackLinkUrl || firstSlide.linkUrl || '#';
+                fallbackAltText = fallbackAltText || firstSlide.altText || '';
             }
 
             const slideCount = slides.length;
@@ -910,6 +982,7 @@ input[type="radio"] {
                 try {
                     // When loading, prioritize the structured 'slides' data over saved 'content'
                     state.blockData.slides = (data && data.slides && data.slides.length > 0) ? data.slides : utils.getFieldValue('slides');
+                    state.blockData.useFirstSlideAsFallback = data?.useFirstSlideAsFallback || false;
                     state.blockData.fallbackImageUrl = data?.fallbackImageUrl || '';
                     state.blockData.fallbackLinkUrl = data?.fallbackLinkUrl || '';
                     state.blockData.fallbackAltText = data?.fallbackAltText || '';
