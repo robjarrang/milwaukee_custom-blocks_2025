@@ -231,10 +231,10 @@
 
             // If badge is hidden, minimal AMPscript
             if (showBadge !== 'true') {
-                return `%%[
+                return `<!--%%[
 VAR @ShowBadge
 SET @ShowBadge = "false"
-]%%`;
+]%%-->`;
             }
 
             // Build the logo type determination logic
@@ -271,7 +271,7 @@ ENDIF`;
                 logoTypeDetermination = `SET @LogoType = "${badgeType}"`;
             }
 
-            return `%%[
+            return `<!--%%[
 /* Legacy Header - Badge Configuration */
 VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge
 SET @UserCulture = AttributeValue("UserCulture")
@@ -290,7 +290,7 @@ ${logoTypeDetermination}
 IF NOT Empty(@LogoType) THEN
     ${generateUrlLookupAmpScript()}
 ENDIF
-]%%`;
+]%%-->`;
         }
 
         // Generate the URL lookup AMPscript (separated for readability)
@@ -454,7 +454,7 @@ ENDIF`;
             const ampScript = generateAmpScript();
 
             // Badge HTML - conditionally shown via AMPscript
-            const badgeHtml = showBadge === 'true' ? `%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%<a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="Milwaukee Trade Logo" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="100"></a>%%[ ENDIF ]%%` : '';
+            const badgeHtml = showBadge === 'true' ? `<!--%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="Milwaukee Trade Logo" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="100"></a><!--%%[ ENDIF ]%%-->` : '';
 
             return `<!-- START .legacy-header -->
 ${ampScript}
