@@ -224,6 +224,10 @@
 
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
+        // Define which badge types are system logos vs trade logos
+        const systemLogos = ['M12', 'M18', 'MXFuel', 'TruckTour', 'AuthorisedDistribution'];
+        const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
+
         // Generate the AMPscript block for badge URL lookup
         function generateAmpScript() {
             const showBadge = utils.getFieldValue('showBadge');
@@ -237,42 +241,10 @@ SET @ShowBadge = "false"
 ]%%-->`;
             }
 
-            // Build the logo type determination logic
-            let logoTypeDetermination = '';
-            
+            // Dynamic mode - let Content Block handle everything (attribute checking + URL lookup)
             if (badgeType === 'dynamic') {
-                // Dynamic mode: check subscriber attributes first
-                logoTypeDetermination = `
-/* Dynamic badge selection from subscriber profile */
-IF AttributeValue("L1_Carpentry_Joinery") == "true" THEN
-    SET @LogoType = "Carpentry"
-ELSEIF AttributeValue("L1_Construction_CE") == "true" THEN
-    SET @LogoType = "Construction"
-ELSEIF AttributeValue("L1_Drain_Cleaning_Inspection") == "true" THEN
-    SET @LogoType = "DrainCleaning"
-ELSEIF AttributeValue("L1_Drywall_Ceiling_Partitioning") == "true" THEN
-    SET @LogoType = "Drywall"
-ELSEIF AttributeValue("L1_Electrical") == "true" THEN
-    SET @LogoType = "Electrical"
-ELSEIF AttributeValue("L1_Mechanical_HVAC_Plumbing") == "true" THEN
-    SET @LogoType = "Plumbing"
-ELSEIF AttributeValue("L1_Outdoor_Landscape_Agriculture") == "true" THEN
-    SET @LogoType = "Landscaping"
-ELSEIF AttributeValue("L1_Transportation") == "true" THEN
-    SET @LogoType = "Automotive"
-ELSEIF AttributeValue("L1_Utilities") == "true" THEN
-    SET @LogoType = "Utilities"
-ELSE
-    SET @LogoType = ""
-    SET @ShowBadge = "false"
-ENDIF`;
-            } else {
-                // Manual mode: use the selected badge type
-                logoTypeDetermination = `SET @LogoType = "${badgeType}"`;
-            }
-
-            return `<!--%%[
-/* Legacy Header - Badge Configuration */
+                return `<!--%%[
+/* Legacy Header - Dynamic Badge Configuration */
 VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge
 SET @UserCulture = AttributeValue("UserCulture")
 SET @ShowBadge = "true"
@@ -283,168 +255,138 @@ ENDIF
 
 SET @LogoImageURL = ""
 SET @LogoLinkURL = ""
+SET @LogoType = ""
 
-${logoTypeDetermination}
-
-/* URL Lookup based on LogoType and UserCulture */
-IF NOT Empty(@LogoType) THEN
-    ${generateUrlLookupAmpScript()}
+/* Dynamic mode - Content Block checks subscriber profile attributes and sets URLs */
+]%%--><!--%%=ContentBlockById("563072")=%%--><!--%%[
+/* Hide badge if no logo was determined */
+IF Empty(@LogoImageURL) THEN
+    SET @ShowBadge = "false"
 ENDIF
+]%%-->`;
+            }
+
+            // Manual system logo - handle inline
+            if (systemLogos.includes(badgeType)) {
+                return `<!--%%[
+/* Legacy Header - Manual System Logo: ${badgeType} */
+VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge
+SET @UserCulture = AttributeValue("UserCulture")
+SET @ShowBadge = "true"
+
+IF Empty(@UserCulture) THEN
+    SET @UserCulture = "EN-GB"
+ENDIF
+
+SET @LogoImageURL = ""
+SET @LogoLinkURL = ""
+SET @LogoType = "${badgeType}"
+
+/* System Logo URL Lookup */
+${generateSystemLogoUrlLookup(badgeType)}
+]%%-->`;
+            }
+
+            // Manual trade logo - set @Manual_* variable and call Content Block
+            if (tradeLogos.includes(badgeType)) {
+                return `<!--%%[
+/* Legacy Header - Manual Trade Logo: ${badgeType} */
+VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge, @Manual_${badgeType}
+SET @UserCulture = AttributeValue("UserCulture")
+SET @ShowBadge = "true"
+
+IF Empty(@UserCulture) THEN
+    SET @UserCulture = "EN-GB"
+ENDIF
+
+SET @LogoImageURL = ""
+SET @LogoLinkURL = ""
+SET @LogoType = ""
+SET @Manual_${badgeType} = "true"
+
+/* Content Block handles URL lookup for trade logo */
+]%%--><!--%%=ContentBlockById("563072")=%%--><!--%%[
+/* Hide badge if no logo was determined */
+IF Empty(@LogoImageURL) THEN
+    SET @ShowBadge = "false"
+ENDIF
+]%%-->`;
+            }
+
+            // Fallback (should not happen)
+            return `<!--%%[
+VAR @ShowBadge
+SET @ShowBadge = "false"
 ]%%-->`;
         }
 
-        // Generate the URL lookup AMPscript (separated for readability)
-        function generateUrlLookupAmpScript() {
-            return `/* System Logos */
-IF @LogoType == "M12" THEN
-    SET @LogoImageURL = "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/aee3c719-16d2-4817-9f74-67e0da54bb52.png"
-    IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = "https://bg.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = "https://cz.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = "https://dk.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = "https://benl.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = "https://nl.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = "https://za.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = "https://ae.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = "https://uk.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = "https://ee.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = "https://fi.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = "https://befr.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = "https://fr.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = "https://frlu.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = "https://frch.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = "https://deat.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = "https://de.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = "https://delu.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = "https://dech.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = "https://hu.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = "https://it.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = "https://lv.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = "https://lt.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = "https://no.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = "https://pl.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = "https://pt.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = "https://ro.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = "https://sk.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = "https://es.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = "https://se.milwaukeetool.eu/systems/m12/"
-    ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = "https://tr.milwaukeetool.eu/systems/m12/"
-    ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu/systems/m12/"
-    ENDIF
+        // Generate URL lookup for a specific system logo
+        function generateSystemLogoUrlLookup(logoType) {
+            const systemLogoUrls = {
+                M12: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/aee3c719-16d2-4817-9f74-67e0da54bb52.png",
+                    path: "/systems/m12/"
+                },
+                M18: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/8c31c2cd-e939-4b3c-b02d-f94706922741.png",
+                    path: "/systems/m18/"
+                },
+                MXFuel: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/9bb4dd26-9f86-4a1c-9d9f-af3845341a4f.png",
+                    path: "/systems/mx-fuel/"
+                },
+                TruckTour: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/0c023144-dbc0-4a70-9e01-b2aa70593c98.png",
+                    link: "https://uk.milwaukeetool.eu/trucktour2025/"
+                },
+                AuthorisedDistribution: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/5d3c1b88-4540-4505-af5f-82c03525794a.png",
+                    path: "/"
+                }
+            };
 
-ELSEIF @LogoType == "M18" THEN
-    SET @LogoImageURL = "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/8c31c2cd-e939-4b3c-b02d-f94706922741.png"
-    IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = "https://bg.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = "https://cz.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = "https://dk.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = "https://benl.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = "https://nl.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = "https://za.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = "https://ae.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = "https://uk.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = "https://ee.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = "https://fi.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = "https://befr.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = "https://fr.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = "https://frlu.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = "https://frch.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = "https://deat.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = "https://de.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = "https://delu.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = "https://dech.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = "https://hu.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = "https://it.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = "https://lv.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = "https://lt.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = "https://no.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = "https://pl.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = "https://pt.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = "https://ro.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = "https://sk.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = "https://es.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = "https://se.milwaukeetool.eu/systems/m18/"
-    ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = "https://tr.milwaukeetool.eu/systems/m18/"
-    ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu/systems/m18/"
-    ENDIF
+            const config = systemLogoUrls[logoType];
+            if (!config) return '';
 
-ELSEIF @LogoType == "MXFuel" THEN
-    SET @LogoImageURL = "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/9bb4dd26-9f86-4a1c-9d9f-af3845341a4f.png"
-    IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = "https://bg.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = "https://cz.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = "https://dk.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = "https://benl.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = "https://nl.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = "https://za.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = "https://ae.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = "https://uk.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = "https://ee.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = "https://fi.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = "https://befr.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = "https://fr.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = "https://frlu.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = "https://frch.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = "https://deat.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = "https://de.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = "https://delu.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = "https://dech.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = "https://hu.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = "https://it.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = "https://lv.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = "https://lt.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = "https://no.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = "https://pl.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = "https://pt.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = "https://ro.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = "https://sk.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = "https://es.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = "https://se.milwaukeetool.eu/systems/mx-fuel/"
-    ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = "https://tr.milwaukeetool.eu/systems/mx-fuel/"
-    ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu/systems/mx-fuel/"
-    ENDIF
+            // TruckTour has a fixed URL
+            if (logoType === 'TruckTour') {
+                return `SET @LogoImageURL = "${config.image}"
+SET @LogoLinkURL = "${config.link}"`;
+            }
 
-ELSEIF @LogoType == "TruckTour" THEN
-    SET @LogoImageURL = "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/0c023144-dbc0-4a70-9e01-b2aa70593c98.png"
-    SET @LogoLinkURL = "https://uk.milwaukeetool.eu/trucktour2025/"
-
-ELSEIF @LogoType == "AuthorisedDistribution" THEN
-    SET @LogoImageURL = "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/5d3c1b88-4540-4505-af5f-82c03525794a.png"
-    IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = "https://bg.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = "https://cz.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = "https://dk.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = "https://benl.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = "https://nl.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = "https://za.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = "https://ae.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = "https://uk.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = "https://ee.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = "https://fi.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = "https://befr.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = "https://fr.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = "https://frlu.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = "https://frch.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = "https://deat.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = "https://de.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = "https://delu.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = "https://dech.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = "https://hu.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = "https://it.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = "https://lv.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = "https://lt.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = "https://no.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = "https://pl.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = "https://pt.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = "https://ro.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = "https://sk.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = "https://es.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = "https://se.milwaukeetool.eu/"
-    ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = "https://tr.milwaukeetool.eu/"
-    ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu/"
-    ENDIF
-
-/* Trade Logos - Reference Content Block for full URL mappings */
-ELSE
-    SET @LogoImageURL = ""
-    SET @LogoLinkURL = ""
-    %%=ContentBlockById("563072")=%%
+            // Other system logos use culture-based URLs
+            return `SET @LogoImageURL = "${config.image}"
+IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = "https://bg.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = "https://cz.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = "https://dk.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = "https://benl.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = "https://nl.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = "https://za.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = "https://ae.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = "https://uk.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = "https://ee.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = "https://fi.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = "https://befr.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = "https://fr.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = "https://frlu.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = "https://frch.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = "https://deat.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = "https://de.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = "https://delu.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = "https://dech.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = "https://hu.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = "https://it.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = "https://lv.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = "https://lt.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = "https://no.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = "https://pl.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = "https://pt.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = "https://ro.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = "https://sk.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = "https://es.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = "https://se.milwaukeetool.eu${config.path}"
+ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = "https://tr.milwaukeetool.eu${config.path}"
+ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu${config.path}"
 ENDIF`;
         }
 
