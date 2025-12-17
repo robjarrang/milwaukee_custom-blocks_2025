@@ -40,6 +40,8 @@
         .badge-option.selected{border-color:#0074d9;background-color:#0074d9;color:white}
         .badge-option.category-header{grid-column:1/-1;background:#f5f5f5;font-weight:bold;cursor:default;border:none;color:#666;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
         .badge-option.category-header:hover{background:#f5f5f5;border:none}
+        /* Quill editor styles */
+        .quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:2.5em;padding:8px 12px}.limited-toolbar .ql-toolbar{padding:5px}.limited-toolbar .ql-toolbar button{width:24px;height:24px}
     </style>
 </head>
 <body>
@@ -107,9 +109,18 @@
 
         <div class="section-divider">
             <div class="section-title">Header Text</div>
+            
             <div class="field-group">
-                <label for="headerText" class="field-label">Header Message</label>
-                <input type="text" id="headerText" class="field-input" placeholder="See what MILWAUKEE® customers have to say." maxlength="200">
+                <label class="field-label">Show Header</label>
+                <div class="option-selector" id="showHeaderSelector">
+                    <div class="option-button selected" data-value="true">Yes</div>
+                    <div class="option-button" data-value="false">No</div>
+                </div>
+            </div>
+
+            <div class="field-group" id="headerTextGroup">
+                <label class="field-label">Header Message</label>
+                <div id="headerTextEditor" class="quill-container limited-toolbar"></div>
             </div>
         </div>
     </div>
@@ -141,6 +152,7 @@
             fields: {
                 showBadge: { type: 'text', defaultValue: 'true' },
                 badgeType: { type: 'text', defaultValue: 'dynamic' },
+                showHeader: { type: 'text', defaultValue: 'true' },
                 headerText: { type: 'text', defaultValue: 'See what MILWAUKEE® customers have to say.', maxLength: 200 }
             },
             debounceDelay: 300,
@@ -198,7 +210,9 @@
             elements.showBadgeSelector = document.getElementById('showBadgeSelector');
             elements.badgeTypeSelector = document.getElementById('badgeTypeSelector');
             elements.badgeTypeGroup = document.getElementById('badgeTypeGroup');
-            elements.headerText = document.getElementById('headerText');
+            elements.showHeaderSelector = document.getElementById('showHeaderSelector');
+            elements.headerTextGroup = document.getElementById('headerTextGroup');
+            elements.headerTextEditor = document.getElementById('headerTextEditor');
         }
 
         function setLoadingState(loading) {
@@ -213,6 +227,44 @@
             if (elements.badgeTypeGroup) {
                 elements.badgeTypeGroup.style.display = showBadge === 'true' ? 'block' : 'none';
             }
+        }
+
+        function toggleHeaderTextVisibility(showHeader) {
+            if (elements.headerTextGroup) {
+                elements.headerTextGroup.style.display = showHeader === 'true' ? 'block' : 'none';
+            }
+        }
+
+        function initializeHeaderEditor() {
+            if (!elements.headerTextEditor || state.editors.headerText) return;
+
+            // Create editor with title preset (includes superscript)
+            const editor = new Quill(elements.headerTextEditor, QuillConfigManager.createConfig('title', {
+                placeholder: 'See what MILWAUKEE® customers have to say.'
+            }));
+
+            state.editors.headerText = editor;
+
+            // Set initial content
+            const content = utils.getFieldValue('headerText');
+            if (content && content.trim()) {
+                QuillConfigManager.setContent(editor, content);
+            }
+
+            // Handle content changes
+            const updateHandler = QuillConfigManager.createUpdateHandler(() => {
+                const html = QuillConfigManager.getCleanContent(editor);
+                updateData('headerText', html);
+            }, moduleConfig.debounceDelay);
+
+            editor.on('text-change', updateHandler);
+        }
+
+        function getHeaderTextContent() {
+            if (state.editors.headerText) {
+                return QuillConfigManager.getCleanContent(state.editors.headerText);
+            }
+            return utils.getFieldValue('headerText');
         }
 
         function updateData(field, value) {
@@ -390,18 +442,47 @@ ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu${config.path}"
 ENDIF`;
         }
 
+        // Get human-readable label for badge type
+        function getBadgeAltText(badgeType) {
+            const labels = {
+                'dynamic': 'Milwaukee Badge (Dynamic)',
+                'M12': 'Milwaukee M12 System',
+                'M18': 'Milwaukee M18 System',
+                'MXFuel': 'Milwaukee MX FUEL System',
+                'TruckTour': 'Milwaukee Truck Tour',
+                'AuthorisedDistribution': 'Milwaukee Authorised Distributor',
+                'Automotive': 'Milwaukee Automotive Trade',
+                'Carpentry': 'Milwaukee Carpentry Trade',
+                'Construction': 'Milwaukee Construction Trade',
+                'Demolition': 'Milwaukee Demolition Trade',
+                'DrainCleaning': 'Milwaukee Drain Cleaning Trade',
+                'Drywall': 'Milwaukee Drywall Trade',
+                'Electrical': 'Milwaukee Electrical Trade',
+                'FireAndRescue': 'Milwaukee Fire & Rescue Trade',
+                'Hire': 'Milwaukee Hire Trade',
+                'Landscaping': 'Milwaukee Landscaping Trade',
+                'MaintenanceAndOperations': 'Milwaukee Maintenance & Operations Trade',
+                'Manufacturing': 'Milwaukee Manufacturing Trade',
+                'Networking': 'Milwaukee Networking Trade',
+                'Plumbing': 'Milwaukee Plumbing Trade',
+                'Utilities': 'Milwaukee Utilities Trade'
+            };
+            return labels[badgeType] || 'Milwaukee Badge';
+        }
+
         function generateTemplate() {
             const showBadge = utils.getFieldValue('showBadge');
-            const headerText = utils.escapeHtml(utils.getFieldValue('headerText'));
+            const badgeType = utils.getFieldValue('badgeType');
+            const showHeader = utils.getFieldValue('showHeader');
+            const headerText = getHeaderTextContent();
             const ampScript = generateAmpScript();
+            const badgeAltText = getBadgeAltText(badgeType);
 
             // Badge HTML - conditionally shown via AMPscript
-            const badgeHtml = showBadge === 'true' ? `<!--%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="Milwaukee Trade Logo" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="100"></a><!--%%[ ENDIF ]%%-->` : '';
+            const badgeHtml = showBadge === 'true' ? `<!--%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="${badgeAltText}" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="100"></a><!--%%[ ENDIF ]%%-->` : '';
 
-            return `<!-- START .legacy-header -->
-${ampScript}
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
-<tr>
+            // Header text section (black bar)
+            const headerHtml = showHeader === 'true' ? `<tr>
 <td class="side" style="background-color: #000000; width: 20px;">&nbsp;</td>
 <td align="center" class="content-inner" style="background-color: #000000; width: 580px;" valign="top">
 <div style="clear: both; display: block; font-size: 10px; height: 10px; line-height: 10px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div>
@@ -415,7 +496,12 @@ ${ampScript}
 <div style="clear: both; display: block; font-size: 10px; height: 10px; line-height: 10px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div>
 </td>
 <td class="side" style="background-color: #000000; width: 20px;">&nbsp;</td>
-</tr>
+</tr>` : '';
+
+            return `<!-- START .legacy-header -->
+${ampScript}
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: #DB021D; width: 620px;">
+${headerHtml}
 <tr>
 <td class="side" style="width: 20px;">&nbsp;</td>
 <td align="center" class="content-inner" style="width: 580px;" valign="top">
@@ -482,6 +568,7 @@ ${badgeHtml}
             }
 
             setupOptionSelector(elements.showBadgeSelector, 'showBadge', toggleBadgeTypeVisibility);
+            setupOptionSelector(elements.showHeaderSelector, 'showHeader', toggleHeaderTextVisibility);
 
             // Badge Type selector (grid of options)
             if (elements.badgeTypeSelector) {
@@ -497,10 +584,8 @@ ${badgeHtml}
                 });
             }
 
-            // Header text input
-            const headerTextHandler = (e) => debouncedUpdateData('headerText', e.target.value);
-            elements.headerText.addEventListener('input', headerTextHandler);
-            state.eventListeners.push({ element: elements.headerText, event: 'input', handler: headerTextHandler });
+            // Initialize header text Quill editor
+            initializeHeaderEditor();
 
             // Copy/Paste configuration buttons
             const copyConfigBtn = document.getElementById('copyConfigBtn');
@@ -516,7 +601,11 @@ ${badgeHtml}
         }
 
         function updateUIFromData() {
-            elements.headerText.value = utils.getFieldValue('headerText');
+            // Update header text editor content
+            if (state.editors.headerText) {
+                const content = utils.getFieldValue('headerText');
+                QuillConfigManager.setContent(state.editors.headerText, content);
+            }
 
             // Update Show Badge selector
             const showBadge = utils.getFieldValue('showBadge');
@@ -530,6 +619,13 @@ ${badgeHtml}
             elements.badgeTypeSelector.querySelectorAll('.badge-option').forEach(btn => {
                 btn.classList.toggle('selected', btn.dataset.value === badgeType);
             });
+
+            // Update Show Header selector
+            const showHeader = utils.getFieldValue('showHeader');
+            elements.showHeaderSelector.querySelectorAll('.option-button').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.value === showHeader);
+            });
+            toggleHeaderTextVisibility(showHeader);
         }
 
         // Copy/Paste Configuration Functions
