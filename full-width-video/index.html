@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <title>Full Width Video Block</title>
     
+    <!-- Early SFMC handshake to prevent timeout while scripts load -->
+    <script>window.parent.postMessage({method:"handShake",origin:window.location.origin},'*');</script>
+    
     <!-- Local assets for fastest loading (no external dependencies) -->
     <link rel="stylesheet" href="../shared-assets/customblock-styles.css">
     <style>
