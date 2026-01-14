@@ -1274,7 +1274,7 @@
                     }
                 });
 
-                state.isInitialized = true;
+                // Note: state.isInitialized is set inside loadData() callback after data loads
             } catch (error) {
                 utils.showError(`Initialisation failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
