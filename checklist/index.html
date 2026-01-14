@@ -758,8 +758,6 @@
                         refreshPreview();
                     }
                 });
-
-                state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialization failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
