@@ -183,7 +183,7 @@
 
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; } },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; const t = s.replace(/%%[^%]+%%/g, 'ampscript'); try { const u = new URL(t); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; } },
             showError(msg, permanent = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent = msg; elements.errorBanner.classList.add('show'); if(!permanent) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000); } },
             getFieldValue(f) { const v = state.blockData[f]; const c = moduleConfig.fields[f]; return (v !== undefined && v !== null) ? (c.type === 'number' ? parseFloat(v) : v) : c.defaultValue; },
             addEventListenerTracked(element, event, handler) { element.addEventListener(event, handler); state.eventListeners.push({ element, event, handler }); }

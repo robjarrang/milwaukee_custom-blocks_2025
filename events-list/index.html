@@ -112,7 +112,7 @@
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (e) { return false; } },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; const t = s.replace(/%%[^%]+%%/g, 'ampscript'); try { new URL(t); return true; } catch (e) { return false; } },
             showError(msg, p = false) { console.error(msg); if(elements.errorBanner) { elements.errorBanner.textContent=msg; elements.errorBanner.classList.add('show'); if(!p) setTimeout(()=>elements.errorBanner.classList.remove('show'),5000); } },
             getFieldValue(f) { return state.blockData[f] !== undefined ? state.blockData[f] : moduleConfig.fields[f].defaultValue; },
 

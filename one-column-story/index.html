@@ -171,7 +171,7 @@
 
         const utils = {
             debounce(func, wait) { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; const t = s.replace(/%%[^%]+%%/g, 'ampscript'); try { const u = new URL(t); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (_) { return false; } },
             sanitizeHtml(h) { 
                 if (!h) return ''; 
                 const t = document.createElement('div'); 

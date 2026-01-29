@@ -261,8 +261,10 @@
             },
             isValidUrl(string) {
                 if (!string || string.trim() === '') return true;
+                // Replace AMPscript variables (%%...%%) with placeholder for validation
+                const testString = string.replace(/%%[^%]+%%/g, 'ampscript');
                 try {
-                    const url = new URL(string);
+                    const url = new URL(testString);
                     return url.protocol === 'http:' || url.protocol === 'https:';
                 } catch (_) { return false; }
             },

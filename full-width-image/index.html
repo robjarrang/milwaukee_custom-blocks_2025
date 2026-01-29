@@ -137,7 +137,7 @@
 
         const utils = {
             debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; },
-            isValidUrl(s) { if (!s || s.trim() === '') return true; try { new URL(s); return true; } catch (_) { return false; } },
+            isValidUrl(s) { if (!s || s.trim() === '') return true; const t = s.replace(/%%[^%]+%%/g, 'ampscript'); try { new URL(t); return true; } catch (_) { return false; } },
             getFieldValue(fieldName) { return state.blockData[fieldName] !== undefined ? state.blockData[fieldName] : moduleConfig.fields[fieldName].defaultValue; }
         };
 

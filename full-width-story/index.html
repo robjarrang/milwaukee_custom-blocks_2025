@@ -257,8 +257,10 @@
             },
             isValidUrl(s) { 
                 if (!s || s.trim() === '') return true; 
+                // Replace AMPscript variables (%%...%%) with placeholder for validation
+                const t = s.replace(/%%[^%]+%%/g, 'ampscript');
                 try { 
-                    const u = new URL(s); 
+                    const u = new URL(t); 
                     return u.protocol === 'http:' || u.protocol === 'https:'; 
                 } catch (_) { 
                     return false; 
