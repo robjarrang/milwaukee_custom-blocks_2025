@@ -86,6 +86,13 @@
                 <div class="field-error" id="buttonUrlError">Please enter a valid URL.</div>
             </div>
             <div class="field-group">
+                <label class="field-label">Button Style</label>
+                <div class="option-selector" id="buttonStyleSelector">
+                    <div class="option-button selected" data-value="solid">Solid</div>
+                    <div class="option-button" data-value="outline">Outline</div>
+                </div>
+            </div>
+            <div class="field-group">
                 <label class="field-label">Button Alignment</label>
                 <div class="option-selector" id="buttonAlignmentSelector">
                     <div class="option-button selected" data-value="center">Center</div>
@@ -115,6 +122,7 @@
             name: 'Full Width Button',
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'red' },
+                buttonStyle: { type: 'text', defaultValue: 'solid' },
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 buttonAlignment: { type: 'text', defaultValue: 'center' },
@@ -190,6 +198,7 @@
             elements.buttonTextEditor = document.getElementById('buttonTextEditor');
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
+            elements.buttonStyleSelector = document.getElementById('buttonStyleSelector');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
             elements.showTopSpacer = document.getElementById('showTopSpacer');
             elements.showBottomSpacer = document.getElementById('showBottomSpacer');
@@ -244,6 +253,7 @@
             // Use color-bg-1 for red/black (allows dark mode override), use color-bg-force-black for true black (no dark mode override)
             const bgClass = backgroundColor === 'trueblack' ? 'color-bg-force-black' : 'color-bg-1';
             const buttonAlign = utils.getFieldValue('buttonAlignment');
+            const buttonStyle = utils.getFieldValue('buttonStyle');
             const buttonUrl = utils.getFieldValue('buttonUrl');
             const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
             const showTopSpacer = utils.getFieldValue('showTopSpacer');
@@ -251,18 +261,32 @@
 
             let buttonTableStyle, buttonClass;
 
-            if (backgroundColor === 'black' || backgroundColor === 'trueblack') {
-                // White bordered button for black background, matching Product Feature style
-                buttonClass = 'button-2-white';
-                buttonTableStyle = `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`;
+            // Determine button style based on user selection and background color
+            const useOutlineStyle = buttonStyle === 'outline' || backgroundColor === 'black' || backgroundColor === 'trueblack';
+
+            if (useOutlineStyle) {
+                // Outline button style
+                if (backgroundColor === 'red') {
+                    // Black bordered button for red background
+                    buttonClass = 'button-2-black';
+                    buttonTableStyle = `background-color: transparent; border: 2px solid #000000; border-collapse: separate; border-radius: 4px !important;`;
+                } else {
+                    // White bordered button for black background
+                    buttonClass = 'button-2-white';
+                    buttonTableStyle = `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`;
+                }
             } else {
-                // Black solid button for red background
+                // Solid button style (only available on red background)
                 buttonClass = 'button-1-black';
                 buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
             }
 
-            const buttonLinkStyle = `color: #ffffff; text-decoration: none;`;
-            const buttonCellStyle = `color: #ffffff; border-radius: 4px !important; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;`;
+            // Determine text color: black text for outline on red, white text otherwise
+            const isOutlineOnRed = useOutlineStyle && backgroundColor === 'red';
+            const textColor = isOutlineOnRed ? '#000000' : '#ffffff';
+            
+            const buttonLinkStyle = `color: ${textColor}; text-decoration: none;`;
+            const buttonCellStyle = `color: ${textColor}; border-radius: 4px !important; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;`;
 
             const topSpacerHtml = showTopSpacer ? 
                 `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>` : 
@@ -358,6 +382,7 @@
             }
 
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
+            setupOptionSelector(elements.buttonStyleSelector, 'buttonStyle');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
 
             // Spacer toggle handlers
@@ -477,6 +502,9 @@
                     elements.backgroundColorSelector.querySelectorAll('.option-button').forEach(btn => {
                         btn.classList.toggle('selected', btn.dataset.value === state.blockData.backgroundColor);
                     });
+                    elements.buttonStyleSelector.querySelectorAll('.option-button').forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.value === state.blockData.buttonStyle);
+                    });
                     elements.buttonAlignmentSelector.querySelectorAll('.option-button').forEach(btn => {
                         btn.classList.toggle('selected', btn.dataset.value === state.blockData.buttonAlignment);
                     });
@@ -551,6 +579,7 @@
         function updateDataFromUI() {
             // Update all fields and refresh preview
             state.blockData.backgroundColor = elements.backgroundColorSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.backgroundColor.defaultValue;
+            state.blockData.buttonStyle = elements.buttonStyleSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.buttonStyle.defaultValue;
             state.blockData.buttonAlignment = elements.buttonAlignmentSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.buttonAlignment.defaultValue;
             state.blockData.showTopSpacer = elements.showTopSpacer.checked;
             state.blockData.showBottomSpacer = elements.showBottomSpacer.checked;
@@ -585,6 +614,7 @@
                     }
 
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
+                    setSelectorState(elements.buttonStyleSelector, 'buttonStyle');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
 
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
