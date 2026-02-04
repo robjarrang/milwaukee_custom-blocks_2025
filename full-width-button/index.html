@@ -68,7 +68,6 @@
                 <div class="option-selector" id="backgroundColorSelector">
                     <div class="option-button selected" data-value="red">Red</div>
                     <div class="option-button" data-value="black">Black</div>
-                    <div class="option-button" data-value="trueblack">True Black</div>
                 </div>
             </div>
             <div class="field-group">
@@ -250,8 +249,7 @@
         function generateTemplate() {
             const backgroundColor = utils.getFieldValue('backgroundColor');
             const bgColorHex = backgroundColor === 'red' ? '#DB011C' : '#000000';
-            // Use color-bg-1 for red/black (allows dark mode override), use color-bg-force-black for true black (no dark mode override)
-            const bgClass = backgroundColor === 'trueblack' ? 'color-bg-force-black' : 'color-bg-1';
+            const bgClass = 'color-bg-1';
             const buttonAlign = utils.getFieldValue('buttonAlignment');
             const buttonStyle = utils.getFieldValue('buttonStyle');
             const buttonUrl = utils.getFieldValue('buttonUrl');
@@ -259,23 +257,30 @@
             const showTopSpacer = utils.getFieldValue('showTopSpacer');
             const showBottomSpacer = utils.getFieldValue('showBottomSpacer');
 
-            let buttonTableStyle, buttonClass;
+            let buttonTableStyle, buttonClass, textColor;
 
             // Determine button style based on user selection and background color
-            const useOutlineStyle = buttonStyle === 'outline' || backgroundColor === 'black' || backgroundColor === 'trueblack';
+            const useOutlineStyle = buttonStyle === 'outline';
 
             if (useOutlineStyle) {
-                // Outline button style - always white bordered
+                // Outline button style - always white bordered with white text
                 buttonClass = 'button-2-white';
                 buttonTableStyle = `background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;`;
+                textColor = '#ffffff';
             } else {
-                // Solid button style (only available on red background)
-                buttonClass = 'button-1-black';
-                buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
+                // Solid button style
+                if (backgroundColor === 'red') {
+                    // Black solid button on red background
+                    buttonClass = 'button-1-black';
+                    buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
+                    textColor = '#ffffff';
+                } else {
+                    // White solid button on black background
+                    buttonClass = 'button-1-white';
+                    buttonTableStyle = `background-color: #ffffff; border-radius: 4px !important;`;
+                    textColor = '#000000';
+                }
             }
-
-            // All button styles use white text
-            const textColor = '#ffffff';
             
             const buttonLinkStyle = `color: ${textColor}; text-decoration: none;`;
             const buttonCellStyle = `color: ${textColor}; border-radius: 4px !important; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;`;
