@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gmail Annotations Block</title>
+
+    <!-- Early SFMC handshake to prevent timeout while scripts load -->
+    <script>window.parent.postMessage({method:"handShake",origin:window.location.origin,payload:{tabs:['htmlblock']}},'*');</script>
+
+    <!-- Local assets for fastest loading -->
+    <link rel="stylesheet" href="../shared-assets/customblock-styles.css">
+    <style>
+        /* Standard base styles */
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
+
+        /* Gmail Annotations specific styles */
+        .annotation-type-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #fff;
+            cursor: pointer;
+            appearance: auto;
+        }
+        .annotation-type-select:focus {
+            outline: none;
+            border-color: #0074d9;
+            box-shadow: 0 0 0 2px rgba(0,116,217,0.2);
+        }
+
+        .annotation-section {
+            display: none;
+        }
+        .annotation-section.active {
+            display: block;
+        }
+
+        .required-marker {
+            color: #DB011C;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+        .optional-tag {
+            color: #888;
+            font-weight: normal;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .field-help {
+            color: #666;
+            font-size: 12px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        .field-help a {
+            color: #0074d9;
+            text-decoration: none;
+        }
+        .field-help a:hover {
+            text-decoration: underline;
+        }
+
+        .best-practice-tip {
+            background-color: #f0f7ff;
+            border-left: 3px solid #0074d9;
+            padding: 8px 12px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #444;
+            line-height: 1.4;
+            border-radius: 0 4px 4px 0;
+        }
+        .best-practice-tip strong {
+            color: #0074d9;
+        }
+
+        /* Card items (Product Carousel) */
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card-item {
+            background-color: #fafafa;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            position: relative;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-weight: bold;
+            font-size: 15px;
+            color: #333;
+            margin: 0;
+        }
+        .card-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .card-control-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 18px;
+            line-height: 1;
+            color: #555;
+            transition: color .2s;
+        }
+        .card-control-btn:hover { color: #0074d9; }
+        .card-control-btn:disabled { color: #ccc; cursor: not-allowed; }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #0074d9;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color .2s;
+        }
+        .btn:hover { background-color: #005a9e; }
+        .btn:disabled { background-color: #aaa; cursor: not-allowed; }
+        .add-card-btn { margin-top: 15px; }
+
+        /* JSON Preview */
+        .json-preview-wrapper {
+            margin-top: 20px;
+        }
+        .json-preview {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        .json-preview .json-key { color: #9cdcfe; }
+        .json-preview .json-string { color: #ce9178; }
+        .json-preview .json-number { color: #b5cea8; }
+        .json-preview .json-bracket { color: #ffd700; }
+        .json-preview .json-brace { color: #da70d6; }
+        .json-preview .json-colon { color: #d4d4d4; }
+
+        .copy-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #333;
+            color: #d4d4d4;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color .2s;
+            margin-bottom: 8px;
+        }
+        .copy-btn:hover { background-color: #555; }
+        .copy-btn.copied { background-color: #2d8a4e; color: #fff; border-color: #2d8a4e; }
+
+        /* Validation summary */
+        .validation-summary {
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .validation-summary.valid {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+        }
+        .validation-summary.invalid {
+            background-color: #fce4ec;
+            border: 1px solid #f8bbd0;
+            color: #c62828;
+        }
+        .validation-summary ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+        .validation-summary li {
+            margin-bottom: 2px;
+        }
+
+        /* Info banner */
+        .info-banner {
+            background-color: #f0f7ff;
+            border: 1px solid #bbdefb;
+            color: #1565c0;
+            padding: 12px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .info-banner strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Date-time input group */
+        .datetime-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .datetime-group .field-input {
+            flex: 1;
+        }
+        .datetime-group select.field-input {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 100px;
+        }
+
+        /* Conditional required indicator */
+        .conditional-required {
+            color: #e65100;
+            font-weight: normal;
+            font-size: 11px;
+            margin-left: 4px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <h2 style="margin-top: 0; color: #333;">Gmail Annotations</h2>
+
+        <div class="error-banner" id="errorBanner"></div>
+
+        <div class="info-banner">
+            <strong>About Gmail Annotations</strong>
+            Gmail Annotations add rich features to your emails in the Promotions tab — such as images, deals, and expiration dates — letting users interact with your promotions directly from their inbox. The JSON-LD output from this block should be placed inside a <code>&lt;script type="application/ld+json"&gt;</code> tag in the <code>&lt;head&gt;</code> of your email.
+        </div>
+
+        <!-- Annotation Type Selector -->
+        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">Annotation Type</div>
+            <div class="field-group">
+                <label for="annotationType" class="field-label">Select annotation type <span class="required-marker">*</span></label>
+                <select id="annotationType" class="annotation-type-select">
+                    <option value="product-carousel">Product Carousel</option>
+                    <option value="single-image">Single Image Preview</option>
+                    <option value="deal-annotation">Deal Annotation</option>
+                    <option value="deal-card">Deal Card</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- PRODUCT CAROUSEL SECTION                                      -->
+        <!-- ============================================================= -->
+        <div id="section-product-carousel" class="annotation-section active">
+            <div class="section-divider">
+                <div class="section-title">Product Carousel Cards</div>
+                <div class="best-practice-tip" style="margin-bottom:15px;">
+                    <strong>Tip:</strong> You can include up to 10 image previews. Each image must have a unique URL and all images should use the same aspect ratio. Supported ratios: 4:5, 1:1, 1.91:1. Use HTTPS URLs and avoid text-only images.
+                </div>
+                <div id="carouselCardsContainer" class="cards-container"></div>
+                <button id="addCarouselCardBtn" class="btn add-card-btn">+ Add Card</button>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- SINGLE IMAGE PREVIEW SECTION                                  -->
+        <!-- ============================================================= -->
+        <div id="section-single-image" class="annotation-section">
+            <div class="section-divider">
+                <div class="section-title">Single Image Preview</div>
+                <div class="best-practice-tip" style="margin-bottom:15px;">
+                    <strong>Tip:</strong> All recipients must receive the same image and image URL. The supported aspect ratio for single image preview is 1.91:1. Use HTTPS URLs and avoid text-only images — product or lifestyle images perform best.
+                </div>
+
+                <div class="field-group">
+                    <label for="singleImageUrl" class="field-label">Image URL <span class="required-marker">*</span></label>
+                    <input type="url" id="singleImageUrl" class="field-input" placeholder="https://www.example.com/image.png">
+                    <div class="field-error">Please enter a valid HTTPS URL</div>
+                    <div class="field-help">PNG or JPEG format. Recommended aspect ratio: 1.91:1. Images are center-cropped automatically.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="singlePromoUrl" class="field-label">Promotion URL <span class="required-marker">*</span></label>
+                    <input type="url" id="singlePromoUrl" class="field-input" placeholder="https://www.example.com/promo">
+                    <div class="field-error">Please enter a valid URL</div>
+                    <div class="field-help">The URL users are directed to when they click the image.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="singleHeadline" class="field-label">Headline <span class="optional-tag">(Optional)</span></label>
+                    <input type="text" id="singleHeadline" class="field-input" placeholder="e.g. Summer Sale — 20% off everything" maxlength="100">
+                    <div class="field-help">A 1–2 line description displayed under the preview image.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="singlePrice" class="field-label">Price <span class="optional-tag">(Optional)</span></label>
+                    <input type="number" id="singlePrice" class="field-input" placeholder="e.g. 99.99" min="0" step="0.01">
+                    <div class="field-help">The price of the promotion. If a discount is set, this displays as the original price.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="singlePriceCurrency" class="field-label">Price Currency <span class="optional-tag">(Optional)</span></label>
+                    <input type="text" id="singlePriceCurrency" class="field-input" placeholder="e.g. USD, EUR, GBP" maxlength="3" style="width:120px;">
+                    <div class="field-help">3-letter <a href="https://en.wikipedia.org/wiki/ISO_4217" target="_blank">ISO 4217</a> currency code. Determines the currency symbol shown with the price.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="singleDiscountValue" class="field-label">Discount Value <span class="optional-tag">(Optional)</span></label>
+                    <input type="number" id="singleDiscountValue" class="field-input" placeholder="e.g. 25" min="0" step="0.01">
+                    <div class="field-help">Amount subtracted from the price to show an adjusted price. e.g. discount 25, price 100, currency USD → displays $75.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- DEAL ANNOTATION SECTION                                       -->
+        <!-- ============================================================= -->
+        <div id="section-deal-annotation" class="annotation-section">
+            <div class="section-divider">
+                <div class="section-title">Deal Annotation</div>
+                <div class="best-practice-tip" style="margin-bottom:15px;">
+                    <strong>Tip:</strong> A deal annotation adds a promotional badge next to your subject line. Be specific: highlight the key feature of your promotion (e.g. "20% off" or "Free Shipping"). Keep the description to 4 words or fewer — it competes with your subject line.
+                </div>
+
+                <div class="info-banner" style="margin-bottom:15px; background-color:#fff8e1; border-color:#ffecb3; color:#e65100;">
+                    <strong>Requirement:</strong> At least one of Description, Discount Code, or Expiry Date must be provided to generate a Deal Annotation.
+                </div>
+
+                <div class="field-group">
+                    <label for="dealDescription" class="field-label">Description <span class="conditional-required">(at least one required)</span></label>
+                    <input type="text" id="dealDescription" class="field-input" placeholder="e.g. 20% off sitewide" maxlength="50">
+                    <div class="field-help">A short, compelling summary of your offer. Displays as a deal badge next to the subject line.</div>
+                    <div class="best-practice-tip"><strong>Best Practice:</strong> Avoid more than 4 words or full sentences — the badge space competes with your subject line.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealDiscountCode" class="field-label">Discount Code <span class="conditional-required">(at least one required)</span></label>
+                    <input type="text" id="dealDiscountCode" class="field-input" placeholder="e.g. 20TODAY" maxlength="30">
+                    <div class="field-help">The promo code users need at checkout. Always prefixed with "Code" in Gmail.</div>
+                    <div class="best-practice-tip"><strong>Best Practice:</strong> Only include a discount code if it is also featured in the email body. Don't repurpose this field.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealAvailabilityStarts" class="field-label">Start Date &amp; Time <span class="optional-tag">(Highly recommended)</span></label>
+                    <input type="datetime-local" id="dealAvailabilityStarts" class="field-input">
+                    <div class="field-help">When the promotion begins. ISO 8601 format will be generated automatically.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealAvailabilityEnds" class="field-label">End Date &amp; Time <span class="conditional-required">(at least one required)</span></label>
+                    <input type="datetime-local" id="dealAvailabilityEnds" class="field-input">
+                    <div class="field-help">When the promotion expires. ISO 8601 format will be generated automatically.</div>
+                    <div class="best-practice-tip"><strong>Best Practice:</strong> Using an expiry date gives your email two chances to appear at the top of the Promotions tab: once when sent and again within 3 days of expiry. Don't leave expired dates in annotations.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- DEAL CARD SECTION                                             -->
+        <!-- ============================================================= -->
+        <div id="section-deal-card" class="annotation-section">
+            <div class="section-divider">
+                <div class="section-title">Deal Card</div>
+                <div class="best-practice-tip" style="margin-bottom:15px;">
+                    <strong>Tip:</strong> Deal Cards are visual summaries of your promotions generated by Gmail. They can appear both in the Promotions tab and within the email itself. Include as many fields as possible for best results.
+                </div>
+
+                <div class="field-group">
+                    <label for="dealCardDescription" class="field-label">Description <span class="required-marker">*</span></label>
+                    <input type="text" id="dealCardDescription" class="field-input" placeholder="e.g. 20% off sitewide" maxlength="50">
+                    <div class="field-error">Description is required for Deal Cards</div>
+                    <div class="field-help">A short, compelling summary of your offer.</div>
+                    <div class="best-practice-tip"><strong>Best Practice:</strong> Be specific about the deal — e.g. "20% off sitewide" or "Buy one, get one free".</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealCardDiscountCode" class="field-label">Discount Code <span class="optional-tag">(Highly recommended)</span></label>
+                    <input type="text" id="dealCardDiscountCode" class="field-input" placeholder="e.g. MAY2024" maxlength="30">
+                    <div class="field-help">The promo code for checkout. Only use if featured in the email. Always prefixed with "Code" in Gmail.</div>
+                </div>
+
+                <div class="info-banner" style="margin-bottom:15px; background-color:#fff8e1; border-color:#ffecb3; color:#e65100;">
+                    <strong>Requirement:</strong> At least one URL is required. An offer page URL is preferred. Only use the homepage URL if a specific offer page is not available.
+                </div>
+
+                <div class="field-group">
+                    <label for="dealCardOfferPageUrl" class="field-label">Offer Page URL <span class="conditional-required">(at least one URL required)</span></label>
+                    <input type="url" id="dealCardOfferPageUrl" class="field-input" placeholder="https://www.example.com/offers/summer-sale">
+                    <div class="field-error">Please enter a valid URL</div>
+                    <div class="field-help">The specific offer landing page. Creates a "Shop now" button on the Deal Card. Preferred over homepage URL.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealCardMerchantUrl" class="field-label">Merchant Homepage URL <span class="conditional-required">(at least one URL required)</span></label>
+                    <input type="url" id="dealCardMerchantUrl" class="field-input" placeholder="https://www.example.com">
+                    <div class="field-error">Please enter a valid URL</div>
+                    <div class="field-help">Use only if a specific offer page is not available. Links to your main homepage.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealCardAvailabilityStarts" class="field-label">Start Date &amp; Time <span class="optional-tag">(Highly recommended)</span></label>
+                    <input type="datetime-local" id="dealCardAvailabilityStarts" class="field-input">
+                    <div class="field-help">When the promotion begins. ISO 8601 format will be generated automatically.</div>
+                </div>
+
+                <div class="field-group">
+                    <label for="dealCardAvailabilityEnds" class="field-label">End Date &amp; Time <span class="optional-tag">(Highly recommended)</span></label>
+                    <input type="datetime-local" id="dealCardAvailabilityEnds" class="field-input">
+                    <div class="field-help">When the promotion expires. ISO 8601 format will be generated automatically.</div>
+                    <div class="best-practice-tip"><strong>Best Practice:</strong> Including an expiry date gives your email two chances to appear in a top bundle: once when sent and again within 3 days of expiry.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- VALIDATION AND OUTPUT                                         -->
+        <!-- ============================================================= -->
+        <div class="section-divider">
+            <div class="section-title">Validation &amp; Output</div>
+            <div id="validationSummary" class="validation-summary valid">
+                &#10003; Ready to generate. Fill in the required fields above.
+            </div>
+            <div class="json-preview-wrapper">
+                <button id="copyJsonBtn" class="copy-btn" title="Copy JSON-LD to clipboard">&#128203; Copy JSON-LD</button>
+                <div id="jsonPreview" class="json-preview">{}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template for Product Carousel card items -->
+    <template id="carouselCardTemplate">
+        <div class="card-item" data-card-id="">
+            <div class="card-header">
+                <h3 class="card-title">Card 1</h3>
+                <div class="card-controls">
+                    <button class="card-control-btn move-up-btn" title="Move Up">&#9650;</button>
+                    <button class="card-control-btn move-down-btn" title="Move Down">&#9660;</button>
+                    <button class="card-control-btn remove-btn" title="Remove Card">&times;</button>
+                </div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Image URL <span class="required-marker">*</span></label>
+                <input type="url" class="field-input" data-field="image" placeholder="https://www.example.com/product-image.png">
+                <div class="field-error">Please enter a valid HTTPS URL</div>
+                <div class="field-help">PNG or JPEG. Supported ratios: 4:5, 1:1, 1.91:1. All carousel images must use the same ratio.</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Promotion URL <span class="required-marker">*</span></label>
+                <input type="url" class="field-input" data-field="url" placeholder="https://www.example.com/promo-page">
+                <div class="field-error">Please enter a valid URL</div>
+                <div class="field-help">Where users go when they click this image.</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Headline <span class="optional-tag">(Optional)</span></label>
+                <input type="text" class="field-input" data-field="headline" placeholder="e.g. Summer Sale Item" maxlength="100">
+                <div class="field-help">1–2 line description shown under the image.</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Price <span class="optional-tag">(Optional)</span></label>
+                <input type="number" class="field-input" data-field="price" placeholder="e.g. 49.99" min="0" step="0.01">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Price Currency <span class="optional-tag">(Optional)</span></label>
+                <input type="text" class="field-input" data-field="priceCurrency" placeholder="e.g. USD" maxlength="3" style="width:120px;">
+                <div class="field-help">3-letter ISO 4217 code (USD, EUR, GBP, etc.)</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Discount Value <span class="optional-tag">(Optional)</span></label>
+                <input type="number" class="field-input" data-field="discountValue" placeholder="e.g. 10" min="0" step="0.01">
+                <div class="field-help">Amount subtracted from price to display an adjusted price.</div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Local bundle for fastest loading -->
+    <script src="../shared-assets/customblock-bundle.js"></script>
+    <script>
+        'use strict';
+
+        // =====================================================================
+        // MODULE CONFIGURATION
+        // =====================================================================
+        const moduleConfig = {
+            name: 'Gmail Annotations Block',
+            fields: {
+                annotationType: { type: 'text', defaultValue: 'product-carousel' },
+                // Product Carousel
+                carouselCards: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), image: '', url: '', headline: '', price: '', priceCurrency: '', discountValue: '' }
+                    ]
+                },
+                // Single Image Preview
+                singleImageUrl: { type: 'url', defaultValue: '' },
+                singlePromoUrl: { type: 'url', defaultValue: '' },
+                singleHeadline: { type: 'text', defaultValue: '' },
+                singlePrice: { type: 'text', defaultValue: '' },
+                singlePriceCurrency: { type: 'text', defaultValue: '' },
+                singleDiscountValue: { type: 'text', defaultValue: '' },
+                // Deal Annotation
+                dealDescription: { type: 'text', defaultValue: '' },
+                dealDiscountCode: { type: 'text', defaultValue: '' },
+                dealAvailabilityStarts: { type: 'text', defaultValue: '' },
+                dealAvailabilityEnds: { type: 'text', defaultValue: '' },
+                // Deal Card
+                dealCardDescription: { type: 'text', defaultValue: '' },
+                dealCardDiscountCode: { type: 'text', defaultValue: '' },
+                dealCardOfferPageUrl: { type: 'url', defaultValue: '' },
+                dealCardMerchantUrl: { type: 'url', defaultValue: '' },
+                dealCardAvailabilityStarts: { type: 'text', defaultValue: '' },
+                dealCardAvailabilityEnds: { type: 'text', defaultValue: '' }
+            },
+            debounceDelay: 300,
+            maxRetries: 3,
+            maxCarouselCards: 10
+        };
+
+        // =====================================================================
+        // STATE MANAGEMENT
+        // =====================================================================
+        const state = {
+            sdk: null,
+            editors: {},
+            blockData: {},
+            isLoading: false,
+            isInitialized: false,
+            eventListeners: [],
+            retryCount: 0
+        };
+
+        const elements = {};
+        let rafId = null;
+
+        // =====================================================================
+        // UTILITY FUNCTIONS
+        // =====================================================================
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func.apply(this, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            isValidUrl(string) {
+                if (!string || string.trim() === '') return true;
+                const testString = string.replace(/%%[^%]+%%/g, 'ampscript');
+                try {
+                    const url = new URL(testString);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) {
+                    return false;
+                }
+            },
+
+            isHttpsUrl(string) {
+                if (!string || string.trim() === '') return true;
+                const testString = string.replace(/%%[^%]+%%/g, 'ampscript');
+                try {
+                    const url = new URL(testString);
+                    return url.protocol === 'https:';
+                } catch (_) {
+                    return false;
+                }
+            },
+
+            showError(message, permanent = false) {
+                if (elements.errorBanner) {
+                    elements.errorBanner.textContent = message;
+                    elements.errorBanner.classList.add('show');
+                    if (!permanent) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000);
+                }
+                console.error(`${moduleConfig.name} Error:`, message);
+            },
+
+            getFieldValue(fieldName) {
+                const value = state.blockData[fieldName];
+                const fieldConfig = moduleConfig.fields[fieldName];
+                if (value !== undefined && value !== null) {
+                    return fieldConfig.type === 'number' ? parseFloat(value) : value;
+                }
+                return fieldConfig ? fieldConfig.defaultValue : '';
+            },
+
+            addEventListenerTracked(element, event, handler) {
+                element.addEventListener(event, handler);
+                state.eventListeners.push({ element, event, handler });
+            },
+
+            /**
+             * Convert a datetime-local value to ISO 8601 with timezone offset
+             */
+            toISO8601(datetimeLocalValue) {
+                if (!datetimeLocalValue) return '';
+                const date = new Date(datetimeLocalValue);
+                if (isNaN(date.getTime())) return '';
+                const offset = -date.getTimezoneOffset();
+                const sign = offset >= 0 ? '+' : '-';
+                const absOffset = Math.abs(offset);
+                const hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
+                const minutes = String(absOffset % 60).padStart(2, '0');
+                // Build ISO string with local timezone offset
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hour = String(date.getHours()).padStart(2, '0');
+                const min = String(date.getMinutes()).padStart(2, '0');
+                const sec = String(date.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hour}:${min}:${sec}${sign}${hours}:${minutes}`;
+            },
+
+            /**
+             * Syntax-highlight JSON for the preview pane
+             */
+            syntaxHighlightJson(json) {
+                return json
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span><span class="json-colon">:</span>')
+                    .replace(/:\s*("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-string">$1</span>')
+                    .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+                    .replace(/[\[\]]/g, '<span class="json-bracket">$&</span>')
+                    .replace(/[{}]/g, '<span class="json-brace">$&</span>');
+            }
+        };
+
+        // =====================================================================
+        // DOM ELEMENT CACHING
+        // =====================================================================
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('mainContainer');
+            elements.loadingOverlay = document.getElementById('loadingOverlay');
+            elements.errorBanner = document.getElementById('errorBanner');
+            elements.annotationType = document.getElementById('annotationType');
+
+            // Sections
+            elements.sectionProductCarousel = document.getElementById('section-product-carousel');
+            elements.sectionSingleImage = document.getElementById('section-single-image');
+            elements.sectionDealAnnotation = document.getElementById('section-deal-annotation');
+            elements.sectionDealCard = document.getElementById('section-deal-card');
+
+            // Product Carousel
+            elements.carouselCardsContainer = document.getElementById('carouselCardsContainer');
+            elements.addCarouselCardBtn = document.getElementById('addCarouselCardBtn');
+            elements.carouselCardTemplate = document.getElementById('carouselCardTemplate');
+
+            // Single Image
+            elements.singleImageUrl = document.getElementById('singleImageUrl');
+            elements.singlePromoUrl = document.getElementById('singlePromoUrl');
+            elements.singleHeadline = document.getElementById('singleHeadline');
+            elements.singlePrice = document.getElementById('singlePrice');
+            elements.singlePriceCurrency = document.getElementById('singlePriceCurrency');
+            elements.singleDiscountValue = document.getElementById('singleDiscountValue');
+
+            // Deal Annotation
+            elements.dealDescription = document.getElementById('dealDescription');
+            elements.dealDiscountCode = document.getElementById('dealDiscountCode');
+            elements.dealAvailabilityStarts = document.getElementById('dealAvailabilityStarts');
+            elements.dealAvailabilityEnds = document.getElementById('dealAvailabilityEnds');
+
+            // Deal Card
+            elements.dealCardDescription = document.getElementById('dealCardDescription');
+            elements.dealCardDiscountCode = document.getElementById('dealCardDiscountCode');
+            elements.dealCardOfferPageUrl = document.getElementById('dealCardOfferPageUrl');
+            elements.dealCardMerchantUrl = document.getElementById('dealCardMerchantUrl');
+            elements.dealCardAvailabilityStarts = document.getElementById('dealCardAvailabilityStarts');
+            elements.dealCardAvailabilityEnds = document.getElementById('dealCardAvailabilityEnds');
+
+            // Output
+            elements.validationSummary = document.getElementById('validationSummary');
+            elements.jsonPreview = document.getElementById('jsonPreview');
+            elements.copyJsonBtn = document.getElementById('copyJsonBtn');
+        }
+
+        // =====================================================================
+        // LOADING STATE
+        // =====================================================================
+        function setLoadingState(loading) {
+            state.isLoading = loading;
+            if (elements.mainContainer && elements.loadingOverlay) {
+                elements.mainContainer.classList.toggle('loading', loading);
+                elements.loadingOverlay.classList.toggle('show', loading);
+            }
+        }
+
+        // =====================================================================
+        // SECTION VISIBILITY
+        // =====================================================================
+        function showActiveSection() {
+            const type = utils.getFieldValue('annotationType');
+            const sections = {
+                'product-carousel': elements.sectionProductCarousel,
+                'single-image': elements.sectionSingleImage,
+                'deal-annotation': elements.sectionDealAnnotation,
+                'deal-card': elements.sectionDealCard
+            };
+
+            Object.values(sections).forEach(section => {
+                if (section) section.classList.remove('active');
+            });
+
+            if (sections[type]) {
+                sections[type].classList.add('active');
+            }
+        }
+
+        // =====================================================================
+        // DATA MANAGEMENT
+        // =====================================================================
+        function updateData(field, value) {
+            if (state.blockData[field] != value) {
+                state.blockData[field] = value;
+                refreshPreview();
+            }
+        }
+
+        const debouncedRefreshPreview = utils.debounce(() => refreshPreview(), moduleConfig.debounceDelay);
+
+        function updateDataDebounced(field, value) {
+            state.blockData[field] = value;
+            debouncedRefreshPreview();
+        }
+
+        // =====================================================================
+        // CAROUSEL CARD MANAGEMENT
+        // =====================================================================
+        function renderCarouselCards() {
+            const cards = utils.getFieldValue('carouselCards');
+            const container = elements.carouselCardsContainer;
+            if (!container) return;
+
+            container.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
+            cards.forEach((card, index) => {
+                const templateContent = elements.carouselCardTemplate.content.cloneNode(true);
+                const cardEl = templateContent.querySelector('.card-item');
+
+                cardEl.dataset.cardId = card.id;
+                cardEl.querySelector('.card-title').textContent = `Card ${index + 1}`;
+
+                // Set field values
+                const fields = cardEl.querySelectorAll('[data-field]');
+                fields.forEach(field => {
+                    const fieldName = field.dataset.field;
+                    if (card[fieldName] !== undefined && card[fieldName] !== '') {
+                        field.value = card[fieldName];
+                    }
+                });
+
+                // Disable move buttons at boundaries
+                if (index === 0) cardEl.querySelector('.move-up-btn').disabled = true;
+                if (index === cards.length - 1) cardEl.querySelector('.move-down-btn').disabled = true;
+
+                // Single card can't be removed
+                if (cards.length <= 1) {
+                    cardEl.querySelector('.remove-btn').disabled = true;
+                }
+
+                fragment.appendChild(templateContent);
+            });
+
+            container.appendChild(fragment);
+
+            // Update add button state
+            if (elements.addCarouselCardBtn) {
+                const atLimit = cards.length >= moduleConfig.maxCarouselCards;
+                elements.addCarouselCardBtn.disabled = atLimit;
+                elements.addCarouselCardBtn.textContent = atLimit ? `Maximum ${moduleConfig.maxCarouselCards} cards reached` : '+ Add Card';
+            }
+        }
+
+        function getCarouselCardsFromUI() {
+            const cards = [];
+            const cardElements = elements.carouselCardsContainer.querySelectorAll('.card-item');
+            cardElements.forEach((cardEl, index) => {
+                const cardData = {
+                    id: cardEl.dataset.cardId || crypto.randomUUID()
+                };
+                cardEl.querySelectorAll('[data-field]').forEach(field => {
+                    cardData[field.dataset.field] = field.value.trim();
+                });
+                cards.push(cardData);
+            });
+            return cards;
+        }
+
+        // =====================================================================
+        // VALIDATION
+        // =====================================================================
+        function validateAnnotation() {
+            const type = utils.getFieldValue('annotationType');
+            const errors = [];
+
+            switch (type) {
+                case 'product-carousel': {
+                    const cards = utils.getFieldValue('carouselCards');
+                    if (!cards || cards.length === 0) {
+                        errors.push('At least one card is required.');
+                    } else {
+                        cards.forEach((card, i) => {
+                            if (!card.image || !card.image.trim()) {
+                                errors.push(`Card ${i + 1}: Image URL is required.`);
+                            } else if (!utils.isValidUrl(card.image)) {
+                                errors.push(`Card ${i + 1}: Image URL is not valid.`);
+                            }
+                            if (!card.url || !card.url.trim()) {
+                                errors.push(`Card ${i + 1}: Promotion URL is required.`);
+                            } else if (!utils.isValidUrl(card.url)) {
+                                errors.push(`Card ${i + 1}: Promotion URL is not valid.`);
+                            }
+                        });
+                    }
+                    break;
+                }
+
+                case 'single-image': {
+                    const imageUrl = utils.getFieldValue('singleImageUrl');
+                    const promoUrl = utils.getFieldValue('singlePromoUrl');
+                    if (!imageUrl) errors.push('Image URL is required.');
+                    else if (!utils.isValidUrl(imageUrl)) errors.push('Image URL is not valid.');
+                    if (!promoUrl) errors.push('Promotion URL is required.');
+                    else if (!utils.isValidUrl(promoUrl)) errors.push('Promotion URL is not valid.');
+                    break;
+                }
+
+                case 'deal-annotation': {
+                    const desc = utils.getFieldValue('dealDescription');
+                    const code = utils.getFieldValue('dealDiscountCode');
+                    const ends = utils.getFieldValue('dealAvailabilityEnds');
+                    if (!desc && !code && !ends) {
+                        errors.push('At least one of Description, Discount Code, or End Date is required.');
+                    }
+                    break;
+                }
+
+                case 'deal-card': {
+                    const desc = utils.getFieldValue('dealCardDescription');
+                    const offerUrl = utils.getFieldValue('dealCardOfferPageUrl');
+                    const merchantUrl = utils.getFieldValue('dealCardMerchantUrl');
+                    if (!desc) {
+                        errors.push('Description is required.');
+                    }
+                    if (!offerUrl && !merchantUrl) {
+                        errors.push('At least one URL (Offer Page or Merchant Homepage) is required.');
+                    }
+                    if (offerUrl && !utils.isValidUrl(offerUrl)) {
+                        errors.push('Offer Page URL is not valid.');
+                    }
+                    if (merchantUrl && !utils.isValidUrl(merchantUrl)) {
+                        errors.push('Merchant Homepage URL is not valid.');
+                    }
+                    break;
+                }
+            }
+
+            return errors;
+        }
+
+        function updateValidationUI(errors) {
+            if (!elements.validationSummary) return;
+
+            if (errors.length === 0) {
+                elements.validationSummary.className = 'validation-summary valid';
+                elements.validationSummary.innerHTML = '&#10003; Valid annotation. JSON-LD is ready to use.';
+            } else {
+                elements.validationSummary.className = 'validation-summary invalid';
+                let html = '&#10007; Please fix the following issues:';
+                html += '<ul>';
+                errors.forEach(error => {
+                    html += `<li>${error}</li>`;
+                });
+                html += '</ul>';
+                elements.validationSummary.innerHTML = html;
+            }
+        }
+
+        // =====================================================================
+        // JSON-LD GENERATION
+        // =====================================================================
+        function generateJsonLd() {
+            const type = utils.getFieldValue('annotationType');
+
+            switch (type) {
+                case 'product-carousel':
+                    return generateProductCarouselJsonLd();
+                case 'single-image':
+                    return generateSingleImageJsonLd();
+                case 'deal-annotation':
+                    return generateDealAnnotationJsonLd();
+                case 'deal-card':
+                    return generateDealCardJsonLd();
+                default:
+                    return [];
+            }
+        }
+
+        function generateProductCarouselJsonLd() {
+            const cards = utils.getFieldValue('carouselCards');
+            if (!cards || cards.length === 0) return [];
+
+            return cards.map((card, index) => {
+                const obj = {
+                    "@context": "http://schema.org/",
+                    "@type": "PromotionCard",
+                    "image": card.image || "",
+                    "url": card.url || ""
+                };
+
+                if (card.headline && card.headline.trim()) obj.headline = card.headline.trim();
+                if (card.price !== undefined && card.price !== '') obj.price = parseFloat(card.price);
+                if (card.priceCurrency && card.priceCurrency.trim()) obj.priceCurrency = card.priceCurrency.trim().toUpperCase();
+                if (card.discountValue !== undefined && card.discountValue !== '') obj.discountValue = parseFloat(card.discountValue);
+                if (cards.length > 1) obj.position = index + 1;
+
+                return obj;
+            });
+        }
+
+        function generateSingleImageJsonLd() {
+            const obj = {
+                "@context": "http://schema.org/",
+                "@type": "PromotionCard",
+                "image": utils.getFieldValue('singleImageUrl') || "",
+                "url": utils.getFieldValue('singlePromoUrl') || ""
+            };
+
+            const headline = utils.getFieldValue('singleHeadline');
+            const price = utils.getFieldValue('singlePrice');
+            const currency = utils.getFieldValue('singlePriceCurrency');
+            const discount = utils.getFieldValue('singleDiscountValue');
+
+            if (headline && headline.trim()) obj.headline = headline.trim();
+            if (price !== undefined && price !== '') obj.price = parseFloat(price);
+            if (currency && currency.trim()) obj.priceCurrency = currency.trim().toUpperCase();
+            if (discount !== undefined && discount !== '') obj.discountValue = parseFloat(discount);
+
+            return [obj];
+        }
+
+        function generateDealAnnotationJsonLd() {
+            const obj = {
+                "@context": "http://schema.org/",
+                "@type": "DiscountOffer"
+            };
+
+            const description = utils.getFieldValue('dealDescription');
+            const discountCode = utils.getFieldValue('dealDiscountCode');
+            const starts = utils.getFieldValue('dealAvailabilityStarts');
+            const ends = utils.getFieldValue('dealAvailabilityEnds');
+
+            if (description && description.trim()) obj.description = description.trim();
+            if (discountCode && discountCode.trim()) obj.discountCode = discountCode.trim();
+            if (starts) {
+                const iso = utils.toISO8601(starts);
+                if (iso) obj.availabilityStarts = iso;
+            }
+            if (ends) {
+                const iso = utils.toISO8601(ends);
+                if (iso) obj.availabilityEnds = iso;
+            }
+
+            return [obj];
+        }
+
+        function generateDealCardJsonLd() {
+            const obj = {
+                "@context": "http://schema.org/",
+                "@type": "DiscountOffer"
+            };
+
+            const description = utils.getFieldValue('dealCardDescription');
+            const discountCode = utils.getFieldValue('dealCardDiscountCode');
+            const offerUrl = utils.getFieldValue('dealCardOfferPageUrl');
+            const merchantUrl = utils.getFieldValue('dealCardMerchantUrl');
+            const starts = utils.getFieldValue('dealCardAvailabilityStarts');
+            const ends = utils.getFieldValue('dealCardAvailabilityEnds');
+
+            if (description && description.trim()) obj.description = description.trim();
+            if (discountCode && discountCode.trim()) obj.discountCode = discountCode.trim();
+            if (starts) {
+                const iso = utils.toISO8601(starts);
+                if (iso) obj.availabilityStarts = iso;
+            }
+            if (ends) {
+                const iso = utils.toISO8601(ends);
+                if (iso) obj.availabilityEnds = iso;
+            }
+            if (offerUrl && offerUrl.trim()) obj.offerPageUrl = offerUrl.trim();
+            if (merchantUrl && merchantUrl.trim()) obj.merchantHomepageUrl = merchantUrl.trim();
+
+            return [obj];
+        }
+
+        // =====================================================================
+        // TEMPLATE GENERATION (SFMC output)
+        // =====================================================================
+        function generateTemplate() {
+            const jsonLd = generateJsonLd();
+            const jsonString = JSON.stringify(jsonLd, null, 2);
+
+            return `<script type="application/ld+json">
+${jsonString}
+<\/script>`;
+        }
+
+        // =====================================================================
+        // PREVIEW REFRESH
+        // =====================================================================
+        function refreshPreview() {
+            if (rafId) cancelAnimationFrame(rafId);
+
+            rafId = requestAnimationFrame(() => {
+                if (state.isLoading || !state.sdk) return;
+                try {
+                    // Update validation
+                    const errors = validateAnnotation();
+                    updateValidationUI(errors);
+
+                    // Update JSON preview
+                    const jsonLd = generateJsonLd();
+                    const jsonString = JSON.stringify(jsonLd, null, 2);
+                    if (elements.jsonPreview) {
+                        elements.jsonPreview.innerHTML = utils.syntaxHighlightJson(jsonString);
+                    }
+
+                    // Set content in SFMC
+                    const html = generateTemplate();
+                    state.sdk.setContent(html);
+                    if (state.sdk.setData) {
+                        state.sdk.setData({ ...state.blockData, content: html });
+                    }
+                } catch (error) {
+                    utils.showError(`Preview update failed: ${error.message}`);
+                }
+            });
+        }
+
+        // =====================================================================
+        // URL VALIDATION (visual feedback)
+        // =====================================================================
+        function validateUrlInput(input) {
+            const value = input.value.trim();
+            const isValid = !value || utils.isValidUrl(value);
+            input.classList.toggle('error', !isValid);
+            const errorEl = input.nextElementSibling;
+            if (errorEl && errorEl.classList.contains('field-error')) {
+                errorEl.style.display = isValid ? 'none' : 'block';
+            }
+            return isValid;
+        }
+
+        // =====================================================================
+        // EVENT HANDLERS
+        // =====================================================================
+        function initializeEventHandlers() {
+            state.eventListeners = [];
+
+            // ---- Annotation Type Selector ----
+            const typeHandler = (e) => {
+                updateData('annotationType', e.target.value);
+                showActiveSection();
+            };
+            utils.addEventListenerTracked(elements.annotationType, 'change', typeHandler);
+
+            // ---- Single Image Preview fields ----
+            const singleImageFields = [
+                { el: elements.singleImageUrl, key: 'singleImageUrl', type: 'url' },
+                { el: elements.singlePromoUrl, key: 'singlePromoUrl', type: 'url' },
+                { el: elements.singleHeadline, key: 'singleHeadline', type: 'text' },
+                { el: elements.singlePrice, key: 'singlePrice', type: 'text' },
+                { el: elements.singlePriceCurrency, key: 'singlePriceCurrency', type: 'text' },
+                { el: elements.singleDiscountValue, key: 'singleDiscountValue', type: 'text' }
+            ];
+
+            singleImageFields.forEach(({ el, key, type }) => {
+                if (!el) return;
+                const handler = (e) => {
+                    if (type === 'url') validateUrlInput(el);
+                    updateDataDebounced(key, e.target.value.trim());
+                };
+                utils.addEventListenerTracked(el, 'input', handler);
+                if (type === 'url') {
+                    utils.addEventListenerTracked(el, 'blur', () => validateUrlInput(el));
+                }
+            });
+
+            // ---- Deal Annotation fields ----
+            const dealFields = [
+                { el: elements.dealDescription, key: 'dealDescription' },
+                { el: elements.dealDiscountCode, key: 'dealDiscountCode' },
+                { el: elements.dealAvailabilityStarts, key: 'dealAvailabilityStarts' },
+                { el: elements.dealAvailabilityEnds, key: 'dealAvailabilityEnds' }
+            ];
+
+            dealFields.forEach(({ el, key }) => {
+                if (!el) return;
+                const handler = (e) => {
+                    updateDataDebounced(key, e.target.value.trim());
+                };
+                utils.addEventListenerTracked(el, 'input', handler);
+                utils.addEventListenerTracked(el, 'change', handler);
+            });
+
+            // ---- Deal Card fields ----
+            const dealCardFields = [
+                { el: elements.dealCardDescription, key: 'dealCardDescription', type: 'text' },
+                { el: elements.dealCardDiscountCode, key: 'dealCardDiscountCode', type: 'text' },
+                { el: elements.dealCardOfferPageUrl, key: 'dealCardOfferPageUrl', type: 'url' },
+                { el: elements.dealCardMerchantUrl, key: 'dealCardMerchantUrl', type: 'url' },
+                { el: elements.dealCardAvailabilityStarts, key: 'dealCardAvailabilityStarts', type: 'text' },
+                { el: elements.dealCardAvailabilityEnds, key: 'dealCardAvailabilityEnds', type: 'text' }
+            ];
+
+            dealCardFields.forEach(({ el, key, type }) => {
+                if (!el) return;
+                const handler = (e) => {
+                    if (type === 'url') validateUrlInput(el);
+                    updateDataDebounced(key, e.target.value.trim());
+                };
+                utils.addEventListenerTracked(el, 'input', handler);
+                utils.addEventListenerTracked(el, 'change', handler);
+                if (type === 'url') {
+                    utils.addEventListenerTracked(el, 'blur', () => validateUrlInput(el));
+                }
+            });
+
+            // ---- Product Carousel: delegated events ----
+            const carouselInputHandler = utils.debounce(() => {
+                state.blockData.carouselCards = getCarouselCardsFromUI();
+                refreshPreview();
+            }, moduleConfig.debounceDelay);
+
+            utils.addEventListenerTracked(elements.carouselCardsContainer, 'input', (e) => {
+                if (e.target.matches('[data-field]')) {
+                    // Validate URL fields immediately
+                    if (e.target.type === 'url') validateUrlInput(e.target);
+                    carouselInputHandler();
+                }
+            });
+
+            utils.addEventListenerTracked(elements.carouselCardsContainer, 'blur', (e) => {
+                if (e.target.type === 'url' && e.target.matches('[data-field]')) {
+                    validateUrlInput(e.target);
+                }
+            }, true);
+
+            // Carousel card controls (move up/down, remove)
+            utils.addEventListenerTracked(elements.carouselCardsContainer, 'click', (e) => {
+                const cards = state.blockData.carouselCards || [];
+                const cardEl = e.target.closest('.card-item');
+                if (!cardEl) return;
+
+                const cardId = cardEl.dataset.cardId;
+                const cardIndex = cards.findIndex(c => c.id === cardId);
+                if (cardIndex === -1) return;
+
+                if (e.target.closest('.remove-btn')) {
+                    if (cards.length <= 1) return;
+                    // Sync current UI values before removing
+                    state.blockData.carouselCards = getCarouselCardsFromUI();
+                    state.blockData.carouselCards.splice(cardIndex, 1);
+                    renderCarouselCards();
+                    refreshPreview();
+                } else if (e.target.closest('.move-up-btn')) {
+                    if (cardIndex > 0) {
+                        state.blockData.carouselCards = getCarouselCardsFromUI();
+                        const temp = state.blockData.carouselCards[cardIndex];
+                        state.blockData.carouselCards[cardIndex] = state.blockData.carouselCards[cardIndex - 1];
+                        state.blockData.carouselCards[cardIndex - 1] = temp;
+                        renderCarouselCards();
+                        refreshPreview();
+                    }
+                } else if (e.target.closest('.move-down-btn')) {
+                    if (cardIndex < cards.length - 1) {
+                        state.blockData.carouselCards = getCarouselCardsFromUI();
+                        const temp = state.blockData.carouselCards[cardIndex];
+                        state.blockData.carouselCards[cardIndex] = state.blockData.carouselCards[cardIndex + 1];
+                        state.blockData.carouselCards[cardIndex + 1] = temp;
+                        renderCarouselCards();
+                        refreshPreview();
+                    }
+                }
+            });
+
+            // Add card button
+            utils.addEventListenerTracked(elements.addCarouselCardBtn, 'click', () => {
+                const cards = getCarouselCardsFromUI();
+                if (cards.length >= moduleConfig.maxCarouselCards) return;
+
+                cards.push({
+                    id: crypto.randomUUID(),
+                    image: '',
+                    url: '',
+                    headline: '',
+                    price: '',
+                    priceCurrency: '',
+                    discountValue: ''
+                });
+                state.blockData.carouselCards = cards;
+                renderCarouselCards();
+                refreshPreview();
+            });
+
+            // ---- Copy JSON button ----
+            utils.addEventListenerTracked(elements.copyJsonBtn, 'click', () => {
+                const jsonLd = generateJsonLd();
+                const jsonString = JSON.stringify(jsonLd, null, 2);
+                navigator.clipboard.writeText(jsonString).then(() => {
+                    elements.copyJsonBtn.textContent = '\u2713 Copied!';
+                    elements.copyJsonBtn.classList.add('copied');
+                    setTimeout(() => {
+                        elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy JSON-LD';
+                        elements.copyJsonBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(() => {
+                    // Fallback: select text in preview
+                    const range = document.createRange();
+                    range.selectNodeContents(elements.jsonPreview);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                });
+            });
+        }
+
+        // =====================================================================
+        // DATA LOADING
+        // =====================================================================
+        function loadData() {
+            if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
+            setLoadingState(true);
+
+            state.sdk.getData((data) => {
+                try {
+                    state.blockData = {};
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = (data && data.hasOwnProperty(key)) ?
+                            data[key] :
+                            moduleConfig.fields[key].defaultValue;
+                    });
+
+                    // Update UI from loaded data
+                    // Annotation Type
+                    if (elements.annotationType) {
+                        elements.annotationType.value = utils.getFieldValue('annotationType');
+                    }
+                    showActiveSection();
+
+                    // Single Image fields
+                    if (elements.singleImageUrl) elements.singleImageUrl.value = utils.getFieldValue('singleImageUrl');
+                    if (elements.singlePromoUrl) elements.singlePromoUrl.value = utils.getFieldValue('singlePromoUrl');
+                    if (elements.singleHeadline) elements.singleHeadline.value = utils.getFieldValue('singleHeadline');
+                    if (elements.singlePrice) elements.singlePrice.value = utils.getFieldValue('singlePrice');
+                    if (elements.singlePriceCurrency) elements.singlePriceCurrency.value = utils.getFieldValue('singlePriceCurrency');
+                    if (elements.singleDiscountValue) elements.singleDiscountValue.value = utils.getFieldValue('singleDiscountValue');
+
+                    // Deal Annotation fields
+                    if (elements.dealDescription) elements.dealDescription.value = utils.getFieldValue('dealDescription');
+                    if (elements.dealDiscountCode) elements.dealDiscountCode.value = utils.getFieldValue('dealDiscountCode');
+                    if (elements.dealAvailabilityStarts) elements.dealAvailabilityStarts.value = utils.getFieldValue('dealAvailabilityStarts');
+                    if (elements.dealAvailabilityEnds) elements.dealAvailabilityEnds.value = utils.getFieldValue('dealAvailabilityEnds');
+
+                    // Deal Card fields
+                    if (elements.dealCardDescription) elements.dealCardDescription.value = utils.getFieldValue('dealCardDescription');
+                    if (elements.dealCardDiscountCode) elements.dealCardDiscountCode.value = utils.getFieldValue('dealCardDiscountCode');
+                    if (elements.dealCardOfferPageUrl) elements.dealCardOfferPageUrl.value = utils.getFieldValue('dealCardOfferPageUrl');
+                    if (elements.dealCardMerchantUrl) elements.dealCardMerchantUrl.value = utils.getFieldValue('dealCardMerchantUrl');
+                    if (elements.dealCardAvailabilityStarts) elements.dealCardAvailabilityStarts.value = utils.getFieldValue('dealCardAvailabilityStarts');
+                    if (elements.dealCardAvailabilityEnds) elements.dealCardAvailabilityEnds.value = utils.getFieldValue('dealCardAvailabilityEnds');
+
+                    // Carousel cards
+                    renderCarouselCards();
+
+                    refreshPreview();
+                    state.retryCount = 0;
+                } catch (error) {
+                    utils.showError(`Failed to load data: ${error.message}`);
+                    Object.keys(moduleConfig.fields).forEach(key => {
+                        state.blockData[key] = moduleConfig.fields[key].defaultValue;
+                    });
+                    renderCarouselCards();
+                    refreshPreview();
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        // =====================================================================
+        // CLEANUP
+        // =====================================================================
+        function cleanup() {
+            state.eventListeners.forEach(({ element, event, handler }) => {
+                if (element && element.removeEventListener) element.removeEventListener(event, handler);
+            });
+            state.eventListeners = [];
+
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+
+            console.log('Gmail Annotations cleanup completed');
+        }
+
+        // =====================================================================
+        // INITIALIZATION
+        // =====================================================================
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
+
+                state.sdk = new window.sfdc.BlockSDK({
+                    tabs: ['htmlblock']
+                });
+
+                cacheElements();
+                initializeEventHandlers();
+                loadData();
+
+                window.addEventListener('beforeunload', cleanup);
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && state.isInitialized) loadData();
+                });
+
+                state.isInitialized = true;
+            } catch (error) {
+                utils.showError(`Initialisation failed: ${error.message}`);
+                if (state.retryCount < moduleConfig.maxRetries) {
+                    state.retryCount++;
+                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                } else {
+                    utils.showError('Failed to initialise after multiple attempts. Please refresh.', true);
+                }
+                setLoadingState(false);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWithRetry);
+        } else {
+            initializeWithRetry();
+        }
+    </script>
+</body>
+</html>
