@@ -1031,9 +1031,15 @@
             const jsonLd = generateJsonLd();
             const jsonString = JSON.stringify(jsonLd, null, 2);
 
-            return `<script type="application/ld+json">
+            // SFMC strips <script> tags from content blocks.
+            // Use AMPscript Concat + TreatAsContent to bypass this.
+            return `%%[
+SET @JSONStart = Concat('<', 'script type="', 'application/ld+json"','>')
+SET @JSONEnd = Concat('<','/','script','>')
+]%%
+%%=TreatAsContent(@JSONStart)=%%
 ${jsonString}
-<\/script>`;
+%%=TreatAsContent(@JSONEnd)=%%`;
         }
 
         // =====================================================================
