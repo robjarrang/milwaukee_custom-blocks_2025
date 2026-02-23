@@ -242,6 +242,30 @@
             margin-left: 4px;
             font-style: italic;
         }
+
+        /* Annotation type thumbnail preview */
+        .annotation-preview {
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+        }
+        .annotation-preview img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .annotation-preview-label {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            padding: 6px 0;
+            background-color: #f0f0f0;
+            border-top: 1px solid #ddd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
@@ -270,6 +294,11 @@
                     <option value="deal-annotation">Deal Annotation</option>
                     <option value="deal-card">Deal Card</option>
                 </select>
+            </div>
+            <!-- Annotation Type Thumbnail Preview -->
+            <div id="annotationPreview" class="annotation-preview">
+                <img id="annotationPreviewImg" src="images/product-carousel.png" alt="Product Carousel preview">
+                <div class="annotation-preview-label">Preview</div>
             </div>
         </div>
 
@@ -664,6 +693,7 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.annotationType = document.getElementById('annotationType');
+            elements.annotationPreviewImg = document.getElementById('annotationPreviewImg');
 
             // Sections
             elements.sectionProductCarousel = document.getElementById('section-product-carousel');
@@ -733,6 +763,18 @@
 
             if (sections[type]) {
                 sections[type].classList.add('active');
+            }
+
+            // Update thumbnail preview image
+            if (elements.annotationPreviewImg) {
+                const previewMap = {
+                    'product-carousel': 'images/product-carousel.png',
+                    'single-image': 'images/single-image.png',
+                    'deal-annotation': 'images/deal-annotation.png',
+                    'deal-card': 'images/deal-card.png'
+                };
+                elements.annotationPreviewImg.src = previewMap[type] || previewMap['product-carousel'];
+                elements.annotationPreviewImg.alt = `${type.replace(/-/g, ' ')} preview`;
             }
         }
 
@@ -1033,13 +1075,16 @@
 
             // SFMC strips <script> tags from content blocks.
             // Use AMPscript Concat + TreatAsContent to bypass this.
-            return `%%[
+            // Wrapped in HTML comment so it doesn't render in editor preview.
+            return `<!--
+%%[
 SET @JSONStart = Concat('<', 'script type="', 'application/ld+json"','>')
 SET @JSONEnd = Concat('<','/','script','>')
 ]%%
 %%=TreatAsContent(@JSONStart)=%%
 ${jsonString}
-%%=TreatAsContent(@JSONEnd)=%%`;
+%%=TreatAsContent(@JSONEnd)=%%
+-->`;
         }
 
         // =====================================================================
