@@ -199,10 +199,8 @@
                 const isLast = index === stats.length - 1;
                 const fontSize = stat.fontSize || 24;
                 const lineHeight = fontSize + 8;
-                const statRow = '<tr><td class="mobile-text-center" style="text-align: center;">' +
-                    '<div style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: ' + fontSize + 'px; font-weight: bold; line-height: ' + lineHeight + 'px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase;">' + stat.title + '</div>' +
-                    '<div style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\';">' + stat.subtitle + '</div>' +
-                    '</td></tr>';
+                const statRow = '<tr><td class="mobile-text-center" style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: ' + fontSize + 'px; font-weight: bold; line-height: ' + lineHeight + 'px; margin: 0; padding-bottom: 0px !important; text-align: center; text-transform: uppercase;">' + stat.title + '</td></tr>' +
+                    '<tr><td class="mobile-text-center" style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\'; text-align: center;">' + stat.subtitle + '</td></tr>';
                 const spacer = !isLast ? '<tr><td><div style="clear: both; display: block; font-size: ' + statSpacing + 'px; height: ' + statSpacing + 'px; line-height: ' + statSpacing + 'px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : '';
                 return statRow + spacer;
             }).join('');
