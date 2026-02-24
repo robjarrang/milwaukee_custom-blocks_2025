@@ -282,7 +282,6 @@
         .image-url-preview img {
             display: block;
             width: 100%;
-            max-width: 300px;
             height: auto;
             background-color: #eee;
         }
@@ -1163,16 +1162,13 @@
 
             // SFMC strips <script> tags from content blocks.
             // Use AMPscript Concat + TreatAsContent to bypass this.
-            // Wrapped in HTML comment so it doesn't render in editor preview.
-            return `<!--
-%%[
+            return `%%[
 SET @JSONStart = Concat('<', 'script type="', 'application/ld+json"','>')
 SET @JSONEnd = Concat('<','/','script','>')
 ]%%
 %%=TreatAsContent(@JSONStart)=%%
 ${jsonString}
-%%=TreatAsContent(@JSONEnd)=%%
--->`;
+%%=TreatAsContent(@JSONEnd)=%%`;
         }
 
         // =====================================================================
