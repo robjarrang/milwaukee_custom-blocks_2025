@@ -126,7 +126,7 @@
             </div>
             <div class="field-group">
                 <label class="field-label">Title Font Size (px)</label>
-                <input type="number" class="field-input" data-field="fontSize" min="12" max="48" value="24">
+                <input type="number" class="field-input" data-field="fontSize" min="12" max="48" step="4" value="24">
             </div>
         </div>
     </template>
@@ -699,7 +699,9 @@
                     const newStats = [...currentStats];
                     let value = e.target.value;
                     if (field === 'fontSize') {
-                        value = parseInt(value) || 24;
+                        value = Math.round((parseInt(value) || 24) / 4) * 4;
+                        value = Math.max(12, Math.min(48, value));
+                        e.target.value = value;
                     }
                     newStats[index] = { ...newStats[index], [field]: value };
                     debouncedUpdateData('stats', newStats);
