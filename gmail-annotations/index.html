@@ -318,7 +318,7 @@
         <div class="info-banner">
             <strong>About Gmail Annotations</strong>
             Gmail Annotations add rich features to your emails in the Promotions tab — such as images, deals, and expiration dates — letting users interact with your promotions directly from their inbox.<br><br>
-            <strong>How to use:</strong> Use the <em>Copy JSON-LD</em> button below to copy the generated code, then paste it inside a <code>&lt;script type="application/ld+json"&gt;</code> tag in the <code>&lt;head&gt;</code> of your email template.
+            <strong>How to use:</strong> Use the <em>Copy Code</em> button below to copy the generated code, then paste it into an <strong>HTML block</strong> placed in the <strong>DEV ONLY</strong> drop zone in your email.
         </div>
 
         <!-- Annotation Type Selector -->
@@ -517,7 +517,7 @@
                 &#10003; Ready to generate. Fill in the required fields above.
             </div>
             <div class="json-preview-wrapper">
-                <button id="copyJsonBtn" class="copy-btn" title="Copy JSON-LD to clipboard">&#128203; Copy JSON-LD</button>
+                <button id="copyJsonBtn" class="copy-btn" title="Copy code to clipboard">&#128203; Copy Code</button>
                 <div id="jsonPreview" class="json-preview">{}</div>
             </div>
         </div>
@@ -1178,11 +1178,12 @@
                     const errors = validateAnnotation();
                     updateValidationUI(errors);
 
-                    // Update JSON preview
+                    // Update JSON preview (with script tag wrapper)
                     const jsonLd = generateJsonLd();
                     const jsonString = JSON.stringify(jsonLd, null, 2);
+                    const fullOutput = `<script type="application/ld+json">\n${jsonString}\n<\/script>`;
                     if (elements.jsonPreview) {
-                        elements.jsonPreview.innerHTML = utils.syntaxHighlightJson(jsonString);
+                        elements.jsonPreview.innerHTML = utils.syntaxHighlightJson(fullOutput);
                     }
 
                     // Set content in SFMC
@@ -1378,15 +1379,16 @@
                 refreshPreview();
             });
 
-            // ---- Copy JSON button ----
+            // ---- Copy Code button ----
             utils.addEventListenerTracked(elements.copyJsonBtn, 'click', () => {
                 const jsonLd = generateJsonLd();
                 const jsonString = JSON.stringify(jsonLd, null, 2);
-                navigator.clipboard.writeText(jsonString).then(() => {
+                const fullOutput = `<script type="application/ld+json">\n${jsonString}\n<\/script>`;
+                navigator.clipboard.writeText(fullOutput).then(() => {
                     elements.copyJsonBtn.textContent = '\u2713 Copied!';
                     elements.copyJsonBtn.classList.add('copied');
                     setTimeout(() => {
-                        elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy JSON-LD';
+                        elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
                         elements.copyJsonBtn.classList.remove('copied');
                     }, 2000);
                 }).catch(() => {
