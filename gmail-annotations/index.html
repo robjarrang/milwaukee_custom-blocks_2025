@@ -1387,21 +1387,61 @@
                 const jsonLd = generateJsonLd();
                 const jsonString = JSON.stringify(jsonLd, null, 2);
                 const fullOutput = `<script type="application/ld+json">\n${jsonString}\n<\/script>`;
-                navigator.clipboard.writeText(fullOutput).then(() => {
+
+                // Attempt 1: execCommand with temporary textarea (works in iframes)
+                const copyViaExecCommand = () => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = fullOutput;
+                    textarea.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    let success = false;
+                    try {
+                        success = document.execCommand('copy');
+                    } catch (e) {
+                        success = false;
+                    }
+                    document.body.removeChild(textarea);
+                    return success;
+                };
+
+                // Attempt 2: Clipboard API (may fail in iframes)
+                const copyViaClipboardApi = () => {
+                    return navigator.clipboard.writeText(fullOutput);
+                };
+
+                // Try execCommand first (most reliable in SFMC iframes)
+                if (copyViaExecCommand()) {
                     elements.copyJsonBtn.textContent = '\u2713 Copied!';
                     elements.copyJsonBtn.classList.add('copied');
                     setTimeout(() => {
                         elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
                         elements.copyJsonBtn.classList.remove('copied');
                     }, 2000);
-                }).catch(() => {
-                    // Fallback: select text in preview
-                    const range = document.createRange();
-                    range.selectNodeContents(elements.jsonPreview);
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                });
+                } else {
+                    // Fall back to Clipboard API
+                    copyViaClipboardApi().then(() => {
+                        elements.copyJsonBtn.textContent = '\u2713 Copied!';
+                        elements.copyJsonBtn.classList.add('copied');
+                        setTimeout(() => {
+                            elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
+                            elements.copyJsonBtn.classList.remove('copied');
+                        }, 2000);
+                    }).catch(() => {
+                        // Final fallback: select the preview text and prompt user
+                        const range = document.createRange();
+                        range.selectNodeContents(elements.jsonPreview);
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        elements.copyJsonBtn.textContent = 'Selected \u2014 press Ctrl+C to copy';
+                        elements.copyJsonBtn.classList.add('copied');
+                        setTimeout(() => {
+                            elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
+                            elements.copyJsonBtn.classList.remove('copied');
+                        }, 4000);
+                    });
+                }
             });
         }
 
