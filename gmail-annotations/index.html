@@ -318,7 +318,7 @@
         <div class="info-banner">
             <strong>About Gmail Annotations</strong>
             Gmail Annotations add rich features to your emails in the Promotions tab — such as images, deals, and expiration dates — letting users interact with your promotions directly from their inbox.<br><br>
-            <strong>How to use:</strong> Use the <em>Copy Code</em> button below to copy the generated code, then paste it into an <strong>HTML block</strong> placed in the <strong>DEV ONLY</strong> drop zone in your email template.
+            <strong>How to use:</strong> Use the <em>Copy JSON-LD</em> button below to copy the generated code, then paste it inside a <code>&lt;script type="application/ld+json"&gt;</code> tag in the <code>&lt;head&gt;</code> of your email template.
         </div>
 
         <!-- Annotation Type Selector -->
@@ -517,7 +517,7 @@
                 &#10003; Ready to generate. Fill in the required fields above.
             </div>
             <div class="json-preview-wrapper">
-                <button id="copyJsonBtn" class="copy-btn" title="Copy code to clipboard">&#128203; Copy Code</button>
+                <button id="copyJsonBtn" class="copy-btn" title="Copy JSON-LD to clipboard">&#128203; Copy JSON-LD</button>
                 <div id="jsonPreview" class="json-preview">{}</div>
             </div>
         </div>
@@ -1181,19 +1181,8 @@
                     // Update JSON preview
                     const jsonLd = generateJsonLd();
                     const jsonString = JSON.stringify(jsonLd, null, 2);
-                    const fullCode = `<script type="application/ld+json">\n${jsonString}\n</script>`;
                     if (elements.jsonPreview) {
-                        // Escape HTML for display and apply syntax highlighting
-                        const escapedCode = fullCode
-                            .replace(/&/g, '&amp;')
-                            .replace(/</g, '&lt;')
-                            .replace(/>/g, '&gt;');
-                        elements.jsonPreview.innerHTML = escapedCode
-                            .replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span><span class="json-colon">:</span>')
-                            .replace(/:\s*("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-string">$1</span>')
-                            .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
-                            .replace(/[\[\]]/g, '<span class="json-bracket">$&</span>')
-                            .replace(/[{}]/g, '<span class="json-brace">$&</span>');
+                        elements.jsonPreview.innerHTML = utils.syntaxHighlightJson(jsonString);
                     }
 
                     // Set content in SFMC
@@ -1393,12 +1382,11 @@
             utils.addEventListenerTracked(elements.copyJsonBtn, 'click', () => {
                 const jsonLd = generateJsonLd();
                 const jsonString = JSON.stringify(jsonLd, null, 2);
-                const fullCode = `<script type="application/ld+json">\n${jsonString}\n</script>`;
-                navigator.clipboard.writeText(fullCode).then(() => {
+                navigator.clipboard.writeText(jsonString).then(() => {
                     elements.copyJsonBtn.textContent = '\u2713 Copied!';
                     elements.copyJsonBtn.classList.add('copied');
                     setTimeout(() => {
-                        elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
+                        elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy JSON-LD';
                         elements.copyJsonBtn.classList.remove('copied');
                     }, 2000);
                 }).catch(() => {
