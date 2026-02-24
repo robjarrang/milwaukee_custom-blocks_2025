@@ -161,6 +161,7 @@
         .json-preview .json-bracket { color: #ffd700; }
         .json-preview .json-brace { color: #da70d6; }
         .json-preview .json-colon { color: #d4d4d4; }
+        .json-preview .json-ampscript { color: #569cd6; }
 
         .copy-btn {
             display: inline-block;
@@ -750,18 +751,36 @@
             },
 
             /**
-             * Syntax-highlight JSON for the preview pane
+             * Syntax-highlight JSON + AMPscript for the preview pane
              */
             syntaxHighlightJson(json) {
                 return json
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
+                    // Highlight AMPscript blocks
+                    .replace(/(%%\[.*?\]%%)/gs, '<span class="json-ampscript">$1</span>')
+                    .replace(/(%%=.*?=%%)/g, '<span class="json-ampscript">$1</span>')
                     .replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span><span class="json-colon">:</span>')
                     .replace(/:\s*("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-string">$1</span>')
                     .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
                     .replace(/[\[\]]/g, '<span class="json-bracket">$&</span>')
                     .replace(/[{}]/g, '<span class="json-brace">$&</span>');
+            },
+
+            /**
+             * Generate the AMPscript-wrapped output for copying/preview
+             */
+            generateCopyOutput() {
+                const jsonLd = generateJsonLd();
+                const jsonString = JSON.stringify(jsonLd, null, 2);
+                return `%%[
+SET @JSONStart = Concat('<', 'script type="', 'application/ld+json"','>')
+SET @JSONEnd = Concat('<','/','script','>')
+]%%
+%%=TreatAsContent(@JSONStart)=%%
+${jsonString}
+%%=TreatAsContent(@JSONEnd)=%%`;
             }
         };
 
@@ -1181,10 +1200,8 @@
                     const errors = validateAnnotation();
                     updateValidationUI(errors);
 
-                    // Update JSON preview (with script tag wrapper)
-                    const jsonLd = generateJsonLd();
-                    const jsonString = JSON.stringify(jsonLd, null, 2);
-                    const fullOutput = `<script type="application/ld+json">\n${jsonString}\n<\/script>`;
+                    // Update code preview (AMPscript-wrapped output)
+                    const fullOutput = utils.generateCopyOutput();
                     if (elements.jsonPreview) {
                         elements.jsonPreview.innerHTML = utils.syntaxHighlightJson(fullOutput);
                     }
@@ -1384,9 +1401,7 @@
 
             // ---- Copy Code button ----
             utils.addEventListenerTracked(elements.copyJsonBtn, 'click', () => {
-                const jsonLd = generateJsonLd();
-                const jsonString = JSON.stringify(jsonLd, null, 2);
-                const fullOutput = `<script type="application/ld+json">\n${jsonString}\n<\/script>`;
+                const fullOutput = utils.generateCopyOutput();
 
                 // Attempt 1: execCommand with temporary textarea (works in iframes)
                 const copyViaExecCommand = () => {
