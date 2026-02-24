@@ -266,6 +266,44 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
+        /* Image URL preview */
+        .image-url-preview {
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .image-url-preview.active {
+            display: block;
+        }
+        .image-url-preview img {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            background-color: #eee;
+        }
+        .image-url-preview-label {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            padding: 4px 0;
+            background-color: #f0f0f0;
+            border-top: 1px solid #ddd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .image-url-preview.error {
+            border-color: #ffcccc;
+            background-color: #fff5f5;
+        }
+        .image-url-preview.error .image-url-preview-label {
+            background-color: #ffeeee;
+            color: #c00;
+        }
     </style>
 </head>
 <body>
@@ -331,6 +369,10 @@
                     <input type="url" id="singleImageUrl" class="field-input" placeholder="https://www.example.com/image.png">
                     <div class="field-error">Please enter a valid HTTPS URL</div>
                     <div class="field-help">PNG or JPEG format. Recommended aspect ratio: 1.91:1. Images are center-cropped automatically.</div>
+                    <div id="singleImagePreview" class="image-url-preview">
+                        <img id="singleImagePreviewImg" src="" alt="Image preview">
+                        <div class="image-url-preview-label">Image Preview</div>
+                    </div>
                 </div>
 
                 <div class="field-group">
@@ -497,6 +539,10 @@
                 <input type="url" class="field-input" data-field="image" placeholder="https://www.example.com/product-image.png">
                 <div class="field-error">Please enter a valid HTTPS URL</div>
                 <div class="field-help">PNG or JPEG. Supported ratios: 4:5, 1:1, 1.91:1. All carousel images must use the same ratio.</div>
+                <div class="image-url-preview card-image-preview">
+                    <img src="" alt="Image preview">
+                    <div class="image-url-preview-label">Image Preview</div>
+                </div>
             </div>
             <div class="field-group">
                 <label class="field-label">Promotion URL <span class="required-marker">*</span></label>
@@ -670,6 +716,40 @@
             },
 
             /**
+             * Update image preview for a given URL input and preview element
+             */
+            updateImagePreview(imageUrl, previewContainer, previewImg) {
+                if (!previewContainer || !previewImg) return;
+                
+                const url = imageUrl ? imageUrl.trim() : '';
+                
+                if (!url) {
+                    previewContainer.classList.remove('active', 'error');
+                    previewImg.src = '';
+                    return;
+                }
+                
+                // Check if it's a valid URL format
+                if (!utils.isValidUrl(url)) {
+                    previewContainer.classList.remove('active');
+                    previewImg.src = '';
+                    return;
+                }
+                
+                // Show preview and attempt to load image
+                previewContainer.classList.add('active');
+                previewContainer.classList.remove('error');
+                
+                previewImg.onload = () => {
+                    previewContainer.classList.remove('error');
+                };
+                previewImg.onerror = () => {
+                    previewContainer.classList.add('error');
+                };
+                previewImg.src = url;
+            },
+
+            /**
              * Syntax-highlight JSON for the preview pane
              */
             syntaxHighlightJson(json) {
@@ -708,6 +788,8 @@
 
             // Single Image
             elements.singleImageUrl = document.getElementById('singleImageUrl');
+            elements.singleImagePreview = document.getElementById('singleImagePreview');
+            elements.singleImagePreviewImg = document.getElementById('singleImagePreviewImg');
             elements.singlePromoUrl = document.getElementById('singlePromoUrl');
             elements.singleHeadline = document.getElementById('singleHeadline');
             elements.singlePrice = document.getElementById('singlePrice');
@@ -819,6 +901,12 @@
                     const fieldName = field.dataset.field;
                     if (card[fieldName] !== undefined && card[fieldName] !== '') {
                         field.value = card[fieldName];
+                        // Update image preview if this is the image field
+                        if (fieldName === 'image') {
+                            const previewContainer = cardEl.querySelector('.card-image-preview');
+                            const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+                            utils.updateImagePreview(card[fieldName], previewContainer, previewImg);
+                        }
                     }
                 });
 
@@ -1161,6 +1249,10 @@ ${jsonString}
                 const handler = (e) => {
                     if (type === 'url') validateUrlInput(el);
                     updateDataDebounced(key, e.target.value.trim());
+                    // Update image preview for singleImageUrl
+                    if (key === 'singleImageUrl') {
+                        utils.updateImagePreview(e.target.value, elements.singleImagePreview, elements.singleImagePreviewImg);
+                    }
                 };
                 utils.addEventListenerTracked(el, 'input', handler);
                 if (type === 'url') {
@@ -1218,6 +1310,17 @@ ${jsonString}
                 if (e.target.matches('[data-field]')) {
                     // Validate URL fields immediately
                     if (e.target.type === 'url') validateUrlInput(e.target);
+                    
+                    // Update image preview for carousel card image fields
+                    if (e.target.dataset.field === 'image') {
+                        const cardEl = e.target.closest('.card-item');
+                        if (cardEl) {
+                            const previewContainer = cardEl.querySelector('.card-image-preview');
+                            const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+                            utils.updateImagePreview(e.target.value, previewContainer, previewImg);
+                        }
+                    }
+                    
                     carouselInputHandler();
                 }
             });
@@ -1331,7 +1434,11 @@ ${jsonString}
                     showActiveSection();
 
                     // Single Image fields
-                    if (elements.singleImageUrl) elements.singleImageUrl.value = utils.getFieldValue('singleImageUrl');
+                    if (elements.singleImageUrl) {
+                        elements.singleImageUrl.value = utils.getFieldValue('singleImageUrl');
+                        // Update image preview on load
+                        utils.updateImagePreview(utils.getFieldValue('singleImageUrl'), elements.singleImagePreview, elements.singleImagePreviewImg);
+                    }
                     if (elements.singlePromoUrl) elements.singlePromoUrl.value = utils.getFieldValue('singlePromoUrl');
                     if (elements.singleHeadline) elements.singleHeadline.value = utils.getFieldValue('singleHeadline');
                     if (elements.singlePrice) elements.singlePrice.value = utils.getFieldValue('singlePrice');
