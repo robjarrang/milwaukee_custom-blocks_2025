@@ -200,21 +200,21 @@
                 const fontSize = stat.fontSize || 24;
                 const lineHeight = fontSize + 8;
                 const statRow = '<tr><td class="mobile-text-center" style="color: #ffffff; font-family: \'Helvetica Neue LT W05_93 Blk E\', Arial, sans-serif, \'Open-Sans\'; font-size: ' + fontSize + 'px; font-weight: bold; line-height: ' + lineHeight + 'px; margin: 0; padding-bottom: 0px !important; text-align: center; text-transform: uppercase;">' + stat.title + '</td></tr>' +
-                    '<tr><td class="mobile-text-center" style="font-size: 16px; line-height: 22px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\'; text-align: center;">' + stat.subtitle + '</td></tr>';
-                const spacer = !isLast ? '<tr><td style="font-size: ' + statSpacing + 'px; height: ' + statSpacing + 'px; line-height: ' + statSpacing + 'px; mso-line-height-rule: exactly;">&nbsp;</td></tr>' : '';
+                    '<tr><td class="mobile-text-center" style="font-size: 16px; line-height: 24px; font-weight: normal; color: #ffffff; font-family: \'Helvetica Neue LT W05_55 Roman\', sans-serif, \'Open-Sans\'; text-align: center;">' + stat.subtitle + '</td></tr>';
+                const spacer = !isLast ? '<tr><td><div style="clear: both; display: block; font-size: ' + statSpacing + 'px; height: ' + statSpacing + 'px; line-height: ' + statSpacing + 'px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' : '';
                 return statRow + spacer;
             }).join('');
 
-            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px; background-color: ' + backgroundColor + ';" valign="middle">' +
-                '<a href="' + imageLink + '" target="_blank">' +
+            const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle">' +
+                '<div><a href="' + imageLink + '" target="_blank">' +
                 '<img align="top" alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="border: none; display: block; height: auto; outline: none; text-decoration: none; font-size:0; line-height:0;" width="290">' +
-                '</a></td>';
+                '</a></div></td>';
             
-            const statsCell = '<td class="block" dir="ltr" style="width: 290px; padding: 0 12px; background-color: ' + backgroundColor + ';" valign="middle">' +
-                '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">' +
-                '<tr><td style="font-size: 8px; height: 8px; line-height: 8px; mso-line-height-rule: exactly;">&nbsp;</td></tr>' +
+            const statsCell = '<td class="block" dir="ltr" style="width: 290px; padding: 0 12px;" valign="middle">' +
+                '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
+                '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 statsHtml +
-                '<tr><td style="font-size: 16px; height: 16px; line-height: 16px; mso-line-height-rule: exactly;">&nbsp;</td></tr>' +
+                '<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 '</table></td>';
 
             // For mobile compatibility, image always comes first in HTML source order
@@ -223,12 +223,16 @@
             const mainContent = imageCell + statsCell;
             
             return '<!-- START .stats-image-block -->' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer color-bg-1" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
-                '<tr><td class="color-bg-1" style="width: 20px; background-color: ' + backgroundColor + '; font-size: 0; line-height: 0;">&nbsp;</td>' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer color-bg-1" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
+                '<tr><td class="color-bg-1" style="width: 20px; background-color: ' + backgroundColor + ';" valign="middle">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
+                '<tr><td style="width: 20px; background-color: ' + backgroundColor + '; font-size: 0; line-height: 0;">&nbsp;</td></tr></table></td>' +
                 '<td align="center" class="content-inner color-bg-1" style="width: 580px; background-color: ' + backgroundColor + ';" valign="middle">' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" ' + tableDirection + ' role="presentation" style="width: 100%;">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" ' + tableDirection + ' role="presentation" style="width: 100%; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
                 '<tr>' + mainContent + '</tr></table></td>' +
-                '<td class="color-bg-1" style="width: 20px; background-color: ' + backgroundColor + '; font-size: 0; line-height: 0;">&nbsp;</td></tr></table>' +
+                '<td class="color-bg-1" style="width: 20px; background-color: ' + backgroundColor + ';" valign="middle">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
+                '<tr><td style="width: 20px; background-color: ' + backgroundColor + '; font-size: 0; line-height: 0;">&nbsp;</td></tr></table></td></tr></table>' +
                 '<!-- END .stats-image-block -->';
         }
 
