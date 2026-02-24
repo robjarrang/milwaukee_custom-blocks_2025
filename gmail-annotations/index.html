@@ -1159,13 +1159,10 @@
         // =====================================================================
         function generateTemplate() {
             // Gmail Annotations JSON-LD must be placed in the email <head> section,
-            // not in the body (copied via "Copy Code" button).
-            // 
-            // This outputs a visual indicator that ONLY shows when editing in SFMC.
-            // The trick: AMPscript doesn't execute in edit mode, so the %%=v(@h)=%%
-            // is literal text (invalid CSS, ignored). During preview/send, AMPscript
-            // executes and inserts "display:none !important;" hiding the indicator.
-            return `%%[SET @h = "display:none !important;"]%%<div style="background:#4CAF50; color:white; padding:8px 12px; border-radius:4px; font-family:Arial,sans-serif; font-size:12px; font-weight:bold; text-align:center; %%=v(@h)=%%">&#9989; Gmail Annotations Active</div>`;
+            // not in the body. SFMC wraps all content block output in tables,
+            // so we output nothing here. Users should copy the JSON-LD from
+            // the preview below and paste it into their email template's <head>.
+            return '';
         }
 
         // =====================================================================
