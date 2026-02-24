@@ -318,7 +318,7 @@
         <div class="info-banner">
             <strong>About Gmail Annotations</strong>
             Gmail Annotations add rich features to your emails in the Promotions tab — such as images, deals, and expiration dates — letting users interact with your promotions directly from their inbox.<br><br>
-            <strong>How to use:</strong> Use the <em>Copy Code</em> button below to copy the generated code, then paste it into an HTML block placed in the DEV ONLY drop zone in your email.
+            <strong>How to use:</strong> Use the <em>Copy Code</em> button below to copy the generated code, then paste it into an HTML block placed in the DEV ONLY drop zone in your email. Any updates to the annotation content will require you to manually update this block.
         </div>
 
         <!-- Annotation Type Selector -->
@@ -1164,7 +1164,7 @@
             // During send, preview, VAWP, or any other _MessageContext, AMPscript IS
             // processed — the condition is always false, so the indicator is hidden.
             return `<!-- %%[IF 1 == 2 THEN]%% -->
-<div style="background-color:#e8f5e9;border:1px solid #c8e6c9;color:#2e7d32;padding:10px;text-align:center;font-family:Arial,sans-serif;font-size:13px;border-radius:4px;">&#9989; Gmail Annotations are active on this email</div>
+<div style="background-color:#e8f5e9;border:1px solid #c8e6c9;color:#2e7d32;padding:10px;margin-top:8px;text-align:center;font-family:Arial,sans-serif;font-size:13px;border-radius:4px;max-width:620px;">&#9989; Gmail Annotations are active on this email.</div>
 <!-- %%[ENDIF]%% -->`;
         }
 
