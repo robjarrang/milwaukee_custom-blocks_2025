@@ -1158,11 +1158,19 @@
         // TEMPLATE GENERATION (SFMC output)
         // =====================================================================
         function generateTemplate() {
-            // Gmail Annotations JSON-LD must be placed in the email <head> section,
-            // not in the body. SFMC wraps all content block output in tables,
-            // so we output nothing here. Users should copy the JSON-LD from
-            // the preview below and paste it into their email template's <head>.
-            return '';
+            // Visual indicator visible ONLY in the Content Builder editor.
+            // AMPscript is not processed in the editor, so the HTML renders.
+            // During send, preview, or view-as-web-page, _MessageContext has
+            // a value so the IF branch executes (empty), hiding the indicator.
+            const type = utils.getFieldValue('annotationType');
+            const typeLabel = {
+                'product-carousel': 'Product Carousel',
+                'single-image': 'Single Image Preview',
+                'deal-annotation': 'Deal Annotation',
+                'deal-card': 'Deal Card'
+            }[type] || type;
+
+            return `%%[IF _MessageContext == "SEND" OR _MessageContext == "PREVIEW" OR _MessageContext == "VAWP" OR _MessageContext == "LANDINGPAGE" OR _MessageContext == "FTAF" OR _MessageContext == "SOCIAL" THEN]%%%%[ELSE]%%<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#e8f5e9;border:1px solid #c8e6c9;"><tr><td style="padding:10px 15px;font-family:Arial,sans-serif;font-size:13px;color:#2e7d32;text-align:center;line-height:1.4;">&#10003; <strong>Gmail Annotations active</strong> &mdash; ${typeLabel}<br><span style="font-size:11px;color:#558b2f;">Copy the code from the Gmail Annotations block and paste it into an HTML block in the DEV ONLY drop zone.</span></td></tr></table>%%[ENDIF]%%`;
         }
 
         // =====================================================================
