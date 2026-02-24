@@ -209,11 +209,11 @@
 
             const imageCell = '<td align="center" class="block" dir="ltr" style="width: 290px;" valign="middle">' +
                 '<div><a href="' + imageLink + '" target="_blank">' +
-                '<img align="top" alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290">' +
+                '<img align="top" alt="' + imageAlt + '" class="fill no-hover" src="' + imageUrl + '" style="border: none; display: block; height: auto; outline: none; text-decoration: none; font-size:0; line-height:0;" width="290">' +
                 '</a></div></td>';
             
             const statsCell = '<td class="block" dir="ltr" style="width: 290px; padding: 0 12px;" valign="middle">' +
-                '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;">' +
+                '<table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
                 '<tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
                 statsHtml +
                 '<tr><td><div style="clear: both; display: block; font-size: 16px; height: 16px; line-height: 16px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>' +
@@ -225,15 +225,15 @@
             const mainContent = imageCell + statsCell;
             
             return '<!-- START .stats-image-block -->' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer color-bg-1" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px;">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer color-bg-1" role="presentation" style="background-color: ' + backgroundColor + '; width: 620px; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
                 '<tr><td class="color-bg-1" style="width: 20px;" valign="middle">' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
                 '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td>' +
                 '<td align="center" class="content-inner color-bg-1" style="width: 580px;" valign="middle">' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" ' + tableDirection + ' role="presentation" style="width: 100%;">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" ' + tableDirection + ' role="presentation" style="width: 100%; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
                 '<tr>' + mainContent + '</tr></table></td>' +
                 '<td class="color-bg-1" style="width: 20px;" valign="middle">' +
-                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">' +
+                '<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">' +
                 '<tr><td style="width: 20px;">&nbsp;</td></tr></table></td></tr></table>' +
                 '<!-- END .stats-image-block -->';
         }
