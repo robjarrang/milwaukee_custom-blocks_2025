@@ -1163,9 +1163,9 @@
             // inside the IF block renders normally and the indicator is visible.
             // During send, preview, VAWP, or any other _MessageContext, AMPscript IS
             // processed — the condition is always false, so the indicator is hidden.
-            return `%%[IF 1 == 2 THEN]%%
+            return `<!-- %%[IF 1 == 2 THEN]%% -->
 <div style="background-color:#e8f5e9;border:1px solid #c8e6c9;color:#2e7d32;padding:10px;text-align:center;font-family:Arial,sans-serif;font-size:13px;border-radius:4px;">&#9989; Gmail Annotations are active on this email</div>
-%%[ENDIF]%%`;
+<!-- %%[ENDIF]%% -->`;
         }
 
         // =====================================================================
