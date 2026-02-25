@@ -59,6 +59,11 @@
             color: #888;
             white-space: nowrap;
         }
+        .option-button.disabled-option {
+            opacity: 0.3;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
 
         /* -- CHECKLIST STYLES -- */
         .items-container{display:flex;flex-direction:column;gap:15px;contain:layout}
@@ -531,6 +536,24 @@
         }
 
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
+
+        function syncButtonMobileAlignment() {
+            const desktopAlign = utils.getFieldValue('buttonAlignment');
+            const mobileSelector = elements.buttonMobileAlignmentSelector;
+            if (!mobileSelector) return;
+            const leftBtn = mobileSelector.querySelector('[data-value="left"]');
+            const centerBtn = mobileSelector.querySelector('[data-value="center"]');
+            if (desktopAlign === 'center') {
+                if (leftBtn) leftBtn.classList.add('disabled-option');
+                // Force mobile to center
+                updateData('buttonMobileAlignment', 'center');
+                if (leftBtn) leftBtn.classList.remove('selected');
+                if (centerBtn) centerBtn.classList.add('selected');
+            } else {
+                if (leftBtn) leftBtn.classList.remove('disabled-option');
+            }
+        }
+
         let rafId = null;
         function generateTemplate() {
             const backgroundColor = utils.getFieldValue('backgroundColor');
@@ -792,6 +815,13 @@
             setupOptionSelector(elements.titleMobileAlignmentSelector, 'titleMobileAlignment');
             setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment');
             setupOptionSelector(elements.bodyMobileAlignmentSelector, 'bodyMobileAlignment');
+
+            // Sync button mobile alignment when desktop alignment changes
+            elements.buttonAlignmentSelector.querySelectorAll('.option-button').forEach(option => {
+                const handler = () => syncButtonMobileAlignment();
+                option.addEventListener('click', handler);
+                state.eventListeners.push({ element: option, event: 'click', handler });
+            });
 
             // Special handler for content type selector to toggle UI
             function setupContentTypeSelector() {
@@ -1173,6 +1203,8 @@
             setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment');
             setSelectorState(elements.bodyMobileAlignmentSelector, 'bodyMobileAlignment');
             setSelectorState(elements.contentTypeSelector, 'contentType');
+
+            syncButtonMobileAlignment();
 
             // Handle content type specific UI
             const contentType = utils.getFieldValue('contentType');
