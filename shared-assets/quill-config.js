@@ -3,6 +3,41 @@
  * Optimized for email content creation and SFMC compatibility
  */
 
+/**
+ * Custom Quill Embed Blot for intentional non-breaking spaces.
+ * Uses an embed blot so it survives all nbsp-stripping layers
+ * (which operate on getText() — embeds return \uFFFC, not \u00A0).
+ * Renders as <span class="ql-nbsp"> </span> in the editor DOM.
+ */
+(function registerNbspBlot() {
+    if (!window.Quill) return; // Will be called again after Quill loads
+
+    const Embed = window.Quill.import('blots/embed');
+
+    class NonBreakingSpaceBlot extends Embed {
+        static blotName = 'nbsp';
+        static tagName = 'span';
+        static className = 'ql-nbsp';
+
+        static create() {
+            const node = super.create();
+            node.innerHTML = '\u00A0';
+            node.setAttribute('contenteditable', 'false');
+            return node;
+        }
+
+        static value() {
+            return true;
+        }
+
+        length() {
+            return 1;
+        }
+    }
+
+    window.Quill.register(NonBreakingSpaceBlot, true);
+})();
+
 class QuillConfigManager {
     static DEFAULT_TIMEOUT = 5000;
     static DEBOUNCE_DELAY = 300;
@@ -11,18 +46,18 @@ class QuillConfigManager {
     static TOOLBAR_PRESETS = {
         minimal: [['bold']],
         basic: [['bold', 'italic'], ['link']],
-        title: [['bold'], [{ 'script': 'super' }]],
+        title: [['bold'], [{ 'script': 'super' }], ['nbsp']],
         button: [[{ 'script': 'super' }]],
-        description: [['bold', 'italic'], [{ 'script': 'super' }], ['link']]
+        description: [['bold', 'italic'], [{ 'script': 'super' }], ['link'], ['nbsp']]
     };
 
     // Format configurations optimized for email
     static FORMAT_PRESETS = {
         minimal: ['bold'],
         basic: ['bold', 'italic', 'link'],
-        title: ['bold', 'script'],
+        title: ['bold', 'script', 'nbsp'],
         button: ['script'],
-        description: ['bold', 'italic', 'script', 'link']
+        description: ['bold', 'italic', 'script', 'link', 'nbsp']
     };
 
     // Email-optimized Quill configurations
@@ -133,6 +168,9 @@ class QuillConfigManager {
             // Add non-breaking space cleanup monitor
             this.addSpaceCleanupMonitor(editor);
 
+            // Register nbsp toolbar handler if toolbar includes the nbsp button
+            this.addNbspToolbarHandler(editor, type, options);
+
             return editor;
         } catch (error) {
             throw new Error(`Failed to initialize Quill editor: ${error.message}`);
@@ -181,6 +219,30 @@ class QuillConfigManager {
                 if (range) {
                     editor.setSelection(Math.min(range.index, maxLength));
                 }
+            }
+        });
+    }
+
+    /**
+     * Registers the nbsp toolbar button handler for inserting intentional non-breaking spaces
+     * @param {Object} editor - Quill instance
+     * @param {string} type - Editor preset type
+     * @param {Object} options - Editor options
+     */
+    static addNbspToolbarHandler(editor, type, options) {
+        // Check if this editor's toolbar includes the nbsp button
+        const toolbar = options.customToolbar || this.TOOLBAR_PRESETS[type] || this.TOOLBAR_PRESETS.basic;
+        const hasNbsp = toolbar.some(group => Array.isArray(group) && group.includes('nbsp'));
+        if (!hasNbsp) return;
+
+        const toolbarModule = editor.getModule('toolbar');
+        if (!toolbarModule) return;
+
+        toolbarModule.addHandler('nbsp', function() {
+            const range = editor.getSelection(true);
+            if (range) {
+                editor.insertEmbed(range.index, 'nbsp', true, 'user');
+                editor.setSelection(range.index + 1, 0, 'user');
             }
         });
     }
@@ -261,12 +323,18 @@ class QuillConfigManager {
             editor.getSemanticHTML() : 
             editor.root.innerHTML;
 
-        // Always clean up non-breaking spaces
+        // Preserve intentional nbsp blots before cleaning
+        content = this.protectNbspBlots(content);
+
+        // Always clean up non-breaking spaces (unintentional ones)
         content = this.cleanSpaces(content);
 
         if (emailOptimized) {
             content = this.sanitizeForEmail(content);
         }
+
+        // Restore intentional nbsp characters
+        content = this.restoreNbspTokens(content);
 
         return content;
     }
@@ -295,8 +363,11 @@ class QuillConfigManager {
             }
         }
 
+        // Preserve intentional nbsp blots before cleaning
+        let result = this.protectNbspBlots(temp.innerHTML);
+
         // Clean up email-incompatible formatting and non-breaking spaces
-        return temp.innerHTML
+        result = result
             .replace(/<p>/g, '')
             .replace(/<\/p>/g, '<br>')        // Convert closing </p> to <br> for line breaks
             .replace(/<div[^>]*>/g, '')
@@ -307,6 +378,9 @@ class QuillConfigManager {
             .replace(/\u00A0/g, ' ')          // Replace Unicode non-breaking spaces
             .replace(/\s{2,}/g, ' ')          // Replace multiple spaces with single space
             .trim();
+
+        // Restore intentional nbsp characters
+        return this.restoreNbspTokens(result);
     }
 
     /**
@@ -318,11 +392,12 @@ class QuillConfigManager {
         if (!editor || !content) return;
 
         try {
+            // Preserve intentional &nbsp; by converting to blot markup before cleaning
+            let cleanContent = this.convertNbspToBlots(content);
+
             // Clean content before setting - convert <br> tags to proper paragraph structure
             // This prevents duplicate line breaks when content is saved and reloaded
-            let cleanContent = content
-                .replace(/&nbsp;/g, ' ')
-                .replace(/\u00A0/g, ' ')
+            cleanContent = cleanContent
                 .replace(/<br\s*\/?>/gi, '</p><p>');  // Convert <br> to paragraph breaks
             
             // Wrap in paragraph tags if not already wrapped
@@ -405,8 +480,55 @@ class QuillConfigManager {
         return editors;
     }
 
+    // ── Non-breaking space blot helpers ──────────────────────────────
+
+    /** Token used to protect intentional nbsp blots during cleanup */
+    static NBSP_TOKEN = '%%INTENTIONAL_NBSP%%';
+
+    /**
+     * Replaces <span class="ql-nbsp">...</span> with a safe token
+     * so that downstream cleanup steps don't strip them.
+     * @param {string} html - HTML string potentially containing nbsp blots
+     * @returns {string} HTML with nbsp blots replaced by tokens
+     */
+    static protectNbspBlots(html) {
+        if (!html) return '';
+        return html.replace(/<span[^>]*class="ql-nbsp"[^>]*>[^<]*<\/span>/gi, this.NBSP_TOKEN);
+    }
+
+    /**
+     * Converts safe tokens back to &nbsp; for email output.
+     * @param {string} html - HTML containing tokens
+     * @returns {string} HTML with tokens replaced by &nbsp;
+     */
+    static restoreNbspTokens(html) {
+        if (!html) return '';
+        return html.replace(new RegExp(this.NBSP_TOKEN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '&nbsp;');
+    }
+
+    /**
+     * Converts standalone &nbsp; in saved content back to blot markup
+     * so that Quill can reconstruct the NonBreakingSpaceBlot on reload.
+     * Only converts &nbsp; that is NOT already inside a ql-nbsp span.
+     * @param {string} html - Saved HTML content
+     * @returns {string} HTML with &nbsp; converted to blot markup
+     */
+    static convertNbspToBlots(html) {
+        if (!html) return '';
+        // First protect any existing blot markup
+        let result = html.replace(/<span[^>]*class="ql-nbsp"[^>]*>[^<]*<\/span>/gi, this.NBSP_TOKEN);
+        // Convert remaining &nbsp; entities to blot markup
+        result = result.replace(/&nbsp;/g, '<span class="ql-nbsp" contenteditable="false">\u00A0</span>');
+        // Also convert Unicode nbsp not inside blots
+        result = result.replace(/\u00A0/g, '<span class="ql-nbsp" contenteditable="false">\u00A0</span>');
+        // Restore the originals that were already blots
+        result = result.replace(new RegExp(this.NBSP_TOKEN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '<span class="ql-nbsp" contenteditable="false">\u00A0</span>');
+        return result;
+    }
+
     /**
      * Cleans up non-breaking spaces from text content
+     * (does NOT affect %%INTENTIONAL_NBSP%% tokens)
      * @param {string} text - Text content to clean
      * @returns {string} Cleaned text with regular spaces
      */
