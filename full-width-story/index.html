@@ -110,6 +110,7 @@
                 <div class="style-controls-wrapper">
                     <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4"></div>
                     <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                    <div class="style-control-group"><label class="field-label">Mobile Alignment</label><div class="option-selector" id="titleMobileAlignmentSelector"><div class="option-button selected" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
 
@@ -129,6 +130,7 @@
                 <div class="style-controls-wrapper">
                     <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4"></div>
                     <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="bodyAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                    <div class="style-control-group"><label class="field-label">Mobile Alignment</label><div class="option-selector" id="bodyMobileAlignmentSelector"><div class="option-button selected" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
 
@@ -150,6 +152,7 @@
                 <div class="field-group"><label for="buttonUrl" class="field-label">Button Link URL</label><input type="url" id="buttonUrl" class="field-input"><div class="field-error" id="buttonUrlError">Please enter a valid URL.</div></div>
                 <div class="style-controls-wrapper">
                     <div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                    <div class="style-control-group"><label class="field-label">Mobile Alignment</label><div class="option-selector" id="buttonMobileAlignmentSelector"><div class="option-button" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
                 </div>
             </div>
         </div>
@@ -203,10 +206,12 @@
                 title: { type: 'richtext', defaultValue: 'Lorem ipsum dolor sit amet', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 24 },
                 titleAlignment: { type: 'text', defaultValue: 'left' },
+                titleMobileAlignment: { type: 'text', defaultValue: 'left' },
                 contentType: { type: 'text', defaultValue: 'text' },
                 bodyText: { type: 'richtext', defaultValue: 'Consectetur elit. Integer fermentum scelerisque urna, at lacinia purus sagittis non. Aenean nisl risus, consequat eu diam sit amet, consectetur pulvinar nisi. Nunc nec est non mi faucibus finibus.' },
                 bodyFontSize: { type: 'number', defaultValue: 16 },
                 bodyAlignment: { type: 'text', defaultValue: 'left' },
+                bodyMobileAlignment: { type: 'text', defaultValue: 'left' },
                 checklistItems: {
                     type: 'list',
                     defaultValue: [
@@ -220,6 +225,7 @@
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 buttonAlignment: { type: 'text', defaultValue: 'center' },
+                buttonMobileAlignment: { type: 'text', defaultValue: 'center' },
                 showSpacerAboveHeading: { type: 'boolean', defaultValue: true }
             },
             debounceDelay: 300,
@@ -411,11 +417,13 @@
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
+            elements.titleMobileAlignmentSelector = document.getElementById('titleMobileAlignmentSelector');
             elements.contentTypeSelector = document.getElementById('contentTypeSelector');
             elements.bodyTextGroup = document.getElementById('bodyTextGroup');
             elements.bodyEditor = document.getElementById('bodyEditor');
             elements.bodyFontSize = document.getElementById('bodyFontSize');
             elements.bodyAlignmentSelector = document.getElementById('bodyAlignmentSelector');
+            elements.bodyMobileAlignmentSelector = document.getElementById('bodyMobileAlignmentSelector');
             elements.checklistGroup = document.getElementById('checklistGroup');
             elements.itemsContainer = document.getElementById('itemsContainer');
             elements.addItemBtn = document.getElementById('addItemBtn');
@@ -428,6 +436,7 @@
             elements.buttonUrl = document.getElementById('buttonUrl');
             elements.buttonUrlError = document.getElementById('buttonUrlError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
+            elements.buttonMobileAlignmentSelector = document.getElementById('buttonMobileAlignmentSelector');
             elements.showSpacerAboveHeading = document.getElementById('showSpacerAboveHeading');
         }
 
@@ -513,7 +522,8 @@
                 const titleSize = utils.getFieldValue('titleFontSize');
                 const titleAlign = utils.getFieldValue('titleAlignment');
                 const titleLineHeight = titleSize + 8;
-                const titleMobileClass = `mobile-text-${titleAlign}`;
+                const titleMobileAlign = utils.getFieldValue('titleMobileAlignment');
+                const titleMobileClass = `mobile-text-${titleMobileAlign}`;
                 titleHtml = `<tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h1 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; padding-bottom: 0px !important; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${processedTitle}</h1></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>`;
             }
 
@@ -543,7 +553,8 @@
                 const bodySize = utils.getFieldValue('bodyFontSize');
                 const bodyAlign = utils.getFieldValue('bodyAlignment');
                 const bodyLineHeight = bodySize + 12;
-                const bodyMobileClass = `mobile-text-${bodyAlign}`;
+                const bodyMobileAlign = utils.getFieldValue('bodyMobileAlignment');
+                const bodyMobileClass = `mobile-text-${bodyMobileAlign}`;
                 contentHtml = `<tr><td class="${bodyMobileClass}" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${bodySize}px; font-weight: normal; line-height: ${bodyLineHeight}px; margin: 0; mso-line-height-rule: exactly; text-align: ${bodyAlign}; mso-hyphenate: none; hyphens: none;">${processedBody}</td></tr>`;
             }
 
@@ -562,7 +573,9 @@
                     buttonTableStyle = `background-color: #000000; border-radius: 4px !important;`;
                 }
                 
-                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="${buttonClass}" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
+                const buttonMobileAlign = utils.getFieldValue('buttonMobileAlignment');
+                const buttonMobileClass = buttonMobileAlign === 'center' ? ' button-mobile-center' : '';
+                buttonHtml = `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr><tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="${buttonClass}${buttonMobileClass}" role="presentation" style="${buttonTableStyle}"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${buttonUrl}" style="color: #ffffff; text-decoration: none;" target="_blank">${processedButtonText}</a></td></tr></table></td></tr></table></td></tr>`;
             }
 
             // Generate bottom spacer - only show if button spacer is enabled or if no button is shown
@@ -751,8 +764,11 @@
 
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
+            setupOptionSelector(elements.buttonMobileAlignmentSelector, 'buttonMobileAlignment');
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
+            setupOptionSelector(elements.titleMobileAlignmentSelector, 'titleMobileAlignment');
             setupOptionSelector(elements.bodyAlignmentSelector, 'bodyAlignment');
+            setupOptionSelector(elements.bodyMobileAlignmentSelector, 'bodyMobileAlignment');
 
             // Special handler for content type selector to toggle UI
             function setupContentTypeSelector() {
@@ -1128,8 +1144,11 @@
 
             setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
             setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
+            setSelectorState(elements.buttonMobileAlignmentSelector, 'buttonMobileAlignment');
             setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
+            setSelectorState(elements.titleMobileAlignmentSelector, 'titleMobileAlignment');
             setSelectorState(elements.bodyAlignmentSelector, 'bodyAlignment');
+            setSelectorState(elements.bodyMobileAlignmentSelector, 'bodyMobileAlignment');
             setSelectorState(elements.contentTypeSelector, 'contentType');
 
             // Handle content type specific UI
