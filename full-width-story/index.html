@@ -18,21 +18,23 @@
         /* -- NEW COMPACT LAYOUT STYLES -- */
         .style-controls-wrapper {
             margin-top: 15px;
-        }
-        .style-controls-labels {
             display: flex;
-            align-items: baseline;
-            gap: 20px;
-            margin-bottom: 5px;
+            flex-direction: column;
+            gap: 12px;
         }
-        .style-controls-labels .field-label {
+        .style-control-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .style-control-row .field-label {
             margin-bottom: 0;
         }
-        .style-controls-labels .field-label:first-child {
+        .style-control-row .field-input {
             width: 80px;
-            flex-shrink: 0;
+            padding: 6px 8px;
         }
-        .style-controls-inputs {
+        .alignment-controls {
             display: flex;
             align-items: center;
             gap: 20px;
@@ -132,12 +134,8 @@
                 <label class="field-label">Title</label>
                 <div id="titleEditor" class="quill-container limited-toolbar"></div>
                 <div class="style-controls-wrapper">
-                    <div class="style-controls-labels"><label class="field-label">Font Size</label><label class="field-label">Alignment</label></div>
-                    <div class="style-controls-inputs">
-                        <input type="number" id="titleFontSize" class="field-input" style="width:80px" min="16" max="48" step="4">
-                        <div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="titleAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
-                        <div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="titleMobileAlignmentSelector"><div class="option-button selected" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
-                    </div>
+                    <div class="style-control-row"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="48" step="4"></div>
+                    <div class="style-control-row"><label class="field-label">Alignment</label><div class="alignment-controls"><div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="titleAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div><div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="titleMobileAlignmentSelector"><div class="option-button selected" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
                 </div>
             </div>
 
@@ -155,12 +153,8 @@
                 <label class="field-label">Body Text</label>
                 <div id="bodyEditor" class="quill-container"></div>
                 <div class="style-controls-wrapper">
-                    <div class="style-controls-labels"><label class="field-label">Font Size</label><label class="field-label">Alignment</label></div>
-                    <div class="style-controls-inputs">
-                        <input type="number" id="bodyFontSize" class="field-input" style="width:80px" min="12" max="28" step="4">
-                        <div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="bodyAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
-                        <div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="bodyMobileAlignmentSelector"><div class="option-button selected" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
-                    </div>
+                    <div class="style-control-row"><label class="field-label">Font Size</label><input type="number" id="bodyFontSize" class="field-input" min="12" max="28" step="4"></div>
+                    <div class="style-control-row"><label class="field-label">Alignment</label><div class="alignment-controls"><div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="bodyAlignmentSelector"><div class="option-button selected" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div><div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="bodyMobileAlignmentSelector"><div class="option-button selected" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
                 </div>
             </div>
 
@@ -181,11 +175,7 @@
                 <div class="field-group"><label for="buttonText" class="field-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div>
                 <div class="field-group"><label for="buttonUrl" class="field-label">Button Link URL</label><input type="url" id="buttonUrl" class="field-input"><div class="field-error" id="buttonUrlError">Please enter a valid URL.</div></div>
                 <div class="style-controls-wrapper">
-                    <div class="style-controls-labels"><label class="field-label">Alignment</label></div>
-                    <div class="style-controls-inputs">
-                        <div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
-                        <div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="buttonMobileAlignmentSelector"><div class="option-button" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
-                    </div>
+                    <div class="style-control-row"><label class="field-label">Alignment</label><div class="alignment-controls"><div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left" title="Align Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Align Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div><div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="buttonMobileAlignmentSelector"><div class="option-button" data-value="left" title="Mobile Left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center" title="Mobile Center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
                 </div>
             </div>
         </div>
