@@ -493,7 +493,10 @@ class QuillConfigManager {
      */
     static protectNbspBlots(html) {
         if (!html) return '';
-        return html.replace(/<span[^>]*class="ql-nbsp"[^>]*>[^<]*<\/span>/gi, this.NBSP_TOKEN);
+        // Quill 2.0 renders embeds as:
+        //   <span class="ql-nbsp" contenteditable="false">\uFEFF<span contenteditable="false"> </span>\uFEFF</span>
+        // Match both the nested (Quill 2.0) and simple forms.
+        return html.replace(/<span[^>]*class="ql-nbsp"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi, this.NBSP_TOKEN);
     }
 
     /**
@@ -515,8 +518,8 @@ class QuillConfigManager {
      */
     static convertNbspToBlots(html) {
         if (!html) return '';
-        // First protect any existing blot markup
-        let result = html.replace(/<span[^>]*class="ql-nbsp"[^>]*>[^<]*<\/span>/gi, this.NBSP_TOKEN);
+        // First protect any existing blot markup (handle Quill 2.0 nested embed structure)
+        let result = html.replace(/<span[^>]*class="ql-nbsp"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi, this.NBSP_TOKEN);
         // Convert remaining &nbsp; entities to blot markup
         result = result.replace(/&nbsp;/g, '<span class="ql-nbsp" contenteditable="false">\u00A0</span>');
         // Also convert Unicode nbsp not inside blots
