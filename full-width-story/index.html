@@ -525,14 +525,7 @@
         }
 
         function processRichText(html) {
-            if (!html) return '';
-            // Content has already been sanitized by getCleanContent(); any &nbsp; or \u00A0
-            // remaining is intentional (from the nbsp blot). Protect them before the
-            // second pass through sanitizeForEmail so they survive the cleanup.
-            const protectedHtml = html
-                .replace(/&nbsp;/g, QuillConfigManager.NBSP_TOKEN)
-                .replace(/\u00A0/g, QuillConfigManager.NBSP_TOKEN);
-            return QuillConfigManager.sanitizeForEmail(protectedHtml);
+            return QuillConfigManager.sanitizeForEmail(html || '');
         }
 
         function updateData(field, value) {
