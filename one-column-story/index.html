@@ -14,10 +14,16 @@
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}.container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;;transition:opacity 0.3s ease}.container.loading{opacity:0.6;pointer-events:none}.field-group{margin-bottom:20px}.field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}.field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}.field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}.field-input.error{border-color:#ff0000}.field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}.field-input.error + .field-error{display:block}.option-selector{display:flex;gap:10px}.option-button{flex:1;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease}.option-button:hover{border-color:#0074d9;background-color:#f0f8ff}.option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}.toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:15px}.toggle-switch{position:relative;display:inline-block;width:48px;height:24px}.toggle-switch input{opacity:0;width:0;height:0}.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}input:checked + .toggle-slider{background-color:#0074d9}input:checked + .toggle-slider:before{transform:translateX(24px)}.disabled-field{opacity:0.5;pointer-events:none}.quill-container{background:white;border:1px solid #ddd;border-radius:4px}.ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}.ql-editor{min-height:60px;padding:12px}.limited-toolbar .ql-editor{min-height:40px}.section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}.section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}.error-banner.show{display:block}
         .option-button svg { display: block; margin: 0 auto; fill: currentColor; }
-        .style-controls-wrapper { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 15px; }
+        .style-controls-wrapper { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .style-control-row { display: flex; flex-direction: column; gap: 5px; }
+        .style-control-row .field-label { margin-bottom: 0; }
+        .style-control-row .field-input { width: 80px; padding: 6px 8px; }
+        .alignment-controls { display: flex; align-items: center; gap: 20px; }
         .style-control-group .field-label { margin-bottom: 5px; }
         .style-control-group .field-input { width: 80px; padding: 6px 8px; }
         .style-control-group .option-selector { width: 110px; }
+        .alignment-inline-group { display: flex; align-items: center; gap: 4px; }
+        .alignment-sub-label { font-size: 12px; color: #888; white-space: nowrap; }
         .items-container{display:flex;flex-direction:column;gap:15px}
         .item{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}
         .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -86,8 +92,8 @@
                 <!-- FIX: Added data-lpignore -->
                 <div id="titleEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
                 <div class="style-controls-wrapper">
-                    <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div>
-                    <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                    <div class="style-control-row"><label class="field-label">Font Size</label><input type="number" id="titleFontSize" class="field-input" min="16" max="32" step="4"></div>
+                    <div class="style-control-row"><label class="field-label">Alignment</label><div class="alignment-controls"><div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="titleAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div><div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="titleMobileAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
                 </div>
             </div>
             <div class="field-group"><label class="field-label">Content Type</label><div class="option-selector" id="contentTypeSelector"><div class="option-button selected" data-value="description">Body Copy</div><div class="option-button" data-value="checklist">Checklist</div></div></div>
@@ -97,8 +103,8 @@
                     <!-- FIX: Added data-lpignore -->
                     <div id="descriptionEditor" class="quill-container" data-lpignore="true"></div>
                     <div class="style-controls-wrapper">
-                        <div class="style-control-group"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div>
-                        <div class="style-control-group"><label class="field-label">Alignment</label><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div>
+                        <div class="style-control-row"><label class="field-label">Font Size</label><input type="number" id="descriptionFontSize" class="field-input" min="12" max="24" step="4"></div>
+                        <div class="style-control-row"><label class="field-label">Alignment</label><div class="alignment-controls"><div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="descriptionAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div><div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="descriptionMobileAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
                     </div>
                 </div>
             </div>
@@ -107,7 +113,7 @@
         <div class="section-divider">
             <div class="section-title">Button Settings</div>
             <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showButton" checked><span class="toggle-slider"></span></label><label for="showButton" class="checkbox-label">Show Button</label></div>
-            <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-group"><label class="field-label">Button Alignment</label><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div>
+            <div id="buttonFieldsGroup"><div class="field-group"><label for="buttonText" class="field-label">Button Text</label><div id="buttonTextEditor" class="quill-container limited-toolbar"></div></div><div class="field-group"><label for="buttonLink" class="field-label">Button Link URL</label><input type="url" id="buttonLink" class="field-input"><div class="field-error" id="buttonLinkError">Please enter a valid URL.</div></div><div class="style-controls-wrapper"><div class="style-control-row"><label class="field-label">Alignment</label><div class="alignment-controls"><div class="alignment-inline-group"><span class="alignment-sub-label">Desktop</span><div class="option-selector" id="buttonAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div><div class="alignment-inline-group"><span class="alignment-sub-label">Mobile</span><div class="option-selector" id="buttonMobileAlignmentSelector"><div class="option-button" data-value="left"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm0-4h10v-2H4v2zm0-4h16v-2H4v2zM4 5v2h10V5H4z"/></svg></div><div class="option-button selected" data-value="center"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm4-4h8v-2H8v2zm-4-4h16v-2H4v2zm4-4h8V5H8v2z"/></svg></div></div></div></div></div></div></div>
         </div>
     </div>
     
@@ -146,15 +152,18 @@
                 title: { type: 'richtext', defaultValue: 'Tempus Euismod Phasellus', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 20 },
                 titleAlignment: { type: 'text', defaultValue: 'center' },
+                titleMobileAlignment: { type: 'text', defaultValue: 'center' },
                 contentType: { type: 'text', defaultValue: 'description' },
                 description: { type: 'richtext', defaultValue: 'Vestibulum condimentum tempus euismod. Phasellus ligula nibh, ornare at ligula a.' },
                 descriptionFontSize: { type: 'number', defaultValue: 16 },
                 descriptionAlignment: { type: 'text', defaultValue: 'center' },
+                descriptionMobileAlignment: { type: 'text', defaultValue: 'center' },
                 items: { type: 'list', defaultValue: [{ id: 'item1', text: '<strong>Lorem ipsum odor amet</strong>' }, { id: 'item2', text: '<strong>Consectetur adipiscing elit</strong>' }] },
                 showButton: { type: 'boolean', defaultValue: true },
                 buttonText: { type: 'text', defaultValue: 'Nulla Ut Erat Enim', maxLength: 40 },
                 buttonLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
-                buttonAlignment: { type: 'text', defaultValue: 'center' }
+                buttonAlignment: { type: 'text', defaultValue: 'center' },
+                buttonMobileAlignment: { type: 'text', defaultValue: 'center' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -218,11 +227,13 @@
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
+            elements.titleMobileAlignmentSelector = document.getElementById('titleMobileAlignmentSelector');
             elements.contentTypeSelector = document.getElementById('contentTypeSelector');
             elements.descriptionSection = document.getElementById('descriptionSection');
             elements.descriptionEditor = document.getElementById('descriptionEditor');
             elements.descriptionFontSize = document.getElementById('descriptionFontSize');
             elements.descriptionAlignmentSelector = document.getElementById('descriptionAlignmentSelector');
+            elements.descriptionMobileAlignmentSelector = document.getElementById('descriptionMobileAlignmentSelector');
             elements.checklistSection = document.getElementById('checklistSection');
             elements.itemsContainer = document.getElementById('itemsContainer');
             elements.addItemBtn = document.getElementById('addItemBtn');
@@ -233,6 +244,7 @@
             elements.buttonLink = document.getElementById('buttonLink');
             elements.buttonLinkError = document.getElementById('buttonLinkError');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
+            elements.buttonMobileAlignmentSelector = document.getElementById('buttonMobileAlignmentSelector');
         }
 
         function setLoadingState(loading) {
@@ -350,21 +362,21 @@
             const buttonLink = utils.getFieldValue('buttonLink');
             const buttonAlign = utils.getFieldValue('buttonAlignment');
             const titleLineHeight = titleSize + 8;
-            const titleMobileClass = titleAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
+            const titleMobileClass = utils.getFieldValue('titleMobileAlignment') === 'left' ? 'mobile-text-left' : 'mobile-text-center';
             let contentHtml = '';
             if (contentType === 'description') {
                 const description = processRichText(utils.getFieldValue('description'));
                 const descriptionSize = utils.getFieldValue('descriptionFontSize');
                 const descriptionAlign = utils.getFieldValue('descriptionAlignment');
                 const descriptionLineHeight = descriptionSize + 12;
-                const descriptionMobileClass = descriptionAlign === 'left' ? 'mobile-text-left' : 'mobile-text-center';
+                const descriptionMobileClass = utils.getFieldValue('descriptionMobileAlignment') === 'left' ? 'mobile-text-left' : 'mobile-text-center';
                 contentHtml = `<tr><td class="story-intro ${descriptionMobileClass}" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: ${descriptionSize}px; font-weight: normal; line-height: ${descriptionLineHeight}px; margin: 0; text-align: ${descriptionAlign};">${description}</td></tr>`;
             } else {
                 const items = utils.getFieldValue('items');
                 const itemRowsHtml = items.map(item => `<tr><td valign="middle" style="width: 20px;"><img alt="Checkmark" src="https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/73ad311a-bf28-4d11-b80d-d0da32b9d2b2.png" style="display: block; height: auto; outline: none; text-decoration: none; min-width: 20px;" width="20"></td><td valign="middle" style="width: 12px;">&nbsp;</td><td class="story-intro mobile-text-left" valign="middle" style="color: #ffffff; font-family: 'Helvetica-Neue', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: normal; line-height: 18px; margin: 0; mso-line-height-rule: exactly; text-align: left;">${processRichText(item.text)}</td></tr>`).join('');
                 contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             }
-            const textContentTable = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;">&nbsp;</td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;">&nbsp;</div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h2 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h2></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;">&nbsp;</div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;">&nbsp;</div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
+            const textContentTable = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;">&nbsp;</td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;">&nbsp;</div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h2 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h2></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;">&nbsp;</div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;">&nbsp;</div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white${utils.getFieldValue('buttonMobileAlignment') === 'center' ? ' button-mobile-center' : ''}" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
             const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
             const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><!--[if (gte mso 9)|(IE)]><table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top"><![endif]-->${textContentTable}<!--[if (gte mso 9)|(IE)]></td></tr><tr><td height="100%">&nbsp;</td></tr></table><![endif]--></td>`;
             
@@ -554,13 +566,16 @@
             setupTextInput(elements.imageLink, 'imageLink', true, elements.imageLinkError);
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
+            setupOptionSelector(elements.titleMobileAlignmentSelector, 'titleMobileAlignment');
             setupOptionSelector(elements.contentTypeSelector, 'contentType', toggleContentTypeView);
             setupNumberInput(elements.descriptionFontSize, 'descriptionFontSize');
             setupOptionSelector(elements.descriptionAlignmentSelector, 'descriptionAlignment');
+            setupOptionSelector(elements.descriptionMobileAlignmentSelector, 'descriptionMobileAlignment');
             setupToggle(elements.showButton, 'showButton', elements.buttonFieldsGroup);
             setupTextInput(elements.buttonText, 'buttonText');
             setupTextInput(elements.buttonLink, 'buttonLink', true, elements.buttonLinkError);
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
+            setupOptionSelector(elements.buttonMobileAlignmentSelector, 'buttonMobileAlignment');
 
             // Use consolidated delegated event handler for items
             const itemHandler = createDelegatedHandler('items', itemActions);
@@ -844,11 +859,14 @@
             });
 
             setSelectorState(elements.titleAlignmentSelector, 'titleAlignment');
+            setSelectorState(elements.titleMobileAlignmentSelector, 'titleMobileAlignment');
             setSelectorState(elements.descriptionAlignmentSelector, 'descriptionAlignment');
+            setSelectorState(elements.descriptionMobileAlignmentSelector, 'descriptionMobileAlignment');
             const showButton = utils.getFieldValue('showButton');
             elements.showButton.checked = showButton;
             if (elements.buttonFieldsGroup) elements.buttonFieldsGroup.classList.toggle('disabled-field', !showButton);
             setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
+            setSelectorState(elements.buttonMobileAlignmentSelector, 'buttonMobileAlignment');
 
             const contentType = utils.getFieldValue('contentType');
             setSelectorState(elements.contentTypeSelector, 'contentType');
