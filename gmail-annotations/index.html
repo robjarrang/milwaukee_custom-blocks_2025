@@ -178,6 +178,59 @@
         .copy-btn:hover { background-color: #555; }
         .copy-btn.copied { background-color: #2d8a4e; color: #fff; border-color: #2d8a4e; }
 
+        /* Output tabs */
+        .output-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+        }
+        .output-tab {
+            padding: 8px 16px;
+            background-color: #2a2a2a;
+            color: #888;
+            border: 1px solid #333;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            transition: background-color .2s, color .2s;
+        }
+        .output-tab:hover {
+            background-color: #333;
+            color: #ccc;
+        }
+        .output-tab.active {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-color: #555;
+        }
+        .output-tab-panel {
+            display: none;
+        }
+        .output-tab-panel.active {
+            display: block;
+        }
+        .output-tab-panel .json-preview {
+            border-radius: 0 0 6px 6px;
+            margin-top: 0;
+        }
+        .output-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .preview-link {
+            font-size: 12px;
+            color: #0074d9;
+            text-decoration: none;
+        }
+        .preview-link:hover {
+            text-decoration: underline;
+        }
+
         /* Validation summary */
         .validation-summary {
             padding: 10px 12px;
@@ -518,9 +571,27 @@
             <div id="validationSummary" class="validation-summary valid">
                 &#10003; Ready to generate. Fill in the required fields above.
             </div>
-            <div class="json-preview-wrapper">
-                <button id="copyJsonBtn" class="copy-btn" title="Copy code to clipboard">&#128203; Copy Code</button>
+
+            <div class="output-tabs">
+                <button class="output-tab active" data-tab="ampscript">Code Snippet (AMPscript)</button>
+                <button class="output-tab" data-tab="preview">Email Preview (Script Tag)</button>
+            </div>
+
+            <!-- Tab 1: AMPscript output for SFMC Code Snippet block -->
+            <div id="tabAmpscript" class="output-tab-panel active">
+                <div class="output-actions">
+                    <button id="copyJsonBtn" class="copy-btn" title="Copy AMPscript code to clipboard">&#128203; Copy Code</button>
+                </div>
                 <div id="jsonPreview" class="json-preview">{}</div>
+            </div>
+
+            <!-- Tab 2: Raw script tag preview for Gmail annotation testing -->
+            <div id="tabPreview" class="output-tab-panel">
+                <div class="output-actions">
+                    <button id="copyPreviewBtn" class="copy-btn" title="Copy script tag to clipboard">&#128203; Copy Script Tag</button>
+                    <a href="https://developers.google.com/workspace/gmail/promotab/preview" target="_blank" class="preview-link">&#128279; Test in Gmail Annotation Preview Tool</a>
+                </div>
+                <div id="scriptPreview" class="json-preview">{}</div>
             </div>
         </div>
     </div>
@@ -782,6 +853,17 @@ SET @JSONEnd = Concat('<','/','script','>')
 %%=TreatAsContent(@JSONStart)=%%
 ${jsonString}
 %%=TreatAsContent(@JSONEnd)=%%`;
+            },
+
+            /**
+             * Generate the raw script tag output for email preview testing
+             */
+            generateScriptTagOutput() {
+                const jsonLd = generateJsonLd();
+                const jsonString = JSON.stringify(jsonLd, null, 2);
+                return `<script type="application/ld+json">
+${jsonString}
+<\/script>`;
             }
         };
 
@@ -833,7 +915,12 @@ ${jsonString}
             // Output
             elements.validationSummary = document.getElementById('validationSummary');
             elements.jsonPreview = document.getElementById('jsonPreview');
+            elements.scriptPreview = document.getElementById('scriptPreview');
             elements.copyJsonBtn = document.getElementById('copyJsonBtn');
+            elements.copyPreviewBtn = document.getElementById('copyPreviewBtn');
+            elements.outputTabs = document.querySelectorAll('.output-tab');
+            elements.tabAmpscript = document.getElementById('tabAmpscript');
+            elements.tabPreview = document.getElementById('tabPreview');
         }
 
         // =====================================================================
@@ -1207,6 +1294,12 @@ ${jsonString}
                         elements.jsonPreview.innerHTML = utils.syntaxHighlightJson(fullOutput);
                     }
 
+                    // Update script tag preview
+                    const scriptOutput = utils.generateScriptTagOutput();
+                    if (elements.scriptPreview) {
+                        elements.scriptPreview.innerHTML = utils.syntaxHighlightJson(scriptOutput);
+                    }
+
                     // Set content in SFMC
                     const html = generateTemplate();
                     state.sdk.setContent(html);
@@ -1400,64 +1493,65 @@ ${jsonString}
                 refreshPreview();
             });
 
-            // ---- Copy Code button ----
-            utils.addEventListenerTracked(elements.copyJsonBtn, 'click', () => {
-                const fullOutput = utils.generateCopyOutput();
+            // ---- Output tab switching ----
+            elements.outputTabs.forEach(tab => {
+                utils.addEventListenerTracked(tab, 'click', () => {
+                    elements.outputTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = tab.dataset.tab;
+                    elements.tabAmpscript.classList.toggle('active', target === 'ampscript');
+                    elements.tabPreview.classList.toggle('active', target === 'preview');
+                });
+            });
 
+            // ---- Shared copy helper ----
+            const copyToClipboard = (text, button, defaultLabel) => {
                 // Attempt 1: execCommand with temporary textarea (works in iframes)
-                const copyViaExecCommand = () => {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = fullOutput;
-                    textarea.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    let success = false;
-                    try {
-                        success = document.execCommand('copy');
-                    } catch (e) {
-                        success = false;
-                    }
-                    document.body.removeChild(textarea);
-                    return success;
-                };
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+                document.body.appendChild(textarea);
+                textarea.select();
+                let success = false;
+                try { success = document.execCommand('copy'); } catch (e) { success = false; }
+                document.body.removeChild(textarea);
 
-                // Attempt 2: Clipboard API (may fail in iframes)
-                const copyViaClipboardApi = () => {
-                    return navigator.clipboard.writeText(fullOutput);
-                };
+                if (success) {
+                    button.textContent = '\u2713 Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => { button.textContent = defaultLabel; button.classList.remove('copied'); }, 2000);
+                    return;
+                }
 
-                // Try execCommand first (most reliable in SFMC iframes)
-                if (copyViaExecCommand()) {
-                    elements.copyJsonBtn.textContent = '\u2713 Copied!';
-                    elements.copyJsonBtn.classList.add('copied');
-                    setTimeout(() => {
-                        elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
-                        elements.copyJsonBtn.classList.remove('copied');
-                    }, 2000);
-                } else {
-                    // Fall back to Clipboard API
-                    copyViaClipboardApi().then(() => {
-                        elements.copyJsonBtn.textContent = '\u2713 Copied!';
-                        elements.copyJsonBtn.classList.add('copied');
-                        setTimeout(() => {
-                            elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
-                            elements.copyJsonBtn.classList.remove('copied');
-                        }, 2000);
-                    }).catch(() => {
-                        // Final fallback: select the preview text and prompt user
+                // Attempt 2: Clipboard API
+                navigator.clipboard.writeText(text).then(() => {
+                    button.textContent = '\u2713 Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => { button.textContent = defaultLabel; button.classList.remove('copied'); }, 2000);
+                }).catch(() => {
+                    // Fallback: select text and prompt user
+                    const previewEl = button.closest('.output-tab-panel').querySelector('.json-preview');
+                    if (previewEl) {
                         const range = document.createRange();
-                        range.selectNodeContents(elements.jsonPreview);
+                        range.selectNodeContents(previewEl);
                         const sel = window.getSelection();
                         sel.removeAllRanges();
                         sel.addRange(range);
-                        elements.copyJsonBtn.textContent = 'Selected \u2014 press Ctrl+C to copy';
-                        elements.copyJsonBtn.classList.add('copied');
-                        setTimeout(() => {
-                            elements.copyJsonBtn.textContent = '\uD83D\uDCCB Copy Code';
-                            elements.copyJsonBtn.classList.remove('copied');
-                        }, 4000);
-                    });
-                }
+                    }
+                    button.textContent = 'Selected \u2014 press Ctrl+C to copy';
+                    button.classList.add('copied');
+                    setTimeout(() => { button.textContent = defaultLabel; button.classList.remove('copied'); }, 4000);
+                });
+            };
+
+            // ---- Copy Code button (AMPscript tab) ----
+            utils.addEventListenerTracked(elements.copyJsonBtn, 'click', () => {
+                copyToClipboard(utils.generateCopyOutput(), elements.copyJsonBtn, '\uD83D\uDCCB Copy Code');
+            });
+
+            // ---- Copy Script Tag button (Preview tab) ----
+            utils.addEventListenerTracked(elements.copyPreviewBtn, 'click', () => {
+                copyToClipboard(utils.generateScriptTagOutput(), elements.copyPreviewBtn, '\uD83D\uDCCB Copy Script Tag');
             });
         }
 
