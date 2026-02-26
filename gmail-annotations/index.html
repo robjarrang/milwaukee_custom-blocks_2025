@@ -218,7 +218,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 8px;
+            margin-top: 8px;
         }
         .preview-link {
             font-size: 12px;
@@ -577,19 +577,19 @@
 
             <!-- Tab 1: AMPscript output for SFMC Code Snippet block -->
             <div id="tabAmpscript" class="output-tab-panel active">
+                <div id="jsonPreview" class="json-preview">{}</div>
                 <div class="output-actions">
                     <button id="copyJsonBtn" class="copy-btn" title="Copy AMPscript code to clipboard">&#128203; Copy Code</button>
                 </div>
-                <div id="jsonPreview" class="json-preview">{}</div>
             </div>
 
             <!-- Tab 2: Raw script tag preview for Gmail annotation testing -->
             <div id="tabPreview" class="output-tab-panel">
+                <div id="scriptPreview" class="json-preview">{}</div>
                 <div class="output-actions">
                     <button id="copyPreviewBtn" class="copy-btn" title="Copy script tag to clipboard">&#128203; Copy Script Tag</button>
                     <a href="https://developers.google.com/workspace/gmail/promotab/preview" target="_blank" class="preview-link">&#128279; Test in Gmail Annotation Preview Tool</a>
                 </div>
-                <div id="scriptPreview" class="json-preview">{}</div>
             </div>
         </div>
     </div>
