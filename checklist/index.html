@@ -177,28 +177,18 @@
             },
 
             createEditor(container, id, content = '') {
-                // Create editor with memory tracking and line break support
-                const editor = new Quill(container, {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [['bold', { 'script': 'super' }], ['link']],
-                        clipboard: { 
-                            matchVisual: false,
-                            // Preserve line breaks in clipboard
-                            matchers: [
-                                // Convert non-breaking spaces to regular spaces
-                                [Node.TEXT_NODE, function(node, delta) {
-                                    if (typeof node.data === 'string') {
-                                        const text = node.data.replace(/\u00A0/g, ' ').replace(/&nbsp;/g, ' ');
-                                        return new (window.Quill.import('delta'))().insert(text);
-                                    }
-                                    return delta;
-                                }]
-                            ]
-                        }
-                    },
-                    formats: ['bold', 'script', 'link'],
-                    placeholder: 'List item text...'
+                // Create editor using shared QuillConfigManager (includes NBSP button & space cleanup)
+                const editor = new Quill(container, QuillConfigManager.createConfig('description', {
+                    placeholder: 'List item text...',
+                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp']],
+                    customFormats: ['bold', 'script', 'link', 'nbsp']
+                }));
+
+                // Apply QuillConfigManager post-init handlers (NBSP cleanup, space monitor, toolbar handler)
+                QuillConfigManager.addEmailFormatting(editor);
+                QuillConfigManager.addSpaceCleanupMonitor(editor);
+                QuillConfigManager.addNbspToolbarHandler(editor, 'description', {
+                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp']]
                 });
 
                 // Track editor metadata
@@ -214,8 +204,7 @@
 
                 // Set content if provided
                 if (content && content.trim()) {
-                    editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
 
                 return editor;
@@ -282,12 +271,9 @@
                 const id = itemEl.dataset.id;
                 const editor = state.editors[id];
                 if (editor) {
-                    // Use Quill 2.0 API for getting content
-                    const content = editor.getSemanticHTML ? 
-                        editor.getSemanticHTML() : 
-                        editor.root.innerHTML;
-                    // Use QuillConfigManager to properly preserve line breaks
-                    newItems.push({ id: id, text: QuillConfigManager.sanitizeForEmail(content) });
+                    // Use QuillConfigManager to get clean content with NBSP blot support
+                    const content = QuillConfigManager.getCleanContent(editor, true);
+                    newItems.push({ id: id, text: content });
                 }
             });
             state.blockData.items = newItems;
