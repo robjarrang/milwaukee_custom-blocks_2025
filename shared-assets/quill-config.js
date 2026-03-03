@@ -267,22 +267,6 @@ class QuillConfigManager {
             }
         });
 
-        // Clean up non-breaking spaces on text changes
-        editor.on('text-change', (delta, oldDelta, source) => {
-            if (source === 'user') {
-                const text = editor.getText();
-                if (text.includes('\u00A0')) {
-                    // Replace non-breaking spaces with regular spaces
-                    const cleanText = text.replace(/\u00A0/g, ' ');
-                    const currentSelection = editor.getSelection();
-                    editor.setText(cleanText);
-                    if (currentSelection) {
-                        editor.setSelection(currentSelection.index, currentSelection.length);
-                    }
-                }
-            }
-        });
-
         // Override paste behavior to clean up non-breaking spaces
         editor.clipboard.addMatcher(Node.TEXT_NODE, function(node, delta) {
             if (typeof node.data === 'string') {
@@ -347,8 +331,21 @@ class QuillConfigManager {
     static sanitizeForEmail(html) {
         if (!html) return '';
 
+        // Step 1: Protect intentional nbsp blots (NBSP button) in the raw string
+        let result = this.protectNbspBlots(html);
+
+        // Step 2: Clean all non-breaking space variants at the STRING level
+        // before DOM parsing. Quill 2.0's getSemanticHTML() replaces every
+        // regular space with &nbsp;, so this is the primary cleanup path.
+        result = result
+            .replace(/&nbsp;/gi, ' ')         // Named entity
+            .replace(/&#160;/gi, ' ')         // Decimal entity
+            .replace(/&#x[Aa]0;/gi, ' ')      // Hex entity
+            .replace(/\u00A0/g, ' ');         // Raw Unicode char
+
+        // Step 3: DOM round-trip for sanitisation (script/event handler removal)
         const temp = document.createElement('div');
-        temp.innerHTML = html;
+        temp.innerHTML = result;
 
         // Remove script and style tags
         temp.querySelectorAll('script, style').forEach(el => el.remove());
@@ -363,18 +360,17 @@ class QuillConfigManager {
             }
         }
 
-        // Preserve intentional nbsp blots (from the NBSP button) before cleaning
-        let result = this.protectNbspBlots(temp.innerHTML);
-
-        // Clean up email-incompatible formatting and non-breaking spaces
-        result = result
+        // Step 4: Serialize back and clean up email-incompatible formatting.
+        // The DOM round-trip may reintroduce &nbsp; so we clean again.
+        result = temp.innerHTML
             .replace(/<p>/g, '')
             .replace(/<\/p>/g, '<br>')        // Convert closing </p> to <br> for line breaks
             .replace(/<div[^>]*>/g, '')
             .replace(/<\/div>/g, '<br>')      // Convert closing </div> to <br> for line breaks
             .replace(/^<br\s*\/?>/g, '')      // Remove leading <br>
             .replace(/<br\s*\/?>$/g, '')      // Remove trailing <br>
-            .replace(/&nbsp;/g, ' ')          // Replace HTML non-breaking spaces
+            .replace(/&nbsp;/gi, ' ')         // Replace HTML non-breaking spaces (post-DOM)
+            .replace(/&#160;/gi, ' ')         // Replace decimal entities (post-DOM)
             .replace(/\u00A0/g, ' ')          // Replace Unicode non-breaking spaces
             .replace(/\s{2,}/g, ' ')          // Replace multiple spaces with single space
             .trim();
@@ -549,37 +545,12 @@ class QuillConfigManager {
      * @param {Object} editor - Quill instance to monitor
      */
     static addSpaceCleanupMonitor(editor) {
-        let isCleaningSpaces = false;
-
-        const cleanupSpaces = () => {
-            if (isCleaningSpaces) return;
-            
-            const text = editor.getText();
-            if (text.includes('\u00A0')) {
-                isCleaningSpaces = true;
-                const selection = editor.getSelection();
-                const cleanText = this.cleanSpaces(text);
-                
-                editor.setText(cleanText);
-                
-                if (selection) {
-                    // Restore cursor position
-                    const newIndex = Math.min(selection.index, cleanText.length);
-                    editor.setSelection(newIndex, 0);
-                }
-                isCleaningSpaces = false;
-            }
-        };
-
-        // Monitor for non-breaking spaces on text changes
-        editor.on('text-change', (delta, oldDelta, source) => {
-            if (source === 'user') {
-                setTimeout(cleanupSpaces, 10); // Small delay to let Quill finish processing
-            }
-        });
-
-        // Also clean on focus loss
-        editor.root.addEventListener('blur', cleanupSpaces);
+        // Non-breaking space cleanup is handled at output time by
+        // sanitizeForEmail() and getCleanContent(). Real-time
+        // editor.setText() calls were stripping all formatting
+        // (bold, links, etc.), so live monitoring is intentionally
+        // disabled. \u00A0 is visually identical to a regular space,
+        // so users are unaffected.
     }
 }
 
