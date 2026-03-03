@@ -363,12 +363,8 @@ class QuillConfigManager {
             }
         }
 
-        // Preserve intentional nbsp blots before cleaning
+        // Preserve intentional nbsp blots (from the NBSP button) before cleaning
         let result = this.protectNbspBlots(temp.innerHTML);
-
-        // Also protect bare &nbsp; entities already present in the input.
-        // At this point any &nbsp; has survived earlier sanitisation and is intentional.
-        result = result.replace(/&nbsp;/g, this.NBSP_TOKEN);
 
         // Clean up email-incompatible formatting and non-breaking spaces
         result = result
