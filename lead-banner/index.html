@@ -69,6 +69,11 @@
         </div>
 
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
+            <div class="section-title">Overlay Tool Bookmark</div>
+            <div class="field-group"><label for="overlayToolLink" class="field-label">Overlay Tool Share Link</label><input type="url" id="overlayToolLink" class="field-input" placeholder="Paste your Image Overlay Tool share link here"><p class="field-hint" style="margin:4px 0 0;font-size:11px;color:#888;">This link is saved for reference only and will not appear in the email output.</p></div>
+        </div>
+
+        <div class="section-divider" id="bannerSettingsSection" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
             <div class="field-group" id="backgroundImageGroup"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
         </div>
@@ -141,7 +146,8 @@
                 heroDesktopImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/3c5efc32-d086-4f3b-b1bb-93d57835d55a.jpg', validator: 'url' },
                 heroMobileImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/7ca5ce3c-68d6-43bd-bbea-33125fa0c950.jpg', validator: 'url' },
                 heroAlt: { type: 'text', defaultValue: 'Hero banner' },
-                contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' }
+                contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
+                overlayToolLink: { type: 'text', defaultValue: '' }
             },
             debounceDelay: 300, 
             maxRetries: 3
@@ -275,6 +281,7 @@
             elements.verticalAlignSelector = document.getElementById('verticalAlignSelector');
             elements.textAlignSelector = document.getElementById('textAlignSelector');
             elements.backgroundImageGroup = document.getElementById('backgroundImageGroup');
+            elements.bannerSettingsSection = document.getElementById('bannerSettingsSection');
             elements.verticalAlignGroup = document.getElementById('verticalAlignGroup');
             elements.textAlignGroup = document.getElementById('textAlignGroup');
             elements.textContent = document.getElementById('textContent');
@@ -295,6 +302,7 @@
             elements.heroAlt = document.getElementById('heroAlt');
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
+            elements.overlayToolLink = document.getElementById('overlayToolLink');
         }
 
         function setLoadingState(loading) {
@@ -471,6 +479,11 @@
             elements.heroAlt.addEventListener('input', heroAltHandler);
             state.eventListeners.push({ element: elements.heroAlt, event: 'input', handler: heroAltHandler });
 
+            // Overlay Tool bookmark (saved but not rendered in email output)
+            const overlayLinkHandler = (e) => debouncedUpdateData('overlayToolLink', e.target.value.trim());
+            elements.overlayToolLink.addEventListener('input', overlayLinkHandler);
+            state.eventListeners.push({ element: elements.overlayToolLink, event: 'input', handler: overlayLinkHandler });
+
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
                 const correctValueOnBlur = (e) => {
@@ -549,6 +562,7 @@
             elements.heroMobileImage.value = utils.getFieldValue('heroMobileImage');
             elements.heroAlt.value = utils.getFieldValue('heroAlt');
             elements.contentUrl.value = utils.getFieldValue('contentUrl');
+            elements.overlayToolLink.value = utils.getFieldValue('overlayToolLink');
             elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
             elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
 
@@ -809,13 +823,15 @@
             
             // Show/hide UI elements based on content type
             if (contentType === 'imageswap') {
-                // Image Swap mode - hide background image and positioning controls
+                // Image Swap mode - hide background image, banner settings title, and positioning controls
+                elements.bannerSettingsSection.style.display = 'none';
                 elements.backgroundImageGroup.style.display = 'none';
                 elements.verticalAlignGroup.style.display = 'none';
                 elements.textAlignGroup.style.display = 'none';
                 elements.imageSwapContent.style.display = 'block';
             } else {
                 // Text or Image mode - show all controls
+                elements.bannerSettingsSection.style.display = 'block';
                 elements.backgroundImageGroup.style.display = 'block';
                 elements.verticalAlignGroup.style.display = 'block';
                 elements.textAlignGroup.style.display = 'block';
