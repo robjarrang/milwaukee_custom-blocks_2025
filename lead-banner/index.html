@@ -70,7 +70,7 @@
 
         <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Overlay Tool Bookmark</div>
-            <div class="field-group"><label for="overlayToolLink" class="field-label">Overlay Tool Share Link</label><input type="url" id="overlayToolLink" class="field-input" placeholder="Paste your Image Overlay Tool share link here"><p class="field-hint" style="margin:4px 0 0;font-size:11px;color:#888;">This link is saved for reference only and will not appear in the email output.</p></div>
+            <div class="field-group"><label for="overlayToolLink" class="field-label">Overlay Tool Share Link</label><input type="url" id="overlayToolLink" class="field-input" placeholder="Paste your Image Overlay Tool share link here"><a id="overlayToolLinkOpen" href="#" target="_blank" rel="noopener noreferrer" style="display:none;margin-top:6px;font-size:12px;color:#4a90d9;text-decoration:underline;cursor:pointer;word-break:break-all;">Open saved overlay settings →</a><p class="field-hint" style="margin:4px 0 0;font-size:11px;color:#888;">This link is saved for reference only and will not appear in the email output.</p></div>
         </div>
 
         <div class="section-divider" id="bannerSettingsSection" style="margin-top:0; padding-top:0; border-top:none;">
@@ -303,6 +303,7 @@
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
             elements.overlayToolLink = document.getElementById('overlayToolLink');
+            elements.overlayToolLinkOpen = document.getElementById('overlayToolLinkOpen');
         }
 
         function setLoadingState(loading) {
@@ -480,7 +481,19 @@
             state.eventListeners.push({ element: elements.heroAlt, event: 'input', handler: heroAltHandler });
 
             // Overlay Tool bookmark (saved but not rendered in email output)
-            const overlayLinkHandler = (e) => debouncedUpdateData('overlayToolLink', e.target.value.trim());
+            function updateOverlayLink(url) {
+                if (url && url.startsWith('http')) {
+                    elements.overlayToolLinkOpen.href = url;
+                    elements.overlayToolLinkOpen.style.display = 'inline-block';
+                } else {
+                    elements.overlayToolLinkOpen.style.display = 'none';
+                }
+            }
+            const overlayLinkHandler = (e) => {
+                const val = e.target.value.trim();
+                debouncedUpdateData('overlayToolLink', val);
+                updateOverlayLink(val);
+            };
             elements.overlayToolLink.addEventListener('input', overlayLinkHandler);
             state.eventListeners.push({ element: elements.overlayToolLink, event: 'input', handler: overlayLinkHandler });
 
@@ -562,7 +575,14 @@
             elements.heroMobileImage.value = utils.getFieldValue('heroMobileImage');
             elements.heroAlt.value = utils.getFieldValue('heroAlt');
             elements.contentUrl.value = utils.getFieldValue('contentUrl');
-            elements.overlayToolLink.value = utils.getFieldValue('overlayToolLink');
+            const savedOverlayLink = utils.getFieldValue('overlayToolLink');
+            elements.overlayToolLink.value = savedOverlayLink;
+            if (savedOverlayLink && savedOverlayLink.startsWith('http')) {
+                elements.overlayToolLinkOpen.href = savedOverlayLink;
+                elements.overlayToolLinkOpen.style.display = 'inline-block';
+            } else {
+                elements.overlayToolLinkOpen.style.display = 'none';
+            }
             elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
             elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
 
