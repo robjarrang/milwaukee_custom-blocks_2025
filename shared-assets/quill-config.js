@@ -309,12 +309,10 @@ class QuillConfigManager {
             dropdown.className = 'ql-linebreak-dropdown';
             dropdown.innerHTML =
                 '<div class="ql-linebreak-option" data-type="standard">' +
-                    '<span class="ql-linebreak-option-label">Line Break</span>' +
-                    '<span class="ql-linebreak-option-code">&lt;br&gt;&amp;nbsp;</span>' +
+                    '<span class="ql-linebreak-option-label">Line break</span>' +
                 '</div>' +
                 '<div class="ql-linebreak-option" data-type="mobile-hide">' +
-                    '<span class="ql-linebreak-option-label">Line Break (Mobile Hide)</span>' +
-                    '<span class="ql-linebreak-option-code">&lt;br class=&quot;mobile-hide&quot;&gt;&amp;nbsp;</span>' +
+                    '<span class="ql-linebreak-option-label">Line break (mobile hide)</span>' +
                 '</div>';
             brButton.appendChild(dropdown);
 
@@ -679,20 +677,19 @@ class QuillConfigManager {
     /**
      * Converts safe tokens back to line break HTML for email output.
      * @param {string} html - HTML containing tokens
-     * @returns {string} HTML with tokens replaced by <br>&nbsp; variants
+     * @returns {string} HTML with tokens replaced by <br> variants
      */
     static restoreLinebreakTokens(html) {
         if (!html) return '';
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return html
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">&nbsp;')
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>&nbsp;');
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">')
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>');
     }
 
     /**
-     * Converts <br>&nbsp; and <br class="mobile-hide">&nbsp; in saved content
+     * Converts <br> and <br class="mobile-hide"> in saved content
      * back to blot markup so that Quill can reconstruct the LineBreakBlot on reload.
-     * Must be called BEFORE convertNbspToBlots to avoid the &nbsp; being consumed.
      * @param {string} html - Saved HTML content
      * @returns {string} HTML with line break patterns converted to blot markup
      */
@@ -700,23 +697,10 @@ class QuillConfigManager {
         if (!html) return '';
         // First protect any existing blot markup
         let result = this.protectLinebreakBlots(html);
-        // Convert <br class="mobile-hide">&nbsp; to blot markup (must be before generic <br>&nbsp;)
+        // Convert <br class="mobile-hide"> to blot markup (must be before generic <br>)
         result = result.replace(
-            /<br\s+class="mobile-hide"\s*\/?>\s*&nbsp;/gi,
+            /<br\s+class="mobile-hide"\s*\/?>/gi,
             '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
-        );
-        result = result.replace(
-            /<br\s+class="mobile-hide"\s*\/?>\s*\u00A0/gi,
-            '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
-        );
-        // Convert <br>&nbsp; to blot markup
-        result = result.replace(
-            /<br\s*\/?>\s*&nbsp;/gi,
-            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
-        );
-        result = result.replace(
-            /<br\s*\/?>\s*\u00A0/gi,
-            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
         );
         // Restore the originals that were already blots
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
