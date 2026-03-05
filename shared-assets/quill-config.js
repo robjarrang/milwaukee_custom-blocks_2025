@@ -454,6 +454,12 @@ class QuillConfigManager {
         content = this.restoreNbspTokens(content);
         content = this.restoreLinebreakTokens(content);
 
+        // Convert Outlook conditional break placeholders to real conditional comments
+        // (only for email output — conditional comments are stripped by DOM parsers)
+        if (emailOptimized) {
+            content = this.convertToConditionalBreaks(content);
+        }
+
         return content;
     }
 
@@ -705,10 +711,23 @@ class QuillConfigManager {
         if (!html) return '';
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return html
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MSO_ONLY), 'g'), '<!--[if mso]><br><![endif]-->')
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_NON_MSO), 'g'), '<!--[if !mso]><br><!--<![endif]-->')
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MSO_ONLY), 'g'), '<br class="mso-only">')
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_NON_MSO), 'g'), '<br class="non-mso">')
             .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">')
             .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>');
+    }
+
+    /**
+     * Converts DOM-safe <br> class placeholders to actual Outlook conditional comments.
+     * Called as the final step only for email output.
+     * @param {string} html - HTML with <br class="mso-only"> / <br class="non-mso"> tags
+     * @returns {string} HTML with real conditional comments
+     */
+    static convertToConditionalBreaks(html) {
+        if (!html) return '';
+        return html
+            .replace(/<br\s+class="mso-only"\s*\/?>/gi, '<!--[if mso]><br><![endif]-->')
+            .replace(/<br\s+class="non-mso"\s*\/?>/gi, '<!--[if !mso]><br><!--<![endif]-->');
     }
 
     /**
@@ -721,13 +740,13 @@ class QuillConfigManager {
         if (!html) return '';
         // First protect any existing blot markup
         let result = this.protectLinebreakBlots(html);
-        // Convert Outlook conditional line breaks to blot markup (must be before generic patterns)
+        // Convert <br class="mso-only"> and <br class="non-mso"> to blot markup (must be before generic patterns)
         result = result.replace(
-            /<!--\[if mso\]><br\s*\/?><\!\[endif\]-->/gi,
+            /<br\s+class="mso-only"\s*\/?>/gi,
             '<span class="ql-linebreak" data-type="mso-only" contenteditable="false">\u21B5O</span>'
         );
         result = result.replace(
-            /<!--\[if !mso\]><br\s*\/?><!--<\!\[endif\]-->/gi,
+            /<br\s+class="non-mso"\s*\/?>/gi,
             '<span class="ql-linebreak" data-type="non-mso" contenteditable="false">\u21B5!O</span>'
         );
         // Convert <br class="mobile-hide"> to blot markup (must be before generic <br>)
