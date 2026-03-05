@@ -683,13 +683,14 @@ class QuillConfigManager {
         if (!html) return '';
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return html
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">')
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>');
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide" data-type="linebreak">')
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br data-type="linebreak">');
     }
 
     /**
-     * Converts <br> and <br class="mobile-hide"> in saved content
+     * Converts marked <br data-type="linebreak"> tags in saved content
      * back to blot markup so that Quill can reconstruct the LineBreakBlot on reload.
+     * Only converts <br> tags with data-type="linebreak" attribute, leaving regular <br> untouched.
      * @param {string} html - Saved HTML content
      * @returns {string} HTML with line break patterns converted to blot markup
      */
@@ -697,10 +698,15 @@ class QuillConfigManager {
         if (!html) return '';
         // First protect any existing blot markup
         let result = this.protectLinebreakBlots(html);
-        // Convert <br class="mobile-hide"> to blot markup (must be before generic <br>)
+        // Convert <br class="mobile-hide" data-type="linebreak"> to blot markup (must be before generic)
         result = result.replace(
-            /<br\s+class="mobile-hide"\s*\/?>/gi,
+            /<br\s+(?:class="mobile-hide"\s+data-type="linebreak"|data-type="linebreak"\s+class="mobile-hide")\s*\/?>/gi,
             '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
+        );
+        // Convert <br data-type="linebreak"> (standard) to blot markup
+        result = result.replace(
+            /<br\s+data-type="linebreak"\s*\/?>/gi,
+            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
         );
         // Restore the originals that were already blots
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
