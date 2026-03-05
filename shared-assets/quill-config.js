@@ -313,7 +313,7 @@ class QuillConfigManager {
                     '<span class="ql-linebreak-option-label">Line break</span>' +
                 '</div>' +
                 '<div class="ql-linebreak-option" data-type="mobile-hide">' +
-                    '<span class="ql-linebreak-option-label">Line break (mobile hide)</span>' +
+                    '<span class="ql-linebreak-option-label">Mobile hide</span>' +
                 '</div>';
             brButton.appendChild(dropdown);
 
