@@ -373,16 +373,7 @@ class QuillConfigManager {
         // Clean up non-breaking spaces on text changes
         editor.on('text-change', (delta, oldDelta, source) => {
             if (source === 'user') {
-                const text = editor.getText();
-                if (text.includes('\u00A0')) {
-                    // Replace non-breaking spaces with regular spaces
-                    const cleanText = text.replace(/\u00A0/g, ' ');
-                    const currentSelection = editor.getSelection();
-                    editor.setText(cleanText);
-                    if (currentSelection) {
-                        editor.setSelection(currentSelection.index, currentSelection.length);
-                    }
-                }
+                QuillConfigManager.cleanNbspFromTextNodes(editor);
             }
         });
 
@@ -536,12 +527,8 @@ class QuillConfigManager {
                 editor.root.innerHTML = cleanContent;
             }
 
-            // Additional cleanup after setting content
-            const text = editor.getText();
-            if (text.includes('\u00A0')) {
-                const cleanText = text.replace(/\u00A0/g, ' ');
-                editor.setText(cleanText);
-            }
+            // Surgically clean stray non-breaking spaces without destroying blots
+            this.cleanNbspFromTextNodes(editor);
         } catch (error) {
             console.warn('Failed to set editor content:', error);
         }
@@ -683,14 +670,15 @@ class QuillConfigManager {
         if (!html) return '';
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return html
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide" data-type="linebreak">')
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br data-type="linebreak">');
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide" data-linebreak="mobile-hide">')
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br data-linebreak="standard">');
     }
 
     /**
-     * Converts marked <br data-type="linebreak"> tags in saved content
-     * back to blot markup so that Quill can reconstruct the LineBreakBlot on reload.
-     * Only converts <br> tags with data-type="linebreak" attribute, leaving regular <br> untouched.
+     * Converts line break markers in saved content back to blot markup
+     * so that Quill can reconstruct the LineBreakBlot on reload.
+     * Matches on the data-linebreak attribute to distinguish intentional
+     * line breaks from paragraph-separator <br> tags.
      * @param {string} html - Saved HTML content
      * @returns {string} HTML with line break patterns converted to blot markup
      */
@@ -698,14 +686,14 @@ class QuillConfigManager {
         if (!html) return '';
         // First protect any existing blot markup
         let result = this.protectLinebreakBlots(html);
-        // Convert <br class="mobile-hide" data-type="linebreak"> to blot markup (must be before generic)
+        // Convert <br ... data-linebreak="mobile-hide" ...> to blot markup
         result = result.replace(
-            /<br\s+(?:class="mobile-hide"\s+data-type="linebreak"|data-type="linebreak"\s+class="mobile-hide")\s*\/?>/gi,
+            /<br[^>]*data-linebreak="mobile-hide"[^>]*>/gi,
             '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
         );
-        // Convert <br data-type="linebreak"> (standard) to blot markup
+        // Convert <br ... data-linebreak="standard" ...> to blot markup
         result = result.replace(
-            /<br\s+data-type="linebreak"\s*\/?>/gi,
+            /<br[^>]*data-linebreak="standard"[^>]*>/gi,
             '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
         );
         // Restore the originals that were already blots
@@ -741,22 +729,9 @@ class QuillConfigManager {
 
         const cleanupSpaces = () => {
             if (isCleaningSpaces) return;
-            
-            const text = editor.getText();
-            if (text.includes('\u00A0')) {
-                isCleaningSpaces = true;
-                const selection = editor.getSelection();
-                const cleanText = this.cleanSpaces(text);
-                
-                editor.setText(cleanText);
-                
-                if (selection) {
-                    // Restore cursor position
-                    const newIndex = Math.min(selection.index, cleanText.length);
-                    editor.setSelection(newIndex, 0);
-                }
-                isCleaningSpaces = false;
-            }
+            isCleaningSpaces = true;
+            QuillConfigManager.cleanNbspFromTextNodes(editor);
+            isCleaningSpaces = false;
         };
 
         // Monitor for non-breaking spaces on text changes
@@ -768,6 +743,47 @@ class QuillConfigManager {
 
         // Also clean on focus loss
         editor.root.addEventListener('blur', cleanupSpaces);
+    }
+
+    /**
+     * Surgically replaces \u00A0 in text nodes only, preserving embed blots.
+     * Walks the editor DOM and skips any node inside a contenteditable="false"
+     * container (which covers NBSP and linebreak embed blots).
+     * @param {Object} editor - Quill instance
+     */
+    static cleanNbspFromTextNodes(editor) {
+        if (!editor || !editor.root) return;
+
+        const treeWalker = document.createTreeWalker(
+            editor.root,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode: (node) => {
+                    let parent = node.parentElement;
+                    while (parent && parent !== editor.root) {
+                        if (parent.getAttribute('contenteditable') === 'false') {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        parent = parent.parentElement;
+                    }
+                    return node.data && node.data.includes('\u00A0')
+                        ? NodeFilter.FILTER_ACCEPT
+                        : NodeFilter.FILTER_SKIP;
+                }
+            }
+        );
+
+        const nodes = [];
+        while (treeWalker.nextNode()) nodes.push(treeWalker.currentNode);
+
+        if (nodes.length > 0) {
+            const selection = editor.getSelection();
+            nodes.forEach(n => { n.data = n.data.replace(/\u00A0/g, ' '); });
+            editor.update();
+            if (selection) {
+                editor.setSelection(selection.index, selection.length);
+            }
+        }
     }
 }
 
