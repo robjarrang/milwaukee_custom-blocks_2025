@@ -28,14 +28,3 @@ body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe U
 /* Line break indicator in editor - mobile-hide variant */
 .ql-editor .ql-linebreak[data-type="mobile-hide"]{background:rgba(255,152,0,0.15);color:#f57c00}
 .ql-editor .ql-linebreak[data-type="mobile-hide"]::after{background:#f57c00}
-
-/* Line break indicator in editor - Outlook only variant */
-.ql-editor .ql-linebreak[data-type="mso-only"]{background:rgba(123,31,162,0.15);color:#7b1fa2}
-.ql-editor .ql-linebreak[data-type="mso-only"]::after{background:#7b1fa2}
-
-/* Line break indicator in editor - non-Outlook variant */
-.ql-editor .ql-linebreak[data-type="non-mso"]{background:rgba(0,137,123,0.15);color:#00897b}
-.ql-editor .ql-linebreak[data-type="non-mso"]::after{background:#00897b}
-
-/* Line break dropdown separator */
-.ql-linebreak-separator{height:1px;background:#eee;margin:4px 0}

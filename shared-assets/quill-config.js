@@ -57,13 +57,7 @@
             const type = value || 'standard';
             node.setAttribute('data-type', type);
             node.setAttribute('contenteditable', 'false');
-            const labels = {
-                'standard': '\u21B5',
-                'mobile-hide': '\u21B5M',
-                'mso-only': '\u21B5O',
-                'non-mso': '\u21B5!O'
-            };
-            node.innerHTML = labels[type] || '\u21B5';
+            node.innerHTML = type === 'mobile-hide' ? '\u21B5M' : '\u21B5';
             return node;
         }
 
@@ -319,13 +313,6 @@ class QuillConfigManager {
                 '</div>' +
                 '<div class="ql-linebreak-option" data-type="mobile-hide">' +
                     '<span class="ql-linebreak-option-label">Line break (mobile hide)</span>' +
-                '</div>' +
-                '<div class="ql-linebreak-separator"></div>' +
-                '<div class="ql-linebreak-option" data-type="mso-only">' +
-                    '<span class="ql-linebreak-option-label">Line break (Outlook only)</span>' +
-                '</div>' +
-                '<div class="ql-linebreak-option" data-type="non-mso">' +
-                    '<span class="ql-linebreak-option-label">Line break (non-Outlook)</span>' +
                 '</div>';
             brButton.appendChild(dropdown);
 
@@ -453,12 +440,6 @@ class QuillConfigManager {
         // Restore intentional nbsp and linebreak characters
         content = this.restoreNbspTokens(content);
         content = this.restoreLinebreakTokens(content);
-
-        // Convert Outlook conditional break placeholders to real conditional comments
-        // (only for email output — conditional comments are stripped by DOM parsers)
-        if (emailOptimized) {
-            content = this.convertToConditionalBreaks(content);
-        }
 
         return content;
     }
@@ -667,8 +648,6 @@ class QuillConfigManager {
     /** Tokens used to protect intentional linebreak blots during cleanup */
     static LINEBREAK_TOKEN_STANDARD = '%%LINEBREAK_STANDARD%%';
     static LINEBREAK_TOKEN_MOBILE_HIDE = '%%LINEBREAK_MOBILE_HIDE%%';
-    static LINEBREAK_TOKEN_MSO_ONLY = '%%LINEBREAK_MSO_ONLY%%';
-    static LINEBREAK_TOKEN_NON_MSO = '%%LINEBREAK_NON_MSO%%';
 
     /**
      * Replaces <span class="ql-linebreak" data-type="...">...</span> with safe tokens
@@ -678,22 +657,15 @@ class QuillConfigManager {
      */
     static protectLinebreakBlots(html) {
         if (!html) return '';
-        const blotPattern = (dataType) => [
-            new RegExp('<span[^>]*class="ql-linebreak"[^>]*data-type="' + dataType + '"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>', 'gi'),
-            new RegExp('<span[^>]*data-type="' + dataType + '"[^>]*class="ql-linebreak"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>', 'gi')
-        ];
-        let result = html;
-        // Match specific variants first (most specific to least)
-        const variants = [
-            ['mobile-hide', this.LINEBREAK_TOKEN_MOBILE_HIDE],
-            ['mso-only', this.LINEBREAK_TOKEN_MSO_ONLY],
-            ['non-mso', this.LINEBREAK_TOKEN_NON_MSO]
-        ];
-        for (const [type, token] of variants) {
-            for (const regex of blotPattern(type)) {
-                result = result.replace(regex, token);
-            }
-        }
+        // Match mobile-hide variant first (more specific)
+        let result = html.replace(
+            /<span[^>]*class="ql-linebreak"[^>]*data-type="mobile-hide"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi,
+            this.LINEBREAK_TOKEN_MOBILE_HIDE
+        );
+        result = result.replace(
+            /<span[^>]*data-type="mobile-hide"[^>]*class="ql-linebreak"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi,
+            this.LINEBREAK_TOKEN_MOBILE_HIDE
+        );
         // Then match standard (remaining ql-linebreak spans)
         result = result.replace(
             /<span[^>]*class="ql-linebreak"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi,
@@ -711,23 +683,8 @@ class QuillConfigManager {
         if (!html) return '';
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return html
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MSO_ONLY), 'g'), '<br class="mso-only">')
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_NON_MSO), 'g'), '<br class="non-mso">')
             .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">')
             .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>');
-    }
-
-    /**
-     * Converts DOM-safe <br> class placeholders to actual Outlook conditional comments.
-     * Called as the final step only for email output.
-     * @param {string} html - HTML with <br class="mso-only"> / <br class="non-mso"> tags
-     * @returns {string} HTML with real conditional comments
-     */
-    static convertToConditionalBreaks(html) {
-        if (!html) return '';
-        return html
-            .replace(/<br\s+class="mso-only"\s*\/?>/gi, '<!--[if mso]><br><![endif]-->')
-            .replace(/<br\s+class="non-mso"\s*\/?>/gi, '<!--[if !mso]><br><!--<![endif]-->');
     }
 
     /**
@@ -740,15 +697,6 @@ class QuillConfigManager {
         if (!html) return '';
         // First protect any existing blot markup
         let result = this.protectLinebreakBlots(html);
-        // Convert <br class="mso-only"> and <br class="non-mso"> to blot markup (must be before generic patterns)
-        result = result.replace(
-            /<br\s+class="mso-only"\s*\/?>/gi,
-            '<span class="ql-linebreak" data-type="mso-only" contenteditable="false">\u21B5O</span>'
-        );
-        result = result.replace(
-            /<br\s+class="non-mso"\s*\/?>/gi,
-            '<span class="ql-linebreak" data-type="non-mso" contenteditable="false">\u21B5!O</span>'
-        );
         // Convert <br class="mobile-hide"> to blot markup (must be before generic <br>)
         result = result.replace(
             /<br\s+class="mobile-hide"\s*\/?>/gi,
@@ -756,16 +704,10 @@ class QuillConfigManager {
         );
         // Restore the originals that were already blots
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const blotMap = [
-            [this.LINEBREAK_TOKEN_MSO_ONLY, 'mso-only', '\u21B5O'],
-            [this.LINEBREAK_TOKEN_NON_MSO, 'non-mso', '\u21B5!O'],
-            [this.LINEBREAK_TOKEN_MOBILE_HIDE, 'mobile-hide', '\u21B5M'],
-            [this.LINEBREAK_TOKEN_STANDARD, 'standard', '\u21B5']
-        ];
-        for (const [token, type, label] of blotMap) {
-            result = result.replace(new RegExp(escapeRegex(token), 'g'),
-                '<span class="ql-linebreak" data-type="' + type + '" contenteditable="false">' + label + '</span>');
-        }
+        result = result.replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'),
+            '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>');
+        result = result.replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'),
+            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>');
         return result;
     }
 
