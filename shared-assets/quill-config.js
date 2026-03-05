@@ -38,6 +38,41 @@
     window.Quill.register(NonBreakingSpaceBlot, true);
 })();
 
+/**
+ * Custom Quill Embed Blot for intentional line breaks.
+ * Supports two types: standard (<br>&nbsp;) and mobile-hide (<br class="mobile-hide">&nbsp;).
+ * Renders as <span class="ql-linebreak" data-type="..."> in the editor DOM.
+ */
+(function registerLineBreakBlot() {
+    if (!window.Quill) return;
+    const Embed = window.Quill.import('blots/embed');
+
+    class LineBreakBlot extends Embed {
+        static blotName = 'linebreak';
+        static tagName = 'span';
+        static className = 'ql-linebreak';
+
+        static create(value) {
+            const node = super.create();
+            const type = value || 'standard';
+            node.setAttribute('data-type', type);
+            node.setAttribute('contenteditable', 'false');
+            node.innerHTML = type === 'mobile-hide' ? '\u21B5M' : '\u21B5';
+            return node;
+        }
+
+        static value(node) {
+            return node.getAttribute('data-type') || 'standard';
+        }
+
+        length() {
+            return 1;
+        }
+    }
+
+    window.Quill.register(LineBreakBlot, true);
+})();
+
 class QuillConfigManager {
     static DEFAULT_TIMEOUT = 5000;
     static DEBOUNCE_DELAY = 300;
@@ -46,18 +81,18 @@ class QuillConfigManager {
     static TOOLBAR_PRESETS = {
         minimal: [['bold']],
         basic: [['bold', 'italic'], ['link']],
-        title: [['bold'], [{ 'script': 'super' }], ['nbsp']],
+        title: [['bold'], [{ 'script': 'super' }], ['nbsp'], ['linebreak']],
         button: [[{ 'script': 'super' }]],
-        description: [['bold', 'italic'], [{ 'script': 'super' }], ['link'], ['nbsp']]
+        description: [['bold', 'italic'], [{ 'script': 'super' }], ['link'], ['nbsp'], ['linebreak']]
     };
 
     // Format configurations optimized for email
     static FORMAT_PRESETS = {
         minimal: ['bold'],
         basic: ['bold', 'italic', 'link'],
-        title: ['bold', 'script', 'nbsp'],
+        title: ['bold', 'script', 'nbsp', 'linebreak'],
         button: ['script'],
-        description: ['bold', 'italic', 'script', 'link', 'nbsp']
+        description: ['bold', 'italic', 'script', 'link', 'nbsp', 'linebreak']
     };
 
     // Email-optimized Quill configurations
@@ -171,6 +206,9 @@ class QuillConfigManager {
             // Register nbsp toolbar handler if toolbar includes the nbsp button
             this.addNbspToolbarHandler(editor, type, options);
 
+            // Register linebreak toolbar handler with dropdown
+            this.addLinebreakToolbarHandler(editor, type, options);
+
             return editor;
         } catch (error) {
             throw new Error(`Failed to initialize Quill editor: ${error.message}`);
@@ -243,6 +281,73 @@ class QuillConfigManager {
             if (range) {
                 editor.insertEmbed(range.index, 'nbsp', true, 'user');
                 editor.setSelection(range.index + 1, 0, 'user');
+            }
+        });
+    }
+
+    /**
+     * Registers the linebreak toolbar button handler with dropdown for choosing break type
+     * @param {Object} editor - Quill instance
+     * @param {string} type - Editor preset type
+     * @param {Object} options - Editor options
+     */
+    static addLinebreakToolbarHandler(editor, type, options) {
+        const toolbar = options.customToolbar || this.TOOLBAR_PRESETS[type] || this.TOOLBAR_PRESETS.basic;
+        const hasLinebreak = toolbar.some(group => Array.isArray(group) && group.includes('linebreak'));
+        if (!hasLinebreak) return;
+
+        const toolbarModule = editor.getModule('toolbar');
+        if (!toolbarModule) return;
+
+        // Find the BR button in the toolbar DOM
+        const toolbarEl = toolbarModule.container;
+        const brButton = toolbarEl ? toolbarEl.querySelector('.ql-linebreak') : null;
+
+        if (brButton) {
+            // Create dropdown element
+            const dropdown = document.createElement('div');
+            dropdown.className = 'ql-linebreak-dropdown';
+            dropdown.innerHTML =
+                '<div class="ql-linebreak-option" data-type="standard">' +
+                    '<span class="ql-linebreak-option-label">Line Break</span>' +
+                    '<span class="ql-linebreak-option-code">&lt;br&gt;&amp;nbsp;</span>' +
+                '</div>' +
+                '<div class="ql-linebreak-option" data-type="mobile-hide">' +
+                    '<span class="ql-linebreak-option-label">Line Break (Mobile Hide)</span>' +
+                    '<span class="ql-linebreak-option-code">&lt;br class=&quot;mobile-hide&quot;&gt;&amp;nbsp;</span>' +
+                '</div>';
+            brButton.appendChild(dropdown);
+
+            // Handle option clicks
+            dropdown.querySelectorAll('.ql-linebreak-option').forEach(opt => {
+                opt.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const breakType = opt.getAttribute('data-type');
+                    const range = editor.getSelection(true);
+                    if (range) {
+                        editor.insertEmbed(range.index, 'linebreak', breakType, 'user');
+                        editor.setSelection(range.index + 1, 0, 'user');
+                    }
+                    dropdown.classList.remove('ql-linebreak-dropdown-open');
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('mousedown', (e) => {
+                if (!brButton.contains(e.target)) {
+                    dropdown.classList.remove('ql-linebreak-dropdown-open');
+                }
+            });
+        }
+
+        // Register the toolbar handler to toggle dropdown
+        toolbarModule.addHandler('linebreak', function() {
+            if (brButton) {
+                const dd = brButton.querySelector('.ql-linebreak-dropdown');
+                if (dd) {
+                    dd.classList.toggle('ql-linebreak-dropdown-open');
+                }
             }
         });
     }
@@ -323,8 +428,9 @@ class QuillConfigManager {
             editor.getSemanticHTML() : 
             editor.root.innerHTML;
 
-        // Preserve intentional nbsp blots before cleaning
+        // Preserve intentional nbsp and linebreak blots before cleaning
         content = this.protectNbspBlots(content);
+        content = this.protectLinebreakBlots(content);
 
         // Always clean up non-breaking spaces (unintentional ones)
         content = this.cleanSpaces(content);
@@ -333,8 +439,9 @@ class QuillConfigManager {
             content = this.sanitizeForEmail(content);
         }
 
-        // Restore intentional nbsp characters
+        // Restore intentional nbsp and linebreak characters
         content = this.restoreNbspTokens(content);
+        content = this.restoreLinebreakTokens(content);
 
         return content;
     }
@@ -363,8 +470,9 @@ class QuillConfigManager {
             }
         }
 
-        // Preserve intentional nbsp blots before cleaning
+        // Preserve intentional nbsp and linebreak blots before cleaning
         let result = this.protectNbspBlots(temp.innerHTML);
+        result = this.protectLinebreakBlots(result);
 
         // Also protect bare &nbsp; entities already present in the input.
         // At this point any &nbsp; has survived earlier sanitisation and is intentional.
@@ -383,8 +491,9 @@ class QuillConfigManager {
             .replace(/\s{2,}/g, ' ')          // Replace multiple spaces with single space
             .trim();
 
-        // Restore intentional nbsp characters
-        return this.restoreNbspTokens(result);
+        // Restore intentional nbsp and linebreak characters
+        result = this.restoreNbspTokens(result);
+        return this.restoreLinebreakTokens(result);
     }
 
     /**
@@ -396,8 +505,11 @@ class QuillConfigManager {
         if (!editor || !content) return;
 
         try {
+            // Preserve intentional line breaks by converting to blot markup before cleaning
+            let cleanContent = this.convertLinebreakToBlots(content);
+
             // Preserve intentional &nbsp; by converting to blot markup before cleaning
-            let cleanContent = this.convertNbspToBlots(content);
+            cleanContent = this.convertNbspToBlots(cleanContent);
 
             // Clean content before setting - convert <br> tags to proper paragraph structure
             // This prevents duplicate line breaks when content is saved and reloaded
@@ -530,6 +642,88 @@ class QuillConfigManager {
         result = result.replace(/\u00A0/g, '<span class="ql-nbsp" contenteditable="false">\u00A0</span>');
         // Restore the originals that were already blots
         result = result.replace(new RegExp(this.NBSP_TOKEN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '<span class="ql-nbsp" contenteditable="false">\u00A0</span>');
+        return result;
+    }
+
+    // ── Line break blot helpers ─────────────────────────────────────
+
+    /** Tokens used to protect intentional linebreak blots during cleanup */
+    static LINEBREAK_TOKEN_STANDARD = '%%LINEBREAK_STANDARD%%';
+    static LINEBREAK_TOKEN_MOBILE_HIDE = '%%LINEBREAK_MOBILE_HIDE%%';
+
+    /**
+     * Replaces <span class="ql-linebreak" data-type="...">...</span> with safe tokens
+     * so that downstream cleanup steps don't strip them.
+     * @param {string} html - HTML string potentially containing linebreak blots
+     * @returns {string} HTML with linebreak blots replaced by tokens
+     */
+    static protectLinebreakBlots(html) {
+        if (!html) return '';
+        // Match mobile-hide variant first (more specific)
+        let result = html.replace(
+            /<span[^>]*class="ql-linebreak"[^>]*data-type="mobile-hide"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi,
+            this.LINEBREAK_TOKEN_MOBILE_HIDE
+        );
+        result = result.replace(
+            /<span[^>]*data-type="mobile-hide"[^>]*class="ql-linebreak"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi,
+            this.LINEBREAK_TOKEN_MOBILE_HIDE
+        );
+        // Then match standard (remaining ql-linebreak spans)
+        result = result.replace(
+            /<span[^>]*class="ql-linebreak"[^>]*>(?:[^<]*<span[^>]*>[^<]*<\/span>[^<]*|[^<]*)<\/span>/gi,
+            this.LINEBREAK_TOKEN_STANDARD
+        );
+        return result;
+    }
+
+    /**
+     * Converts safe tokens back to line break HTML for email output.
+     * @param {string} html - HTML containing tokens
+     * @returns {string} HTML with tokens replaced by <br>&nbsp; variants
+     */
+    static restoreLinebreakTokens(html) {
+        if (!html) return '';
+        const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return html
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">&nbsp;')
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>&nbsp;');
+    }
+
+    /**
+     * Converts <br>&nbsp; and <br class="mobile-hide">&nbsp; in saved content
+     * back to blot markup so that Quill can reconstruct the LineBreakBlot on reload.
+     * Must be called BEFORE convertNbspToBlots to avoid the &nbsp; being consumed.
+     * @param {string} html - Saved HTML content
+     * @returns {string} HTML with line break patterns converted to blot markup
+     */
+    static convertLinebreakToBlots(html) {
+        if (!html) return '';
+        // First protect any existing blot markup
+        let result = this.protectLinebreakBlots(html);
+        // Convert <br class="mobile-hide">&nbsp; to blot markup (must be before generic <br>&nbsp;)
+        result = result.replace(
+            /<br\s+class="mobile-hide"\s*\/?>\s*&nbsp;/gi,
+            '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
+        );
+        result = result.replace(
+            /<br\s+class="mobile-hide"\s*\/?>\s*\u00A0/gi,
+            '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
+        );
+        // Convert <br>&nbsp; to blot markup
+        result = result.replace(
+            /<br\s*\/?>\s*&nbsp;/gi,
+            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
+        );
+        result = result.replace(
+            /<br\s*\/?>\s*\u00A0/gi,
+            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
+        );
+        // Restore the originals that were already blots
+        const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        result = result.replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'),
+            '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>');
+        result = result.replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'),
+            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>');
         return result;
     }
 
