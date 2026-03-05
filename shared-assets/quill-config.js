@@ -117,8 +117,9 @@ class QuillConfigManager {
                         return delta.compose(new (window.Quill.import('delta'))().retain(delta.length(), { 'block-format': null }));
                     }],
                     // Clean up any remaining non-breaking spaces from HTML
+                    // Skip custom blot elements (ql-nbsp, ql-linebreak) to preserve intentional embeds
                     ['*', function(node, delta) {
-                        if (node.innerHTML) {
+                        if (node.innerHTML && !node.classList?.contains('ql-nbsp') && !node.classList?.contains('ql-linebreak')) {
                             node.innerHTML = node.innerHTML.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
                         }
                         return delta;
@@ -535,13 +536,6 @@ class QuillConfigManager {
                 // Fallback for older versions
                 editor.root.innerHTML = cleanContent;
             }
-
-            // Additional cleanup after setting content
-            const text = editor.getText();
-            if (text.includes('\u00A0')) {
-                const cleanText = text.replace(/\u00A0/g, ' ');
-                editor.setText(cleanText);
-            }
         } catch (error) {
             console.warn('Failed to set editor content:', error);
         }
@@ -684,7 +678,7 @@ class QuillConfigManager {
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return html
             .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_MOBILE_HIDE), 'g'), '<br class="mobile-hide">')
-            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br>');
+            .replace(new RegExp(escapeRegex(this.LINEBREAK_TOKEN_STANDARD), 'g'), '<br class="line-break">');
     }
 
     /**
@@ -701,6 +695,11 @@ class QuillConfigManager {
         result = result.replace(
             /<br\s+class="mobile-hide"\s*\/?>/gi,
             '<span class="ql-linebreak" data-type="mobile-hide" contenteditable="false">\u21B5M</span>'
+        );
+        // Convert <br class="line-break"> to standard blot markup
+        result = result.replace(
+            /<br\s+class="line-break"\s*\/?>/gi,
+            '<span class="ql-linebreak" data-type="standard" contenteditable="false">\u21B5</span>'
         );
         // Restore the originals that were already blots
         const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
