@@ -444,14 +444,20 @@
                 itemEl.querySelector('.move-down-btn').disabled = index === items.length - 1;
                 fragment.appendChild(itemFragment);
 
-                // Create editor using shared QuillConfigManager - async initialization not needed for simple editors
+                // Create editor using shared QuillConfigManager
+                const checklistToolbar = [['bold', 'italic'], ['link'], ['nbsp'], ['linebreak']];
+                const checklistFormats = ['bold', 'italic', 'link', 'nbsp', 'linebreak'];
                 const editor = new Quill(editorDiv, QuillConfigManager.createConfig('basic', {
-                    placeholder: 'Enter item text...'
+                    placeholder: 'Enter item text...',
+                    customToolbar: checklistToolbar,
+                    customFormats: checklistFormats
                 }));
 
-                // Apply email-optimized formatting and space cleanup
+                // Apply email-optimized formatting, space cleanup, and toolbar handlers
                 QuillConfigManager.addEmailFormatting(editor);
                 QuillConfigManager.addSpaceCleanupMonitor(editor);
+                QuillConfigManager.addNbspToolbarHandler(editor, 'basic', { customToolbar: checklistToolbar });
+                QuillConfigManager.addLinebreakToolbarHandler(editor, 'basic', { customToolbar: checklistToolbar });
 
                 // Set content if provided
                 if (item.text && item.text.trim()) {

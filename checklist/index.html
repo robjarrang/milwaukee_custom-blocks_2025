@@ -177,18 +177,21 @@
             },
 
             createEditor(container, id, content = '') {
-                // Create editor using shared QuillConfigManager (includes NBSP button & space cleanup)
+                // Create editor using shared QuillConfigManager (includes NBSP + BR buttons & space cleanup)
                 const editor = new Quill(container, QuillConfigManager.createConfig('description', {
                     placeholder: 'List item text...',
-                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp']],
-                    customFormats: ['bold', 'script', 'link', 'nbsp']
+                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp'], ['linebreak']],
+                    customFormats: ['bold', 'script', 'link', 'nbsp', 'linebreak']
                 }));
 
-                // Apply QuillConfigManager post-init handlers (NBSP cleanup, space monitor, toolbar handler)
+                // Apply QuillConfigManager post-init handlers
                 QuillConfigManager.addEmailFormatting(editor);
                 QuillConfigManager.addSpaceCleanupMonitor(editor);
                 QuillConfigManager.addNbspToolbarHandler(editor, 'description', {
-                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp']]
+                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp'], ['linebreak']]
+                });
+                QuillConfigManager.addLinebreakToolbarHandler(editor, 'description', {
+                    customToolbar: [['bold', { 'script': 'super' }], ['link'], ['nbsp'], ['linebreak']]
                 });
 
                 // Track editor metadata
