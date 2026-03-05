@@ -496,7 +496,11 @@ class QuillConfigManager {
     }
 
     /**
-     * Sets content in Quill editor safely
+     * Sets content in Quill editor safely.
+     * Uses a token-based approach: custom blot patterns (linebreaks, nbsp) are
+     * replaced with text tokens BEFORE pasting, then after paste the tokens are
+     * found in the editor text and replaced with real embed blots via insertEmbed().
+     * This avoids relying on dangerouslyPasteHTML to reconstruct custom embeds.
      * @param {Object} editor - Quill instance
      * @param {string} content - HTML content to set
      */
@@ -504,40 +508,78 @@ class QuillConfigManager {
         if (!editor || !content) return;
 
         try {
-            // Preserve intentional line breaks by converting to blot markup before cleaning
-            let cleanContent = this.convertLinebreakToBlots(content);
+            let cleanContent = content;
 
-            // Preserve intentional &nbsp; by converting to blot markup before cleaning
-            cleanContent = this.convertNbspToBlots(cleanContent);
+            // Step 1: Convert any existing blot markup to tokens
+            cleanContent = this.protectLinebreakBlots(cleanContent);
+            cleanContent = this.protectNbspBlots(cleanContent);
 
-            // Clean content before setting - convert <br> tags to proper paragraph structure
-            // This prevents duplicate line breaks when content is saved and reloaded
-            cleanContent = cleanContent
-                .replace(/<br\s*\/?>/gi, '</p><p>');  // Convert <br> to paragraph breaks
-            
-            // Wrap in paragraph tags if not already wrapped
+            // Step 2: Convert email-safe patterns to tokens
+            // Linebreaks (mobile-hide first, then standard — order matters)
+            cleanContent = cleanContent.replace(/<br\s+class="mobile-hide"\s*\/?>/gi, this.LINEBREAK_TOKEN_MOBILE_HIDE);
+            cleanContent = cleanContent.replace(/<br\s+class="line-break"\s*\/?>/gi, this.LINEBREAK_TOKEN_STANDARD);
+            // &nbsp; entities
+            cleanContent = cleanContent.replace(/&nbsp;/g, this.NBSP_TOKEN);
+            cleanContent = cleanContent.replace(/\u00A0/g, this.NBSP_TOKEN);
+
+            // Step 3: Convert remaining <br> to paragraph structure
+            cleanContent = cleanContent.replace(/<br\s*\/?>/gi, '</p><p>');
+
+            // Step 4: Wrap in paragraph tags if not already wrapped
             if (!cleanContent.trim().startsWith('<p>')) {
                 cleanContent = '<p>' + cleanContent + '</p>';
             }
-            
-            // Clean up empty paragraphs and normalize
-            cleanContent = cleanContent
-                .replace(/<p><\/p>/g, '')           // Remove empty paragraphs
-                .replace(/<p>\s*<\/p>/g, '')        // Remove whitespace-only paragraphs
-                .replace(/<\/p>\s*<p>/g, '</p><p>'); // Normalize paragraph spacing
 
-            // Clear existing content first
+            // Step 5: Clean up empty paragraphs and normalize
+            cleanContent = cleanContent
+                .replace(/<p><\/p>/g, '')
+                .replace(/<p>\s*<\/p>/g, '')
+                .replace(/<\/p>\s*<p>/g, '</p><p>');
+
+            // Step 6: Paste content — tokens survive as plain text
             editor.setText('');
-            
-            // Use clipboard.dangerouslyPasteHTML for Quill 2.0
             if (editor.clipboard && editor.clipboard.dangerouslyPasteHTML) {
                 editor.clipboard.dangerouslyPasteHTML(cleanContent);
             } else {
-                // Fallback for older versions
                 editor.root.innerHTML = cleanContent;
             }
+
+            // Step 7: Replace text tokens with actual embed blots
+            this._replaceTokensWithEmbeds(editor);
         } catch (error) {
             console.warn('Failed to set editor content:', error);
+        }
+    }
+
+    /**
+     * Scans editor text for placeholder tokens and replaces them with
+     * actual embed blots using Quill's insertEmbed API.
+     * Processes from end-to-start so earlier positions aren't shifted.
+     * @param {Object} editor - Quill instance
+     */
+    static _replaceTokensWithEmbeds(editor) {
+        const text = editor.getText();
+        const replacements = [];
+        const tokenMap = [
+            { token: this.LINEBREAK_TOKEN_MOBILE_HIDE, blotName: 'linebreak', value: 'mobile-hide' },
+            { token: this.LINEBREAK_TOKEN_STANDARD, blotName: 'linebreak', value: 'standard' },
+            { token: this.NBSP_TOKEN, blotName: 'nbsp', value: true }
+        ];
+
+        for (const { token, blotName, value } of tokenMap) {
+            let pos = 0;
+            while ((pos = text.indexOf(token, pos)) !== -1) {
+                replacements.push({ pos, len: token.length, blotName, value });
+                pos += token.length;
+            }
+        }
+
+        // Sort descending by position so replacements don't shift earlier indices
+        replacements.sort((a, b) => b.pos - a.pos);
+
+        for (const { pos, len, blotName, value } of replacements) {
+            editor.deleteText(pos, len, 'silent');
+            editor.insertEmbed(pos, blotName, value, 'silent');
         }
     }
 
