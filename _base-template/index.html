@@ -308,7 +308,7 @@
 
                 if (content && content.trim()) {
                     editor.setContents([]);
-                    editor.clipboard.dangerouslyPasteHTML(content);
+                    QuillConfigManager.setContent(editor, content);
                 }
 
                 return editor;
@@ -759,14 +759,10 @@
                     Object.keys(state.editors).forEach(key => {
                         if (state.editors[key]) {
                             const content = utils.getFieldValue(key);
-                            try {
-                                state.editors[key].setContents([]);
-                                if (content && content.trim()) {
-                                    state.editors[key].clipboard.dangerouslyPasteHTML(content);
-                                }
-                            } catch (error) {
-                                console.warn(`Using fallback method for editor ${key}:`, error);
-                                state.editors[key].root.innerHTML = content || '';
+                            if (content && content.trim()) {
+                                QuillConfigManager.setContent(state.editors[key], content);
+                            } else {
+                                state.editors[key].setText('');
                             }
                         }
                     });

@@ -1226,17 +1226,10 @@
             Object.keys(state.editors).forEach(key => { 
                 if (state.editors[key]) {
                     const content = utils.getFieldValue(key);
-                    try {
-                        // Clear existing content first
-                        state.editors[key].setContents([]);
-                        // Use the new clipboard API to paste HTML content
-                        if (content && content.trim()) {
-                            state.editors[key].clipboard.dangerouslyPasteHTML(content);
-                        }
-                    } catch (error) {
-                        // Fallback to root innerHTML for compatibility
-                        console.warn(`Using fallback method for editor ${key}:`, error);
-                        state.editors[key].root.innerHTML = content || '';
+                    if (content && content.trim()) {
+                        QuillConfigManager.setContent(state.editors[key], content);
+                    } else {
+                        state.editors[key].setText('');
                     }
                 }
             });
