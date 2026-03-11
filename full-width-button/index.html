@@ -103,8 +103,24 @@
         <!-- Spacing Settings -->
         <div class="section-divider">
             <div class="section-title">Spacing Settings</div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showTopSpacer" checked><span class="toggle-slider"></span></label><label for="showTopSpacer" class="checkbox-label">Show Top Spacer</label></div>
-            <div class="toggle-container"><label class="toggle-switch"><input type="checkbox" id="showBottomSpacer" checked><span class="toggle-slider"></span></label><label for="showBottomSpacer" class="checkbox-label">Show Bottom Spacer</label></div>
+            <div class="field-group">
+                <label class="field-label">Top Spacer</label>
+                <div class="option-selector" id="topSpacerSelector">
+                    <div class="option-button selected" data-value="both">Both</div>
+                    <div class="option-button" data-value="desktop">Desktop</div>
+                    <div class="option-button" data-value="mobile">Mobile</div>
+                    <div class="option-button" data-value="none">None</div>
+                </div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Bottom Spacer</label>
+                <div class="option-selector" id="bottomSpacerSelector">
+                    <div class="option-button selected" data-value="both">Both</div>
+                    <div class="option-button" data-value="desktop">Desktop</div>
+                    <div class="option-button" data-value="mobile">Mobile</div>
+                    <div class="option-button" data-value="none">None</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -125,8 +141,8 @@
                 buttonText: { type: 'richtext', defaultValue: 'Phasellus a mauris', maxLength: 50 },
                 buttonUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 buttonAlignment: { type: 'text', defaultValue: 'center' },
-                showTopSpacer: { type: 'boolean', defaultValue: true },
-                showBottomSpacer: { type: 'boolean', defaultValue: true }
+                showTopSpacer: { type: 'text', defaultValue: 'both' },
+                showBottomSpacer: { type: 'text', defaultValue: 'both' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -199,8 +215,8 @@
             elements.buttonUrlError = document.getElementById('buttonUrlError');
             elements.buttonStyleSelector = document.getElementById('buttonStyleSelector');
             elements.buttonAlignmentSelector = document.getElementById('buttonAlignmentSelector');
-            elements.showTopSpacer = document.getElementById('showTopSpacer');
-            elements.showBottomSpacer = document.getElementById('showBottomSpacer');
+            elements.topSpacerSelector = document.getElementById('topSpacerSelector');
+            elements.bottomSpacerSelector = document.getElementById('bottomSpacerSelector');
         }
 
         function setLoadingState(loading) {
@@ -254,8 +270,8 @@
             const buttonStyle = utils.getFieldValue('buttonStyle');
             const buttonUrl = utils.getFieldValue('buttonUrl');
             const processedButtonText = processRichText(utils.getFieldValue('buttonText'));
-            const showTopSpacer = utils.getFieldValue('showTopSpacer');
-            const showBottomSpacer = utils.getFieldValue('showBottomSpacer');
+            const topSpacerMode = utils.getFieldValue('showTopSpacer');
+            const bottomSpacerMode = utils.getFieldValue('showBottomSpacer');
 
             let buttonTableStyle, buttonClass, textColor;
 
@@ -285,13 +301,21 @@
             const buttonLinkStyle = `color: ${textColor}; text-decoration: none;`;
             const buttonCellStyle = `color: ${textColor}; border-radius: 4px !important; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%;`;
 
-            const topSpacerHtml = showTopSpacer ? 
-                `<tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>` : 
-                '';
-            
-            const bottomSpacerHtml = showBottomSpacer ? 
-                `<tr><td><div style="clear: both; display: block; font-size: 28px; height: 28px; line-height: 28px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>` : 
-                '';
+            // Generate spacer HTML with responsive visibility classes
+            function buildSpacerHtml(mode, size) {
+                const spacerDiv = `<div style="clear: both; display: block; font-size: ${size}px; height: ${size}px; line-height: ${size}px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div>`;
+                if (mode === 'both') {
+                    return `<tr><td>${spacerDiv}</td></tr>`;
+                } else if (mode === 'desktop') {
+                    return `<tr class="mobile-hide"><td>${spacerDiv}</td></tr>`;
+                } else if (mode === 'mobile') {
+                    return `<tr class="swap-content" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><td>${spacerDiv}</td></tr>`;
+                }
+                return '';
+            }
+
+            const topSpacerHtml = buildSpacerHtml(topSpacerMode, 20);
+            const bottomSpacerHtml = buildSpacerHtml(bottomSpacerMode, 28);
 
             return `<!-- START .fw-button --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer ${bgClass}" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
                 <tr>
@@ -381,14 +405,8 @@
             setupOptionSelector(elements.backgroundColorSelector, 'backgroundColor');
             setupOptionSelector(elements.buttonStyleSelector, 'buttonStyle');
             setupOptionSelector(elements.buttonAlignmentSelector, 'buttonAlignment');
-
-            // Spacer toggle handlers
-            const topSpacerHandler = (e) => { updateData('showTopSpacer', e.target.checked); };
-            const bottomSpacerHandler = (e) => { updateData('showBottomSpacer', e.target.checked); };
-            elements.showTopSpacer.addEventListener('change', topSpacerHandler);
-            elements.showBottomSpacer.addEventListener('change', bottomSpacerHandler);
-            state.eventListeners.push({ element: elements.showTopSpacer, event: 'change', handler: topSpacerHandler });
-            state.eventListeners.push({ element: elements.showBottomSpacer, event: 'change', handler: bottomSpacerHandler });
+            setupOptionSelector(elements.topSpacerSelector, 'showTopSpacer');
+            setupOptionSelector(elements.bottomSpacerSelector, 'showBottomSpacer');
 
             // Button URL input
             const urlHandler = (e) => {
@@ -505,8 +523,12 @@
                     elements.buttonAlignmentSelector.querySelectorAll('.option-button').forEach(btn => {
                         btn.classList.toggle('selected', btn.dataset.value === state.blockData.buttonAlignment);
                     });
-                    elements.showTopSpacer.checked = state.blockData.showTopSpacer;
-                    elements.showBottomSpacer.checked = state.blockData.showBottomSpacer;
+                    elements.topSpacerSelector.querySelectorAll('.option-button').forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.value === state.blockData.showTopSpacer);
+                    });
+                    elements.bottomSpacerSelector.querySelectorAll('.option-button').forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.value === state.blockData.showBottomSpacer);
+                    });
                     elements.buttonUrl.value = state.blockData.buttonUrl || '';
                     
                     // Update Quill editor
@@ -578,8 +600,8 @@
             state.blockData.backgroundColor = elements.backgroundColorSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.backgroundColor.defaultValue;
             state.blockData.buttonStyle = elements.buttonStyleSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.buttonStyle.defaultValue;
             state.blockData.buttonAlignment = elements.buttonAlignmentSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.buttonAlignment.defaultValue;
-            state.blockData.showTopSpacer = elements.showTopSpacer.checked;
-            state.blockData.showBottomSpacer = elements.showBottomSpacer.checked;
+            state.blockData.showTopSpacer = elements.topSpacerSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.showTopSpacer.defaultValue;
+            state.blockData.showBottomSpacer = elements.bottomSpacerSelector.querySelector('.option-button.selected')?.dataset.value || moduleConfig.fields.showBottomSpacer.defaultValue;
             state.blockData.buttonUrl = elements.buttonUrl.value.trim();
             if (state.editors.buttonText) {
                 state.blockData.buttonText = state.editors.buttonText.root.innerHTML;
@@ -613,12 +635,10 @@
                     setSelectorState(elements.backgroundColorSelector, 'backgroundColor');
                     setSelectorState(elements.buttonStyleSelector, 'buttonStyle');
                     setSelectorState(elements.buttonAlignmentSelector, 'buttonAlignment');
+                    setSelectorState(elements.topSpacerSelector, 'showTopSpacer');
+                    setSelectorState(elements.bottomSpacerSelector, 'showBottomSpacer');
 
                     if (elements.buttonUrl) elements.buttonUrl.value = utils.getFieldValue('buttonUrl');
-                    
-                    // Set spacer toggle states
-                    elements.showTopSpacer.checked = utils.getFieldValue('showTopSpacer');
-                    elements.showBottomSpacer.checked = utils.getFieldValue('showBottomSpacer');
 
                     // Set Quill editor content via QuillConfigManager
                     if (state.editors.buttonText) {
