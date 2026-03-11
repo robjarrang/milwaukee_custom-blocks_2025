@@ -287,6 +287,25 @@
         const systemLogos = ['M12', 'M18', 'MXFuel', 'TruckTour', 'AuthorisedDistribution'];
         const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
 
+        // EN-GB fallback image URLs for each trade (used when culture-specific image is missing)
+        const tradeEnGbImageUrls = {
+            Automotive: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/b870e91c-bd64-49d3-95b2-ee138f029c33.png',
+            Carpentry: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/4f8fbc62-6898-4f75-a9d1-226c0bd318d8.png',
+            Construction: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/11cf82a3-ee0b-4a32-b48a-ebb065735978.png',
+            Demolition: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/cca7b9b3-5fe8-49e8-9df0-eba7188c4ea0.png',
+            DrainCleaning: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/e22aad9f-e85c-43a2-8ba6-b2491b295693.png',
+            Drywall: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/1fc65270-5e64-4754-a822-c4513bc45ae1.png',
+            Electrical: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/bcc65836-545c-4890-aa08-22f9d965e95a.png',
+            FireAndRescue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/238b3195-c4c2-4ef1-a426-c6e2996a6a97.png',
+            Hire: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/e3bbf85b-155d-4b47-bd3e-d96bbc50d565.png',
+            Landscaping: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/ca997991-1c95-4606-8f93-623d8229d50a.png',
+            MaintenanceAndOperations: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/230511f8-9e90-40e7-a76e-9dc3b877a135.png',
+            Manufacturing: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/00fa9987-6e88-4a2a-b668-5c3861ef0343.png',
+            Networking: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/b7b7c099-7c80-4005-8a1e-dc6f99ecc7b5.png',
+            Plumbing: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/cfb4e159-7885-41da-9877-5c9eb04e9fe4.png',
+            Utilities: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/49810903-6b56-425d-9098-e0e25eb2766f.png'
+        };
+
         // Generate the AMPscript block for badge URL lookup
         function generateAmpScript() {
             const showBadge = utils.getFieldValue('showBadge');
@@ -349,6 +368,7 @@ ${generateSystemLogoUrlLookup(badgeType)}
 
             // Manual trade logo - set @Manual_* variable and call Content Block
             if (tradeLogos.includes(badgeType)) {
+                const enGbFallback = tradeEnGbImageUrls[badgeType] || '';
                 return `<!--%%[
 /* Legacy Header - Manual Trade Logo: ${badgeType} */
 VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge, @Manual_${badgeType}, @FallbackImageURL
@@ -367,9 +387,9 @@ SET @FallbackImageURL = "https://image.s50.sfmc-content.com/lib/fe30117175640478
 
 /* Content Block handles URL lookup for trade logo */
 ]%%--><!--%%=ContentBlockById("563072")=%%--><!--%%[
-/* Hide badge if no logo was determined or fallback image is used */
+/* If image is missing or fallback was used, show the English version instead */
 IF Empty(@LogoImageURL) OR @LogoImageURL == @FallbackImageURL THEN
-    SET @ShowBadge = "false"
+    SET @LogoImageURL = "${enGbFallback}"
 ENDIF
 ]%%-->`;
             }
