@@ -304,7 +304,7 @@ SET @ShowBadge = "false"
             if (badgeType === 'dynamic') {
                 return `<!--%%[
 /* Legacy Header - Dynamic Badge Configuration */
-VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge
+VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge, @FallbackImageURL
 SET @UserCulture = AttributeValue("UserCulture")
 SET @ShowBadge = "true"
 
@@ -315,11 +315,12 @@ ENDIF
 SET @LogoImageURL = ""
 SET @LogoLinkURL = ""
 SET @LogoType = ""
+SET @FallbackImageURL = "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/default-trade-logo.png"
 
 /* Dynamic mode - Content Block checks subscriber profile attributes and sets URLs */
 ]%%--><!--%%=ContentBlockById("563072")=%%--><!--%%[
-/* Hide badge if no logo was determined */
-IF Empty(@LogoImageURL) THEN
+/* Hide badge if no trade was determined, image is missing, or fallback image is used */
+IF Empty(@LogoImageURL) OR @LogoImageURL == @FallbackImageURL OR @LogoType == "Generic" THEN
     SET @ShowBadge = "false"
 ENDIF
 ]%%-->`;
@@ -350,7 +351,7 @@ ${generateSystemLogoUrlLookup(badgeType)}
             if (tradeLogos.includes(badgeType)) {
                 return `<!--%%[
 /* Legacy Header - Manual Trade Logo: ${badgeType} */
-VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge, @Manual_${badgeType}
+VAR @UserCulture, @LogoImageURL, @LogoLinkURL, @LogoType, @ShowBadge, @Manual_${badgeType}, @FallbackImageURL
 SET @UserCulture = AttributeValue("UserCulture")
 SET @ShowBadge = "true"
 
@@ -362,11 +363,12 @@ SET @LogoImageURL = ""
 SET @LogoLinkURL = ""
 SET @LogoType = ""
 SET @Manual_${badgeType} = "true"
+SET @FallbackImageURL = "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/default-trade-logo.png"
 
 /* Content Block handles URL lookup for trade logo */
 ]%%--><!--%%=ContentBlockById("563072")=%%--><!--%%[
-/* Hide badge if no logo was determined */
-IF Empty(@LogoImageURL) THEN
+/* Hide badge if no logo was determined or fallback image is used */
+IF Empty(@LogoImageURL) OR @LogoImageURL == @FallbackImageURL THEN
     SET @ShowBadge = "false"
 ENDIF
 ]%%-->`;
