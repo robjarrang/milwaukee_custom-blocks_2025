@@ -133,6 +133,7 @@
                 <div class="field-group"><label for="heroMobileImage" class="field-label">Mobile Hero Image URL</label><input type="url" id="heroMobileImage" class="field-input" placeholder="https://example.com/mobile-hero.jpg"><div class="field-error" id="heroMobileImageError">Please enter a valid image URL.</div></div>
                 <div class="field-group"><label for="heroAlt" class="field-label">Hero Images Alt Text</label><input type="text" id="heroAlt" class="field-input" placeholder="Descriptive text for the hero images" maxlength="100"></div>
                 <div id="heroHeightsGroup" style="display:none;">
+                    <div class="field-group-inline" style="margin-top:10px;"><label for="heroAutoHeight" class="field-label" style="font-weight:normal;">Auto-detect heights from image dimensions</label><input type="checkbox" id="heroAutoHeight" style="width:auto;" checked></div>
                     <div class="field-group-inline"><label for="heroDesktopHeight" class="field-label">Desktop Banner Height (px)</label><input type="number" id="heroDesktopHeight" class="field-input" min="200" max="1000" step="4"></div>
                     <div class="field-group-inline"><label for="heroMobileHeight" class="field-label">Mobile Banner Height (px)</label><input type="number" id="heroMobileHeight" class="field-input" min="200" max="1500" step="4"></div>
                     <p class="field-hint" style="margin:4px 0 0;font-size:11px;color:#888;">Explicit heights are required when a trade badge is overlaid on the hero image. Match these to your artwork's aspect ratio.</p>
@@ -184,6 +185,7 @@
                 heroMobileImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/7ca5ce3c-68d6-43bd-bbea-33125fa0c950.jpg', validator: 'url' },
                 heroDesktopHeight: { type: 'number', defaultValue: 484 },
                 heroMobileHeight: { type: 'number', defaultValue: 600 },
+                heroAutoHeight: { type: 'boolean', defaultValue: true },
                 heroAlt: { type: 'text', defaultValue: 'Hero banner' },
                 contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 overlayToolLink: { type: 'text', defaultValue: '' },
@@ -533,6 +535,35 @@
             return isValid; 
         }
 
+        // Auto-detect hero image natural dimensions and set the corresponding height field.
+        // Scales to 620px content width (desktop) / 580px content width (mobile after ~94.5% scale).
+        // We use 620px for both because the mobile image renders at 100% of the 620px container on phones.
+        const heroDimensionCache = {};
+        function autoDetectHeroHeight(url, targetWidth, inputEl, dataKey) {
+            if (!elements.heroAutoHeight || !elements.heroAutoHeight.checked) return;
+            if (!url || !utils.isValidUrl(url)) return;
+            const apply = (natW, natH) => {
+                if (!natW || !natH) return;
+                const computed = Math.round((natH / natW) * targetWidth / 4) * 4; // snap to step=4
+                if (computed > 0) {
+                    inputEl.value = computed;
+                    updateData(dataKey, computed);
+                }
+            };
+            if (heroDimensionCache[url]) {
+                const { w, h } = heroDimensionCache[url];
+                apply(w, h);
+                return;
+            }
+            const img = new Image();
+            img.onload = () => {
+                heroDimensionCache[url] = { w: img.naturalWidth, h: img.naturalHeight };
+                apply(img.naturalWidth, img.naturalHeight);
+            };
+            img.onerror = () => {};
+            img.src = url;
+        }
+
         function initializeEventHandlers() {
             state.eventListeners = [];
 
@@ -554,6 +585,27 @@
             setupUrlInput(elements.heroDesktopImage, elements.heroDesktopImageError, 'heroDesktopImage');
             setupUrlInput(elements.heroMobileImage, elements.heroMobileImageError, 'heroMobileImage');
             setupUrlInput(elements.contentUrl, elements.contentUrlError, 'contentUrl');
+
+            // Auto-detect hero image heights on URL change
+            const desktopAutoHandler = () => autoDetectHeroHeight(elements.heroDesktopImage.value.trim(), 620, elements.heroDesktopHeight, 'heroDesktopHeight');
+            const mobileAutoHandler = () => autoDetectHeroHeight(elements.heroMobileImage.value.trim(), 620, elements.heroMobileHeight, 'heroMobileHeight');
+            elements.heroDesktopImage.addEventListener('blur', desktopAutoHandler);
+            elements.heroMobileImage.addEventListener('blur', mobileAutoHandler);
+            state.eventListeners.push({ element: elements.heroDesktopImage, event: 'blur', handler: desktopAutoHandler });
+            state.eventListeners.push({ element: elements.heroMobileImage, event: 'blur', handler: mobileAutoHandler });
+
+            // Auto-detect toggle
+            const autoToggleHandler = (e) => {
+                updateData('heroAutoHeight', e.target.checked);
+                elements.heroDesktopHeight.disabled = e.target.checked;
+                elements.heroMobileHeight.disabled = e.target.checked;
+                if (e.target.checked) {
+                    desktopAutoHandler();
+                    mobileAutoHandler();
+                }
+            };
+            elements.heroAutoHeight.addEventListener('change', autoToggleHandler);
+            state.eventListeners.push({ element: elements.heroAutoHeight, event: 'change', handler: autoToggleHandler });
 
             // Text input handlers for alt text fields
             const altTextHandler = (e) => debouncedUpdateData('titleImageAlt', e.target.value.trim());
@@ -682,6 +734,10 @@
             elements.tradeBadge.value = utils.getFieldValue('tradeBadge');
             elements.heroDesktopHeight.value = utils.getFieldValue('heroDesktopHeight');
             elements.heroMobileHeight.value = utils.getFieldValue('heroMobileHeight');
+            const autoOn = utils.getFieldValue('heroAutoHeight') !== false;
+            elements.heroAutoHeight.checked = autoOn;
+            elements.heroDesktopHeight.disabled = autoOn;
+            elements.heroMobileHeight.disabled = autoOn;
 
             // Update Quill editors
             Object.keys(state.editors).forEach(key => {
