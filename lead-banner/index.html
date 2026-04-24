@@ -132,12 +132,6 @@
                 <div class="field-group"><label for="heroDesktopImage" class="field-label">Desktop Hero Image URL</label><input type="url" id="heroDesktopImage" class="field-input" placeholder="https://example.com/desktop-hero.jpg"><div class="field-error" id="heroDesktopImageError">Please enter a valid image URL.</div></div>
                 <div class="field-group"><label for="heroMobileImage" class="field-label">Mobile Hero Image URL</label><input type="url" id="heroMobileImage" class="field-input" placeholder="https://example.com/mobile-hero.jpg"><div class="field-error" id="heroMobileImageError">Please enter a valid image URL.</div></div>
                 <div class="field-group"><label for="heroAlt" class="field-label">Hero Images Alt Text</label><input type="text" id="heroAlt" class="field-input" placeholder="Descriptive text for the hero images" maxlength="100"></div>
-                <div id="heroHeightsGroup" style="display:none;">
-                    <div class="field-group-inline" style="margin-top:10px;"><label for="heroAutoHeight" class="field-label" style="font-weight:normal;">Auto-detect heights from image dimensions</label><input type="checkbox" id="heroAutoHeight" style="width:auto;" checked></div>
-                    <div class="field-group-inline"><label for="heroDesktopHeight" class="field-label">Desktop Banner Height (px)</label><input type="number" id="heroDesktopHeight" class="field-input" min="200" max="1000" step="4"></div>
-                    <div class="field-group-inline"><label for="heroMobileHeight" class="field-label">Mobile Banner Height (px)</label><input type="number" id="heroMobileHeight" class="field-input" min="200" max="1500" step="4"></div>
-                    <p class="field-hint" style="margin:4px 0 0;font-size:11px;color:#888;">Explicit heights are required when a trade badge is overlaid on the hero image. Match these to your artwork's aspect ratio.</p>
-                </div>
             </div>
 
             <div class="field-group"><label for="contentUrl" class="field-label">Content Link URL</label><input type="url" id="contentUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/"><div class="field-error" id="contentUrlError">Please enter a valid URL.</div></div>
@@ -183,8 +177,6 @@
                 titleImageWidth: { type: 'number', defaultValue: 300 },
                 heroDesktopImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/3c5efc32-d086-4f3b-b1bb-93d57835d55a.jpg', validator: 'url' },
                 heroMobileImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/7ca5ce3c-68d6-43bd-bbea-33125fa0c950.jpg', validator: 'url' },
-                heroDesktopHeight: { type: 'number', defaultValue: 484 },
-                heroMobileHeight: { type: 'number', defaultValue: 600 },
                 heroAlt: { type: 'text', defaultValue: 'Hero banner' },
                 contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
                 overlayToolLink: { type: 'text', defaultValue: '' },
@@ -341,12 +333,6 @@
             elements.heroMobileImage = document.getElementById('heroMobileImage');
             elements.heroMobileImageError = document.getElementById('heroMobileImageError');
             elements.heroAlt = document.getElementById('heroAlt');
-            elements.heroDesktopHeight = document.getElementById('heroDesktopHeight');
-            elements.heroMobileHeight = document.getElementById('heroMobileHeight');
-            elements.heroHeightsGroup = document.getElementById('heroHeightsGroup');
-            elements.heroDesktopHeight = document.getElementById('heroDesktopHeight');
-            elements.heroMobileHeight = document.getElementById('heroMobileHeight');
-            elements.heroHeightsGroup = document.getElementById('heroHeightsGroup');
             elements.contentUrl = document.getElementById('contentUrl');
             elements.contentUrlError = document.getElementById('contentUrlError');
             elements.overlayToolLink = document.getElementById('overlayToolLink');
@@ -451,26 +437,7 @@
                 const heroMobileImage = utils.getFieldValue('heroMobileImage');
                 const heroAlt = utils.getFieldValue('heroAlt');
 
-                if (!badgeActive) {
-                    // Simple image-swap (existing behaviour) - just swap <img> src between desktop/mobile
-                    return `<!-- START .leadbanner - Image Swap --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><!-- Desktop row - hidden on mobile --><tr class="mobile-hide"><td align="center" style="padding:0;"><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill" src="${heroDesktopImage}" style="display:block;width:620px;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a></td></tr><!-- Mobile row - revealed on mobile via .swap-content --><tr class="swap-content" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><td align="center" style="padding:0;"><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill" src="${heroMobileImage}" style="display:block;width:100%;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a></td></tr></table></td></tr></table><!-- END .leadbanner - Image Swap -->`;
-                }
-
-                // Image Swap + Trade Badge: overlay the logo+badge row on each hero image using VML for Outlook.
-                const desktopHeight = utils.getFieldValue('heroDesktopHeight');
-                const mobileHeight = utils.getFieldValue('heroMobileHeight');
-                // Reserve ~110px for logo/badge row at top, 20px spacer at bottom; remainder is the main click-through area.
-                const logoRowHeight = 110;
-                const spacerHeight = 20;
-                const desktopClickHeight = Math.max(40, desktopHeight - logoRowHeight - spacerHeight);
-                const mobileClickHeight = Math.max(40, mobileHeight - logoRowHeight - spacerHeight);
-                const clickAnchor = (h) => `<a href="${contentUrl}" style="display:block;width:100%;height:${h}px;line-height:${h}px;text-decoration:none;" target="_blank" aria-label="${heroAlt}">&nbsp;</a>`;
-                const spacerRow = `<tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;">&nbsp;</div></td></tr>`;
-
-                const desktopCell = `<td background="${heroDesktopImage}" bgcolor="${fallbackColor}" class="color-bg-1" height="${desktopHeight}" style="background-image:url('${heroDesktopImage}');background-position:center top;background-size:100% auto;background-repeat:no-repeat;background-color:${fallbackColor};" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:${desktopHeight}px;"><v:fill type="frame" aspect="atmost" position="0,0" src="${heroDesktopImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="center" height="${desktopClickHeight}" style="height:${desktopClickHeight}px;" valign="middle">${clickAnchor(desktopClickHeight)}</td></tr>${spacerRow}</table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td>`;
-                const mobileCell = `<td background="${heroMobileImage}" bgcolor="${fallbackColor}" class="color-bg-1" height="${mobileHeight}" style="background-image:url('${heroMobileImage}');background-position:center top;background-size:100% auto;background-repeat:no-repeat;background-color:${fallbackColor};" valign="top" width="620"><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="center" height="${mobileClickHeight}" style="height:${mobileClickHeight}px;" valign="middle">${clickAnchor(mobileClickHeight)}</td></tr>${spacerRow}</table></div></td>`;
-
-                return `${badgePreamble}<!-- START .leadbanner - Image Swap + Trade Badge --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><!-- Desktop row - hidden on mobile --><tr class="mobile-hide">${desktopCell}</tr><!--[if !mso]><!-- --><!-- Mobile row - revealed on mobile via .swap-content; hidden from Outlook via conditional comment --><tr class="swap-content" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${mobileCell}</tr><!--<![endif]--></table></td></tr></table><!-- END .leadbanner - Image Swap + Trade Badge -->`;
+                return `<!-- START .leadbanner - Image Swap --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><!-- Desktop row - hidden on mobile --><tr class="mobile-hide"><td align="center" style="padding:0;"><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill" src="${heroDesktopImage}" style="display:block;width:620px;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a></td></tr><!-- Mobile row - revealed on mobile via .swap-content --><tr class="swap-content" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><td align="center" style="padding:0;"><a href="${contentUrl}" style="text-decoration:none;" target="_blank"><img alt="${heroAlt}" border="0" class="fill" src="${heroMobileImage}" style="display:block;width:100%;height:auto;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" width="620"></a></td></tr></table></td></tr></table><!-- END .leadbanner - Image Swap -->`;
             }
 
             // --- FIX: Dynamic Padding Logic ---
@@ -583,10 +550,7 @@
             state.eventListeners.push({ element: elements.overlayToolLink, event: 'input', handler: overlayLinkHandler });
 
             // Trade / System badge selector
-            const tradeBadgeHandler = (e) => {
-                updateData('tradeBadge', e.target.value);
-                updateHeroHeightsVisibility();
-            };
+            const tradeBadgeHandler = (e) => updateData('tradeBadge', e.target.value);
             elements.tradeBadge.addEventListener('change', tradeBadgeHandler);
             state.eventListeners.push({ element: elements.tradeBadge, event: 'change', handler: tradeBadgeHandler });
 
@@ -602,21 +566,12 @@
                     input.value = correctedValue;
                     updateData(dataKey, correctedValue);
                 };
-                // Live update while using spinner arrows or typing (debounced)
-                const liveHandler = (e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value)) debouncedUpdateData(dataKey, value);
-                };
-                inputElement.addEventListener('input', liveHandler);
                 inputElement.addEventListener('blur', correctValueOnBlur);
-                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveHandler });
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
 
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupNumberInput(elements.subtitleFontSize, 'subtitleFontSize');
-            setupNumberInput(elements.heroDesktopHeight, 'heroDesktopHeight');
-            setupNumberInput(elements.heroMobileHeight, 'heroMobileHeight');
 
             // Special handling for image width (step of 10)
             const imageWidthHandler = (e) => {
@@ -688,8 +643,6 @@
             elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
             elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
             elements.tradeBadge.value = utils.getFieldValue('tradeBadge');
-            elements.heroDesktopHeight.value = utils.getFieldValue('heroDesktopHeight');
-            elements.heroMobileHeight.value = utils.getFieldValue('heroMobileHeight');
 
             // Update Quill editors
             Object.keys(state.editors).forEach(key => {
@@ -944,12 +897,12 @@
             
             // Show/hide UI elements based on content type
             if (contentType === 'imageswap') {
-                // Image Swap mode - hide background image and positioning (they don't apply)
+                // Image Swap mode - hide background image, positioning and trade badge (not supported here)
                 elements.bannerSettingsSection.style.display = 'block';
                 elements.backgroundImageGroup.style.display = 'none';
                 elements.verticalAlignGroup.style.display = 'none';
                 elements.textAlignGroup.style.display = 'none';
-                if (elements.tradeBadgeGroup) elements.tradeBadgeGroup.style.display = 'block';
+                if (elements.tradeBadgeGroup) elements.tradeBadgeGroup.style.display = 'none';
                 elements.imageSwapContent.style.display = 'block';
             } else {
                 // Text or Image mode - show all controls
@@ -965,16 +918,6 @@
                     elements.textContent.style.display = 'block';
                 }
             }
-
-            updateHeroHeightsVisibility();
-        }
-
-        function updateHeroHeightsVisibility() {
-            if (!elements.heroHeightsGroup) return;
-            const ct = utils.getFieldValue('contentType');
-            const badge = utils.getFieldValue('tradeBadge');
-            const show = ct === 'imageswap' && badge && badge !== 'none';
-            elements.heroHeightsGroup.style.display = show ? 'block' : 'none';
         }
 
         function loadData() {
