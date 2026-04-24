@@ -76,6 +76,38 @@
         <div class="section-divider" id="bannerSettingsSection" style="margin-top:0; padding-top:0; border-top:none;">
             <div class="section-title">Banner Settings</div>
             <div class="field-group" id="backgroundImageGroup"><label for="backgroundImage" class="field-label">Background Image URL</label><input type="url" id="backgroundImage" class="field-input" placeholder="https://example.com/image.jpg"><div class="field-error" id="backgroundImageError">Please enter a valid image URL.</div></div>
+            <div class="field-group" id="tradeBadgeGroup">
+                <label for="tradeBadge" class="field-label">Trade / System Badge</label>
+                <select id="tradeBadge" class="field-input">
+                    <option value="none">None (no badge)</option>
+                    <option value="auto">Auto (from Trade__c)</option>
+                    <optgroup label="Systems">
+                        <option value="System_M12">M12</option>
+                        <option value="System_M18">M18</option>
+                        <option value="System_MXFuel">MX FUEL</option>
+                        <option value="System_TruckTour">Truck Tour</option>
+                        <option value="System_AuthorisedDistribution">Authorised Distribution</option>
+                    </optgroup>
+                    <optgroup label="Trades">
+                        <option value="Manual_Automotive">Automotive / Transportation</option>
+                        <option value="Manual_Carpentry">Carpentry</option>
+                        <option value="Manual_Construction">Construction</option>
+                        <option value="Manual_Demolition">Demolition</option>
+                        <option value="Manual_DrainCleaning">Drain Cleaning</option>
+                        <option value="Manual_Drywall">Drywall</option>
+                        <option value="Manual_Electrical">Electrical</option>
+                        <option value="Manual_FireAndRescue">Fire and Rescue</option>
+                        <option value="Manual_Hire">Hire</option>
+                        <option value="Manual_Landscaping">Landscaping / Outdoor</option>
+                        <option value="Manual_MaintenanceAndOperations">Maintenance and Operations</option>
+                        <option value="Manual_Manufacturing">Manufacturing</option>
+                        <option value="Manual_Networking">Networking</option>
+                        <option value="Manual_Plumbing">Plumbing / HVAC</option>
+                        <option value="Manual_Utilities">Utilities</option>
+                    </optgroup>
+                </select>
+                <p class="field-hint" style="margin:4px 0 0;font-size:11px;color:#888;">Shows a trade or system logo in the top-right of the banner. Auto uses the subscriber's Trade__c field.</p>
+            </div>
         </div>
 
         <div class="section-divider">
@@ -147,7 +179,8 @@
                 heroMobileImage: { type: 'url', defaultValue: 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/7ca5ce3c-68d6-43bd-bbea-33125fa0c950.jpg', validator: 'url' },
                 heroAlt: { type: 'text', defaultValue: 'Hero banner' },
                 contentUrl: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/', validator: 'url' },
-                overlayToolLink: { type: 'text', defaultValue: '' }
+                overlayToolLink: { type: 'text', defaultValue: '' },
+                tradeBadge: { type: 'text', defaultValue: 'none' }
             },
             debounceDelay: 300, 
             maxRetries: 3
@@ -304,6 +337,8 @@
             elements.contentUrlError = document.getElementById('contentUrlError');
             elements.overlayToolLink = document.getElementById('overlayToolLink');
             elements.overlayToolLinkOpen = document.getElementById('overlayToolLinkOpen');
+            elements.tradeBadge = document.getElementById('tradeBadge');
+            elements.tradeBadgeGroup = document.getElementById('tradeBadgeGroup');
         }
 
         function setLoadingState(loading) {
@@ -376,6 +411,20 @@
             const logoImage = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/a3a77919-71b9-4b9d-b1ad-90f327487e3f.png';
             const logoUrl = 'https://%%CountryCode%%.milwaukeetool.eu/';
             const fallbackColor = '#DB011C';
+            const tradeBadge = utils.getFieldValue('tradeBadge');
+
+            // Build AMPscript preamble and badge cell for Text / Image Title modes
+            const systemVars = ['System_M12','System_M18','System_MXFuel','System_TruckTour','System_AuthorisedDistribution'];
+            const tradeVars = ['Manual_Carpentry','Manual_Construction','Manual_DrainCleaning','Manual_Drywall','Manual_Electrical','Manual_Plumbing','Manual_Landscaping','Manual_Automotive','Manual_Utilities','Manual_Demolition','Manual_FireAndRescue','Manual_Hire','Manual_MaintenanceAndOperations','Manual_Manufacturing','Manual_Networking'];
+            const allBadgeVars = systemVars.concat(tradeVars);
+            const badgeActive = tradeBadge && tradeBadge !== 'none';
+            let badgePreamble = '';
+            if (badgeActive) {
+                const varDecl = '<!-- %%[\nVAR ' + allBadgeVars.map(v => '@' + v).join(', ') + '\n' +
+                    allBadgeVars.map(v => 'SET @' + v + ' = "' + (v === tradeBadge ? 'true' : 'false') + '"').join('\n') +
+                    '\n]%% --><!-- %%=ContentBlockById("799765")=%% -->';
+                badgePreamble = varDecl;
+            }
 
             // Handle Image Swap mode separately
             if (contentType === 'imageswap') {
@@ -394,7 +443,9 @@
             if (textAlign === 'right') paddingRight = 60;
             const paddingString = `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`;
 
-            const logoHtml = `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="left" style="padding:0 0 0 12px;" valign="top"><a href="${logoUrl}" target="_blank"><img alt="Logo" src="${logoImage}" style="border:0;display:block;height:auto;outline:none;text-decoration:none;" width="180"></a></td></tr></table>`;
+            const logoHtml = badgeActive
+                ? `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="left" class="leadbanner-logo-cell" style="padding:0 0 0 12px;" valign="top"><a href="${logoUrl}" style="display:inline-block;position:relative;z-index:2;" target="_blank"><img alt="Milwaukee Tool" src="${logoImage}" style="border:0;display:block;height:auto;outline:none;text-decoration:none;" width="180"></a></td><td align="right" class="leadbanner-icon-cell" height="110" style="padding:0 12px 0 0;" valign="top" width="50%"><!-- %%[ IF NOT Empty(@LogoImageURL) AND @LogoType != "Generic" THEN ]%% --><!--[if mso]><br><![endif]--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="Milwaukee Trade Logo" src="%%=v(@LogoImageURL)=%%" style="border:0;display:block;height:auto;margin-top:12px;outline:none;text-decoration:none;" width="94"></a><!-- %%[ ENDIF ]%% --></td></tr></table>`
+                : `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;"><tr><td align="left" style="padding:0 0 0 12px;" valign="top"><a href="${logoUrl}" target="_blank"><img alt="Logo" src="${logoImage}" style="border:0;display:block;height:auto;outline:none;text-decoration:none;" width="180"></a></td></tr></table>`;
 
             let contentHtml = '';
             
@@ -421,7 +472,7 @@
                 contentHtml = `<h1 class="leadbanner-title" style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',sans-serif,'Open Sans';font-size:${titleSize}px;font-weight:bold;line-height:${titleLineHeight}px;margin:0 0 10px 0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedTitle}</a></h1><p class="leadbanner-subtitle" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open Sans';font-size:${subtitleSize}px;font-stretch:condensed;font-weight:normal;line-height:${subtitleLineHeight}px;margin:0;padding:0;text-transform:uppercase;"><a href="${contentUrl}" style="color:#ffffff;text-decoration:none;" target="_blank">${processedSubtitle}</a></p>`;
             }
 
-            return `<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}">${contentType === 'image' ? `<a href="${contentUrl}" target="_blank">` : ''}${contentHtml}${contentType === 'image' ? '</a>' : ''}</td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
+            return `${badgePreamble}<!-- START .leadbanner --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:${fallbackColor};width:620px;"><tr><td align="center" class="content-inner" style="width:580px;" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;" width="620"><tr><td background="${bgImage}" height="484" style="background-position:center center;background-size:cover;background-repeat:no-repeat;" valign="top" width="620"><!--[if gte mso 9]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;height:484px;"><v:fill type="frame" src="${bgImage}" color="${fallbackColor}" /><v:textbox inset="0,0,0,0"><![endif]--><div>${logoHtml}<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" height="340" role="presentation" style="height:280px;width:100%;"><tr><td align="${textAlign}" class="leadbanner-content" height="280" style="padding:${paddingString}; text-align:${textAlign};" valign="${verticalAlign}">${contentType === 'image' ? `<a href="${contentUrl}" target="_blank">` : ''}${contentHtml}${contentType === 'image' ? '</a>' : ''}</td></tr><tr><td class="block" style="width:100%;"><div style="font-size:20px;height:20px;line-height:20px;"></div></td></tr></table></div><!--[if gte mso 9]></v:textbox></v:rect><![endif]--></td></tr></table></td></tr></table><!-- END .leadbanner -->`;
         }
 
         function refreshPreview() {
@@ -496,6 +547,11 @@
             };
             elements.overlayToolLink.addEventListener('input', overlayLinkHandler);
             state.eventListeners.push({ element: elements.overlayToolLink, event: 'input', handler: overlayLinkHandler });
+
+            // Trade / System badge selector
+            const tradeBadgeHandler = (e) => updateData('tradeBadge', e.target.value);
+            elements.tradeBadge.addEventListener('change', tradeBadgeHandler);
+            state.eventListeners.push({ element: elements.tradeBadge, event: 'change', handler: tradeBadgeHandler });
 
             function setupNumberInput(inputElement, dataKey) {
                 const step = 4;
@@ -585,6 +641,7 @@
             }
             elements.titleFontSize.value = utils.getFieldValue('titleFontSize');
             elements.subtitleFontSize.value = utils.getFieldValue('subtitleFontSize');
+            elements.tradeBadge.value = utils.getFieldValue('tradeBadge');
 
             // Update Quill editors
             Object.keys(state.editors).forEach(key => {
@@ -844,6 +901,7 @@
                 elements.backgroundImageGroup.style.display = 'none';
                 elements.verticalAlignGroup.style.display = 'none';
                 elements.textAlignGroup.style.display = 'none';
+                if (elements.tradeBadgeGroup) elements.tradeBadgeGroup.style.display = 'none';
                 elements.imageSwapContent.style.display = 'block';
             } else {
                 // Text or Image mode - show all controls
@@ -851,6 +909,7 @@
                 elements.backgroundImageGroup.style.display = 'block';
                 elements.verticalAlignGroup.style.display = 'block';
                 elements.textAlignGroup.style.display = 'block';
+                if (elements.tradeBadgeGroup) elements.tradeBadgeGroup.style.display = 'block';
                 
                 if (contentType === 'image') {
                     elements.imageContent.style.display = 'block';
