@@ -602,7 +602,14 @@
                     input.value = correctedValue;
                     updateData(dataKey, correctedValue);
                 };
+                // Live update while using spinner arrows or typing (debounced)
+                const liveHandler = (e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value)) debouncedUpdateData(dataKey, value);
+                };
+                inputElement.addEventListener('input', liveHandler);
                 inputElement.addEventListener('blur', correctValueOnBlur);
+                state.eventListeners.push({ element: inputElement, event: 'input', handler: liveHandler });
                 state.eventListeners.push({ element: inputElement, event: 'blur', handler: correctValueOnBlur });
             }
 
