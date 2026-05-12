@@ -445,8 +445,8 @@
                 fragment.appendChild(itemFragment);
 
                 // Create editor using shared QuillConfigManager
-                const checklistToolbar = [['bold', 'italic'], ['link'], ['nbsp'], ['linebreak']];
-                const checklistFormats = ['bold', 'italic', 'link', 'nbsp', 'linebreak'];
+                const checklistToolbar = [['bold', 'italic'], [{ 'script': 'super' }], ['link'], ['nbsp'], ['linebreak']];
+                const checklistFormats = ['bold', 'italic', 'script', 'link', 'nbsp', 'linebreak'];
                 const editor = new Quill(editorDiv, QuillConfigManager.createConfig('basic', {
                     placeholder: 'Enter item text...',
                     customToolbar: checklistToolbar,
