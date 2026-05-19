@@ -124,13 +124,14 @@
             img.onload = () => {
                 imageLoadInFlight.delete(url);
                 if (img.naturalWidth > 0) {
-                    // Floor to the nearest even integer. Odd pixel heights can still
-                    // produce 1px hairlines in Outlook (subpixel halving for borders /
-                    // mso-table rendering), so we force an even value. Flooring (rather
-                    // than rounding) guarantees the rendered height never exceeds the
-                    // natural aspect-ratio height.
+                    // Floor to the nearest multiple of 4 (≈ 1pt at 96 DPI, since 1pt = 1.333px).
+                    // Per email-rendering guidance for Outlook 365 / Word engine, keeping every
+                    // height/padding/line-height divisible by 4 prevents the px→pt conversion
+                    // from landing on a fractional point value (which is the root cause of the
+                    // 1px white hairline). Flooring (not rounding) guarantees the rendered
+                    // height never exceeds the natural aspect-ratio height.
                     const exact = IMG_RENDER_WIDTH * img.naturalHeight / img.naturalWidth;
-                    const h = Math.max(2, 2 * Math.floor(exact / 2));
+                    const h = Math.max(4, 4 * Math.floor(exact / 4));
                     imageDimensionCache.set(url, h);
                     refreshPreview();
                 }
