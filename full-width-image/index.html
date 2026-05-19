@@ -86,8 +86,8 @@
                 <input type="text" id="imageAlt" class="field-input" placeholder="Descriptive text for the image">
             </div>
             <div class="field-group">
-                <label for="imageHeight" class="field-label">Image Height (px) <span style="font-weight:normal;color:#666;">&mdash; optional, Outlook fix</span></label>
-                <input type="number" id="imageHeight" class="field-input" placeholder="Leave blank for auto" min="1" step="1">
+                <label for="imageHeight" class="field-label">Image Height (optional, px)</label>
+                <input type="number" id="imageHeight" class="field-input" min="0" step="4" placeholder="Leave blank for auto. Set only to resolve Outlook height issues.">
             </div>
         </div>
 
@@ -169,7 +169,7 @@
             state.blockData.imageUrl = elements.imageUrl.value;
             state.blockData.imageLink = elements.imageLink.value;
             state.blockData.imageAlt = elements.imageAlt.value;
-            state.blockData.imageHeight = elements.imageHeight.value;
+            state.blockData.imageHeight = elements.imageHeight.value.trim();
             state.blockData.showTopSpacer = elements.showTopSpacer.checked;
             state.blockData.showBottomSpacer = elements.showBottomSpacer.checked;
             state.blockData.showSidePadding = elements.showSidePadding.checked;
@@ -195,11 +195,14 @@
             const imageUrl = utils.getFieldValue('imageUrl');
             const imageLink = utils.getFieldValue('imageLink');
             const imageAlt = utils.getFieldValue('imageAlt');
+            const imageHeightRaw = utils.getFieldValue('imageHeight');
+            const imageHeight = (imageHeightRaw !== undefined && imageHeightRaw !== null && String(imageHeightRaw).trim() !== '' && !isNaN(parseInt(imageHeightRaw, 10)) && parseInt(imageHeightRaw, 10) > 0)
+                ? parseInt(imageHeightRaw, 10)
+                : null;
+            const heightAttr = imageHeight ? ` height="${imageHeight}"` : '';
             const showTopSpacer = utils.getFieldValue('showTopSpacer');
             const showBottomSpacer = utils.getFieldValue('showBottomSpacer');
             const showSidePadding = utils.getFieldValue('showSidePadding');
-            const imageHeight = utils.getFieldValue('imageHeight');
-            const heightAttr = imageHeight ? ` height="${parseInt(imageHeight, 10)}"` : '';
 
             const bgColorHex = backgroundColor === 'red' ? '#DB011C' : '#000000';
 
@@ -225,7 +228,7 @@ ${topSpacerHtml}
 <tr>
 <td align="center" class="block" style="width: 100%;" valign="top">
 <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
-<img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}"${heightAttr} style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 620px;" width="620">
+<img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 620px;" width="620"${heightAttr}>
 </a>
 </td>
 </tr>
@@ -233,7 +236,7 @@ ${bottomSpacerHtml}
 </table>
 </td>
 </tr>
-</table><!-- END .fw-image -->`;}
+</table><!-- END .fw-image -->`;
             } else {
                 // Standard layout with side padding
                 return `<!-- START .fw-image --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color: ${bgColorHex}; width: 620px;">
@@ -245,7 +248,7 @@ ${topSpacerHtml}
 <tr>
 <td align="center" class="block" style="width: 100%;" valign="top">
 <a href="${imageLink || '#'}" target="_blank" style="text-decoration: none; color: #000001;">
-<img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}"${heightAttr} style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580">
+<img align="top" alt="${imageAlt}" class="fill" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none; width: 100%; max-width: 580px;" width="580"${heightAttr}>
 </a>
 </td>
 </tr>
