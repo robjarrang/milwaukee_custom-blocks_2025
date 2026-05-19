@@ -247,7 +247,16 @@
                 return spacerRow + rowHtml;
             }).join('');
 
-            return `<!-- START .event-listing --><table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer event-listing" role="presentation" style="background-color: ${bgColorHex}; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 620px;" width="620"><tr><td class="side" style="width: 20px;">&nbsp;</td><td align="center" class="content-inner" style="width: 580px;" width="580"><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">${allEventRowsHtml}</table></td><td class="side" style="width: 20px;">&nbsp;</td></tr></table><!-- END .event-listing -->`;
+            // Defense-in-depth: Outlook 365 (Windows) ignores CSS `background-color`
+            // on many table/td elements and falls back to the HTML `bgcolor` attribute.
+            // When a row stretches to a fractional pixel height, the fractional sliver
+            // is filled from whichever ancestor first has a `bgcolor` attribute set —
+            // if none is set, Outlook paints it with the document/body background
+            // (which inherits from the surrounding email shell, often white or red).
+            // We set `bgcolor` on every wrapper (outer table, side gutter cells,
+            // content-inner cell, inner sect table) so the entire ancestor chain is
+            // explicitly painted with the block colour.
+            return `<!-- START .event-listing --><table align="center" bgcolor="${bgColorHex}" border="0" cellpadding="0" cellspacing="0" class="content-outer event-listing" role="presentation" style="background-color: ${bgColorHex}; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 620px;" width="620"><tr><td bgcolor="${bgColorHex}" class="side" style="background-color: ${bgColorHex}; width: 20px;">&nbsp;</td><td align="center" bgcolor="${bgColorHex}" class="content-inner" style="background-color: ${bgColorHex}; width: 580px;" width="580"><table align="center" bgcolor="${bgColorHex}" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="background-color: ${bgColorHex}; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">${allEventRowsHtml}</table></td><td bgcolor="${bgColorHex}" class="side" style="background-color: ${bgColorHex}; width: 20px;">&nbsp;</td></tr></table><!-- END .event-listing -->`;
         }
 
         function refreshPreview() {
