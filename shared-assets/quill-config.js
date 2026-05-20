@@ -250,7 +250,15 @@ class QuillConfigManager {
      * @param {number} maxLength - Maximum character length
      */
     static addLengthLimiting(editor, maxLength) {
-        editor.on('text-change', () => {
+        editor.on('text-change', (delta, oldDelta, source) => {
+            // Only enforce length on user input. Silent/API changes are used
+            // internally by setContent()/_replaceTokensWithEmbeds() where text
+            // may briefly contain expanded placeholder tokens (e.g.
+            // %%LINEBREAK_MOBILE_HIDE%%) that are longer than the final embed
+            // representation. Truncating during those operations can chop
+            // tokens in half and leave literal fragments like "%%LINEBREAK_MOBILE"
+            // in the editor.
+            if (source !== 'user') return;
             const text = editor.getText();
             if (text.length > maxLength) {
                 const range = editor.getSelection();
