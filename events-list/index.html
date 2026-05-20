@@ -36,6 +36,13 @@
                 </label>
                 <label for="showButtonsToggle">Show Buttons</label>
             </div>
+            <div class="toggle-container">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="showDividersToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <label for="showDividersToggle">Show Dividers Between Events</label>
+            </div>
         </div>
 
         <div class="section-divider">
@@ -98,6 +105,7 @@
             fields: {
                 backgroundColor: { type: 'text', defaultValue: 'red' },
                 showButtons: { type: 'boolean', defaultValue: true },
+                showDividers: { type: 'boolean', defaultValue: false },
                 events: {
                     type: 'list',
                     defaultValue: [
@@ -162,6 +170,7 @@
             elements.errorBanner = document.getElementById('errorBanner');
             elements.backgroundColorSelector = document.getElementById('backgroundColorSelector');
             elements.showButtonsToggle = document.getElementById('showButtonsToggle');
+            elements.showDividersToggle = document.getElementById('showDividersToggle');
             elements.eventsContainer = document.getElementById('eventsContainer');
             elements.addEventBtn = document.getElementById('addEventBtn');
             elements.eventTemplate = document.getElementById('eventTemplate');
@@ -177,6 +186,7 @@
             const selectedColorEl = elements.backgroundColorSelector.querySelector('.selected');
             state.blockData.backgroundColor = selectedColorEl ? selectedColorEl.dataset.color : 'red';
             state.blockData.showButtons = elements.showButtonsToggle.checked;
+            state.blockData.showDividers = elements.showDividersToggle.checked;
 
             const newEvents = Array.from(elements.eventsContainer.querySelectorAll('.event-item')).map(itemEl => {
                 const event = { id: itemEl.dataset.id };
@@ -247,6 +257,7 @@
         function generateTemplate() {
             const backgroundColor = utils.getFieldValue('backgroundColor');
             const showButtons = utils.getFieldValue('showButtons');
+            const showDividers = utils.getFieldValue('showDividers');
             const bgColorHex = backgroundColor === 'red' ? '#DB011C' : '#000000';
             const events = utils.getFieldValue('events');
 
@@ -257,14 +268,26 @@
             // background through fractional-pixel gaps.
             const spacerRow = `<tr bgcolor="${bgColorHex}" style="background-color: ${bgColorHex};"><td bgcolor="${bgColorHex}" height="20" style="background-color: ${bgColorHex}; font-size: 1px; height: 20px; line-height: 20px; mso-line-height-rule: exactly; padding: 0;">&nbsp;</td></tr>`;
 
+            // 1px white horizontal divider between events. Uses the div-based
+            // separator pattern (background colour + matching font/line-height) which
+            // renders consistently across Outlook Word, Outlook.com, Gmail and Apple
+            // Mail without the minimum-margin quirks of `<hr>`. Sits inside its own
+            // bgcolor'd TR so the surrounding block colour fills the row, not the
+            // body background.
+            const dividerRow = `<tr bgcolor="${bgColorHex}" style="background-color: ${bgColorHex};"><td bgcolor="${bgColorHex}" style="background-color: ${bgColorHex}; font-size: 0; line-height: 0; mso-line-height-rule: exactly; padding: 0;"><div role="separator" style="background: #ffffff; color: #ffffff; font-size: 1px; height: 1px; line-height: 1px; mso-line-height-rule: exactly;">&#8202;</div></td></tr>`;
+
             const allEventRowsHtml = events.map((event, i) => {
                 const rowHtml = generateEventHtml(event, backgroundColor, bgColorHex, showButtons);
                 // Spacer before every event (including the first, to replace the removed top padding)
                 // and after the final event (to replace the removed bottom padding).
+                // When dividers are enabled, insert `divider + spacer` before every event
+                // except the first, so each divider sits symmetrically between two
+                // 20px spacers.
+                const divider = (i > 0 && showDividers) ? (dividerRow + spacerRow) : '';
                 if (i === events.length - 1) {
-                    return spacerRow + rowHtml + spacerRow;
+                    return spacerRow + divider + rowHtml + spacerRow;
                 }
-                return spacerRow + rowHtml;
+                return spacerRow + divider + rowHtml;
             }).join('');
 
             // Defense-in-depth: Outlook 365 (Windows) ignores CSS `background-color`
@@ -413,6 +436,7 @@
             });
 
             utils.addEventListenerTracked(elements.showButtonsToggle, 'change', updateDataFromUI);
+            utils.addEventListenerTracked(elements.showDividersToggle, 'change', updateDataFromUI);
 
             // Optimized event delegation for events
             const eventsHandler = createDelegatedHandler('events', eventActions);
@@ -453,6 +477,7 @@
 
                     document.querySelectorAll('.color-option').forEach(o => o.classList.toggle('selected', o.dataset.color === state.blockData.backgroundColor));
                     elements.showButtonsToggle.checked = state.blockData.showButtons;
+                    elements.showDividersToggle.checked = state.blockData.showDividers;
                     renderEventsUI();
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
