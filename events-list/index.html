@@ -268,13 +268,15 @@
             // background through fractional-pixel gaps.
             const spacerRow = `<tr bgcolor="${bgColorHex}" style="background-color: ${bgColorHex};"><td bgcolor="${bgColorHex}" height="20" style="background-color: ${bgColorHex}; font-size: 1px; height: 20px; line-height: 20px; mso-line-height-rule: exactly; padding: 0;">&nbsp;</td></tr>`;
 
-            // 1px white horizontal divider between events. Uses the div-based
-            // separator pattern (background colour + matching font/line-height) which
-            // renders consistently across Outlook Word, Outlook.com, Gmail and Apple
-            // Mail without the minimum-margin quirks of `<hr>`. Sits inside its own
-            // bgcolor'd TR so the surrounding block colour fills the row, not the
-            // body background.
-            const dividerRow = `<tr bgcolor="${bgColorHex}" style="background-color: ${bgColorHex};"><td bgcolor="${bgColorHex}" style="background-color: ${bgColorHex}; font-size: 0; line-height: 0; mso-line-height-rule: exactly; padding: 0;"><div role="separator" style="background: #ffffff; color: #ffffff; font-size: 1px; height: 1px; line-height: 1px; mso-line-height-rule: exactly;">&#8202;</div></td></tr>`;
+            // 1px white horizontal divider between events, styled to match the
+            // original template (subtle 30%-opacity rule). Opacity is unsupported in
+            // Outlook Word so the line renders solid white there \u2014 an acceptable
+            // degradation in exchange for a consistent 1px height. `color` is set
+            // alongside `background-color` because Outlook's <hr> takes its colour
+            // from `color`, while modern clients use `background-color`. No padding
+            // on the wrapping td \u2014 the 20px spacing above and below comes from the
+            // surrounding spacer rows.
+            const dividerRow = `<tr bgcolor="${bgColorHex}" style="background-color: ${bgColorHex};"><td bgcolor="${bgColorHex}" style="background-color: ${bgColorHex}; font-size: 0; line-height: 0; mso-line-height-rule: exactly; padding: 0;"><hr style="background-color: #ffffff; border: 0; color: #ffffff; height: 1px; margin: 0; opacity: 0.3;"></td></tr>`;
 
             const allEventRowsHtml = events.map((event, i) => {
                 const rowHtml = generateEventHtml(event, backgroundColor, bgColorHex, showButtons);
