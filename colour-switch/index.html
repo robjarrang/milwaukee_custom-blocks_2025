@@ -75,6 +75,14 @@
                 </div>
                 <div class="field-hint">Full width stacks image above text. Compact shows text/button next to a smaller image.</div>
             </div>
+            <div class="field-group" id="compactImageAlignmentGroup">
+                <label class="field-label">Compact image position</label>
+                <div class="option-selector" id="compactImageAlignmentSelector">
+                    <div class="option-button" data-value="left">Left</div>
+                    <div class="option-button selected" data-value="right">Right</div>
+                </div>
+                <div class="field-hint">Desktop only. On mobile the image always sits above the text.</div>
+            </div>
             <div class="field-group">
                 <label class="field-label">Background colour</label>
                 <div class="option-selector" id="backgroundColourSelector">
@@ -226,6 +234,7 @@
             name: 'Colour Switch Block',
             fields: {
                 layout: { type: 'text', defaultValue: 'full' },
+                compactImageAlignment: { type: 'text', defaultValue: 'right' },
                 backgroundColour: { type: 'text', defaultValue: 'black' },
                 coloursPerRow: { type: 'number', defaultValue: 4 },
                 imageWidth: { type: 'number', defaultValue: 380 },
@@ -331,6 +340,8 @@
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
             elements.layoutSelector = document.getElementById('layoutSelector');
+            elements.compactImageAlignmentSelector = document.getElementById('compactImageAlignmentSelector');
+            elements.compactImageAlignmentGroup = document.getElementById('compactImageAlignmentGroup');
             elements.backgroundColourSelector = document.getElementById('backgroundColourSelector');
             elements.coloursPerRow = document.getElementById('coloursPerRow');
             elements.imageWidth = document.getElementById('imageWidth');
@@ -370,6 +381,7 @@
 
         function updateDataFromUI() {
             state.blockData.layout = getSelectorValue(elements.layoutSelector, 'full');
+            state.blockData.compactImageAlignment = getSelectorValue(elements.compactImageAlignmentSelector, 'right');
             state.blockData.backgroundColour = getSelectorValue(elements.backgroundColourSelector, 'black');
             state.blockData.coloursPerRow = parseInt(elements.coloursPerRow.value, 10) || moduleConfig.fields.coloursPerRow.defaultValue;
             state.blockData.imageWidth = parseInt(elements.imageWidth.value, 10) || moduleConfig.fields.imageWidth.defaultValue;
@@ -573,6 +585,7 @@
                 });
             }
             setupOptionSelector(elements.layoutSelector, 'layout');
+            setupOptionSelector(elements.compactImageAlignmentSelector, 'compactImageAlignment');
             setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
 
             // Generic text inputs
@@ -641,10 +654,12 @@
                 elements.coloursPerRow.max = 4;
                 elements.imageWidth.max = 290;
                 elements.fallbackImageWidth.max = 290;
+                if (elements.compactImageAlignmentGroup) elements.compactImageAlignmentGroup.style.display = '';
             } else {
                 elements.coloursPerRow.max = 5;
                 elements.imageWidth.max = 580;
                 elements.fallbackImageWidth.max = 580;
+                if (elements.compactImageAlignmentGroup) elements.compactImageAlignmentGroup.style.display = 'none';
             }
         }
 
@@ -656,6 +671,7 @@
         function getResolvedSettings() {
             const layout = utils.getFieldValue('layout') === 'compact' ? 'compact' : 'full';
             const isCompact = layout === 'compact';
+            const compactImageAlignment = utils.getFieldValue('compactImageAlignment') === 'left' ? 'left' : 'right';
             const maxImageWidth = isCompact ? 290 : 580;
             const maxPerRow = isCompact ? 4 : 5;
 
@@ -699,6 +715,8 @@
 
             return {
                 layout, isCompact, moduleName,
+                compactImageAlignment,
+                compactDir: isCompact && compactImageAlignment === 'right' ? ' dir="rtl"' : '',
                 moduleClass: `mwk-${moduleName}-interactive`,
                 coloursPerRow,
                 imageWidth, fallbackImageWidth,
@@ -953,7 +971,7 @@ ${swatches}
   <tr>
     <td class="side" style="width:20px">&nbsp;</td>
     <td class="content-inner" valign="middle" align="center" style="width:580px">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="width:100%">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0"${s.compactDir} style="width:100%">
         <tr>
           <td class="block" dir="ltr" valign="middle" align="center" style="width:290px">
             <a href="${fallbackHref}" target="_blank">
@@ -986,7 +1004,7 @@ ${radios}
   <tr>
     <td class="side" style="width:20px">&nbsp;</td>
     <td class="content-inner" valign="middle" align="center" style="width:580px">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="width:100%">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0"${s.compactDir} style="width:100%">
         <tr>
           <td class="block" dir="ltr" valign="middle" align="center" style="width:290px">
 ${imagePanels}
@@ -1093,6 +1111,7 @@ ${body}
 
                     // Populate UI
                     setSelectorValue(elements.layoutSelector, state.blockData.layout || 'full');
+                    setSelectorValue(elements.compactImageAlignmentSelector, state.blockData.compactImageAlignment || 'right');
                     setSelectorValue(elements.backgroundColourSelector, state.blockData.backgroundColour || 'black');
                     elements.coloursPerRow.value = state.blockData.coloursPerRow;
                     elements.imageWidth.value = state.blockData.imageWidth;
