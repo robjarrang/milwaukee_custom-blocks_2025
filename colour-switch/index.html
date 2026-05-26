@@ -83,11 +83,6 @@
                     <div class="option-button" data-value="white">White</div>
                 </div>
             </div>
-            <div class="field-group">
-                <label class="field-label" for="moduleName">Unique module name</label>
-                <input type="text" id="moduleName" class="field-input" placeholder="e.g. bolt-100-colour-swap-01">
-                <div class="field-hint">Must be unique within an email. Letters, numbers and hyphens only. If you use this module more than once, change this value for each version.</div>
-            </div>
         </div>
 
         <!-- SIZING -->
@@ -232,7 +227,6 @@
             fields: {
                 layout: { type: 'text', defaultValue: 'full' },
                 backgroundColour: { type: 'text', defaultValue: 'black' },
-                moduleName: { type: 'text', defaultValue: '' },
                 coloursPerRow: { type: 'number', defaultValue: 4 },
                 imageWidth: { type: 'number', defaultValue: 380 },
                 fallbackImageWidth: { type: 'number', defaultValue: 580 },
@@ -338,7 +332,6 @@
             elements.errorBanner = document.getElementById('errorBanner');
             elements.layoutSelector = document.getElementById('layoutSelector');
             elements.backgroundColourSelector = document.getElementById('backgroundColourSelector');
-            elements.moduleName = document.getElementById('moduleName');
             elements.coloursPerRow = document.getElementById('coloursPerRow');
             elements.imageWidth = document.getElementById('imageWidth');
             elements.fallbackImageWidth = document.getElementById('fallbackImageWidth');
@@ -378,7 +371,6 @@
         function updateDataFromUI() {
             state.blockData.layout = getSelectorValue(elements.layoutSelector, 'full');
             state.blockData.backgroundColour = getSelectorValue(elements.backgroundColourSelector, 'black');
-            state.blockData.moduleName = elements.moduleName.value;
             state.blockData.coloursPerRow = parseInt(elements.coloursPerRow.value, 10) || moduleConfig.fields.coloursPerRow.defaultValue;
             state.blockData.imageWidth = parseInt(elements.imageWidth.value, 10) || moduleConfig.fields.imageWidth.defaultValue;
             state.blockData.fallbackImageWidth = parseInt(elements.fallbackImageWidth.value, 10) || 0;
@@ -584,7 +576,7 @@
             setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
 
             // Generic text inputs
-            ['moduleName', 'buttonText', 'fallbackProductName', 'fallbackImageAltText'].forEach(id => {
+            ['buttonText', 'fallbackProductName', 'fallbackImageAltText'].forEach(id => {
                 const el = elements[id];
                 if (!el) return;
                 utils.addEventListenerTracked(el, 'input', () => {
@@ -667,8 +659,10 @@
             const maxImageWidth = isCompact ? 290 : 580;
             const maxPerRow = isCompact ? 4 : 5;
 
-            let moduleName = utils.sanitizeModuleName(utils.getFieldValue('moduleName'));
-            if (!moduleName) moduleName = utils.sanitizeModuleName(makeDefaultModuleName());
+            // Generate a fresh unique ID on every render. This guarantees that the
+            // radio inputs and scoped CSS selectors never collide with other instances
+            // of this block placed in the same email — the user doesn't have to manage it.
+            const moduleName = utils.sanitizeModuleName(makeDefaultModuleName());
 
             const coloursRaw = utils.getFieldValue('colours') || [];
             const colours = coloursRaw.slice(0, moduleConfig.maxItems);
@@ -1097,15 +1091,9 @@ ${body}
                         state.blockData.colours = JSON.parse(JSON.stringify(moduleConfig.fields.colours.defaultValue));
                     }
 
-                    // Default moduleName if blank
-                    if (!state.blockData.moduleName) {
-                        state.blockData.moduleName = makeDefaultModuleName();
-                    }
-
                     // Populate UI
                     setSelectorValue(elements.layoutSelector, state.blockData.layout || 'full');
                     setSelectorValue(elements.backgroundColourSelector, state.blockData.backgroundColour || 'black');
-                    elements.moduleName.value = state.blockData.moduleName;
                     elements.coloursPerRow.value = state.blockData.coloursPerRow;
                     elements.imageWidth.value = state.blockData.imageWidth;
                     elements.fallbackImageWidth.value = state.blockData.fallbackImageWidth || 0;
