@@ -7,58 +7,52 @@
     <!-- Early SFMC handshake to prevent timeout while scripts load -->
     <script>window.parent.postMessage({method:"handShake",origin:window.location.origin,payload:{tabs:['htmlblock']}},'*');</script>
 
-    <!-- Quill.js CSS (locally hosted) -->
-    <link href="../shared-assets/quill.snow.css" rel="stylesheet">
-    <!-- Local assets for fastest loading -->
     <link rel="stylesheet" href="../shared-assets/customblock-styles.css">
     <style>
-        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:white}
-        .container{max-width:800px;margin:0 auto;background:white;padding:20px;transition:opacity 0.3s ease}
+        body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:#fff}
+        .container{max-width:860px;margin:0 auto;background:#fff;padding:20px;transition:opacity 0.3s ease}
         .container.loading{opacity:0.6;pointer-events:none}
-        .field-group{margin-bottom:20px}
-        .field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}
-        .field-help{font-size:12px;color:#666;margin-top:4px;font-weight:normal}
-        .field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color 0.3s ease}
-        .field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}
-        .field-input.error{border-color:#ff0000}
-        .field-error{color:#ff0000;font-size:12px;margin-top:4px;display:none}
-        .field-input.error + .field-error{display:block}
-        .checkbox-label{cursor:pointer;user-select:none;font-size:14px;color:#333}
-        .toggle-container{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-        .toggle-switch{position:relative;display:inline-block;width:48px;height:24px;flex-shrink:0}
-        .toggle-switch input{opacity:0;width:0;height:0}
-        .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.3s;border-radius:24px}
-        .toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%}
-        input:checked + .toggle-slider{background-color:#0074d9}
-        input:checked + .toggle-slider:before{transform:translateX(24px)}
-        .option-selector{display:flex;gap:10px;flex-wrap:wrap}
-        .option-button{flex:1;min-width:80px;padding:8px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease;font-size:14px}
-        .option-button:hover{border-color:#0074d9;background-color:#f0f8ff}
-        .option-button.selected{border-color:#0074d9;background-color:#0074d9;color:white}
-        .section-divider{margin:30px 0;border-top:2px solid #eee;padding-top:20px}
+        h2{margin-top:0;color:#333}
+        .section-divider{margin-top:30px;padding-top:20px;border-top:2px solid #eee}
         .section-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:15px}
-        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999}
+        .field-group{margin-bottom:18px}
+        .field-row{display:flex;gap:15px;flex-wrap:wrap}
+        .field-row > .field-group{flex:1;min-width:200px}
+        .field-label{display:block;margin-bottom:5px;font-weight:bold;color:#333;font-size:14px}
+        .field-hint{font-size:12px;color:#666;margin-top:4px}
+        .field-input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;transition:border-color .3s ease}
+        .field-input:focus{outline:none;border-color:#0074d9;box-shadow:0 0 0 2px rgba(0,116,217,0.2)}
+        .field-input.error{border-color:#DB011C}
+        .field-error{color:#DB011C;font-size:12px;margin-top:4px;display:none}
+        .field-input.error + .field-error{display:block}
+        .option-selector{display:flex;gap:8px;flex-wrap:wrap}
+        .option-button{flex:1;min-width:80px;padding:8px 12px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease;font-size:14px;background:#fff}
+        .option-button:hover{border-color:#0074d9;background-color:#f0f8ff}
+        .option-button.selected{border-color:#0074d9;background-color:#0074d9;color:#fff}
+        .colour-input-wrap{display:flex;align-items:center;gap:8px}
+        .colour-input-wrap input[type="color"]{width:42px;height:38px;padding:2px;border:1px solid #ddd;border-radius:4px;cursor:pointer;background:#fff;flex-shrink:0}
+        .colour-input-wrap input[type="text"]{flex:1}
+        .items-container{display:flex;flex-direction:column;gap:15px}
+        .item{background:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}
+        .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
+        .item-title{font-weight:bold;font-size:15px;margin:0;display:flex;align-items:center;gap:10px}
+        .item-swatch-preview{display:inline-block;width:24px;height:24px;border-radius:50%;border:1px solid #ccc;vertical-align:middle}
+        .item-controls{display:flex;gap:6px}
+        .item-control-btn{background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;padding:4px 8px;font-size:14px;line-height:1;color:#555;transition:all .2s}
+        .item-control-btn:hover{color:#0074d9;border-color:#0074d9}
+        .item-control-btn:disabled{color:#ccc;border-color:#eee;cursor:not-allowed}
+        .btn{display:inline-block;padding:10px 16px;background-color:#0074d9;color:#fff;text-decoration:none;border-radius:4px;border:none;cursor:pointer;font-size:14px;font-weight:bold;transition:background-color .2s}
+        .btn:hover{background-color:#005a9e}
+        .btn:disabled{background-color:#ccc;cursor:not-allowed}
+        .add-item-btn{margin-top:15px}
+        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.9);display:none;align-items:center;justify-content:center;z-index:9999}
         .loading-overlay.show{display:flex}
         .loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #0074d9;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}
         @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        .error-banner{background-color:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}
+        .error-banner{background:#fee;border:1px solid #fcc;color:#c00;padding:10px;margin-bottom:20px;border-radius:4px;display:none}
         .error-banner.show{display:block}
-
-        .row{display:flex;gap:15px;flex-wrap:wrap}
-        .row > .field-group{flex:1;min-width:180px}
-
-        .colour-card{background-color:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;margin-bottom:15px;transition:opacity .2s ease}
-        .colour-card.inactive{opacity:0.4}
-        .colour-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
-        .colour-card-title{display:flex;align-items:center;gap:10px;font-weight:bold;font-size:15px;margin:0;color:#333}
-        .colour-swatch-preview{display:inline-block;width:24px;height:24px;border-radius:50%;border:1px solid #ccc;background-color:#cccccc;flex-shrink:0}
-        .colour-card-toggle{background:none;border:none;cursor:pointer;font-size:14px;color:#0074d9;padding:4px 8px}
-        .colour-card-body{display:none}
-        .colour-card.open .colour-card-body{display:block}
-        .colour-card-body .field-group{margin-bottom:12px}
-        .colour-picker-wrap{display:flex;align-items:center;gap:8px}
-        .colour-picker-wrap input[type=color]{width:40px;height:36px;padding:2px;border:1px solid #ddd;border-radius:4px;cursor:pointer;flex-shrink:0;background:none}
-        .colour-picker-wrap input[type=text]{flex:1}
+        .item-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        @media(max-width:600px){.item-grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
@@ -67,219 +61,200 @@
     </div>
 
     <div class="container" id="mainContainer">
-        <h2 style="margin-top: 0; color: #333;">Colour Switch</h2>
-
+        <h2>Colour Switch Block</h2>
         <div class="error-banner" id="errorBanner"></div>
 
-        <!-- General Settings -->
-        <div class="section-divider" style="margin-top:0; padding-top:0; border-top:none;">
-            <div class="section-title">General Settings</div>
-
+        <!-- LAYOUT -->
+        <div class="section-divider" style="margin-top:0;padding-top:0;border-top:none">
+            <div class="section-title">Layout</div>
             <div class="field-group">
-                <label for="moduleName" class="field-label">Module name</label>
-                <input type="text" id="moduleName" class="field-input" placeholder="e.g. bolt-100-colour-switch-01">
-                <div class="field-help">Used to generate unique IDs. Letters, numbers and hyphens only. Change this for each instance of the module in the same email.</div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Layout</label>
+                <label class="field-label">Layout style</label>
                 <div class="option-selector" id="layoutSelector">
-                    <div class="option-button" data-value="compact">Compact (two-column)</div>
-                    <div class="option-button" data-value="full-width">Full width (stacked)</div>
+                    <div class="option-button selected" data-value="full">Full width</div>
+                    <div class="option-button" data-value="compact">Compact (two column)</div>
                 </div>
+                <div class="field-hint">Full width stacks image above text. Compact shows text/button next to a smaller image.</div>
             </div>
-
             <div class="field-group">
                 <label class="field-label">Background colour</label>
                 <div class="option-selector" id="backgroundColourSelector">
-                    <div class="option-button" data-value="black">Black</div>
                     <div class="option-button" data-value="red">Red</div>
+                    <div class="option-button selected" data-value="black">Black</div>
                     <div class="option-button" data-value="white">White</div>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="field-group">
-                    <label for="numberOfColourOptions" class="field-label">Number of colour options</label>
-                    <input type="number" id="numberOfColourOptions" class="field-input" min="1" max="10" step="1" value="4">
-                </div>
-                <div class="field-group">
-                    <label for="coloursPerRow" class="field-label">Swatches per row</label>
-                    <input type="number" id="coloursPerRow" class="field-input" min="1" max="4" step="1" value="4">
-                </div>
+            <div class="field-group">
+                <label class="field-label" for="moduleName">Unique module name</label>
+                <input type="text" id="moduleName" class="field-input" placeholder="e.g. bolt-100-colour-swap-01">
+                <div class="field-hint">Must be unique within an email. Letters, numbers and hyphens only. If you use this module more than once, change this value for each version.</div>
             </div>
+        </div>
 
-            <div class="row">
+        <!-- SIZING -->
+        <div class="section-divider">
+            <div class="section-title">Sizing</div>
+            <div class="field-row">
                 <div class="field-group">
-                    <label for="imageWidth" class="field-label">Image width (px)</label>
-                    <input type="number" id="imageWidth" class="field-input" min="100" max="580" step="2" value="290">
-                    <div class="field-help">Compact: max 290. Full width: max 580.</div>
+                    <label class="field-label" for="coloursPerRow">Swatches per row</label>
+                    <input type="number" id="coloursPerRow" class="field-input" min="1" max="5" step="1" value="4">
+                    <div class="field-hint">Full width: 1-5. Compact: 1-4.</div>
                 </div>
                 <div class="field-group">
-                    <label for="fallbackImageWidth" class="field-label">Fallback image width (px)</label>
-                    <input type="number" id="fallbackImageWidth" class="field-input" min="100" max="580" step="2" value="290">
-                    <div class="field-help">Leave equal to image width unless different.</div>
+                    <label class="field-label" for="imageWidth">Interactive image width (px)</label>
+                    <input type="number" id="imageWidth" class="field-input" min="100" max="580" step="10" value="380">
+                    <div class="field-hint">Max 580 (full) or 290 (compact).</div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="fallbackImageWidth">Fallback image width (px)</label>
+                    <input type="number" id="fallbackImageWidth" class="field-input" min="100" max="580" step="10" value="580">
+                    <div class="field-hint">Leave 0 to match the interactive width.</div>
                 </div>
             </div>
         </div>
 
-        <!-- Button settings -->
+        <!-- MAIN LINK + BUTTON -->
         <div class="section-divider">
-            <div class="section-title">Button &amp; Links</div>
-
+            <div class="section-title">Link &amp; button</div>
             <div class="field-group">
-                <label for="productPageLink" class="field-label">Main product page URL</label>
+                <label class="field-label" for="productPageLink">Main product page link</label>
                 <input type="url" id="productPageLink" class="field-input" placeholder="https://www.milwaukeetool.eu/...">
-                <div class="field-help">Used for the button and fallback image link.</div>
-                <div class="field-error" id="productPageLinkError">Please enter a valid URL (http:// or https://)</div>
+                <div class="field-error">Please enter a valid URL.</div>
+                <div class="field-hint">Used for the button and fallback image when no specific links are provided.</div>
             </div>
-
-            <div class="field-group">
-                <label for="buttonText" class="field-label">Button text</label>
-                <input type="text" id="buttonText" class="field-input" placeholder="View product" maxlength="50">
-            </div>
-
-            <div class="field-group">
-                <label for="buttonLink" class="field-label">Button URL (optional)</label>
-                <input type="url" id="buttonLink" class="field-input" placeholder="Leave blank to use main product page URL">
-                <div class="field-error" id="buttonLinkError">Please enter a valid URL (http:// or https://)</div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label" for="buttonText">Button text</label>
+                    <input type="text" id="buttonText" class="field-input" value="View product" maxlength="60">
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="buttonLink">Button link (optional)</label>
+                    <input type="url" id="buttonLink" class="field-input" placeholder="Leave blank to use main link">
+                    <div class="field-error">Please enter a valid URL.</div>
+                </div>
             </div>
         </div>
 
-        <!-- Fallback content -->
+        <!-- FALLBACK -->
         <div class="section-divider">
-            <div class="section-title">Fallback Content</div>
-            <p style="font-size:12px;color:#666;margin-top:0;">Shown in Outlook, Gmail, Yahoo and other clients that don&rsquo;t support interactive switching.</p>
-
+            <div class="section-title">Fallback (Outlook / Gmail / Yahoo)</div>
             <div class="field-group">
-                <label for="fallbackProductName" class="field-label">Fallback product name (optional)</label>
-                <input type="text" id="fallbackProductName" class="field-input" placeholder="e.g. BOLT&trade; 100 WHITE" maxlength="120">
+                <label class="field-label" for="fallbackProductName">Fallback product name</label>
+                <input type="text" id="fallbackProductName" class="field-input" placeholder="Leave blank to omit" maxlength="120">
             </div>
-
             <div class="field-group">
-                <label for="fallbackImage" class="field-label">Fallback image URL</label>
+                <label class="field-label" for="fallbackImage">Fallback image URL</label>
                 <input type="url" id="fallbackImage" class="field-input" placeholder="https://...">
-                <div class="field-error" id="fallbackImageError">Please enter a valid URL (http:// or https://)</div>
+                <div class="field-error">Please enter a valid URL.</div>
             </div>
-
             <div class="field-group">
-                <label for="fallbackImageAltText" class="field-label">Fallback image alt text</label>
+                <label class="field-label" for="fallbackImageAltText">Fallback image alt text</label>
                 <input type="text" id="fallbackImageAltText" class="field-input" maxlength="200">
             </div>
         </div>
 
-        <!-- Colour options -->
+        <!-- COLOUR OPTIONS -->
         <div class="section-divider">
-            <div class="section-title">Colour Options</div>
-            <p style="font-size:12px;color:#666;margin-top:0;">Edit all 10 colours below. Only the first <em>N</em> (set by &ldquo;Number of colour options&rdquo; above) are shown in the email.</p>
-            <div id="coloursContainer"></div>
+            <div class="section-title">Colour options</div>
+            <div class="field-hint" style="margin-bottom:10px">Add 1 to 10 colour variants. Each requires an image and a swatch colour.</div>
+            <div id="itemsContainer" class="items-container"></div>
+            <button id="addItemBtn" class="btn add-item-btn">Add colour option</button>
         </div>
     </div>
 
-    <!-- Template for a single colour option card -->
-    <template id="colourCardTemplate">
-        <div class="colour-card" data-index="">
-            <div class="colour-card-header">
-                <h3 class="colour-card-title">
-                    <span class="colour-swatch-preview"></span>
-                    <span class="colour-card-label-text">Colour</span>
+    <!-- Template for a single colour item -->
+    <template id="itemTemplate">
+        <div class="item">
+            <div class="item-header">
+                <h3 class="item-title">
+                    <span class="item-swatch-preview" data-field="swatchPreview"></span>
+                    <span class="item-title-text">Colour</span>
                 </h3>
-                <button type="button" class="colour-card-toggle">Expand</button>
+                <div class="item-controls">
+                    <button type="button" class="item-control-btn move-up-btn" title="Move up">▲</button>
+                    <button type="button" class="item-control-btn move-down-btn" title="Move down">▼</button>
+                    <button type="button" class="item-control-btn duplicate-btn" title="Duplicate">⎘</button>
+                    <button type="button" class="item-control-btn remove-btn" title="Remove">✕</button>
+                </div>
             </div>
-            <div class="colour-card-body">
+            <div class="item-grid">
                 <div class="field-group">
-                    <label class="field-label">Product name</label>
-                    <input type="text" class="field-input" data-field="productName" maxlength="120">
+                    <label class="field-label">Product name (shown above image)</label>
+                    <input type="text" class="field-input" data-field="productName" placeholder="e.g. BOLT™ 100 WHITE" maxlength="120">
                 </div>
                 <div class="field-group">
+                    <label class="field-label">Swatch label (tooltip)</label>
+                    <input type="text" class="field-input" data-field="label" placeholder="e.g. White" maxlength="60">
+                </div>
+                <div class="field-group" style="grid-column:1/-1">
                     <label class="field-label">Image URL</label>
                     <input type="url" class="field-input" data-field="image" placeholder="https://...">
-                    <div class="field-error">Please enter a valid URL (http:// or https://)</div>
+                    <div class="field-error">Please enter a valid URL.</div>
                 </div>
-                <div class="field-group">
+                <div class="field-group" style="grid-column:1/-1">
                     <label class="field-label">Image alt text</label>
                     <input type="text" class="field-input" data-field="altText" maxlength="200">
                 </div>
-                <div class="row">
-                    <div class="field-group">
-                        <label class="field-label">Swatch label (tooltip)</label>
-                        <input type="text" class="field-input" data-field="label" maxlength="60">
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label">Product URL (optional)</label>
-                        <input type="url" class="field-input" data-field="link" placeholder="Leave blank to use main product page URL">
-                        <div class="field-error">Please enter a valid URL (http:// or https://)</div>
+                <div class="field-group" style="grid-column:1/-1">
+                    <label class="field-label">Link URL (optional)</label>
+                    <input type="url" class="field-input" data-field="link" placeholder="Leave blank to use main link">
+                    <div class="field-error">Please enter a valid URL.</div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Swatch colour</label>
+                    <div class="colour-input-wrap">
+                        <input type="color" data-field="swatchColourPicker" value="#cccccc">
+                        <input type="text" class="field-input" data-field="swatchColour" placeholder="#cccccc" maxlength="32">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="field-group">
-                        <label class="field-label">Swatch colour</label>
-                        <div class="colour-picker-wrap">
-                            <input type="color" data-field="swatchColourPicker" value="#cccccc">
-                            <input type="text" class="field-input" data-field="swatchColour" maxlength="20" placeholder="#cccccc">
-                        </div>
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label">Swatch border</label>
-                        <div class="toggle-container" style="margin-top:6px;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" data-field="swatchBorder">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="checkbox-label">Add light grey border</span>
-                        </div>
-                        <div class="field-help">Recommended for white, black or very light swatches.</div>
-                    </div>
+                <div class="field-group">
+                    <label class="field-label">Swatch border</label>
+                    <input type="text" class="field-input" data-field="swatchBorder" placeholder='none or "1px solid #cccccc"' maxlength="60">
+                    <div class="field-hint">Use <code>none</code> or a CSS border (e.g. <code>1px solid #cccccc</code>).</div>
                 </div>
             </div>
         </div>
     </template>
 
-    <!-- Quill.js script -->
-    <script src="../shared-assets/quill.js"></script>
-    <!-- Local bundle for fastest loading -->
     <script src="../shared-assets/customblock-bundle.js"></script>
-    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
 
         // =====================================================================
         // MODULE CONFIGURATION
         // =====================================================================
-        const TOTAL_COLOURS = 10;
-
-        const DEFAULT_COLOURS = [
-            { productName: 'BOLT\u2122 100 WHITE',  image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932478122--Hero_1.png', altText: 'BOLT 100 white safety helmet',  label: 'White',  link: '', swatchColour: '#f2f2f2', swatchBorder: true  },
-            { productName: 'BOLT\u2122 100 YELLOW', image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932478913--Hero_1.png', altText: 'BOLT 100 yellow safety helmet', label: 'Yellow', link: '', swatchColour: '#F7D100', swatchBorder: false },
-            { productName: 'BOLT\u2122 100 BLUE',   image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932478914--Hero_1.png', altText: 'BOLT 100 blue safety helmet',   label: 'Blue',   link: '', swatchColour: '#26366F', swatchBorder: false },
-            { productName: 'BOLT\u2122 100 GREEN',  image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932478915--Hero_1.png', altText: 'BOLT 100 green safety helmet',  label: 'Green',  link: '', swatchColour: '#00965E', swatchBorder: false },
-            { productName: 'BOLT\u2122 100 RED',    image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932478916--Hero_1.png', altText: 'BOLT 100 red safety helmet',    label: 'Red',    link: '', swatchColour: '#B50018', swatchBorder: false },
-            { productName: 'BOLT\u2122 100 BLACK',  image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932478917--Hero_1.png', altText: 'BOLT 100 black safety helmet',  label: 'Black',  link: '', swatchColour: '#000000', swatchBorder: true  },
-            { productName: 'BOLT\u2122 100 ORANGE', image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932480663--Hero_1.png', altText: 'BOLT 100 orange safety helmet', label: 'Orange', link: '', swatchColour: '#F58220', swatchBorder: false },
-            { productName: 'BOLT\u2122 100 HIGH VISIBILITY YELLOW', image: 'https://static.milwaukeetool.eu/remote.axd/milwaukee-media-images.s3.amazonaws.com/hi/4932480664--Hero_1.png', altText: 'BOLT 100 high visibility yellow safety helmet', label: 'High vis yellow', link: '', swatchColour: '#C4D600', swatchBorder: false },
-            { productName: '', image: '', altText: '', label: 'Colour 9',  link: '', swatchColour: '#777777', swatchBorder: false },
-            { productName: '', image: '', altText: '', label: 'Colour 10', link: '', swatchColour: '#6F2DA8', swatchBorder: false }
-        ];
+        function makeDefaultModuleName() {
+            const rand = Math.random().toString(36).slice(2, 8);
+            return `colour-swap-${rand}`;
+        }
 
         const moduleConfig = {
-            name: 'Colour Switch',
+            name: 'Colour Switch Block',
             fields: {
-                moduleName: { type: 'text', defaultValue: 'colour-switch-01' },
-                layout: { type: 'text', defaultValue: 'compact' },
+                layout: { type: 'text', defaultValue: 'full' },
                 backgroundColour: { type: 'text', defaultValue: 'black' },
-                numberOfColourOptions: { type: 'number', defaultValue: 4 },
+                moduleName: { type: 'text', defaultValue: '' },
                 coloursPerRow: { type: 'number', defaultValue: 4 },
-                imageWidth: { type: 'number', defaultValue: 290 },
-                fallbackImageWidth: { type: 'number', defaultValue: 290 },
+                imageWidth: { type: 'number', defaultValue: 380 },
+                fallbackImageWidth: { type: 'number', defaultValue: 580 },
                 productPageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
-                buttonText: { type: 'text', defaultValue: 'View product' },
                 buttonLink: { type: 'url', defaultValue: '' },
+                buttonText: { type: 'text', defaultValue: 'View product' },
                 fallbackProductName: { type: 'text', defaultValue: '' },
                 fallbackImage: { type: 'url', defaultValue: '' },
                 fallbackImageAltText: { type: 'text', defaultValue: '' },
-                colours: { type: 'list', defaultValue: DEFAULT_COLOURS }
+                colours: {
+                    type: 'list',
+                    defaultValue: [
+                        { id: crypto.randomUUID(), productName: 'PRODUCT WHITE',  image: '', altText: 'Product white',  label: 'White',  link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT YELLOW', image: '', altText: 'Product yellow', label: 'Yellow', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT BLUE',   image: '', altText: 'Product blue',   label: 'Blue',   link: '', swatchColour: '#26366F', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT GREEN',  image: '', altText: 'Product green',  label: 'Green',  link: '', swatchColour: '#00965E', swatchBorder: 'none' }
+                    ]
+                }
             },
-            debounceDelay: 300,
+            maxItems: 10,
+            minItems: 1,
+            debounceDelay: 350,
             maxRetries: 3
         };
 
@@ -291,10 +266,9 @@
             blockData: {},
             isLoading: false,
             isInitialized: false,
-            eventListeners: [],
-            retryCount: 0
+            retryCount: 0,
+            eventListeners: []
         };
-
         const elements = {};
         let rafId = null;
 
@@ -302,459 +276,768 @@
         // UTILS
         // =====================================================================
         const utils = {
-            debounce(func, wait) {
-                let t;
-                return function(...args) {
-                    clearTimeout(t);
-                    t = setTimeout(() => func.apply(this, args), wait);
-                };
-            },
+            debounce(fn, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), wait); }; },
             isValidUrl(s) {
                 if (!s || s.trim() === '') return true;
                 const t = s.replace(/%%[^%]+%%/g, 'ampscript');
-                try {
-                    const u = new URL(t);
-                    return u.protocol === 'http:' || u.protocol === 'https:';
-                } catch (_) { return false; }
+                try { const u = new URL(t); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; }
             },
-            escapeHtml(str) {
-                if (str == null) return '';
-                return String(str)
+            showError(msg, permanent = false) {
+                console.error(`${moduleConfig.name}:`, msg);
+                if (elements.errorBanner) {
+                    elements.errorBanner.textContent = msg;
+                    elements.errorBanner.classList.add('show');
+                    if (!permanent) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000);
+                }
+            },
+            getFieldValue(field) {
+                const v = state.blockData[field];
+                const cfg = moduleConfig.fields[field];
+                if (v === undefined || v === null) return cfg.defaultValue;
+                if (cfg.type === 'number') {
+                    const n = parseFloat(v);
+                    return isNaN(n) ? cfg.defaultValue : n;
+                }
+                return v;
+            },
+            sanitizeModuleName(s) {
+                return String(s || '').toLowerCase().trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+            },
+            escapeHtml(s) {
+                return String(s == null ? '' : s)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#39;');
             },
-            escapeAttr(str) {
-                return utils.escapeHtml(str);
-            },
-            escapeUrl(str) {
-                if (!str) return '';
-                return String(str).replace(/"/g, '%22').replace(/</g, '%3C').replace(/>/g, '%3E');
-            },
-            sanitiseModuleName(s) {
-                return String(s || '').toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'colour-switch';
-            },
-            isValidHex(s) {
-                return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test((s || '').trim());
-            },
-            showError(message, permanent = false) {
-                if (elements.errorBanner) {
-                    elements.errorBanner.textContent = message;
-                    elements.errorBanner.classList.add('show');
-                    if (!permanent) setTimeout(() => elements.errorBanner.classList.remove('show'), 5000);
+            escapeAttr(s) { return this.escapeHtml(s); },
+            escapeUrl(s) {
+                const v = String(s == null ? '' : s).trim();
+                // Allow http(s) URLs and AMPscript only
+                if (!v) return '';
+                if (/^https?:\/\//i.test(v) || /%%[^%]+%%/.test(v)) {
+                    return v.replace(/"/g, '%22').replace(/</g, '%3C').replace(/>/g, '%3E');
                 }
-                console.error(`${moduleConfig.name} Error:`, message);
-            },
-            getFieldValue(name) {
-                const v = state.blockData[name];
-                const fc = moduleConfig.fields[name];
-                if (v !== undefined && v !== null) {
-                    return fc.type === 'number' ? parseFloat(v) : v;
-                }
-                return fc.defaultValue;
+                return '';
             },
             clamp(n, min, max) { return Math.max(min, Math.min(max, n)); },
-            addTracked(el, ev, fn) {
-                el.addEventListener(ev, fn);
-                state.eventListeners.push({ element: el, event: ev, handler: fn });
-            }
+            addEventListenerTracked(el, ev, h) { el.addEventListener(ev, h); state.eventListeners.push({ element: el, event: ev, handler: h }); }
         };
 
         // =====================================================================
-        // ELEMENT CACHING
+        // DOM CACHE
         // =====================================================================
         function cacheElements() {
             elements.mainContainer = document.getElementById('mainContainer');
             elements.loadingOverlay = document.getElementById('loadingOverlay');
             elements.errorBanner = document.getElementById('errorBanner');
-
-            elements.moduleName = document.getElementById('moduleName');
             elements.layoutSelector = document.getElementById('layoutSelector');
             elements.backgroundColourSelector = document.getElementById('backgroundColourSelector');
-            elements.numberOfColourOptions = document.getElementById('numberOfColourOptions');
+            elements.moduleName = document.getElementById('moduleName');
             elements.coloursPerRow = document.getElementById('coloursPerRow');
             elements.imageWidth = document.getElementById('imageWidth');
             elements.fallbackImageWidth = document.getElementById('fallbackImageWidth');
-
             elements.productPageLink = document.getElementById('productPageLink');
-            elements.productPageLinkError = document.getElementById('productPageLinkError');
-            elements.buttonText = document.getElementById('buttonText');
             elements.buttonLink = document.getElementById('buttonLink');
-            elements.buttonLinkError = document.getElementById('buttonLinkError');
-
+            elements.buttonText = document.getElementById('buttonText');
             elements.fallbackProductName = document.getElementById('fallbackProductName');
             elements.fallbackImage = document.getElementById('fallbackImage');
-            elements.fallbackImageError = document.getElementById('fallbackImageError');
             elements.fallbackImageAltText = document.getElementById('fallbackImageAltText');
-
-            elements.coloursContainer = document.getElementById('coloursContainer');
-            elements.colourCardTemplate = document.getElementById('colourCardTemplate');
+            elements.itemsContainer = document.getElementById('itemsContainer');
+            elements.addItemBtn = document.getElementById('addItemBtn');
+            elements.itemTemplate = document.getElementById('itemTemplate');
         }
 
-        // =====================================================================
-        // LOADING STATE
-        // =====================================================================
         function setLoadingState(loading) {
             state.isLoading = loading;
-            if (elements.mainContainer && elements.loadingOverlay) {
-                elements.mainContainer.classList.toggle('loading', loading);
-                elements.loadingOverlay.classList.toggle('show', loading);
-            }
+            if (elements.mainContainer) elements.mainContainer.classList.toggle('loading', loading);
+            if (elements.loadingOverlay) elements.loadingOverlay.classList.toggle('show', loading);
         }
 
         // =====================================================================
-        // DATA HELPERS
+        // DATA <-> UI
         // =====================================================================
-        function updateData(field, value) {
-            if (state.blockData[field] !== value) {
-                state.blockData[field] = value;
-                refreshPreview();
-            }
+        function readColoursFromUI() {
+            return Array.from(elements.itemsContainer.querySelectorAll('.item'), itemEl => ({
+                id: itemEl.dataset.id,
+                productName: itemEl.querySelector('[data-field="productName"]').value,
+                label: itemEl.querySelector('[data-field="label"]').value,
+                image: itemEl.querySelector('[data-field="image"]').value.trim(),
+                altText: itemEl.querySelector('[data-field="altText"]').value,
+                link: itemEl.querySelector('[data-field="link"]').value.trim(),
+                swatchColour: itemEl.querySelector('[data-field="swatchColour"]').value.trim() || '#cccccc',
+                swatchBorder: itemEl.querySelector('[data-field="swatchBorder"]').value.trim() || 'none'
+            }));
         }
-        const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
-        function updateColourField(index, field, value) {
-            const colours = utils.getFieldValue('colours').slice();
-            const item = { ...(colours[index] || {}) };
-            if (item[field] === value) return;
-            item[field] = value;
-            colours[index] = item;
-            state.blockData.colours = colours;
+        function updateDataFromUI() {
+            state.blockData.layout = getSelectorValue(elements.layoutSelector, 'full');
+            state.blockData.backgroundColour = getSelectorValue(elements.backgroundColourSelector, 'black');
+            state.blockData.moduleName = elements.moduleName.value;
+            state.blockData.coloursPerRow = parseInt(elements.coloursPerRow.value, 10) || moduleConfig.fields.coloursPerRow.defaultValue;
+            state.blockData.imageWidth = parseInt(elements.imageWidth.value, 10) || moduleConfig.fields.imageWidth.defaultValue;
+            state.blockData.fallbackImageWidth = parseInt(elements.fallbackImageWidth.value, 10) || 0;
+            state.blockData.productPageLink = elements.productPageLink.value.trim();
+            state.blockData.buttonLink = elements.buttonLink.value.trim();
+            state.blockData.buttonText = elements.buttonText.value;
+            state.blockData.fallbackProductName = elements.fallbackProductName.value;
+            state.blockData.fallbackImage = elements.fallbackImage.value.trim();
+            state.blockData.fallbackImageAltText = elements.fallbackImageAltText.value;
+            state.blockData.colours = readColoursFromUI();
             refreshPreview();
         }
-        const debouncedUpdateColourField = utils.debounce(updateColourField, moduleConfig.debounceDelay);
+        const debouncedUpdateDataFromUI = utils.debounce(updateDataFromUI, moduleConfig.debounceDelay);
+
+        function getSelectorValue(selectorEl, fallback) {
+            const sel = selectorEl && selectorEl.querySelector('.option-button.selected');
+            return sel ? sel.dataset.value : fallback;
+        }
+
+        function setSelectorValue(selectorEl, value) {
+            if (!selectorEl) return;
+            selectorEl.querySelectorAll('.option-button').forEach(o => {
+                o.classList.toggle('selected', o.dataset.value === value);
+            });
+        }
 
         // =====================================================================
-        // BACKGROUND / COLOUR DERIVATION
+        // ITEMS RENDERING
         // =====================================================================
-        function deriveBackground(bgName) {
-            switch ((bgName || '').toLowerCase()) {
-                case 'red':   return { hex: '#B50018', ring: '#ffffff', text: '#ffffff' };
-                case 'white': return { hex: '#ffffff', ring: '#000000', text: '#000000' };
-                case 'black':
-                default:      return { hex: '#000000', ring: '#ffffff', text: '#ffffff' };
+        function renderItemsUI() {
+            const colours = utils.getFieldValue('colours') || [];
+            const fragment = document.createDocumentFragment();
+
+            colours.forEach((c, index) => {
+                const frag = elements.itemTemplate.content.cloneNode(true);
+                const itemEl = frag.querySelector('.item');
+                itemEl.dataset.id = c.id;
+                itemEl.querySelector('.item-title-text').textContent = `Colour ${index + 1}${c.label ? ' — ' + c.label : ''}`;
+
+                const setVal = (field, value) => {
+                    const el = itemEl.querySelector(`[data-field="${field}"]`);
+                    if (el) el.value = value == null ? '' : value;
+                };
+                setVal('productName', c.productName);
+                setVal('label', c.label);
+                setVal('image', c.image);
+                setVal('altText', c.altText);
+                setVal('link', c.link);
+                setVal('swatchColour', c.swatchColour);
+                setVal('swatchBorder', c.swatchBorder);
+
+                // Sync colour picker + preview swatch
+                const picker = itemEl.querySelector('[data-field="swatchColourPicker"]');
+                const swatchHex = /^#[0-9a-f]{6}$/i.test(c.swatchColour || '') ? c.swatchColour : '#cccccc';
+                if (picker) picker.value = swatchHex;
+                const preview = itemEl.querySelector('[data-field="swatchPreview"]');
+                if (preview) {
+                    preview.style.backgroundColor = c.swatchColour || '#cccccc';
+                    if (c.swatchBorder && c.swatchBorder !== 'none') preview.style.border = c.swatchBorder;
+                }
+
+                if (index === 0) itemEl.querySelector('.move-up-btn').disabled = true;
+                if (index === colours.length - 1) itemEl.querySelector('.move-down-btn').disabled = true;
+                if (colours.length <= moduleConfig.minItems) itemEl.querySelector('.remove-btn').disabled = true;
+
+                fragment.appendChild(frag);
+            });
+
+            elements.itemsContainer.replaceChildren();
+            elements.itemsContainer.appendChild(fragment);
+            elements.addItemBtn.disabled = colours.length >= moduleConfig.maxItems;
+        }
+
+        const itemActions = {
+            '.remove-btn': (item, index, items) => {
+                if (items.length <= moduleConfig.minItems) return false;
+                items.splice(index, 1);
+                return true;
+            },
+            '.move-up-btn': (item, index, items) => {
+                if (index <= 0) return false;
+                [items[index], items[index - 1]] = [items[index - 1], items[index]];
+                return true;
+            },
+            '.move-down-btn': (item, index, items) => {
+                if (index >= items.length - 1) return false;
+                [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                return true;
+            },
+            '.duplicate-btn': (item, index, items) => {
+                if (items.length >= moduleConfig.maxItems) return false;
+                items.splice(index + 1, 0, { ...item, id: crypto.randomUUID() });
+                return true;
+            }
+        };
+
+        function handleItemClick(e) {
+            if (e.target.closest('#addItemBtn')) {
+                const current = state.blockData.colours || [];
+                if (current.length >= moduleConfig.maxItems) return;
+                const next = [...current, {
+                    id: crypto.randomUUID(),
+                    productName: '',
+                    image: '',
+                    altText: '',
+                    label: '',
+                    link: '',
+                    swatchColour: '#cccccc',
+                    swatchBorder: '1px solid #cccccc'
+                }];
+                state.blockData.colours = next;
+                renderItemsUI();
+                updateDataFromUI();
+                return;
+            }
+            const itemEl = e.target.closest('.item');
+            if (!itemEl) return;
+            const id = itemEl.dataset.id;
+            // Read live values first so reorders preserve unsaved edits
+            const liveItems = readColoursFromUI();
+            const idx = liveItems.findIndex(i => i.id === id);
+            if (idx === -1) return;
+
+            for (const [selector, action] of Object.entries(itemActions)) {
+                if (e.target.closest(selector)) {
+                    if (action(liveItems[idx], idx, liveItems)) {
+                        state.blockData.colours = liveItems;
+                        renderItemsUI();
+                        updateDataFromUI();
+                    }
+                    return;
+                }
             }
         }
 
-        function swatchBorderCss(item) {
-            return item && item.swatchBorder ? '1px solid #cccccc' : 'none';
+        function handleItemInput(e) {
+            const target = e.target;
+            if (!target.matches('[data-field]')) return;
+            const itemEl = target.closest('.item');
+            if (!itemEl) return;
+
+            // Sync hex picker -> text and vice versa
+            if (target.dataset.field === 'swatchColourPicker') {
+                const txt = itemEl.querySelector('[data-field="swatchColour"]');
+                if (txt) txt.value = target.value;
+            } else if (target.dataset.field === 'swatchColour') {
+                const picker = itemEl.querySelector('[data-field="swatchColourPicker"]');
+                if (picker && /^#[0-9a-f]{6}$/i.test(target.value.trim())) picker.value = target.value.trim();
+            }
+
+            // URL validation feedback
+            if (target.type === 'url') {
+                const err = target.parentElement.querySelector('.field-error') || target.nextElementSibling;
+                const ok = utils.isValidUrl(target.value);
+                target.classList.toggle('error', !ok);
+                if (err && err.classList.contains('field-error')) err.style.display = ok ? 'none' : 'block';
+            }
+
+            // Update preview swatch immediately
+            if (target.dataset.field === 'swatchColour' || target.dataset.field === 'swatchColourPicker' || target.dataset.field === 'swatchBorder') {
+                const preview = itemEl.querySelector('[data-field="swatchPreview"]');
+                if (preview) {
+                    const colourVal = itemEl.querySelector('[data-field="swatchColour"]').value.trim() || '#cccccc';
+                    const borderVal = itemEl.querySelector('[data-field="swatchBorder"]').value.trim();
+                    preview.style.backgroundColor = colourVal;
+                    preview.style.border = (borderVal && borderVal !== 'none') ? borderVal : '1px solid #ccc';
+                }
+            }
+
+            // Update title text on label change
+            if (target.dataset.field === 'label') {
+                const titleEl = itemEl.querySelector('.item-title-text');
+                if (titleEl) {
+                    const items = readColoursFromUI();
+                    const idx = items.findIndex(i => i.id === itemEl.dataset.id);
+                    if (idx !== -1) titleEl.textContent = `Colour ${idx + 1}${target.value ? ' — ' + target.value : ''}`;
+                }
+            }
+
+            debouncedUpdateDataFromUI();
         }
+
+        // =====================================================================
+        // EVENT HANDLERS (top-level fields)
+        // =====================================================================
+        function initializeEventHandlers() {
+            // Option selectors
+            function setupOptionSelector(selectorEl, key) {
+                if (!selectorEl) return;
+                selectorEl.querySelectorAll('.option-button').forEach(btn => {
+                    utils.addEventListenerTracked(btn, 'click', (e) => {
+                        const b = e.currentTarget;
+                        selectorEl.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
+                        b.classList.add('selected');
+                        state.blockData[key] = b.dataset.value;
+                        // Adjust constraints if layout changes
+                        if (key === 'layout') applyLayoutConstraints();
+                        refreshPreview();
+                    });
+                });
+            }
+            setupOptionSelector(elements.layoutSelector, 'layout');
+            setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
+
+            // Generic text inputs
+            ['moduleName', 'buttonText', 'fallbackProductName', 'fallbackImageAltText'].forEach(id => {
+                const el = elements[id];
+                if (!el) return;
+                utils.addEventListenerTracked(el, 'input', () => {
+                    state.blockData[id] = el.value;
+                    debouncedRefresh();
+                });
+            });
+
+            // URL inputs with validation
+            ['productPageLink', 'buttonLink', 'fallbackImage'].forEach(id => {
+                const el = elements[id];
+                if (!el) return;
+                const err = el.parentElement.querySelector('.field-error');
+                const validate = () => {
+                    const ok = utils.isValidUrl(el.value);
+                    el.classList.toggle('error', !ok);
+                    if (err) err.style.display = ok ? 'none' : 'block';
+                    return ok;
+                };
+                utils.addEventListenerTracked(el, 'input', () => {
+                    validate();
+                    state.blockData[id] = el.value.trim();
+                    debouncedRefresh();
+                });
+                utils.addEventListenerTracked(el, 'blur', validate);
+            });
+
+            // Number inputs
+            const numberFields = ['coloursPerRow', 'imageWidth', 'fallbackImageWidth'];
+            numberFields.forEach(id => {
+                const el = elements[id];
+                if (!el) return;
+                utils.addEventListenerTracked(el, 'input', () => {
+                    const v = parseInt(el.value, 10);
+                    if (!isNaN(v)) {
+                        state.blockData[id] = v;
+                        debouncedRefresh();
+                    }
+                });
+                utils.addEventListenerTracked(el, 'blur', () => {
+                    const min = parseInt(el.min, 10);
+                    const max = parseInt(el.max, 10);
+                    let v = parseInt(el.value, 10);
+                    if (isNaN(v)) v = moduleConfig.fields[id].defaultValue;
+                    if (!isNaN(min)) v = Math.max(min, v);
+                    if (!isNaN(max)) v = Math.min(max, v);
+                    el.value = v;
+                    state.blockData[id] = v;
+                    refreshPreview();
+                });
+            });
+
+            // Items container delegation
+            utils.addEventListenerTracked(elements.addItemBtn, 'click', handleItemClick);
+            utils.addEventListenerTracked(elements.itemsContainer, 'click', handleItemClick);
+            utils.addEventListenerTracked(elements.itemsContainer, 'input', handleItemInput);
+        }
+
+        function applyLayoutConstraints() {
+            const layout = utils.getFieldValue('layout');
+            if (layout === 'compact') {
+                elements.coloursPerRow.max = 4;
+                elements.imageWidth.max = 290;
+                elements.fallbackImageWidth.max = 290;
+            } else {
+                elements.coloursPerRow.max = 5;
+                elements.imageWidth.max = 580;
+                elements.fallbackImageWidth.max = 580;
+            }
+        }
+
+        const debouncedRefresh = utils.debounce(refreshPreview, moduleConfig.debounceDelay);
 
         // =====================================================================
         // TEMPLATE GENERATION
         // =====================================================================
-        function generateTemplate() {
-            const moduleNameRaw = utils.getFieldValue('moduleName');
-            const moduleName = utils.sanitiseModuleName(moduleNameRaw);
-            const moduleClass = `mwk-${moduleName}-interactive`;
-            const layout = utils.getFieldValue('layout');
-            const bgName = utils.getFieldValue('backgroundColour');
-            const bg = deriveBackground(bgName);
+        function getResolvedSettings() {
+            const layout = utils.getFieldValue('layout') === 'compact' ? 'compact' : 'full';
+            const isCompact = layout === 'compact';
+            const maxImageWidth = isCompact ? 290 : 580;
+            const maxPerRow = isCompact ? 4 : 5;
 
-            const numberOfColourOptions = utils.clamp(parseInt(utils.getFieldValue('numberOfColourOptions'), 10) || 1, 1, TOTAL_COLOURS);
-            const coloursPerRow = utils.clamp(parseInt(utils.getFieldValue('coloursPerRow'), 10) || 4, 1, 4);
-            const maxImage = layout === 'full-width' ? 580 : 290;
-            let imageWidth = utils.clamp(parseInt(utils.getFieldValue('imageWidth'), 10) || maxImage, 1, maxImage);
+            let moduleName = utils.sanitizeModuleName(utils.getFieldValue('moduleName'));
+            if (!moduleName) moduleName = utils.sanitizeModuleName(makeDefaultModuleName());
+
+            const coloursRaw = utils.getFieldValue('colours') || [];
+            const colours = coloursRaw.slice(0, moduleConfig.maxItems);
+            const count = Math.max(moduleConfig.minItems, Math.min(coloursRaw.length, moduleConfig.maxItems));
+
+            const coloursPerRow = utils.clamp(parseInt(utils.getFieldValue('coloursPerRow'), 10) || 1, 1, maxPerRow);
+            const imageWidth = utils.clamp(parseInt(utils.getFieldValue('imageWidth'), 10) || maxImageWidth, 1, maxImageWidth);
             let fallbackImageWidth = parseInt(utils.getFieldValue('fallbackImageWidth'), 10);
-            if (!fallbackImageWidth) fallbackImageWidth = imageWidth;
-            fallbackImageWidth = utils.clamp(fallbackImageWidth, 1, maxImage);
+            if (!fallbackImageWidth || fallbackImageWidth < 1) fallbackImageWidth = imageWidth;
+            fallbackImageWidth = utils.clamp(fallbackImageWidth, 1, maxImageWidth);
 
-            const productPageLink = (utils.getFieldValue('productPageLink') || '').trim();
-            const buttonText = utils.getFieldValue('buttonText') || '';
-            const buttonLinkRaw = (utils.getFieldValue('buttonLink') || '').trim();
-            const buttonFinalLink = buttonLinkRaw || productPageLink;
+            const bg = utils.getFieldValue('backgroundColour');
+            const bgMap = {
+                red:   { bgHex: '#B50018', ringColour: '#ffffff', nameColour: '#ffffff' },
+                white: { bgHex: '#ffffff', ringColour: '#000000', nameColour: '#000000' },
+                black: { bgHex: '#000000', ringColour: '#ffffff', nameColour: '#ffffff' }
+            };
+            const palette = bgMap[bg] || bgMap.black;
 
-            const fallbackProductName = utils.getFieldValue('fallbackProductName') || '';
-            const fallbackImage = (utils.getFieldValue('fallbackImage') || '').trim();
-            const fallbackImageAltText = utils.getFieldValue('fallbackImageAltText') || '';
+            const productPageLink = utils.getFieldValue('productPageLink');
+            const buttonLink = utils.getFieldValue('buttonLink');
+            const buttonFinalLink = buttonLink && buttonLink.trim() ? buttonLink.trim() : productPageLink;
 
-            const coloursAll = utils.getFieldValue('colours') || [];
-            const colours = [];
-            for (let i = 0; i < numberOfColourOptions; i++) {
-                const c = coloursAll[i] || {};
-                const linkVal = (c.link || '').trim();
-                colours.push({
-                    productName: c.productName || '',
-                    image: (c.image || '').trim(),
-                    altText: c.altText || '',
-                    label: c.label || '',
-                    finalLink: linkVal || productPageLink,
-                    swatchColour: c.swatchColour || '#cccccc',
-                    swatchBorderCss: swatchBorderCss(c)
-                });
-            }
+            const resolvedColours = colours.map((c, i) => ({
+                index: i + 1,
+                productName: c.productName || '',
+                image: c.image || '',
+                altText: c.altText || '',
+                label: c.label || `Colour ${i + 1}`,
+                link: (c.link && c.link.trim()) ? c.link.trim() : productPageLink,
+                swatchColour: c.swatchColour || '#cccccc',
+                swatchBorder: c.swatchBorder || 'none'
+            }));
 
-            // Wrap inline AMPscript so it works when the block is dropped into SFMC.
-            // Within SFMC use the redirect helper; outside it the bare URL renders.
-            const redirect = (url) => `%%=RedirectTo("${utils.escapeAttr(url)}")=%%`;
-
-            // ------------- CSS -------------
-            const styles = buildStyles(moduleName, moduleClass, bg);
-
-            // ------------- Inputs (radio toggles) -------------
-            let inputs = `<input class="mwk-colour-swap-input" type="radio" id="${moduleName}-colour-option-1" name="${moduleName}" checked style="display: none; mso-hide: all;">\n`;
-            for (let i = 2; i <= numberOfColourOptions; i++) {
-                inputs += `<input class="mwk-colour-swap-input" type="radio" id="${moduleName}-colour-option-${i}" name="${moduleName}" style="display: none; mso-hide: all;">\n`;
-            }
-
-            // ------------- Fallback (Outlook/Yahoo/Gmail unsupported) -------------
-            const fallbackBlock = buildFallback(layout, bg, fallbackProductName, fallbackImage, fallbackImageAltText, fallbackImageWidth, buttonText, buttonFinalLink, productPageLink, bgName, redirect);
-
-            // ------------- Interactive -------------
-            const interactiveBlock = buildInteractive(layout, moduleName, moduleClass, bg, bgName, colours, coloursPerRow, imageWidth, buttonText, buttonFinalLink, redirect);
-
-            return `<!-- START .mwk-${moduleName} -->\n${styles}\n${fallbackBlock}\n<!--[if !mso]><! -->\n${inputs}\n${interactiveBlock}\n<!-- <![endif]-->\n<!-- END .mwk-${moduleName} -->`;
+            return {
+                layout, isCompact, moduleName,
+                moduleClass: `mwk-${moduleName}-interactive`,
+                coloursPerRow,
+                imageWidth, fallbackImageWidth,
+                bg, ...palette,
+                buttonText: utils.getFieldValue('buttonText') || 'View product',
+                productPageLink, buttonFinalLink,
+                fallbackProductName: utils.getFieldValue('fallbackProductName'),
+                fallbackImage: utils.getFieldValue('fallbackImage'),
+                fallbackImageAltText: utils.getFieldValue('fallbackImageAltText'),
+                colours: resolvedColours,
+                count
+            };
         }
 
-        function buildStyles(moduleName, moduleClass, bg) {
-            let panelChecked = '';
-            let swatchChecked = '';
-            for (let i = 1; i <= TOTAL_COLOURS; i++) {
-                panelChecked += `\n  #${moduleName}-colour-option-${i}:checked ~ .${moduleClass} .mwk-colour-swap-panel-${i}${i < TOTAL_COLOURS ? ',' : ' {'}`;
+        function buildScopedStyles(s) {
+            // Per-instance CSS that targets this module's radio IDs.
+            const m = s.moduleName;
+            const cls = s.moduleClass;
+            const ring = s.ringColour;
+            const panelRules = [];
+            const swatchRules = [];
+            for (let i = 1; i <= 10; i++) {
+                panelRules.push(`#${m}-colour-option-${i}:checked ~ .${cls} .mwk-colour-swap-panel-${i}`);
+                swatchRules.push(`#${m}-colour-option-${i}:checked ~ .${cls} .mwk-colour-swap-swatch-${i}`);
             }
-            for (let i = 1; i <= TOTAL_COLOURS; i++) {
-                swatchChecked += `\n  #${moduleName}-colour-option-${i}:checked ~ .${moduleClass} .mwk-colour-swap-swatch-${i}${i < TOTAL_COLOURS ? ',' : ' {'}`;
-            }
-
             return `<style type="text/css">
-.mwk-colour-swap-fallback { display: table; width: 620px; }
-.mwk-colour-swap-interactive { display: none; max-height: 0; max-width: 0; overflow: hidden; mso-hide: all; width: 620px; }
-.mwk-colour-swap-input { display: none; mso-hide: all; }
-.mwk-colour-swap-image { display: block; height: auto; max-width: 100%; }
-.mwk-colour-swap-panel { display: none; max-height: 0; overflow: hidden; }
-.mwk-colour-swap-panel-1 { display: block; max-height: none; overflow: visible; }
-.mwk-colour-swap-swatch { border: 2px solid transparent; border-collapse: separate !important; border-radius: 50%; cursor: pointer; height: 48px; width: 48px; }
-.mwk-colour-swap-swatch-cell { font-size: 0; height: 44px; line-height: 0; mso-line-height-rule: exactly; padding: 0; text-align: center; width: 44px; }
-.mwk-colour-swap-swatch-dot { border-radius: 50%; display: block; font-size: 0; height: 34px; line-height: 34px; margin: 0 auto; padding: 0; width: 34px; }
-
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  .mwk-colour-swap-fallback { display: none !important; max-height: 0 !important; max-width: 0 !important; overflow: hidden !important; visibility: hidden !important; }
-  .mwk-colour-swap-interactive { display: table !important; max-height: none !important; max-width: inherit !important; overflow: visible !important; visibility: inherit !important; }
-  input.mwk-colour-swap-input { display: none !important; }
-  .mwk-colour-swap-panel { display: none !important; max-height: 0 !important; overflow: hidden !important; }
-${panelChecked}
-    display: block !important; max-height: none !important; overflow: visible !important;
-  }
-${swatchChecked}
-    border-color: ${bg.ring} !important;
-  }
+.mwk-colour-swap-fallback{display:table;width:620px}
+.mwk-colour-swap-interactive{display:none;max-height:0;max-width:0;overflow:hidden;mso-hide:all;width:620px}
+.mwk-colour-swap-input{display:none;mso-hide:all}
+.mwk-colour-swap-image{display:block;height:auto;max-width:100%}
+.mwk-colour-swap-panel{display:none;max-height:0;overflow:hidden}
+.mwk-colour-swap-panel-1{display:block;max-height:none;overflow:visible}
+.mwk-colour-swap-swatch{border:2px solid transparent;border-collapse:separate !important;border-radius:50%;cursor:pointer;height:48px;width:48px}
+.mwk-colour-swap-swatch-cell{font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;width:44px}
+.mwk-colour-swap-swatch-dot{border-radius:50%;display:block;font-size:0;height:34px;line-height:34px;margin:0 auto;padding:0;width:34px}
+@media screen and (-webkit-min-device-pixel-ratio:0){
+.mwk-colour-swap-fallback{display:none !important;max-height:0 !important;max-width:0 !important;overflow:hidden !important;visibility:hidden !important}
+.mwk-colour-swap-interactive{display:table !important;max-height:none !important;max-width:inherit !important;overflow:visible !important;visibility:inherit !important}
+input.mwk-colour-swap-input{display:none !important}
+.mwk-colour-swap-panel{display:none !important;max-height:0 !important;overflow:hidden !important}
+${panelRules.join(',\n')}{display:block !important;max-height:none !important;overflow:visible !important}
+${swatchRules.join(',\n')}{border-color:${ring} !important}
 }
-
-#converted-body .mwk-colour-swap-fallback { display: table !important; width: 100% !important; max-height: inherit !important; max-width: inherit !important; overflow: visible !important; visibility: inherit !important; }
-#converted-body .mwk-colour-swap-interactive { display: none !important; overflow: hidden !important; width: 0px !important; height: 0px !important; max-height: 0px !important; max-width: 0px !important; line-height: 0px !important; visibility: hidden !important; }
-
-body[data-outlook-cycle] .mwk-colour-swap-fallback,
-[class~="x_mwk-colour-swap-fallback"] { display: table !important; width: auto !important; overflow: visible !important; float: none !important; max-height: inherit !important; max-width: inherit !important; line-height: auto !important; margin-top: 0px !important; visibility: inherit !important; }
-
-body[data-outlook-cycle] .mwk-colour-swap-interactive,
-[class~="x_mwk-colour-swap-interactive"] { display: none !important; overflow: hidden !important; float: left !important; width: 0px !important; max-height: 0px !important; max-width: 0px !important; line-height: 0px !important; visibility: hidden !important; }
-
-u + .body .mwk-colour-swap-fallback { display: table !important; visibility: inherit !important; }
-u + .body .mwk-colour-swap-interactive { display: none !important; overflow: hidden !important; width: 0px !important; max-height: 0px !important; max-width: 0px !important; line-height: 0px !important; visibility: hidden !important; }
-
-@media yahoo {
-  .mwk-colour-swap-fallback { display: table !important; max-height: none !important; overflow: visible !important; visibility: inherit !important; }
-  .mwk-colour-swap-interactive { display: none !important; max-height: 0 !important; overflow: hidden !important; visibility: hidden !important; }
+#converted-body .mwk-colour-swap-fallback{display:table !important;width:100% !important;max-height:inherit !important;max-width:inherit !important;overflow:visible !important;visibility:inherit !important}
+#converted-body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !important;width:0 !important;height:0 !important;max-height:0 !important;max-width:0 !important;line-height:0 !important;visibility:hidden !important}
+body[data-outlook-cycle] .mwk-colour-swap-fallback,[class~="x_mwk-colour-swap-fallback"]{display:table !important;width:auto !important;overflow:visible !important;float:none !important;max-height:inherit !important;max-width:inherit !important;line-height:auto !important;margin-top:0 !important;visibility:inherit !important}
+body[data-outlook-cycle] .mwk-colour-swap-interactive,[class~="x_mwk-colour-swap-interactive"]{display:none !important;overflow:hidden !important;float:left !important;width:0 !important;max-height:0 !important;max-width:0 !important;line-height:0 !important;visibility:hidden !important}
+u + .body .mwk-colour-swap-fallback{display:table !important;visibility:inherit !important}
+u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !important;width:0 !important;max-height:0 !important;max-width:0 !important;line-height:0 !important;visibility:hidden !important}
+@media yahoo{
+.mwk-colour-swap-fallback{display:table !important;max-height:none !important;overflow:visible !important;visibility:inherit !important}
+.mwk-colour-swap-interactive{display:none !important;max-height:0 !important;overflow:hidden !important;visibility:hidden !important}
 }
-
-@media only screen and (max-width: 580px) {
-  .mwk-colour-swap-image { height: auto !important; max-width: 100% !important; width: 100% !important; }
-  .mwk-colour-swap-swatch { height: 42px !important; width: 42px !important; }
-  .mwk-colour-swap-swatch-cell { height: 38px !important; width: 38px !important; }
-  .mwk-colour-swap-swatch-dot { height: 28px !important; line-height: 28px !important; width: 28px !important; }
+@media only screen and (max-width:580px){
+.mwk-colour-swap-image{height:auto !important;max-width:100% !important;width:100% !important}
+.mwk-colour-swap-swatch{height:42px !important;width:42px !important}
+.mwk-colour-swap-swatch-cell{height:38px !important;width:38px !important}
+.mwk-colour-swap-swatch-dot{height:28px !important;line-height:28px !important;width:28px !important}
 }
 </style>
 <style type="text/css">
-.mwk-colour-swap-interactive\\0 { display: none !important; overflow: hidden !important; width: 0px !important; height: 0px !important; max-height: 0px !important; max-width: 0px !important; line-height: 0px !important; visibility: hidden !important; }
-.mwk-colour-swap-fallback\\0 { display: table !important; width: 100% !important; max-height: inherit !important; max-width: inherit !important; overflow: visible !important; visibility: inherit !important; }
+.mwk-colour-swap-interactive\\0{display:none !important;overflow:hidden !important;width:0 !important;height:0 !important;max-height:0 !important;max-width:0 !important;line-height:0 !important;visibility:hidden !important}
+.mwk-colour-swap-fallback\\0{display:table !important;width:100% !important;max-height:inherit !important;max-width:inherit !important;overflow:visible !important;visibility:inherit !important}
 </style>`;
         }
 
-        function buildButton(bgName, buttonText, buttonFinalLink, redirect) {
-            const href = redirect(buttonFinalLink);
-            const label = utils.escapeHtml(buttonText);
-            if (bgName === 'black') {
-                return `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="center" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white button-mobile-center" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${href}" style="color: #ffffff; text-decoration: none;" target="_blank">${label}</a></td></tr></table></td></tr></table>`;
+        function buildButton(s, link) {
+            const href = utils.escapeUrl(link);
+            const txt = utils.escapeHtml(s.buttonText);
+            if (s.bg === 'black') {
+                return `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%"><tr><td align="center" class="block" style="width:100%" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white button-mobile-center" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important"><tr><td align="center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:12px 20px;text-align:center;text-transform:uppercase;width:100%;border-radius:4px !important"><a href="${href}" style="color:#ffffff;text-decoration:none" target="_blank">${txt}</a></td></tr></table></td></tr></table>`;
             }
-            // red or white background - use solid black button
-            return `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="center" class="block" style="width: 100%;" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button-1-black button-mobile-center" role="presentation" style="background-color: #000000; border-radius: 4px !important;"><tr><td align="center" style="color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-align: center; text-transform: uppercase; width: 100%; border-radius: 4px !important;"><a href="${href}" style="color: #ffffff; text-decoration: none;" target="_blank">${label}</a></td></tr></table></td></tr></table>`;
+            return `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%"><tr><td align="center" class="block" style="width:100%" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button-1-black button-mobile-center" role="presentation" style="background-color:#000000;border-radius:4px !important"><tr><td align="center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:12px 20px;text-align:center;text-transform:uppercase;width:100%;border-radius:4px !important"><a href="${href}" style="color:#ffffff;text-decoration:none" target="_blank">${txt}</a></td></tr></table></td></tr></table>`;
         }
 
-        function buildFallback(layout, bg, fallbackProductName, fallbackImage, fallbackImageAltText, fallbackImageWidth, buttonText, buttonFinalLink, productPageLink, bgName, redirect) {
-            const productNameBlock = fallbackProductName
-                ? `<tr><td class="mobile-text-center" align="center" style="text-align: center;"><h2 style="color: ${bg.text}; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-stretch: condensed; font-weight: bold; line-height: 28px; margin: 0; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${utils.escapeHtml(fallbackProductName)}</h2></td></tr>
-                  <tr><td><div style="clear: both; display: block; font-size: 18px; height: 18px; line-height: 18px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>`
-                : '';
-
-            const button = buildButton(bgName, buttonText, buttonFinalLink, redirect);
-            const imgHref = redirect(productPageLink);
-            const imgSrc = utils.escapeAttr(fallbackImage);
-            const imgAlt = utils.escapeAttr(fallbackImageAltText);
-
-            if (layout === 'full-width') {
-                return `<table role="presentation" class="content-outer mwk-colour-swap-fallback yahooshow" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color: ${bg.hex}; width: 620px;">
-  <tr>
-    <td class="side" style="width: 20px;">&nbsp;</td>
-    <td class="content-inner" valign="middle" align="center" style="width: 580px;">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-        <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-        <tr>
-          <td align="center" valign="middle">
-            <a href="${imgHref}" target="_blank"><img class="fill mwk-colour-swap-image" src="${imgSrc}" alt="${imgAlt}" width="${fallbackImageWidth}" style="border: none; display: block; height: auto; max-width: 100%; outline: none; text-decoration: none; width: ${fallbackImageWidth}px;"></a>
-          </td>
-        </tr>
-        <tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-        ${productNameBlock}
-        <tr><td>${button}</td></tr>
-        <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-      </table>
-    </td>
-    <td class="side" style="width: 20px;">&nbsp;</td>
-  </tr>
-</table>`;
-            }
-
-            // Compact (two-column)
-            return `<table role="presentation" class="content-outer mwk-colour-swap-fallback yahooshow" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color: ${bg.hex}; width: 620px;">
-  <tr>
-    <td class="side" style="width: 20px;">&nbsp;</td>
-    <td class="content-inner" valign="middle" align="center" style="width: 580px;">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-        <tr>
-          <td class="block" valign="middle" align="center" style="width: 290px;">
-            <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-              <tr><td style="padding: 20px;" valign="middle">
-                <table role="presentation" class="sect" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-                  <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-                  ${productNameBlock}
-                  <tr><td>${button}</td></tr>
-                  <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-                </table>
-              </td></tr>
-            </table>
-          </td>
-          <td class="block" valign="middle" align="center" style="width: 290px;">
-            <a href="${imgHref}" target="_blank"><img class="fill mwk-colour-swap-image" src="${imgSrc}" alt="${imgAlt}" width="${fallbackImageWidth}" style="border: none; display: block; height: auto; max-width: 100%; outline: none; text-decoration: none; width: ${fallbackImageWidth}px;"></a>
-          </td>
-        </tr>
-      </table>
-    </td>
-    <td class="side" style="width: 20px;">&nbsp;</td>
-  </tr>
-</table>`;
+        function spacer(px) {
+            return `<div style="clear:both;display:block;font-size:${px}px;height:${px}px;line-height:${px}px;margin:0;mso-line-height-rule:exactly;padding:0">&nbsp;</div>`;
         }
 
-        function buildNamePanels(colours, textColour) {
-            let html = '';
-            for (let i = 0; i < colours.length; i++) {
-                const c = colours[i];
-                const n = i + 1;
-                const display = i === 0 ? 'display: block;' : 'display: none; max-height: 0; overflow: hidden;';
-                const inner = c.productName
-                    ? `<h2 style="color: ${textColour}; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: 20px; font-stretch: condensed; font-weight: bold; line-height: 28px; margin: 0; text-transform: uppercase; mso-hyphenate: none; hyphens: none;">${utils.escapeHtml(c.productName)}</h2>`
-                    : '';
-                html += `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${n}" style="${display}">${inner}</div>\n`;
+        function buildRadioInputs(s) {
+            const out = [];
+            for (let i = 1; i <= s.count; i++) {
+                const checked = i === 1 ? ' checked' : '';
+                out.push(`<input class="mwk-colour-swap-input" type="radio" id="${s.moduleName}-colour-option-${i}" name="${s.moduleName}"${checked} style="display:none;mso-hide:all">`);
             }
-            return html;
+            return out.join('\n');
         }
 
-        function buildImagePanels(colours, imageWidth, redirect) {
-            let html = '';
-            for (let i = 0; i < colours.length; i++) {
-                const c = colours[i];
-                const n = i + 1;
-                const display = i === 0 ? 'display: block;' : 'display: none; max-height: 0; overflow: hidden;';
-                html += `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${n}" style="${display}">
-  <a href="${redirect(c.finalLink)}" target="_blank"><img class="fill mwk-colour-swap-image" src="${utils.escapeAttr(c.image)}" alt="${utils.escapeAttr(c.altText)}" width="${imageWidth}" style="border: none; display: block; height: auto; max-width: 100%; outline: none; text-decoration: none; width: ${imageWidth}px;"></a>
-</div>\n`;
-            }
-            return html;
-        }
-
-        function buildSwatches(moduleName, colours, coloursPerRow) {
-            let html = '<table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr>';
-            for (let i = 0; i < colours.length; i++) {
-                const c = colours[i];
-                const n = i + 1;
-                html += `<td align="center" valign="middle" style="padding: 0 3px; font-size: 0; line-height: 0;">
-  <label for="${moduleName}-colour-option-${n}" title="${utils.escapeAttr(c.label)}" style="cursor: pointer; display: block;">
-    <table role="presentation" class="mwk-colour-swap-swatch mwk-colour-swap-swatch-${n}" align="center" border="0" cellspacing="0" cellpadding="0" width="48" height="48" style="border: 2px solid transparent; border-collapse: separate !important; border-radius: 50%; cursor: pointer; height: 48px; width: 48px;">
-      <tr><td class="mwk-colour-swap-swatch-cell" align="center" valign="middle" width="44" height="44" style="font-size: 0; height: 44px; line-height: 0; mso-line-height-rule: exactly; padding: 0; text-align: center; width: 44px;">
-        <span class="mwk-colour-swap-swatch-dot" style="background-color: ${utils.escapeAttr(c.swatchColour)}; border: ${utils.escapeAttr(c.swatchBorderCss)}; border-radius: 50%; display: block; font-size: 0; height: 34px; line-height: 34px; margin: 0 auto; padding: 0; width: 34px;">&nbsp;</span>
-      </td></tr>
+        function buildSwatchCell(s, c) {
+            const i = c.index;
+            return `<td align="center" valign="middle" style="padding:0 3px;font-size:0;line-height:0">
+  <label for="${s.moduleName}-colour-option-${i}" title="${utils.escapeAttr(c.label)}" style="cursor:pointer;display:block">
+    <table role="presentation" class="mwk-colour-swap-swatch mwk-colour-swap-swatch-${i}" align="center" border="0" cellspacing="0" cellpadding="0" width="48" height="48" style="border:2px solid transparent;border-collapse:separate !important;border-radius:50%;cursor:pointer;height:48px;width:48px">
+      <tr>
+        <td class="mwk-colour-swap-swatch-cell" align="center" valign="middle" width="44" height="44" style="font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;width:44px">
+          <span class="mwk-colour-swap-swatch-dot" style="background-color:${utils.escapeAttr(c.swatchColour)};border:${utils.escapeAttr(c.swatchBorder)};border-radius:50%;display:block;font-size:0;height:34px;line-height:34px;margin:0 auto;padding:0;width:34px">&nbsp;</span>
+        </td>
+      </tr>
     </table>
   </label>
 </td>`;
-                // Row break (but not after last item)
-                if (((n) % coloursPerRow === 0) && n < colours.length) {
-                    html += `</tr></table>
-<div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div>
-<table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr>`;
-                }
-            }
-            html += '</tr></table>';
-            return html;
         }
 
-        function buildInteractive(layout, moduleName, moduleClass, bg, bgName, colours, coloursPerRow, imageWidth, buttonText, buttonFinalLink, redirect) {
-            const namePanels = buildNamePanels(colours, bg.text);
-            const imagePanels = buildImagePanels(colours, imageWidth, redirect);
-            const swatches = buildSwatches(moduleName, colours, coloursPerRow);
-            const button = buildButton(bgName, buttonText, buttonFinalLink, redirect);
+        function buildSwatchGrid(s) {
+            // Open the first row's table.
+            const parts = [];
+            parts.push('<table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr>');
+            s.colours.forEach((c, idx) => {
+                parts.push(buildSwatchCell(s, c));
+                const isRowEnd = ((idx + 1) % s.coloursPerRow === 0) && (idx + 1 < s.colours.length);
+                if (isRowEnd) {
+                    parts.push('</tr></table>');
+                    parts.push(spacer(8));
+                    parts.push('<table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr>');
+                }
+            });
+            parts.push('</tr></table>');
+            return parts.join('\n');
+        }
 
-            if (layout === 'full-width') {
-                return `<table role="presentation" class="content-outer mwk-colour-swap-interactive ${moduleClass} yahoohide" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color: ${bg.hex}; width: 620px; display: none; max-height: 0; max-width: 0; overflow: hidden; mso-hide: all;">
+        function buildImagePanel(s, c, withName) {
+            const href = utils.escapeUrl(c.link);
+            const src = utils.escapeAttr(c.image);
+            const alt = utils.escapeAttr(c.altText);
+            const visibility = c.index === 1 ? 'display:block' : 'display:none;max-height:0;overflow:hidden';
+            let nameBlock = '';
+            if (withName && c.productName) {
+                nameBlock = `
+              ${spacer(18)}
+              <h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`;
+            }
+            return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">
+  <a href="${href}" target="_blank">
+    <img class="fill mwk-colour-swap-image" src="${src}" alt="${alt}" width="${s.imageWidth}" style="border:none;display:block;height:auto;max-width:100%;outline:none;text-decoration:none;width:${s.imageWidth}px">
+  </a>${nameBlock}
+</div>`;
+        }
+
+        function buildCompactNamePanel(s, c) {
+            const visibility = c.index === 1 ? 'display:block' : 'display:none;max-height:0;overflow:hidden';
+            const name = c.productName
+                ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`
+                : '';
+            return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">${name}</div>`;
+        }
+
+        function buildCompactImagePanel(s, c) {
+            const href = utils.escapeUrl(c.link);
+            const src = utils.escapeAttr(c.image);
+            const alt = utils.escapeAttr(c.altText);
+            const visibility = c.index === 1 ? 'display:block' : 'display:none;max-height:0;overflow:hidden';
+            return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">
+  <a href="${href}" target="_blank">
+    <img class="fill mwk-colour-swap-image" src="${src}" alt="${alt}" width="${s.imageWidth}" style="border:none;display:block;height:auto;max-width:100%;outline:none;text-decoration:none;width:${s.imageWidth}px">
+  </a>
+</div>`;
+        }
+
+        function generateFullWidth(s) {
+            const fallbackHref = utils.escapeUrl(s.productPageLink);
+            const fallbackImg = utils.escapeAttr(s.fallbackImage);
+            const fallbackAlt = utils.escapeAttr(s.fallbackImageAltText);
+
+            const fallbackNameBlock = s.fallbackProductName ? `
+        <tr><td>${spacer(18)}</td></tr>
+        <tr>
+          <td class="mobile-text-center" align="center" style="text-align:center">
+            <h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>
+          </td>
+        </tr>` : '';
+
+            const interactivePanels = s.colours.map(c => buildImagePanel(s, c, true)).join('\n');
+            const radios = buildRadioInputs(s);
+            const swatches = buildSwatchGrid(s);
+            const buttonHtml = buildButton(s, s.buttonFinalLink);
+
+            return `<table role="presentation" class="content-outer mwk-colour-swap-fallback yahooshow" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:${s.bgHex};width:620px">
   <tr>
-    <td class="side" style="width: 20px;">&nbsp;</td>
-    <td class="content-inner" valign="middle" align="center" style="width: 580px;">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-        <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-        <tr><td align="center" valign="middle">${imagePanels}</td></tr>
-        <tr><td><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-        <tr><td class="mobile-text-center" align="center" style="text-align: center;">${namePanels}</td></tr>
-        <tr><td><div style="clear: both; display: block; font-size: 18px; height: 18px; line-height: 18px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-        <tr><td align="center" style="font-size: 0; line-height: 0;">${swatches}</td></tr>
-        <tr><td><div style="clear: both; display: block; font-size: 18px; height: 18px; line-height: 18px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-        <tr><td>${button}</td></tr>
-        <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
+    <td class="side" style="width:20px">&nbsp;</td>
+    <td class="content-inner" valign="top" align="center" style="width:580px">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+        <tr><td>${spacer(24)}</td></tr>
+        <tr>
+          <td class="block" valign="top" align="center" style="width:100%">
+            <a href="${fallbackHref}" target="_blank">
+              <img class="fill mwk-colour-swap-image" src="${fallbackImg}" alt="${fallbackAlt}" width="${s.fallbackImageWidth}" style="border:none;display:block;height:auto;max-width:100%;outline:none;text-decoration:none;width:${s.fallbackImageWidth}px">
+            </a>
+          </td>
+        </tr>${fallbackNameBlock}
+        <tr><td>${spacer(18)}</td></tr>
+        <tr><td>${buttonHtml}</td></tr>
+        <tr><td>${spacer(24)}</td></tr>
       </table>
     </td>
-    <td class="side" style="width: 20px;">&nbsp;</td>
+    <td class="side" style="width:20px">&nbsp;</td>
   </tr>
-</table>`;
-            }
+</table>
 
-            // Compact two-column
-            return `<table role="presentation" class="content-outer mwk-colour-swap-interactive ${moduleClass} yahoohide" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color: ${bg.hex}; width: 620px; display: none; max-height: 0; max-width: 0; overflow: hidden; mso-hide: all;">
+<!--[if !mso]><! -->
+${radios}
+<table role="presentation" class="content-outer mwk-colour-swap-interactive ${s.moduleClass} yahoohide" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:${s.bgHex};width:620px;display:none;max-height:0;max-width:0;overflow:hidden;mso-hide:all">
   <tr>
-    <td class="side" style="width: 20px;">&nbsp;</td>
-    <td class="content-inner" valign="middle" align="center" style="width: 580px;">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
+    <td class="side" style="width:20px">&nbsp;</td>
+    <td class="content-inner" valign="top" align="center" style="width:580px">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+        <tr><td>${spacer(24)}</td></tr>
         <tr>
-          <td class="block" valign="middle" align="center" style="width: 290px;">
-            <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-              <tr><td style="padding: 20px;" valign="middle">
-                <table role="presentation" class="sect" border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-                  <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-                  <tr><td class="mobile-text-center" align="center" style="text-align: center;">${namePanels}</td></tr>
-                  <tr><td><div style="clear: both; display: block; font-size: 18px; height: 18px; line-height: 18px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-                  <tr><td align="center" style="font-size: 0; line-height: 0;">${swatches}</td></tr>
-                  <tr><td><div style="clear: both; display: block; font-size: 18px; height: 18px; line-height: 18px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-                  <tr><td>${button}</td></tr>
-                  <tr><td class="mobile-hide"><div style="clear: both; display: block; font-size: 20px; height: 20px; line-height: 20px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>
-                </table>
-              </td></tr>
+          <td class="block" valign="top" align="center" style="width:100%">
+${interactivePanels}
+          </td>
+        </tr>
+        <tr><td>${spacer(18)}</td></tr>
+        <tr>
+          <td align="center" style="font-size:0;line-height:0">
+${swatches}
+          </td>
+        </tr>
+        <tr><td>${spacer(20)}</td></tr>
+        <tr><td>${buttonHtml}</td></tr>
+        <tr><td>${spacer(24)}</td></tr>
+      </table>
+    </td>
+    <td class="side" style="width:20px">&nbsp;</td>
+  </tr>
+</table>
+<!-- <![endif]-->`;
+        }
+
+        function generateCompact(s) {
+            const fallbackHref = utils.escapeUrl(s.productPageLink);
+            const fallbackImg = utils.escapeAttr(s.fallbackImage);
+            const fallbackAlt = utils.escapeAttr(s.fallbackImageAltText);
+
+            const fallbackNameBlock = s.fallbackProductName ? `
+                    <tr>
+                      <td class="mobile-text-center" align="center" style="text-align:center">
+                        <h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>
+                      </td>
+                    </tr>
+                    <tr><td>${spacer(18)}</td></tr>` : '';
+
+            const buttonHtml = buildButton(s, s.buttonFinalLink);
+            const radios = buildRadioInputs(s);
+            const namePanels = s.colours.map(c => buildCompactNamePanel(s, c)).join('\n');
+            const imagePanels = s.colours.map(c => buildCompactImagePanel(s, c)).join('\n');
+            const swatches = buildSwatchGrid(s);
+
+            return `<table role="presentation" class="content-outer mwk-colour-swap-fallback yahooshow" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:${s.bgHex};width:620px">
+  <tr>
+    <td class="side" style="width:20px">&nbsp;</td>
+    <td class="content-inner" valign="middle" align="center" style="width:580px">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+        <tr>
+          <td class="block" valign="middle" align="center" style="width:290px">
+            <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+              <tr>
+                <td style="padding:20px" valign="middle">
+                  <table role="presentation" class="sect" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+                    <tr><td class="mobile-hide">${spacer(20)}</td></tr>${fallbackNameBlock}
+                    <tr><td>${buttonHtml}</td></tr>
+                    <tr><td class="mobile-hide">${spacer(20)}</td></tr>
+                  </table>
+                </td>
+              </tr>
             </table>
           </td>
-          <td class="block" valign="middle" align="center" style="width: 290px;">${imagePanels}</td>
+          <td class="block" valign="middle" align="center" style="width:290px">
+            <a href="${fallbackHref}" target="_blank">
+              <img class="fill mwk-colour-swap-image" src="${fallbackImg}" alt="${fallbackAlt}" width="${s.fallbackImageWidth}" style="border:none;display:block;height:auto;max-width:100%;outline:none;text-decoration:none;width:${s.fallbackImageWidth}px">
+            </a>
+          </td>
         </tr>
       </table>
     </td>
-    <td class="side" style="width: 20px;">&nbsp;</td>
+    <td class="side" style="width:20px">&nbsp;</td>
   </tr>
-</table>`;
+</table>
+
+<!--[if !mso]><! -->
+${radios}
+<table role="presentation" class="content-outer mwk-colour-swap-interactive ${s.moduleClass} yahoohide" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:${s.bgHex};width:620px;display:none;max-height:0;max-width:0;overflow:hidden;mso-hide:all">
+  <tr>
+    <td class="side" style="width:20px">&nbsp;</td>
+    <td class="content-inner" valign="middle" align="center" style="width:580px">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+        <tr>
+          <td class="block" valign="middle" align="center" style="width:290px">
+            <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+              <tr>
+                <td style="padding:20px" valign="middle">
+                  <table role="presentation" class="sect" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+                    <tr><td class="mobile-hide">${spacer(20)}</td></tr>
+                    <tr>
+                      <td class="mobile-text-center" align="center" style="text-align:center">
+${namePanels}
+                      </td>
+                    </tr>
+                    <tr><td>${spacer(18)}</td></tr>
+                    <tr>
+                      <td align="center" style="font-size:0;line-height:0">
+${swatches}
+                      </td>
+                    </tr>
+                    <tr><td>${spacer(18)}</td></tr>
+                    <tr><td>${buttonHtml}</td></tr>
+                    <tr><td class="mobile-hide">${spacer(20)}</td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td class="block" valign="middle" align="center" style="width:290px">
+${imagePanels}
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td class="side" style="width:20px">&nbsp;</td>
+  </tr>
+</table>
+<!-- <![endif]-->`;
+        }
+
+        function generateTemplate() {
+            const s = getResolvedSettings();
+            const styles = buildScopedStyles(s);
+            const body = s.isCompact ? generateCompact(s) : generateFullWidth(s);
+            const wrapperLabel = s.isCompact ? 'compact-colour-swap-product' : 'colour-swap-product';
+            return `${styles}
+
+<!-- START .mwk-${wrapperLabel} (${s.moduleName}) -->
+${body}
+<!-- END .mwk-${wrapperLabel} -->`;
         }
 
         // =====================================================================
@@ -770,317 +1053,72 @@ u + .body .mwk-colour-swap-interactive { display: none !important; overflow: hid
                     if (state.sdk.setData) {
                         state.sdk.setData({ ...state.blockData, content: html });
                     }
-                } catch (error) {
-                    utils.showError(`Preview update failed: ${error.message}`);
+                } catch (err) {
+                    utils.showError(`Preview update failed: ${err.message}`);
                 }
             });
-        }
-
-        // =====================================================================
-        // URL VALIDATION
-        // =====================================================================
-        function validateUrlInput(input, errorElement) {
-            const value = (input.value || '').trim();
-            const isValid = !value || utils.isValidUrl(value);
-            input.classList.toggle('error', !isValid);
-            if (errorElement) errorElement.style.display = isValid ? 'none' : 'block';
-            return isValid;
-        }
-
-        // =====================================================================
-        // COLOUR CARDS UI
-        // =====================================================================
-        function renderColourCards() {
-            const colours = utils.getFieldValue('colours') || [];
-            const numActive = utils.clamp(parseInt(utils.getFieldValue('numberOfColourOptions'), 10) || 1, 1, TOTAL_COLOURS);
-
-            elements.coloursContainer.replaceChildren();
-            const fragment = document.createDocumentFragment();
-
-            for (let i = 0; i < TOTAL_COLOURS; i++) {
-                const c = colours[i] || {};
-                const node = elements.colourCardTemplate.content.cloneNode(true);
-                const card = node.querySelector('.colour-card');
-                card.dataset.index = String(i);
-                if (i >= numActive) card.classList.add('inactive');
-
-                const labelText = node.querySelector('.colour-card-label-text');
-                labelText.textContent = `Colour ${i + 1}${i >= numActive ? ' (not used)' : ''}${c.label ? ' — ' + c.label : ''}`;
-
-                const swatchPreview = node.querySelector('.colour-swatch-preview');
-                swatchPreview.style.backgroundColor = c.swatchColour || '#cccccc';
-                swatchPreview.style.border = c.swatchBorder ? '1px solid #cccccc' : '1px solid #ddd';
-
-                // Inputs
-                const productName = node.querySelector('[data-field="productName"]');
-                const image = node.querySelector('[data-field="image"]');
-                const altText = node.querySelector('[data-field="altText"]');
-                const label = node.querySelector('[data-field="label"]');
-                const link = node.querySelector('[data-field="link"]');
-                const swatchColourTxt = node.querySelector('[data-field="swatchColour"]');
-                const swatchColourPicker = node.querySelector('[data-field="swatchColourPicker"]');
-                const swatchBorder = node.querySelector('[data-field="swatchBorder"]');
-
-                productName.value = c.productName || '';
-                image.value = c.image || '';
-                altText.value = c.altText || '';
-                label.value = c.label || '';
-                link.value = c.link || '';
-                swatchColourTxt.value = c.swatchColour || '#cccccc';
-                if (utils.isValidHex(c.swatchColour)) swatchColourPicker.value = c.swatchColour;
-                swatchBorder.checked = Boolean(c.swatchBorder);
-
-                fragment.appendChild(node);
-            }
-
-            elements.coloursContainer.appendChild(fragment);
-        }
-
-        function updateCardLabelPreview(card, index) {
-            const colours = utils.getFieldValue('colours') || [];
-            const c = colours[index] || {};
-            const numActive = utils.clamp(parseInt(utils.getFieldValue('numberOfColourOptions'), 10) || 1, 1, TOTAL_COLOURS);
-            const labelText = card.querySelector('.colour-card-label-text');
-            labelText.textContent = `Colour ${index + 1}${index >= numActive ? ' (not used)' : ''}${c.label ? ' — ' + c.label : ''}`;
-            const swatchPreview = card.querySelector('.colour-swatch-preview');
-            swatchPreview.style.backgroundColor = c.swatchColour || '#cccccc';
-            swatchPreview.style.border = c.swatchBorder ? '1px solid #cccccc' : '1px solid #ddd';
-        }
-
-        function refreshActiveStates() {
-            const numActive = utils.clamp(parseInt(utils.getFieldValue('numberOfColourOptions'), 10) || 1, 1, TOTAL_COLOURS);
-            elements.coloursContainer.querySelectorAll('.colour-card').forEach((card, idx) => {
-                card.classList.toggle('inactive', idx >= numActive);
-                updateCardLabelPreview(card, idx);
-            });
-        }
-
-        // =====================================================================
-        // EVENT HANDLERS
-        // =====================================================================
-        function initializeEventHandlers() {
-            state.eventListeners = [];
-
-            // Option selectors
-            function setupOptionSelector(selectorEl, dataKey, onChange) {
-                if (!selectorEl) return;
-                selectorEl.querySelectorAll('.option-button').forEach(option => {
-                    const handler = (e) => {
-                        const btn = e.currentTarget;
-                        selectorEl.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
-                        btn.classList.add('selected');
-                        updateData(dataKey, btn.dataset.value);
-                        if (onChange) onChange(btn.dataset.value);
-                    };
-                    utils.addTracked(option, 'click', handler);
-                });
-            }
-
-            setupOptionSelector(elements.layoutSelector, 'layout', (val) => {
-                // Adjust max image widths suggestion
-                const maxW = val === 'full-width' ? 580 : 290;
-                elements.imageWidth.max = String(maxW);
-                elements.fallbackImageWidth.max = String(maxW);
-            });
-            setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
-
-            // Text input helper
-            function setupTextInput(el, dataKey, maxLength) {
-                if (!el) return;
-                const handler = (e) => {
-                    let v = e.target.value;
-                    if (maxLength) v = v.substring(0, maxLength);
-                    e.target.value = v;
-                    debouncedUpdateData(dataKey, v);
-                };
-                utils.addTracked(el, 'input', handler);
-            }
-            setupTextInput(elements.moduleName, 'moduleName', 80);
-            setupTextInput(elements.buttonText, 'buttonText', 50);
-            setupTextInput(elements.fallbackProductName, 'fallbackProductName', 120);
-            setupTextInput(elements.fallbackImageAltText, 'fallbackImageAltText', 200);
-
-            // URL inputs
-            function setupUrlInput(el, dataKey, errEl) {
-                if (!el) return;
-                const inp = (e) => {
-                    if (validateUrlInput(el, errEl)) {
-                        debouncedUpdateData(dataKey, e.target.value.trim());
-                    }
-                };
-                const blr = () => validateUrlInput(el, errEl);
-                utils.addTracked(el, 'input', inp);
-                utils.addTracked(el, 'blur', blr);
-            }
-            setupUrlInput(elements.productPageLink, 'productPageLink', elements.productPageLinkError);
-            setupUrlInput(elements.buttonLink, 'buttonLink', elements.buttonLinkError);
-            setupUrlInput(elements.fallbackImage, 'fallbackImage', elements.fallbackImageError);
-
-            // Number inputs
-            function setupNumberInput(el, dataKey, step, onAfter) {
-                if (!el) return;
-                const stp = step || 1;
-                const blr = (e) => {
-                    const input = e.target;
-                    let v = parseInt(input.value, 10);
-                    const min = parseInt(input.min, 10);
-                    const max = parseInt(input.max, 10);
-                    if (isNaN(v)) v = moduleConfig.fields[dataKey].defaultValue;
-                    v = utils.clamp(v, min, max);
-                    if (stp > 1) v = Math.round(v / stp) * stp;
-                    input.value = v;
-                    updateData(dataKey, v);
-                    if (onAfter) onAfter(v);
-                };
-                const liv = (e) => {
-                    const v = parseInt(e.target.value, 10);
-                    if (!isNaN(v)) {
-                        debouncedUpdateData(dataKey, v);
-                        if (onAfter) onAfter(v);
-                    }
-                };
-                utils.addTracked(el, 'input', liv);
-                utils.addTracked(el, 'blur', blr);
-            }
-            setupNumberInput(elements.numberOfColourOptions, 'numberOfColourOptions', 1, () => refreshActiveStates());
-            setupNumberInput(elements.coloursPerRow, 'coloursPerRow', 1);
-            setupNumberInput(elements.imageWidth, 'imageWidth', 2);
-            setupNumberInput(elements.fallbackImageWidth, 'fallbackImageWidth', 2);
-
-            // Colour cards (delegated)
-            const cardsHandler = (e) => {
-                const card = e.target.closest('.colour-card');
-                if (!card) return;
-                const index = parseInt(card.dataset.index, 10);
-
-                // Toggle expand/collapse
-                if (e.target.matches('.colour-card-toggle')) {
-                    const isOpen = card.classList.toggle('open');
-                    e.target.textContent = isOpen ? 'Collapse' : 'Expand';
-                    return;
-                }
-
-                const fieldEl = e.target.closest('[data-field]');
-                if (!fieldEl) return;
-                const field = fieldEl.dataset.field;
-
-                if (field === 'swatchBorder') {
-                    updateColourField(index, 'swatchBorder', fieldEl.checked);
-                    updateCardLabelPreview(card, index);
-                    return;
-                }
-
-                if (field === 'swatchColourPicker') {
-                    const val = fieldEl.value;
-                    const txt = card.querySelector('[data-field="swatchColour"]');
-                    if (txt) txt.value = val;
-                    updateColourField(index, 'swatchColour', val);
-                    updateCardLabelPreview(card, index);
-                    return;
-                }
-
-                if (field === 'swatchColour') {
-                    const val = fieldEl.value.trim();
-                    if (utils.isValidHex(val)) {
-                        const picker = card.querySelector('[data-field="swatchColourPicker"]');
-                        if (picker) picker.value = val;
-                        fieldEl.classList.remove('error');
-                    } else if (val !== '') {
-                        fieldEl.classList.add('error');
-                    }
-                    debouncedUpdateColourField(index, 'swatchColour', val || '#cccccc');
-                    updateCardLabelPreview(card, index);
-                    return;
-                }
-
-                if (field === 'image' || field === 'link') {
-                    const errEl = fieldEl.parentElement.querySelector('.field-error');
-                    if (validateUrlInput(fieldEl, errEl)) {
-                        debouncedUpdateColourField(index, field, fieldEl.value.trim());
-                    }
-                    return;
-                }
-
-                // Plain text fields (productName, altText, label)
-                debouncedUpdateColourField(index, field, fieldEl.value);
-                if (field === 'label') updateCardLabelPreview(card, index);
-            };
-
-            utils.addTracked(elements.coloursContainer, 'input', cardsHandler);
-            utils.addTracked(elements.coloursContainer, 'change', cardsHandler);
-            utils.addTracked(elements.coloursContainer, 'click', cardsHandler);
-            utils.addTracked(elements.coloursContainer, 'blur', cardsHandler, true);
         }
 
         // =====================================================================
         // DATA LOADING
         // =====================================================================
-        function setSelectorState(selectorEl, dataKey) {
-            const v = utils.getFieldValue(dataKey);
-            if (!selectorEl) return;
-            selectorEl.querySelectorAll('.option-button').forEach(o => {
-                o.classList.toggle('selected', o.dataset.value === v);
-            });
-        }
-
         function loadData() {
             if (!state.sdk || !state.sdk.getData) return utils.showError('SDK not available');
             setLoadingState(true);
-
             state.sdk.getData((data) => {
                 try {
                     state.blockData = {};
                     Object.keys(moduleConfig.fields).forEach(key => {
-                        if (data && Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined && data[key] !== null) {
+                        if (data && data.hasOwnProperty(key) && data[key] !== undefined && data[key] !== null) {
                             state.blockData[key] = data[key];
                         } else {
+                            // Deep copy default for list type
                             const def = moduleConfig.fields[key].defaultValue;
-                            state.blockData[key] = Array.isArray(def) ? JSON.parse(JSON.stringify(def)) : def;
+                            state.blockData[key] = (moduleConfig.fields[key].type === 'list') ? JSON.parse(JSON.stringify(def)) : def;
                         }
                     });
 
-                    // Normalise colours array
-                    let colours = state.blockData.colours;
-                    if (!Array.isArray(colours)) colours = [];
-                    // Pad / trim
-                    while (colours.length < TOTAL_COLOURS) {
-                        colours.push({ productName: '', image: '', altText: '', label: '', link: '', swatchColour: '#cccccc', swatchBorder: false });
+                    // Ensure colours have IDs and required fields
+                    if (Array.isArray(state.blockData.colours)) {
+                        state.blockData.colours.forEach(c => {
+                            if (!c.id) c.id = crypto.randomUUID();
+                            if (c.productName == null) c.productName = '';
+                            if (c.image == null) c.image = '';
+                            if (c.altText == null) c.altText = '';
+                            if (c.label == null) c.label = '';
+                            if (c.link == null) c.link = '';
+                            if (!c.swatchColour) c.swatchColour = '#cccccc';
+                            if (!c.swatchBorder) c.swatchBorder = 'none';
+                        });
+                    } else {
+                        state.blockData.colours = JSON.parse(JSON.stringify(moduleConfig.fields.colours.defaultValue));
                     }
-                    colours = colours.slice(0, TOTAL_COLOURS);
-                    state.blockData.colours = colours;
 
-                    // Update simple inputs
-                    elements.moduleName.value = utils.getFieldValue('moduleName');
-                    elements.numberOfColourOptions.value = utils.getFieldValue('numberOfColourOptions');
-                    elements.coloursPerRow.value = utils.getFieldValue('coloursPerRow');
-                    elements.imageWidth.value = utils.getFieldValue('imageWidth');
-                    elements.fallbackImageWidth.value = utils.getFieldValue('fallbackImageWidth');
-                    elements.productPageLink.value = utils.getFieldValue('productPageLink');
-                    elements.buttonText.value = utils.getFieldValue('buttonText');
-                    elements.buttonLink.value = utils.getFieldValue('buttonLink');
-                    elements.fallbackProductName.value = utils.getFieldValue('fallbackProductName');
-                    elements.fallbackImage.value = utils.getFieldValue('fallbackImage');
-                    elements.fallbackImageAltText.value = utils.getFieldValue('fallbackImageAltText');
+                    // Default moduleName if blank
+                    if (!state.blockData.moduleName) {
+                        state.blockData.moduleName = makeDefaultModuleName();
+                    }
 
-                    setSelectorState(elements.layoutSelector, 'layout');
-                    setSelectorState(elements.backgroundColourSelector, 'backgroundColour');
+                    // Populate UI
+                    setSelectorValue(elements.layoutSelector, state.blockData.layout || 'full');
+                    setSelectorValue(elements.backgroundColourSelector, state.blockData.backgroundColour || 'black');
+                    elements.moduleName.value = state.blockData.moduleName;
+                    elements.coloursPerRow.value = state.blockData.coloursPerRow;
+                    elements.imageWidth.value = state.blockData.imageWidth;
+                    elements.fallbackImageWidth.value = state.blockData.fallbackImageWidth || 0;
+                    elements.productPageLink.value = state.blockData.productPageLink || '';
+                    elements.buttonLink.value = state.blockData.buttonLink || '';
+                    elements.buttonText.value = state.blockData.buttonText || '';
+                    elements.fallbackProductName.value = state.blockData.fallbackProductName || '';
+                    elements.fallbackImage.value = state.blockData.fallbackImage || '';
+                    elements.fallbackImageAltText.value = state.blockData.fallbackImageAltText || '';
 
-                    // Adjust image width max based on layout
-                    const maxW = utils.getFieldValue('layout') === 'full-width' ? 580 : 290;
-                    elements.imageWidth.max = String(maxW);
-                    elements.fallbackImageWidth.max = String(maxW);
-
-                    renderColourCards();
+                    applyLayoutConstraints();
+                    renderItemsUI();
                     refreshPreview();
                     state.retryCount = 0;
                 } catch (error) {
                     utils.showError(`Failed to load data: ${error.message}`);
-                    Object.keys(moduleConfig.fields).forEach(key => {
-                        const def = moduleConfig.fields[key].defaultValue;
-                        state.blockData[key] = Array.isArray(def) ? JSON.parse(JSON.stringify(def)) : def;
-                    });
-                    renderColourCards();
-                    refreshPreview();
                 } finally {
                     setLoadingState(false);
                 }
@@ -1104,24 +1142,20 @@ u + .body .mwk-colour-swap-interactive { display: none !important; overflow: hid
         function initializeWithRetry() {
             try {
                 if (!window.sfdc || !window.sfdc.BlockSDK) throw new Error('BlockSDK not loaded');
-
                 state.sdk = new window.sfdc.BlockSDK({ tabs: ['htmlblock'] });
-
                 cacheElements();
                 initializeEventHandlers();
                 loadData();
-
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => {
                     if (!document.hidden && state.isInitialized) loadData();
                 });
-
                 state.isInitialized = true;
             } catch (error) {
                 utils.showError(`Initialisation failed: ${error.message}`);
                 if (state.retryCount < moduleConfig.maxRetries) {
                     state.retryCount++;
-                    setTimeout(() => initializeWithRetry(), 1000 * state.retryCount);
+                    setTimeout(initializeWithRetry, 1000 * state.retryCount);
                 } else {
                     utils.showError('Failed to initialise after multiple attempts. Please refresh.', true);
                 }
