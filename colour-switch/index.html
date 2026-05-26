@@ -71,7 +71,7 @@
                 <label class="field-label">Layout style</label>
                 <div class="option-selector" id="layoutSelector">
                     <div class="option-button selected" data-value="full">Full width</div>
-                    <div class="option-button" data-value="compact">Compact (two column)</div>
+                    <div class="option-button" data-value="compact">Compact</div>
                 </div>
                 <div class="field-hint">Full width stacks image above text. Compact shows text/button next to a smaller image.</div>
             </div>
@@ -178,7 +178,7 @@
             </div>
             <div class="item-grid">
                 <div class="field-group">
-                    <label class="field-label">Product name (shown above image)</label>
+                    <label class="field-label">Product name</label>
                     <input type="text" class="field-input" data-field="productName" placeholder="e.g. BOLT™ 100 WHITE" maxlength="120">
                 </div>
                 <div class="field-group">
@@ -240,15 +240,15 @@
                 buttonLink: { type: 'url', defaultValue: '' },
                 buttonText: { type: 'text', defaultValue: 'View product' },
                 fallbackProductName: { type: 'text', defaultValue: '' },
-                fallbackImage: { type: 'url', defaultValue: '' },
+                fallbackImage: { type: 'url', defaultValue: 'https://placehold.co/1160x1160/cccccc/333333/png?text=580x580+(x2)' },
                 fallbackImageAltText: { type: 'text', defaultValue: '' },
                 colours: {
                     type: 'list',
                     defaultValue: [
-                        { id: crypto.randomUUID(), productName: 'PRODUCT WHITE',  image: '', altText: 'Product white',  label: 'White',  link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT YELLOW', image: '', altText: 'Product yellow', label: 'Yellow', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT BLUE',   image: '', altText: 'Product blue',   label: 'Blue',   link: '', swatchColour: '#26366F', swatchBorder: 'none' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT GREEN',  image: '', altText: 'Product green',  label: 'Green',  link: '', swatchColour: '#00965E', swatchBorder: 'none' }
+                        { id: crypto.randomUUID(), productName: 'PRODUCT WHITE',  image: 'https://placehold.co/760x760/f2f2f2/333333/png?text=380x380+(x2)', altText: 'Product white',  label: 'White',  link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT YELLOW', image: 'https://placehold.co/760x760/F7D100/333333/png?text=380x380+(x2)', altText: 'Product yellow', label: 'Yellow', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT BLUE',   image: 'https://placehold.co/760x760/26366F/FFFFFF/png?text=380x380+(x2)', altText: 'Product blue',   label: 'Blue',   link: '', swatchColour: '#26366F', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT GREEN',  image: 'https://placehold.co/760x760/00965E/FFFFFF/png?text=380x380+(x2)', altText: 'Product green',  label: 'Green',  link: '', swatchColour: '#00965E', swatchBorder: 'none' }
                     ]
                 }
             },
