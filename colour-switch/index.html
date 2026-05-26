@@ -952,13 +952,21 @@ ${swatches}
             const imagePanels = s.colours.map(c => buildCompactImagePanel(s, c)).join('\n');
             const swatches = buildSwatchGrid(s);
 
+            // Image cell is first in source order so that on mobile (when cells stack)
+            // the image appears above the text/button/swatches. dir="rtl" on the parent
+            // table flips desktop order back so the image visually sits on the right.
             return `<table role="presentation" class="content-outer mwk-colour-swap-fallback yahooshow" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:${s.bgHex};width:620px">
   <tr>
     <td class="side" style="width:20px">&nbsp;</td>
     <td class="content-inner" valign="middle" align="center" style="width:580px">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="width:100%">
         <tr>
-          <td class="block" valign="middle" align="center" style="width:290px">
+          <td class="block" dir="ltr" valign="middle" align="center" style="width:290px">
+            <a href="${fallbackHref}" target="_blank">
+              <img class="fill mwk-colour-swap-image" src="${fallbackImg}" alt="${fallbackAlt}" width="${s.fallbackImageWidth}" style="border:none;display:block;height:auto;max-width:100%;outline:none;text-decoration:none;width:${s.fallbackImageWidth}px">
+            </a>
+          </td>
+          <td class="block" dir="ltr" valign="middle" align="center" style="width:290px">
             <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
               <tr>
                 <td style="padding:20px" valign="middle">
@@ -970,11 +978,6 @@ ${swatches}
                 </td>
               </tr>
             </table>
-          </td>
-          <td class="block" valign="middle" align="center" style="width:290px">
-            <a href="${fallbackHref}" target="_blank">
-              <img class="fill mwk-colour-swap-image" src="${fallbackImg}" alt="${fallbackAlt}" width="${s.fallbackImageWidth}" style="border:none;display:block;height:auto;max-width:100%;outline:none;text-decoration:none;width:${s.fallbackImageWidth}px">
-            </a>
           </td>
         </tr>
       </table>
@@ -989,9 +992,12 @@ ${radios}
   <tr>
     <td class="side" style="width:20px">&nbsp;</td>
     <td class="content-inner" valign="middle" align="center" style="width:580px">
-      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
+      <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="width:100%">
         <tr>
-          <td class="block" valign="middle" align="center" style="width:290px">
+          <td class="block" dir="ltr" valign="middle" align="center" style="width:290px">
+${imagePanels}
+          </td>
+          <td class="block" dir="ltr" valign="middle" align="center" style="width:290px">
             <table role="presentation" class="sect" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%">
               <tr>
                 <td style="padding:20px" valign="middle">
@@ -1015,9 +1021,6 @@ ${swatches}
                 </td>
               </tr>
             </table>
-          </td>
-          <td class="block" valign="middle" align="center" style="width:290px">
-${imagePanels}
           </td>
         </tr>
       </table>
