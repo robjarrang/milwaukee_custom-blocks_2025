@@ -140,9 +140,10 @@
                     <input type="text" id="buttonText" class="field-input" value="View product" maxlength="60">
                 </div>
                 <div class="field-group">
-                    <label class="field-label" for="buttonLink">Button link (optional)</label>
+                    <label class="field-label" for="buttonLink">Fallback button link (optional)</label>
                     <input type="url" id="buttonLink" class="field-input" placeholder="Leave blank to use main link">
                     <div class="field-error">Please enter a valid URL.</div>
+                    <div class="field-hint">Used by the button in the Outlook / Gmail / Yahoo fallback only. Interactive button mirrors the selected colour's link.</div>
                 </div>
             </div>
         </div>
@@ -211,6 +212,7 @@
                     <label class="field-label">Link URL (optional)</label>
                     <input type="url" class="field-input" data-field="link" placeholder="Leave blank to use main link">
                     <div class="field-error">Please enter a valid URL.</div>
+                    <div class="field-hint">Used for both the image and the button when this colour is selected.</div>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Swatch colour</label>
@@ -806,6 +808,15 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             return `<table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%"><tr><td align="center" class="block" style="width:100%" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="button-1-black button-mobile-center" role="presentation" style="background-color:#000000;border-radius:4px !important"><tr><td align="center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:12px 20px;text-align:center;text-transform:uppercase;width:100%;border-radius:4px !important"><a href="${href}" style="color:#ffffff;text-decoration:none" target="_blank">${txt}</a></td></tr></table></td></tr></table>`;
         }
 
+        function buildButtonPanels(s) {
+            // One button per colour, wrapped in the same panel show/hide system as the
+            // image panels. When a swatch is selected, that colour's button link is shown.
+            return s.colours.map(c => {
+                const visibility = c.index === 1 ? 'display:block' : 'display:none;max-height:0;overflow:hidden';
+                return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">${buildButton(s, c.link)}</div>`;
+            }).join('\n');
+        }
+
         function spacer(px) {
             return `<div style="clear:both;display:block;font-size:${px}px;height:${px}px;line-height:${px}px;margin:0;mso-line-height-rule:exactly;padding:0">&nbsp;</div>`;
         }
@@ -917,6 +928,7 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             const radios = buildRadioInputs(s);
             const swatches = buildSwatchGrid(s);
             const buttonHtml = buildButton(s, s.buttonFinalLink);
+            const buttonPanels = buildButtonPanels(s);
 
             return `<table role="presentation" class="content-outer mwk-colour-swap-fallback yahooshow" align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:${s.bgHex};width:620px">
   <tr>
@@ -960,7 +972,7 @@ ${swatches}
           </td>
         </tr>
         <tr><td>${spacer(20)}</td></tr>
-        <tr><td>${buttonHtml}</td></tr>
+        <tr><td>${buttonPanels}</td></tr>
         <tr><td>${spacer(24)}</td></tr>
       </table>
     </td>
@@ -984,6 +996,7 @@ ${swatches}
                     <tr><td>${spacer(18)}</td></tr>` : '';
 
             const buttonHtml = buildButton(s, s.buttonFinalLink);
+            const buttonPanels = buildButtonPanels(s);
             const radios = buildRadioInputs(s);
             const namePanels = s.colours.map(c => buildCompactNamePanel(s, c)).join('\n');
             const imagePanels = s.colours.map(c => buildCompactImagePanel(s, c)).join('\n');
@@ -1052,7 +1065,7 @@ ${swatches}
                       </td>
                     </tr>
                     <tr><td>${spacer(18)}</td></tr>
-                    <tr><td>${buttonHtml}</td></tr>
+                    <tr><td>${buttonPanels}</td></tr>
                     <tr><td class="mobile-hide">${spacer(20)}</td></tr>
                   </table>
                 </td>
