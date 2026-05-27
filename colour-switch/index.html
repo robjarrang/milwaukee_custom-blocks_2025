@@ -145,6 +145,11 @@
                 <input type="text" id="fallbackProductName" class="field-input" placeholder="Leave blank to omit" maxlength="120">
             </div>
             <div class="field-group">
+                <label class="field-label" for="subtitle">Subtitle</label>
+                <input type="text" id="subtitle" class="field-input" placeholder="Leave blank to omit" maxlength="120" value="Select colour">
+                <div class="field-hint">Optional small line shown under the product name (e.g. “Select colour”).</div>
+            </div>
+            <div class="field-group">
                 <label class="field-label" for="fallbackImage">Fallback image URL</label>
                 <input type="url" id="fallbackImage" class="field-input" placeholder="https://...">
                 <div class="field-error">Please enter a valid URL.</div>
@@ -243,6 +248,7 @@
                 buttonLink: { type: 'url', defaultValue: '' },
                 buttonText: { type: 'text', defaultValue: 'View product' },
                 fallbackProductName: { type: 'text', defaultValue: '' },
+                subtitle: { type: 'text', defaultValue: 'Select colour' },
                 fallbackImage: { type: 'url', defaultValue: 'https://placehold.co/1160x1160/cccccc/333333/png?text=580x580+(x2)' },
                 fallbackImageAltText: { type: 'text', defaultValue: '' },
                 colours: {
@@ -350,6 +356,7 @@
             elements.buttonLink = document.getElementById('buttonLink');
             elements.buttonText = document.getElementById('buttonText');
             elements.fallbackProductName = document.getElementById('fallbackProductName');
+            elements.subtitle = document.getElementById('subtitle');
             elements.fallbackImage = document.getElementById('fallbackImage');
             elements.fallbackImageAltText = document.getElementById('fallbackImageAltText');
             elements.itemsContainer = document.getElementById('itemsContainer');
@@ -390,6 +397,7 @@
             state.blockData.buttonLink = elements.buttonLink.value.trim();
             state.blockData.buttonText = elements.buttonText.value;
             state.blockData.fallbackProductName = elements.fallbackProductName.value;
+            state.blockData.subtitle = elements.subtitle.value;
             state.blockData.fallbackImage = elements.fallbackImage.value.trim();
             state.blockData.fallbackImageAltText = elements.fallbackImageAltText.value;
             state.blockData.colours = readColoursFromUI();
@@ -589,7 +597,7 @@
             setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
 
             // Generic text inputs
-            ['buttonText', 'fallbackProductName', 'fallbackImageAltText'].forEach(id => {
+            ['buttonText', 'fallbackProductName', 'fallbackImageAltText', 'subtitle'].forEach(id => {
                 const el = elements[id];
                 if (!el) return;
                 utils.addEventListenerTracked(el, 'input', () => {
@@ -724,6 +732,7 @@
                 buttonText: utils.getFieldValue('buttonText') || 'View product',
                 productPageLink, buttonFinalLink,
                 fallbackProductName: utils.getFieldValue('fallbackProductName'),
+                subtitle: utils.getFieldValue('subtitle'),
                 fallbackImage: utils.getFieldValue('fallbackImage'),
                 fallbackImageAltText: utils.getFieldValue('fallbackImageAltText'),
                 colours: resolvedColours,
@@ -843,10 +852,17 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             const alt = utils.escapeAttr(c.altText);
             const visibility = c.index === 1 ? 'display:block' : 'display:none;max-height:0;overflow:hidden';
             let nameBlock = '';
-            if (withName && c.productName) {
+            if (withName && (c.productName || s.subtitle)) {
+                const titleHtml = c.productName
+                    ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`
+                    : '';
+                const subtitleHtml = s.subtitle
+                    ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>`
+                    : '';
+                const between = (c.productName && s.subtitle) ? spacer(6) : '';
                 nameBlock = `
               ${spacer(18)}
-              <h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`;
+              ${titleHtml}${between}${subtitleHtml}`;
             }
             return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">
   <a href="${href}" target="_blank">
@@ -860,7 +876,11 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             const name = c.productName
                 ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`
                 : '';
-            return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">${name}</div>`;
+            const subtitle = s.subtitle
+                ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>`
+                : '';
+            const between = (c.productName && s.subtitle) ? spacer(4) : '';
+            return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">${name}${between}${subtitle}</div>`;
         }
 
         function buildCompactImagePanel(s, c) {
@@ -880,11 +900,11 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             const fallbackImg = utils.escapeAttr(s.fallbackImage);
             const fallbackAlt = utils.escapeAttr(s.fallbackImageAltText);
 
-            const fallbackNameBlock = s.fallbackProductName ? `
+            const fallbackNameBlock = (s.fallbackProductName || s.subtitle) ? `
         <tr><td>${spacer(18)}</td></tr>
         <tr>
           <td class="mobile-text-center" align="center" style="text-align:center">
-            <h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>
+            ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(6) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>` : ''}
           </td>
         </tr>` : '';
 
@@ -950,10 +970,10 @@ ${swatches}
             const fallbackImg = utils.escapeAttr(s.fallbackImage);
             const fallbackAlt = utils.escapeAttr(s.fallbackImageAltText);
 
-            const fallbackNameBlock = s.fallbackProductName ? `
+            const fallbackNameBlock = (s.fallbackProductName || s.subtitle) ? `
                     <tr>
                       <td class="mobile-text-center" align="center" style="text-align:center">
-                        <h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>
+                        ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(4) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>` : ''}
                       </td>
                     </tr>
                     <tr><td>${spacer(18)}</td></tr>` : '';
@@ -1120,6 +1140,7 @@ ${body}
                     elements.buttonLink.value = state.blockData.buttonLink || '';
                     elements.buttonText.value = state.blockData.buttonText || '';
                     elements.fallbackProductName.value = state.blockData.fallbackProductName || '';
+                    elements.subtitle.value = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select colour';
                     elements.fallbackImage.value = state.blockData.fallbackImage || '';
                     elements.fallbackImageAltText.value = state.blockData.fallbackImageAltText || '';
 
