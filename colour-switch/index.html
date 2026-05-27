@@ -763,9 +763,9 @@
 .mwk-colour-swap-image{display:block;height:auto;max-width:100%}
 .mwk-colour-swap-panel{display:none;max-height:0;overflow:hidden}
 .mwk-colour-swap-panel-1{display:block;max-height:none;overflow:visible}
-.mwk-colour-swap-swatch{border:2px solid transparent;border-collapse:separate !important;border-radius:50%;cursor:pointer;height:48px;width:48px}
-.mwk-colour-swap-swatch-cell{font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;width:44px}
-.mwk-colour-swap-swatch-dot{border-radius:50%;display:block;font-size:0;height:34px;line-height:34px;margin:0 auto;padding:0;width:34px}
+.mwk-colour-swap-swatch{border:2px solid transparent;border-collapse:separate !important;border-spacing:0 !important;border-radius:50%;cursor:pointer;height:48px;width:48px}
+.mwk-colour-swap-swatch-cell{font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;vertical-align:middle;width:44px}
+.mwk-colour-swap-swatch-dot{border-radius:50%;display:block;font-size:0;height:40px;line-height:40px;margin:0 auto;padding:0;width:40px}
 @media screen and (-webkit-min-device-pixel-ratio:0){
 .mwk-colour-swap-fallback{display:none !important;max-height:0 !important;max-width:0 !important;overflow:hidden !important;visibility:hidden !important}
 .mwk-colour-swap-interactive{display:table !important;max-height:none !important;max-width:inherit !important;overflow:visible !important;visibility:inherit !important}
@@ -788,7 +788,7 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
 .mwk-colour-swap-image{height:auto !important;max-width:100% !important;width:100% !important}
 .mwk-colour-swap-swatch{height:42px !important;width:42px !important}
 .mwk-colour-swap-swatch-cell{height:38px !important;width:38px !important}
-.mwk-colour-swap-swatch-dot{height:28px !important;line-height:28px !important;width:28px !important}
+.mwk-colour-swap-swatch-dot{height:34px !important;line-height:34px !important;width:34px !important}
 }
 </style>
 <style type="text/css">
@@ -823,10 +823,10 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             const i = c.index;
             return `<td align="center" valign="middle" style="padding:0 3px;font-size:0;line-height:0">
   <label for="${s.moduleName}-colour-option-${i}" title="${utils.escapeAttr(c.label)}" style="cursor:pointer;display:block">
-    <table role="presentation" class="mwk-colour-swap-swatch mwk-colour-swap-swatch-${i}" align="center" border="0" cellspacing="0" cellpadding="0" width="48" height="48" style="border:2px solid transparent;border-collapse:separate !important;border-radius:50%;cursor:pointer;height:48px;width:48px">
+    <table role="presentation" class="mwk-colour-swap-swatch mwk-colour-swap-swatch-${i}" align="center" border="0" cellspacing="0" cellpadding="0" width="48" height="48" style="border:2px solid transparent;border-collapse:separate !important;border-spacing:0 !important;border-radius:50%;cursor:pointer;height:48px;width:48px">
       <tr>
-        <td class="mwk-colour-swap-swatch-cell" align="center" valign="middle" width="44" height="44" style="font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;width:44px">
-          <span class="mwk-colour-swap-swatch-dot" style="background-color:${utils.escapeAttr(c.swatchColour)};border:${utils.escapeAttr(c.swatchBorder)};border-radius:50%;display:block;font-size:0;height:34px;line-height:34px;margin:0 auto;padding:0;width:34px">&nbsp;</span>
+        <td class="mwk-colour-swap-swatch-cell" align="center" valign="middle" width="44" height="44" style="font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;vertical-align:middle;width:44px">
+          <span class="mwk-colour-swap-swatch-dot" style="background-color:${utils.escapeAttr(c.swatchColour)};border:${utils.escapeAttr(c.swatchBorder)};border-radius:50%;display:block;font-size:0;height:40px;line-height:40px;margin:0 auto;padding:0;width:40px">&nbsp;</span>
         </td>
       </tr>
     </table>
