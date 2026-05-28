@@ -7,6 +7,7 @@
     <!-- Early SFMC handshake to prevent timeout while scripts load -->
     <script>window.parent.postMessage({method:"handShake",origin:window.location.origin,payload:{tabs:['htmlblock']}},'*');</script>
 
+    <link href="../shared-assets/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="../shared-assets/customblock-styles.css">
     <style>
         body{margin:0;padding:10px;font-family:Arial,sans-serif;background-color:#fff}
@@ -25,7 +26,11 @@
         .field-input.error{border-color:#DB011C}
         .field-error{color:#DB011C;font-size:12px;margin-top:4px;display:none}
         .field-input.error + .field-error{display:block}
-        textarea.field-input{font-family:inherit;line-height:1.4;resize:vertical;min-height:36px;overflow:hidden}
+        .quill-container{background:#fff;border:1px solid #ddd;border-radius:4px}
+        .ql-toolbar{border:none;border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}
+        .ql-container{border:none;border-radius:0 0 4px 4px;font-size:14px}
+        .ql-editor{min-height:60px;padding:12px}
+        .limited-toolbar .ql-editor{min-height:40px}
         .option-selector{display:flex;gap:8px;flex-wrap:wrap}
         .option-button{flex:1;min-width:80px;padding:8px 12px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease;font-size:14px;background:#fff}
         .option-button:hover{border-color:#0074d9;background-color:#f0f8ff}
@@ -120,9 +125,9 @@
         <div class="section-divider">
             <div class="section-title">Content</div>
             <div class="field-group">
-                <label class="field-label" for="subtitle">Subtitle</label>
-                <input type="text" id="subtitle" class="field-input" placeholder="Leave blank to omit" maxlength="120" value="Select colour">
-                <div class="field-hint">Optional small line shown under the product name.</div>
+                <label class="field-label" for="subtitleEditor">Subtitle</label>
+                <div id="subtitleEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
+                <div class="field-hint">Optional small line shown under the product name. Use the line-break button to push text to a new line.</div>
             </div>
         </div>
 
@@ -153,9 +158,9 @@
         <div class="section-divider">
             <div class="section-title">Fallback (Outlook / Gmail / Yahoo)</div>
             <div class="field-group">
-                <label class="field-label" for="fallbackProductName">Fallback product name</label>
-                <textarea id="fallbackProductName" class="field-input" placeholder="Leave blank to omit" maxlength="120" rows="1"></textarea>
-                <div class="field-hint">Press Enter to start a new line.</div>
+                <label class="field-label" for="fallbackProductNameEditor">Fallback product name</label>
+                <div id="fallbackProductNameEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
+                <div class="field-hint">Use the line-break button to push text to a new line.</div>
             </div>
             <div class="field-group">
                 <label class="field-label" for="fallbackImage">Fallback image URL</label>
@@ -195,7 +200,7 @@
             <div class="item-grid">
                 <div class="field-group">
                     <label class="field-label">Product name</label>
-                    <textarea class="field-input" data-field="productName" placeholder="e.g. BOLT™ 100 WHITE" maxlength="120" rows="1"></textarea>
+                    <div class="quill-container limited-toolbar" data-field="productNameEditor" data-lpignore="true"></div>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Swatch label (tooltip)</label>
@@ -232,7 +237,9 @@
         </div>
     </template>
 
+    <script src="../shared-assets/quill.js"></script>
     <script src="../shared-assets/customblock-bundle.js"></script>
+    <script src="../shared-assets/quill-config.js"></script>
     <script>
         'use strict';
 
@@ -285,7 +292,8 @@
             isLoading: false,
             isInitialized: false,
             retryCount: 0,
-            eventListeners: []
+            eventListeners: [],
+            editors: new Map()
         };
         const elements = {};
         let rafId = null;
@@ -334,15 +342,29 @@
                     .replace(/'/g, '&#39;');
             },
             escapeAttr(s) { return this.escapeHtml(s); },
-            // For multi-line text fields: escape HTML, then convert newlines to <br>.
-            // Mirrors the Quill linebreak behaviour used by other modules.
+            // Pass-through for content that has already been sanitised by Quill / sanitizeHtml.
+            // Used for fields that support inline formatting and <br> line breaks.
             textHtml(s) {
-                return this.escapeHtml(s).replace(/\r\n|\r|\n/g, '<br>');
+                return s == null ? '' : String(s);
             },
-            autoSizeTextarea(el) {
-                if (!el) return;
-                el.style.height = 'auto';
-                el.style.height = `${el.scrollHeight}px`;
+            sanitizeHtml(h) {
+                if (!h) return '';
+                const t = document.createElement('div');
+                t.innerHTML = h;
+                Array.from(t.querySelectorAll('script, style')).forEach(e => e.remove());
+                Array.from(t.getElementsByTagName('*')).forEach(e => {
+                    Array.from(e.attributes).forEach(r => {
+                        if (r.name.startsWith('on')) e.removeAttribute(r.name);
+                    });
+                });
+                return t.innerHTML;
+            },
+            cleanupEditor(id) {
+                const editor = state.editors.get(id);
+                if (editor && window.QuillConfigManager) {
+                    QuillConfigManager.cleanup([editor]);
+                    state.editors.delete(id);
+                }
             },
             escapeUrl(s) {
                 const v = String(s == null ? '' : s).trim();
@@ -374,8 +396,8 @@
             elements.productPageLink = document.getElementById('productPageLink');
             elements.buttonLink = document.getElementById('buttonLink');
             elements.buttonText = document.getElementById('buttonText');
-            elements.fallbackProductName = document.getElementById('fallbackProductName');
-            elements.subtitle = document.getElementById('subtitle');
+            elements.fallbackProductNameEditor = document.getElementById('fallbackProductNameEditor');
+            elements.subtitleEditor = document.getElementById('subtitleEditor');
             elements.fallbackImage = document.getElementById('fallbackImage');
             elements.fallbackImageAltText = document.getElementById('fallbackImageAltText');
             elements.itemsContainer = document.getElementById('itemsContainer');
@@ -393,16 +415,22 @@
         // DATA <-> UI
         // =====================================================================
         function readColoursFromUI() {
-            return Array.from(elements.itemsContainer.querySelectorAll('.item'), itemEl => ({
-                id: itemEl.dataset.id,
-                productName: itemEl.querySelector('[data-field="productName"]').value,
-                label: itemEl.querySelector('[data-field="label"]').value,
-                image: itemEl.querySelector('[data-field="image"]').value.trim(),
-                altText: itemEl.querySelector('[data-field="altText"]').value,
-                link: itemEl.querySelector('[data-field="link"]').value.trim(),
-                swatchColour: itemEl.querySelector('[data-field="swatchColour"]').value.trim() || '#cccccc',
-                swatchBorder: itemEl.querySelector('[data-field="swatchBorder"]').value.trim() || 'none'
-            }));
+            return Array.from(elements.itemsContainer.querySelectorAll('.item'), itemEl => {
+                const editor = state.editors.get(`item-${itemEl.dataset.id}-productName`);
+                const productName = editor
+                    ? utils.sanitizeHtml(QuillConfigManager.getCleanContent(editor, true))
+                    : '';
+                return {
+                    id: itemEl.dataset.id,
+                    productName,
+                    label: itemEl.querySelector('[data-field="label"]').value,
+                    image: itemEl.querySelector('[data-field="image"]').value.trim(),
+                    altText: itemEl.querySelector('[data-field="altText"]').value,
+                    link: itemEl.querySelector('[data-field="link"]').value.trim(),
+                    swatchColour: itemEl.querySelector('[data-field="swatchColour"]').value.trim() || '#cccccc',
+                    swatchBorder: itemEl.querySelector('[data-field="swatchBorder"]').value.trim() || 'none'
+                };
+            });
         }
 
         function updateDataFromUI() {
@@ -415,8 +443,12 @@
             state.blockData.productPageLink = elements.productPageLink.value.trim();
             state.blockData.buttonLink = elements.buttonLink.value.trim();
             state.blockData.buttonText = elements.buttonText.value;
-            state.blockData.fallbackProductName = elements.fallbackProductName.value;
-            state.blockData.subtitle = elements.subtitle.value;
+            state.blockData.fallbackProductName = state.editors.get('fallbackProductName')
+                ? utils.sanitizeHtml(QuillConfigManager.getCleanContent(state.editors.get('fallbackProductName'), true))
+                : '';
+            state.blockData.subtitle = state.editors.get('subtitle')
+                ? utils.sanitizeHtml(QuillConfigManager.getCleanContent(state.editors.get('subtitle'), true))
+                : '';
             state.blockData.fallbackImage = elements.fallbackImage.value.trim();
             state.blockData.fallbackImageAltText = elements.fallbackImageAltText.value;
             state.blockData.colours = readColoursFromUI();
@@ -441,6 +473,14 @@
         // =====================================================================
         function renderItemsUI() {
             const colours = utils.getFieldValue('colours') || [];
+
+            // Clean up all existing per-item editors (DOM is fully replaced below)
+            for (const id of Array.from(state.editors.keys())) {
+                if (id.startsWith('item-')) {
+                    utils.cleanupEditor(id);
+                }
+            }
+
             const fragment = document.createDocumentFragment();
 
             colours.forEach((c, index) => {
@@ -453,7 +493,6 @@
                     const el = itemEl.querySelector(`[data-field="${field}"]`);
                     if (el) el.value = value == null ? '' : value;
                 };
-                setVal('productName', c.productName);
                 setVal('label', c.label);
                 setVal('image', c.image);
                 setVal('altText', c.altText);
@@ -481,8 +520,31 @@
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
             elements.addItemBtn.disabled = colours.length >= moduleConfig.maxItems;
-            // Auto-size any multi-line text fields once they're in the DOM.
-            elements.itemsContainer.querySelectorAll('textarea.field-input').forEach(t => utils.autoSizeTextarea(t));
+
+            // Initialise per-item Quill editors for productName using the shared 'title' preset
+            const titleToolbar = QuillConfigManager.TOOLBAR_PRESETS.title;
+            const titleFormats = QuillConfigManager.FORMAT_PRESETS.title;
+            colours.forEach(c => {
+                const editorKey = `item-${c.id}-productName`;
+                const itemEl = elements.itemsContainer.querySelector(`.item[data-id="${c.id}"]`);
+                if (!itemEl) return;
+                const editorDiv = itemEl.querySelector('[data-field="productNameEditor"]');
+                if (!editorDiv) return;
+                const editor = new Quill(editorDiv, QuillConfigManager.createConfig('title', {
+                    placeholder: 'e.g. BOLT™ 100 WHITE',
+                    customToolbar: titleToolbar,
+                    customFormats: titleFormats
+                }));
+                QuillConfigManager.addEmailFormatting(editor);
+                QuillConfigManager.addSpaceCleanupMonitor(editor);
+                QuillConfigManager.addNbspToolbarHandler(editor, 'title', { customToolbar: titleToolbar });
+                QuillConfigManager.addLinebreakToolbarHandler(editor, 'title', { customToolbar: titleToolbar });
+                if (c.productName && String(c.productName).trim()) {
+                    QuillConfigManager.setContent(editor, c.productName);
+                }
+                editor.on('text-change', debouncedUpdateDataFromUI);
+                state.editors.set(editorKey, editor);
+            });
         }
 
         const itemActions = {
@@ -553,9 +615,6 @@
             const itemEl = target.closest('.item');
             if (!itemEl) return;
 
-            // Auto-grow textareas as the user adds line breaks.
-            if (target.tagName === 'TEXTAREA') utils.autoSizeTextarea(target);
-
             // Sync hex picker -> text and vice versa
             if (target.dataset.field === 'swatchColourPicker') {
                 const txt = itemEl.querySelector('[data-field="swatchColour"]');
@@ -621,12 +680,11 @@
             setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
 
             // Generic text inputs
-            ['buttonText', 'fallbackProductName', 'fallbackImageAltText', 'subtitle'].forEach(id => {
+            ['buttonText', 'fallbackImageAltText'].forEach(id => {
                 const el = elements[id];
                 if (!el) return;
                 utils.addEventListenerTracked(el, 'input', () => {
                     state.blockData[id] = el.value;
-                    if (el.tagName === 'TEXTAREA') utils.autoSizeTextarea(el);
                     debouncedRefresh();
                 });
             });
@@ -679,6 +737,35 @@
             utils.addEventListenerTracked(elements.addItemBtn, 'click', handleItemClick);
             utils.addEventListenerTracked(elements.itemsContainer, 'click', handleItemClick);
             utils.addEventListenerTracked(elements.itemsContainer, 'input', handleItemInput);
+        }
+
+        // =====================================================================
+        // QUILL EDITORS (subtitle + fallback product name)
+        // =====================================================================
+        async function initializeEditors() {
+            if (!window.QuillConfigManager) throw new Error('QuillConfigManager not loaded');
+
+            const subtitleEditor = await QuillConfigManager.initializeEditor(
+                elements.subtitleEditor,
+                'title',
+                { placeholder: 'Leave blank to omit', maxLength: 120 }
+            );
+            subtitleEditor.on('text-change', QuillConfigManager.createUpdateHandler(() => {
+                state.blockData.subtitle = utils.sanitizeHtml(QuillConfigManager.getCleanContent(subtitleEditor, true));
+                refreshPreview();
+            }, moduleConfig.debounceDelay));
+            state.editors.set('subtitle', subtitleEditor);
+
+            const fallbackProductNameEditor = await QuillConfigManager.initializeEditor(
+                elements.fallbackProductNameEditor,
+                'title',
+                { placeholder: 'Leave blank to omit', maxLength: 120 }
+            );
+            fallbackProductNameEditor.on('text-change', QuillConfigManager.createUpdateHandler(() => {
+                state.blockData.fallbackProductName = utils.sanitizeHtml(QuillConfigManager.getCleanContent(fallbackProductNameEditor, true));
+                refreshPreview();
+            }, moduleConfig.debounceDelay));
+            state.editors.set('fallbackProductName', fallbackProductNameEditor);
         }
 
         function applyLayoutConstraints() {
@@ -1175,11 +1262,14 @@ ${body}
                     elements.productPageLink.value = state.blockData.productPageLink || '';
                     elements.buttonLink.value = state.blockData.buttonLink || '';
                     elements.buttonText.value = state.blockData.buttonText || '';
-                    elements.fallbackProductName.value = state.blockData.fallbackProductName || '';
-                    elements.subtitle.value = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select colour';
-                    // Resize multi-line text fields to fit their loaded content.
-                    utils.autoSizeTextarea(elements.fallbackProductName);
-                    utils.autoSizeTextarea(elements.subtitle);
+                    if (state.editors.get('fallbackProductName')) {
+                        QuillConfigManager.setContent(state.editors.get('fallbackProductName'), state.blockData.fallbackProductName || '');
+                    }
+                    if (state.editors.get('subtitle')) {
+                        const sub = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select colour';
+                        QuillConfigManager.setContent(state.editors.get('subtitle'), sub);
+                        state.blockData.subtitle = sub;
+                    }
                     elements.fallbackImage.value = state.blockData.fallbackImage || '';
                     elements.fallbackImageAltText.value = state.blockData.fallbackImageAltText || '';
 
@@ -1203,6 +1293,10 @@ ${body}
                 if (element && element.removeEventListener) element.removeEventListener(event, handler);
             });
             state.eventListeners = [];
+            if (window.QuillConfigManager && state.editors.size) {
+                QuillConfigManager.cleanup([...state.editors.values()]);
+                state.editors.clear();
+            }
             if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         }
 
@@ -1215,7 +1309,12 @@ ${body}
                 state.sdk = new window.sfdc.BlockSDK({ tabs: ['htmlblock'] });
                 cacheElements();
                 initializeEventHandlers();
-                loadData();
+                initializeEditors().then(() => {
+                    loadData();
+                }).catch((err) => {
+                    utils.showError(`Editor init failed: ${err.message}`);
+                    loadData();
+                });
                 window.addEventListener('beforeunload', cleanup);
                 document.addEventListener('visibilitychange', () => {
                     if (!document.hidden && state.isInitialized) loadData();
