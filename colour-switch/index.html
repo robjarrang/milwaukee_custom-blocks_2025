@@ -25,6 +25,7 @@
         .field-input.error{border-color:#DB011C}
         .field-error{color:#DB011C;font-size:12px;margin-top:4px;display:none}
         .field-input.error + .field-error{display:block}
+        textarea.field-input{font-family:inherit;line-height:1.4;resize:vertical;min-height:36px;overflow:hidden}
         .option-selector{display:flex;gap:8px;flex-wrap:wrap}
         .option-button{flex:1;min-width:80px;padding:8px 12px;text-align:center;border:2px solid #ddd;border-radius:4px;cursor:pointer;transition:all .2s ease;font-size:14px;background:#fff}
         .option-button:hover{border-color:#0074d9;background-color:#f0f8ff}
@@ -153,7 +154,8 @@
             <div class="section-title">Fallback (Outlook / Gmail / Yahoo)</div>
             <div class="field-group">
                 <label class="field-label" for="fallbackProductName">Fallback product name</label>
-                <input type="text" id="fallbackProductName" class="field-input" placeholder="Leave blank to omit" maxlength="120">
+                <textarea id="fallbackProductName" class="field-input" placeholder="Leave blank to omit" maxlength="120" rows="1"></textarea>
+                <div class="field-hint">Press Enter to start a new line.</div>
             </div>
             <div class="field-group">
                 <label class="field-label" for="fallbackImage">Fallback image URL</label>
@@ -193,7 +195,7 @@
             <div class="item-grid">
                 <div class="field-group">
                     <label class="field-label">Product name</label>
-                    <input type="text" class="field-input" data-field="productName" placeholder="e.g. BOLT™ 100 WHITE" maxlength="120">
+                    <textarea class="field-input" data-field="productName" placeholder="e.g. BOLT™ 100 WHITE" maxlength="120" rows="1"></textarea>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Swatch label (tooltip)</label>
@@ -332,6 +334,16 @@
                     .replace(/'/g, '&#39;');
             },
             escapeAttr(s) { return this.escapeHtml(s); },
+            // For multi-line text fields: escape HTML, then convert newlines to <br>.
+            // Mirrors the Quill linebreak behaviour used by other modules.
+            textHtml(s) {
+                return this.escapeHtml(s).replace(/\r\n|\r|\n/g, '<br>');
+            },
+            autoSizeTextarea(el) {
+                if (!el) return;
+                el.style.height = 'auto';
+                el.style.height = `${el.scrollHeight}px`;
+            },
             escapeUrl(s) {
                 const v = String(s == null ? '' : s).trim();
                 // Allow http(s) URLs and AMPscript only
@@ -469,6 +481,8 @@
             elements.itemsContainer.replaceChildren();
             elements.itemsContainer.appendChild(fragment);
             elements.addItemBtn.disabled = colours.length >= moduleConfig.maxItems;
+            // Auto-size any multi-line text fields once they're in the DOM.
+            elements.itemsContainer.querySelectorAll('textarea.field-input').forEach(t => utils.autoSizeTextarea(t));
         }
 
         const itemActions = {
@@ -538,6 +552,9 @@
             if (!target.matches('[data-field]')) return;
             const itemEl = target.closest('.item');
             if (!itemEl) return;
+
+            // Auto-grow textareas as the user adds line breaks.
+            if (target.tagName === 'TEXTAREA') utils.autoSizeTextarea(target);
 
             // Sync hex picker -> text and vice versa
             if (target.dataset.field === 'swatchColourPicker') {
@@ -609,6 +626,7 @@
                 if (!el) return;
                 utils.addEventListenerTracked(el, 'input', () => {
                     state.blockData[id] = el.value;
+                    if (el.tagName === 'TEXTAREA') utils.autoSizeTextarea(el);
                     debouncedRefresh();
                 });
             });
@@ -870,10 +888,10 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             let nameBlock = '';
             if (withName && (c.productName || s.subtitle)) {
                 const titleHtml = c.productName
-                    ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`
+                    ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(c.productName)}</h2>`
                     : '';
                 const subtitleHtml = s.subtitle
-                    ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>`
+                    ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-align:center;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.subtitle)}</div>`
                     : '';
                 const between = (c.productName && s.subtitle) ? spacer(6) : '';
                 nameBlock = `
@@ -890,10 +908,10 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
         function buildCompactNamePanel(s, c) {
             const visibility = c.index === 1 ? 'display:block' : 'display:none;max-height:0;overflow:hidden';
             const name = c.productName
-                ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(c.productName)}</h2>`
+                ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(c.productName)}</h2>`
                 : '';
             const subtitle = s.subtitle
-                ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>`
+                ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.subtitle)}</div>`
                 : '';
             const between = (c.productName && s.subtitle) ? spacer(4) : '';
             return `<div class="mwk-colour-swap-panel mwk-colour-swap-panel-${c.index}" style="${visibility}">${name}${between}${subtitle}</div>`;
@@ -920,7 +938,7 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
         <tr><td>${spacer(18)}</td></tr>
         <tr>
           <td class="mobile-text-center" align="center" style="text-align:center">
-            ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(6) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>` : ''}
+            ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(6) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.subtitle)}</div>` : ''}
           </td>
         </tr>` : '';
 
@@ -990,7 +1008,7 @@ ${swatches}
             const fallbackNameBlock = (s.fallbackProductName || s.subtitle) ? `
                     <tr>
                       <td class="mobile-text-center" align="center" style="text-align:center">
-                        ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(4) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.escapeHtml(s.subtitle)}</div>` : ''}
+                        ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(4) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.subtitle)}</div>` : ''}
                       </td>
                     </tr>
                     <tr><td>${spacer(18)}</td></tr>` : '';
@@ -1159,6 +1177,9 @@ ${body}
                     elements.buttonText.value = state.blockData.buttonText || '';
                     elements.fallbackProductName.value = state.blockData.fallbackProductName || '';
                     elements.subtitle.value = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select colour';
+                    // Resize multi-line text fields to fit their loaded content.
+                    utils.autoSizeTextarea(elements.fallbackProductName);
+                    utils.autoSizeTextarea(elements.subtitle);
                     elements.fallbackImage.value = state.blockData.fallbackImage || '';
                     elements.fallbackImageAltText.value = state.blockData.fallbackImageAltText || '';
 
