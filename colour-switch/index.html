@@ -175,7 +175,7 @@
 
         <!-- COLOUR OPTIONS -->
         <div class="section-divider">
-            <div class="section-title">Colour options</div>
+            <div class="section-title">Options</div>
             <div class="field-group">
                 <label class="field-label">Selector style</label>
                 <div class="option-selector" id="selectorStyleSelector">
@@ -184,7 +184,7 @@
                 </div>
                 <div class="field-hint">Choose whether the interactive controls use coloured circles or thumbnail images.</div>
             </div>
-            <div class="field-hint" style="margin-bottom:10px">Add 1 to 10 colour variants. Each requires an image. Swatches also require a colour; thumbnails can use an optional thumbnail URL or fall back to the main image.</div>
+            <div class="field-hint" style="margin-bottom:10px">Add 1 to 10 product variants. Each requires an image. Swatches also require a colour; thumbnails can use an optional thumbnail URL or fall back to the main image.</div>
             <div id="itemsContainer" class="items-container"></div>
             <button id="addItemBtn" class="btn add-item-btn">Add option</button>
         </div>
@@ -212,7 +212,7 @@
                 </div>
                 <div class="field-group">
                     <label class="field-label">Option label (tooltip)</label>
-                    <input type="text" class="field-input" data-field="label" placeholder="e.g. White" maxlength="60">
+                    <input type="text" class="field-input" data-field="label" placeholder="e.g. Option 1" maxlength="60">
                 </div>
                 <div class="field-group" style="grid-column:1/-1">
                     <label class="field-label">Image URL</label>
@@ -279,16 +279,16 @@
                 buttonLink: { type: 'url', defaultValue: '' },
                 buttonText: { type: 'text', defaultValue: 'View product' },
                 fallbackProductName: { type: 'text', defaultValue: '' },
-                subtitle: { type: 'text', defaultValue: 'Select colour' },
+                subtitle: { type: 'text', defaultValue: 'Select option' },
                 fallbackImage: { type: 'url', defaultValue: 'https://placehold.co/1160x1160/cccccc/333333/png?text=580x580+(x2)' },
                 fallbackImageAltText: { type: 'text', defaultValue: '' },
                 colours: {
                     type: 'list',
                     defaultValue: [
-                        { id: crypto.randomUUID(), productName: 'PRODUCT WHITE',  image: 'https://placehold.co/760x760/f2f2f2/333333/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product white',  label: 'White',  link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT YELLOW', image: 'https://placehold.co/760x760/F7D100/333333/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product yellow', label: 'Yellow', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT BLUE',   image: 'https://placehold.co/760x760/26366F/FFFFFF/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product blue',   label: 'Blue',   link: '', swatchColour: '#26366F', swatchBorder: 'none' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT GREEN',  image: 'https://placehold.co/760x760/00965E/FFFFFF/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product green',  label: 'Green',  link: '', swatchColour: '#00965E', swatchBorder: 'none' }
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 1', image: 'https://placehold.co/760x760/f2f2f2/333333/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 1', label: 'Option 1', link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 2', image: 'https://placehold.co/760x760/F7D100/333333/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 2', label: 'Option 2', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 3', image: 'https://placehold.co/760x760/26366F/FFFFFF/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 3', label: 'Option 3', link: '', swatchColour: '#26366F', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 4', image: 'https://placehold.co/760x760/00965E/FFFFFF/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 4', label: 'Option 4', link: '', swatchColour: '#00965E', swatchBorder: 'none' }
                     ]
                 }
             },
@@ -678,6 +678,27 @@
             debouncedUpdateDataFromUI();
         }
 
+
+        function normaliseDefaultCopyForThumbnailMode(colours) {
+            const legacyDefaults = [
+                { productName: 'PRODUCT WHITE', altText: 'Product white', label: 'White' },
+                { productName: 'PRODUCT YELLOW', altText: 'Product yellow', label: 'Yellow' },
+                { productName: 'PRODUCT BLUE', altText: 'Product blue', label: 'Blue' },
+                { productName: 'PRODUCT GREEN', altText: 'Product green', label: 'Green' }
+            ];
+
+            return colours.map((c, index) => {
+                const legacy = legacyDefaults[index];
+                if (!legacy) return c;
+
+                const next = { ...c };
+                if (next.productName === legacy.productName) next.productName = `PRODUCT OPTION ${index + 1}`;
+                if (next.altText === legacy.altText) next.altText = `Product option ${index + 1}`;
+                if (next.label === legacy.label) next.label = `Option ${index + 1}`;
+                return next;
+            });
+        }
+
         // =====================================================================
         // EVENT HANDLERS (top-level fields)
         // =====================================================================
@@ -691,6 +712,10 @@
                         selectorEl.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
                         b.classList.add('selected');
                         state.blockData[key] = b.dataset.value;
+                        if (key === 'selectorStyle' && b.dataset.value === 'thumbnails') {
+                            state.blockData.colours = normaliseDefaultCopyForThumbnailMode(readColoursFromUI());
+                            renderItemsUI();
+                        }
                         // Adjust constraints if layout changes
                         if (key === 'layout') applyLayoutConstraints();
                         refreshPreview();
@@ -1318,7 +1343,7 @@ ${body}
                         QuillConfigManager.setContent(state.editors.get('fallbackProductName'), state.blockData.fallbackProductName || '');
                     }
                     if (state.editors.get('subtitle')) {
-                        const sub = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select colour';
+                        const sub = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select option';
                         QuillConfigManager.setContent(state.editors.get('subtitle'), sub);
                         state.blockData.subtitle = sub;
                     }
