@@ -42,7 +42,7 @@
         .item{background:#fafafa;padding:15px;border:1px solid #ddd;border-radius:6px;position:relative}
         .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
         .item-title{font-weight:bold;font-size:15px;margin:0;display:flex;align-items:center;gap:10px}
-        .item-swatch-preview{display:inline-block;width:24px;height:24px;border-radius:50%;border:1px solid #ccc;vertical-align:middle}
+        .item-swatch-preview{display:inline-block;width:24px;height:24px;border-radius:50%;border:1px solid #ccc;vertical-align:middle;background-position:center;background-size:cover}
         .item-controls{display:flex;gap:6px}
         .item-control-btn{background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;padding:4px 8px;font-size:14px;line-height:1;color:#555;transition:all .2s}
         .item-control-btn:hover{color:#0074d9;border-color:#0074d9}
@@ -104,7 +104,7 @@
             <div class="section-title">Sizing</div>
             <div class="field-row">
                 <div class="field-group">
-                    <label class="field-label" for="coloursPerRow">Swatches per row</label>
+                    <label class="field-label" for="coloursPerRow">Options per row</label>
                     <input type="number" id="coloursPerRow" class="field-input" min="1" max="5" step="1" value="4">
                     <div class="field-hint">Full width: 1-5. Compact: 1-4.</div>
                 </div>
@@ -175,10 +175,18 @@
 
         <!-- COLOUR OPTIONS -->
         <div class="section-divider">
-            <div class="section-title">Colour options</div>
-            <div class="field-hint" style="margin-bottom:10px">Add 1 to 10 colour variants. Each requires an image and a swatch colour.</div>
+            <div class="section-title">Options</div>
+            <div class="field-group">
+                <label class="field-label">Selector style</label>
+                <div class="option-selector" id="selectorStyleSelector">
+                    <div class="option-button selected" data-value="swatches">Colour swatches</div>
+                    <div class="option-button" data-value="thumbnails">Image thumbnails</div>
+                </div>
+                <div class="field-hint">Choose whether the interactive controls use coloured circles or thumbnail images.</div>
+            </div>
+            <div class="field-hint" style="margin-bottom:10px">Add 1 to 10 product variants. Each requires an image. Swatches also require a colour; thumbnails can use an optional thumbnail URL or fall back to the main image.</div>
             <div id="itemsContainer" class="items-container"></div>
-            <button id="addItemBtn" class="btn add-item-btn">Add colour option</button>
+            <button id="addItemBtn" class="btn add-item-btn">Add option</button>
         </div>
     </div>
 
@@ -188,7 +196,7 @@
             <div class="item-header">
                 <h3 class="item-title">
                     <span class="item-swatch-preview" data-field="swatchPreview"></span>
-                    <span class="item-title-text">Colour</span>
+                    <span class="item-title-text">Option</span>
                 </h3>
                 <div class="item-controls">
                     <button type="button" class="item-control-btn move-up-btn" title="Move up">▲</button>
@@ -203,8 +211,8 @@
                     <div class="quill-container limited-toolbar" data-field="productNameEditor" data-lpignore="true"></div>
                 </div>
                 <div class="field-group">
-                    <label class="field-label">Swatch label (tooltip)</label>
-                    <input type="text" class="field-input" data-field="label" placeholder="e.g. White" maxlength="60">
+                    <label class="field-label">Option label (tooltip)</label>
+                    <input type="text" class="field-input" data-field="label" placeholder="e.g. Option 1" maxlength="60">
                 </div>
                 <div class="field-group" style="grid-column:1/-1">
                     <label class="field-label">Image URL</label>
@@ -214,6 +222,12 @@
                 <div class="field-group" style="grid-column:1/-1">
                     <label class="field-label">Image alt text</label>
                     <input type="text" class="field-input" data-field="altText" maxlength="200">
+                </div>
+                <div class="field-group" style="grid-column:1/-1">
+                    <label class="field-label">Thumbnail image URL (optional)</label>
+                    <input type="url" class="field-input" data-field="thumbnailImage" placeholder="Leave blank to use the main image">
+                    <div class="field-error">Please enter a valid URL.</div>
+                    <div class="field-hint">Used only when selector style is set to image thumbnails.</div>
                 </div>
                 <div class="field-group" style="grid-column:1/-1">
                     <label class="field-label">Link URL (optional)</label>
@@ -257,6 +271,7 @@
                 layout: { type: 'text', defaultValue: 'full' },
                 compactImageAlignment: { type: 'text', defaultValue: 'right' },
                 backgroundColour: { type: 'text', defaultValue: 'black' },
+                selectorStyle: { type: 'text', defaultValue: 'swatches' },
                 coloursPerRow: { type: 'number', defaultValue: 4 },
                 imageWidth: { type: 'number', defaultValue: 380 },
                 fallbackImageWidth: { type: 'number', defaultValue: 580 },
@@ -264,16 +279,16 @@
                 buttonLink: { type: 'url', defaultValue: '' },
                 buttonText: { type: 'text', defaultValue: 'View product' },
                 fallbackProductName: { type: 'text', defaultValue: '' },
-                subtitle: { type: 'text', defaultValue: 'Select colour' },
+                subtitle: { type: 'text', defaultValue: 'Select option' },
                 fallbackImage: { type: 'url', defaultValue: 'https://placehold.co/1160x1160/cccccc/333333/png?text=580x580+(x2)' },
                 fallbackImageAltText: { type: 'text', defaultValue: '' },
                 colours: {
                     type: 'list',
                     defaultValue: [
-                        { id: crypto.randomUUID(), productName: 'PRODUCT WHITE',  image: 'https://placehold.co/760x760/f2f2f2/333333/png?text=380x380+(x2)', altText: 'Product white',  label: 'White',  link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT YELLOW', image: 'https://placehold.co/760x760/F7D100/333333/png?text=380x380+(x2)', altText: 'Product yellow', label: 'Yellow', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT BLUE',   image: 'https://placehold.co/760x760/26366F/FFFFFF/png?text=380x380+(x2)', altText: 'Product blue',   label: 'Blue',   link: '', swatchColour: '#26366F', swatchBorder: 'none' },
-                        { id: crypto.randomUUID(), productName: 'PRODUCT GREEN',  image: 'https://placehold.co/760x760/00965E/FFFFFF/png?text=380x380+(x2)', altText: 'Product green',  label: 'Green',  link: '', swatchColour: '#00965E', swatchBorder: 'none' }
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 1', image: 'https://placehold.co/760x760/f2f2f2/333333/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 1', label: 'Option 1', link: '', swatchColour: '#f2f2f2', swatchBorder: '1px solid #cccccc' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 2', image: 'https://placehold.co/760x760/F7D100/333333/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 2', label: 'Option 2', link: '', swatchColour: '#F7D100', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 3', image: 'https://placehold.co/760x760/26366F/FFFFFF/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 3', label: 'Option 3', link: '', swatchColour: '#26366F', swatchBorder: 'none' },
+                        { id: crypto.randomUUID(), productName: 'PRODUCT OPTION 4', image: 'https://placehold.co/760x760/00965E/FFFFFF/png?text=380x380+(x2)', thumbnailImage: '', altText: 'Product option 4', label: 'Option 4', link: '', swatchColour: '#00965E', swatchBorder: 'none' }
                     ]
                 }
             },
@@ -390,6 +405,7 @@
             elements.compactImageAlignmentSelector = document.getElementById('compactImageAlignmentSelector');
             elements.compactImageAlignmentGroup = document.getElementById('compactImageAlignmentGroup');
             elements.backgroundColourSelector = document.getElementById('backgroundColourSelector');
+            elements.selectorStyleSelector = document.getElementById('selectorStyleSelector');
             elements.coloursPerRow = document.getElementById('coloursPerRow');
             elements.imageWidth = document.getElementById('imageWidth');
             elements.fallbackImageWidth = document.getElementById('fallbackImageWidth');
@@ -425,6 +441,7 @@
                     productName,
                     label: itemEl.querySelector('[data-field="label"]').value,
                     image: itemEl.querySelector('[data-field="image"]').value.trim(),
+                    thumbnailImage: itemEl.querySelector('[data-field="thumbnailImage"]').value.trim(),
                     altText: itemEl.querySelector('[data-field="altText"]').value,
                     link: itemEl.querySelector('[data-field="link"]').value.trim(),
                     swatchColour: itemEl.querySelector('[data-field="swatchColour"]').value.trim() || '#cccccc',
@@ -437,6 +454,7 @@
             state.blockData.layout = getSelectorValue(elements.layoutSelector, 'full');
             state.blockData.compactImageAlignment = getSelectorValue(elements.compactImageAlignmentSelector, 'right');
             state.blockData.backgroundColour = getSelectorValue(elements.backgroundColourSelector, 'black');
+            state.blockData.selectorStyle = getSelectorValue(elements.selectorStyleSelector, 'swatches');
             state.blockData.coloursPerRow = parseInt(elements.coloursPerRow.value, 10) || moduleConfig.fields.coloursPerRow.defaultValue;
             state.blockData.imageWidth = parseInt(elements.imageWidth.value, 10) || moduleConfig.fields.imageWidth.defaultValue;
             state.blockData.fallbackImageWidth = parseInt(elements.fallbackImageWidth.value, 10) || 0;
@@ -487,7 +505,7 @@
                 const frag = elements.itemTemplate.content.cloneNode(true);
                 const itemEl = frag.querySelector('.item');
                 itemEl.dataset.id = c.id;
-                itemEl.querySelector('.item-title-text').textContent = `Colour ${index + 1}${c.label ? ' — ' + c.label : ''}`;
+                itemEl.querySelector('.item-title-text').textContent = `Option ${index + 1}${c.label ? ' — ' + c.label : ''}`;
 
                 const setVal = (field, value) => {
                     const el = itemEl.querySelector(`[data-field="${field}"]`);
@@ -495,6 +513,7 @@
                 };
                 setVal('label', c.label);
                 setVal('image', c.image);
+                setVal('thumbnailImage', c.thumbnailImage);
                 setVal('altText', c.altText);
                 setVal('link', c.link);
                 setVal('swatchColour', c.swatchColour);
@@ -507,6 +526,8 @@
                 const preview = itemEl.querySelector('[data-field="swatchPreview"]');
                 if (preview) {
                     preview.style.backgroundColor = c.swatchColour || '#cccccc';
+                    preview.style.backgroundImage = c.thumbnailImage ? `url(${c.thumbnailImage})` : '';
+                    if (c.thumbnailImage) preview.style.borderRadius = '4px';
                     if (c.swatchBorder && c.swatchBorder !== 'none') preview.style.border = c.swatchBorder;
                 }
 
@@ -578,6 +599,7 @@
                     id: crypto.randomUUID(),
                     productName: '',
                     image: '',
+                    thumbnailImage: '',
                     altText: '',
                     label: '',
                     link: '',
@@ -649,11 +671,32 @@
                 if (titleEl) {
                     const items = readColoursFromUI();
                     const idx = items.findIndex(i => i.id === itemEl.dataset.id);
-                    if (idx !== -1) titleEl.textContent = `Colour ${idx + 1}${target.value ? ' — ' + target.value : ''}`;
+                    if (idx !== -1) titleEl.textContent = `Option ${idx + 1}${target.value ? ' — ' + target.value : ''}`;
                 }
             }
 
             debouncedUpdateDataFromUI();
+        }
+
+
+        function normaliseDefaultCopyForThumbnailMode(colours) {
+            const legacyDefaults = [
+                { productName: 'PRODUCT WHITE', altText: 'Product white', label: 'White' },
+                { productName: 'PRODUCT YELLOW', altText: 'Product yellow', label: 'Yellow' },
+                { productName: 'PRODUCT BLUE', altText: 'Product blue', label: 'Blue' },
+                { productName: 'PRODUCT GREEN', altText: 'Product green', label: 'Green' }
+            ];
+
+            return colours.map((c, index) => {
+                const legacy = legacyDefaults[index];
+                if (!legacy) return c;
+
+                const next = { ...c };
+                if (next.productName === legacy.productName) next.productName = `PRODUCT OPTION ${index + 1}`;
+                if (next.altText === legacy.altText) next.altText = `Product option ${index + 1}`;
+                if (next.label === legacy.label) next.label = `Option ${index + 1}`;
+                return next;
+            });
         }
 
         // =====================================================================
@@ -669,6 +712,10 @@
                         selectorEl.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
                         b.classList.add('selected');
                         state.blockData[key] = b.dataset.value;
+                        if (key === 'selectorStyle' && b.dataset.value === 'thumbnails') {
+                            state.blockData.colours = normaliseDefaultCopyForThumbnailMode(readColoursFromUI());
+                            renderItemsUI();
+                        }
                         // Adjust constraints if layout changes
                         if (key === 'layout') applyLayoutConstraints();
                         refreshPreview();
@@ -678,6 +725,7 @@
             setupOptionSelector(elements.layoutSelector, 'layout');
             setupOptionSelector(elements.compactImageAlignmentSelector, 'compactImageAlignment');
             setupOptionSelector(elements.backgroundColourSelector, 'backgroundColour');
+            setupOptionSelector(elements.selectorStyleSelector, 'selectorStyle');
 
             // Generic text inputs
             ['buttonText', 'fallbackImageAltText'].forEach(id => {
@@ -827,14 +875,16 @@
                 productName: c.productName || '',
                 image: c.image || '',
                 altText: c.altText || '',
-                label: c.label || `Colour ${i + 1}`,
+                label: c.label || `Option ${i + 1}`,
                 link: (c.link && c.link.trim()) ? c.link.trim() : productPageLink,
+                thumbnailImage: (c.thumbnailImage && c.thumbnailImage.trim()) ? c.thumbnailImage.trim() : (c.image || ''),
                 swatchColour: c.swatchColour || '#cccccc',
                 swatchBorder: c.swatchBorder || 'none'
             }));
 
             return {
                 layout, isCompact, moduleName,
+                selectorStyle: utils.getFieldValue('selectorStyle') === 'thumbnails' ? 'thumbnails' : 'swatches',
                 compactImageAlignment,
                 compactDir: isCompact && compactImageAlignment === 'right' ? ' dir="rtl"' : '',
                 moduleClass: `mwk-${moduleName}-interactive`,
@@ -861,7 +911,7 @@
             const swatchRules = [];
             for (let i = 1; i <= 10; i++) {
                 panelRules.push(`#${m}-colour-option-${i}:checked ~ .${cls} .mwk-colour-swap-panel-${i}`);
-                swatchRules.push(`#${m}-colour-option-${i}:checked ~ .${cls} .mwk-colour-swap-swatch-${i}`);
+                swatchRules.push(`#${m}-colour-option-${i}:checked ~ .${cls} .mwk-colour-swap-swatch-${i}, #${m}-colour-option-${i}:checked ~ .${cls} .mwk-colour-swap-thumb-${i}`);
             }
             return `<style type="text/css">
 .mwk-colour-swap-fallback{display:table;width:620px}
@@ -873,6 +923,9 @@
 .mwk-colour-swap-swatch{border:2px solid transparent;border-collapse:separate !important;border-spacing:0 !important;border-radius:50%;cursor:pointer;height:48px;width:48px}
 .mwk-colour-swap-swatch-cell{font-size:0;height:44px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;vertical-align:middle;width:44px}
 .mwk-colour-swap-swatch-dot{border-radius:50%;display:block;font-size:0;height:40px;line-height:40px;margin:0 auto;padding:0;width:40px}
+.mwk-colour-swap-thumb{border:2px solid transparent;border-collapse:separate !important;border-radius:4px;cursor:pointer;height:58px;width:58px}
+.mwk-colour-swap-thumb-cell{font-size:0;height:54px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;width:54px}
+.mwk-colour-swap-thumb-img{border:none;display:block;height:auto;margin:0 auto;outline:none;text-decoration:none;width:54px}
 @media screen and (-webkit-min-device-pixel-ratio:0){
 .mwk-colour-swap-fallback{display:none !important;max-height:0 !important;max-width:0 !important;overflow:hidden !important;visibility:hidden !important}
 .mwk-colour-swap-interactive{display:table !important;max-height:none !important;max-width:inherit !important;overflow:visible !important;visibility:inherit !important}
@@ -896,6 +949,9 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
 .mwk-colour-swap-swatch{height:42px !important;width:42px !important}
 .mwk-colour-swap-swatch-cell{height:38px !important;width:38px !important}
 .mwk-colour-swap-swatch-dot{height:34px !important;line-height:34px !important;width:34px !important}
+.mwk-colour-swap-thumb{height:52px !important;width:52px !important}
+.mwk-colour-swap-thumb-cell{height:48px !important;width:48px !important}
+.mwk-colour-swap-thumb-img{width:48px !important}
 }
 </style>
 <style type="text/css">
@@ -950,12 +1006,31 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
 </td>`;
         }
 
+        function buildThumbnailCell(s, c) {
+            const i = c.index;
+            return `<td align="center" valign="middle" style="padding:0 4px;font-size:0;line-height:0">
+  <label for="${s.moduleName}-colour-option-${i}" title="${utils.escapeAttr(c.label)}" style="cursor:pointer;display:block">
+    <table role="presentation" class="mwk-colour-swap-thumb mwk-colour-swap-thumb-${i}" align="center" border="0" cellspacing="0" cellpadding="0" width="58" height="58" style="border:2px solid transparent;border-collapse:separate !important;border-radius:4px;cursor:pointer;height:58px;width:58px">
+      <tr>
+        <td class="mwk-colour-swap-thumb-cell" align="center" valign="middle" width="54" height="54" style="font-size:0;height:54px;line-height:0;mso-line-height-rule:exactly;padding:0;text-align:center;width:54px">
+          <img class="mwk-colour-swap-thumb-img" src="${utils.escapeAttr(c.thumbnailImage)}" alt="${utils.escapeAttr(c.label)}" width="54" style="border:none;display:block;height:auto;margin:0 auto;outline:none;text-decoration:none;width:54px">
+        </td>
+      </tr>
+    </table>
+  </label>
+</td>`;
+        }
+
+        function buildSelectorCell(s, c) {
+            return s.selectorStyle === 'thumbnails' ? buildThumbnailCell(s, c) : buildSwatchCell(s, c);
+        }
+
         function buildSwatchGrid(s) {
             // Open the first row's table.
             const parts = [];
             parts.push('<table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr>');
             s.colours.forEach((c, idx) => {
-                parts.push(buildSwatchCell(s, c));
+                parts.push(buildSelectorCell(s, c));
                 const isRowEnd = ((idx + 1) % s.coloursPerRow === 0) && (idx + 1 < s.colours.length);
                 if (isRowEnd) {
                     parts.push('</tr></table>');
@@ -1242,6 +1317,7 @@ ${body}
                             if (!c.id) c.id = crypto.randomUUID();
                             if (c.productName == null) c.productName = '';
                             if (c.image == null) c.image = '';
+                            if (c.thumbnailImage == null) c.thumbnailImage = '';
                             if (c.altText == null) c.altText = '';
                             if (c.label == null) c.label = '';
                             if (c.link == null) c.link = '';
@@ -1256,6 +1332,7 @@ ${body}
                     setSelectorValue(elements.layoutSelector, state.blockData.layout || 'full');
                     setSelectorValue(elements.compactImageAlignmentSelector, state.blockData.compactImageAlignment || 'right');
                     setSelectorValue(elements.backgroundColourSelector, state.blockData.backgroundColour || 'black');
+                    setSelectorValue(elements.selectorStyleSelector, state.blockData.selectorStyle || 'swatches');
                     elements.coloursPerRow.value = state.blockData.coloursPerRow;
                     elements.imageWidth.value = state.blockData.imageWidth;
                     elements.fallbackImageWidth.value = state.blockData.fallbackImageWidth || 0;
@@ -1266,7 +1343,7 @@ ${body}
                         QuillConfigManager.setContent(state.editors.get('fallbackProductName'), state.blockData.fallbackProductName || '');
                     }
                     if (state.editors.get('subtitle')) {
-                        const sub = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select colour';
+                        const sub = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select option';
                         QuillConfigManager.setContent(state.editors.get('subtitle'), sub);
                         state.blockData.subtitle = sub;
                     }
