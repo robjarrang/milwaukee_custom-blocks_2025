@@ -43,6 +43,7 @@
         .item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
         .item-title{font-weight:bold;font-size:15px;margin:0;display:flex;align-items:center;gap:10px}
         .item-swatch-preview{display:inline-block;width:24px;height:24px;border-radius:50%;border:1px solid #ccc;vertical-align:middle;background-position:center;background-size:cover}
+        .item.thumbnail-mode [data-swatch-only]{display:none !important}
         .item-controls{display:flex;gap:6px}
         .item-control-btn{background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;padding:4px 8px;font-size:14px;line-height:1;color:#555;transition:all .2s}
         .item-control-btn:hover{color:#0074d9;border-color:#0074d9}
@@ -195,7 +196,7 @@
         <div class="item">
             <div class="item-header">
                 <h3 class="item-title">
-                    <span class="item-swatch-preview" data-field="swatchPreview"></span>
+                    <span class="item-swatch-preview" data-field="swatchPreview" data-swatch-only></span>
                     <span class="item-title-text">Option</span>
                 </h3>
                 <div class="item-controls">
@@ -233,16 +234,16 @@
                     <label class="field-label">Link URL (optional)</label>
                     <input type="url" class="field-input" data-field="link" placeholder="Leave blank to use main link">
                     <div class="field-error">Please enter a valid URL.</div>
-                    <div class="field-hint">Used for both the image and the button when this colour is selected.</div>
+                    <div class="field-hint">Used for both the image and the button when this option is selected.</div>
                 </div>
-                <div class="field-group">
+                <div class="field-group" data-swatch-only>
                     <label class="field-label">Swatch colour</label>
                     <div class="colour-input-wrap">
                         <input type="color" data-field="swatchColourPicker" value="#cccccc">
                         <input type="text" class="field-input" data-field="swatchColour" placeholder="#cccccc" maxlength="32">
                     </div>
                 </div>
-                <div class="field-group">
+                <div class="field-group" data-swatch-only>
                     <label class="field-label">Swatch border</label>
                     <input type="text" class="field-input" data-field="swatchBorder" placeholder='none or "1px solid #cccccc"' maxlength="60">
                     <div class="field-hint">Use <code>none</code> or a CSS border (e.g. <code>1px solid #cccccc</code>).</div>
@@ -491,6 +492,7 @@
         // =====================================================================
         function renderItemsUI() {
             const colours = utils.getFieldValue('colours') || [];
+            const isThumbnailMode = utils.getFieldValue('selectorStyle') === 'thumbnails';
 
             // Clean up all existing per-item editors (DOM is fully replaced below)
             for (const id of Array.from(state.editors.keys())) {
@@ -505,6 +507,7 @@
                 const frag = elements.itemTemplate.content.cloneNode(true);
                 const itemEl = frag.querySelector('.item');
                 itemEl.dataset.id = c.id;
+                itemEl.classList.toggle('thumbnail-mode', isThumbnailMode);
                 itemEl.querySelector('.item-title-text').textContent = `Option ${index + 1}${c.label ? ' — ' + c.label : ''}`;
 
                 const setVal = (field, value) => {
@@ -712,8 +715,11 @@
                         selectorEl.querySelectorAll('.option-button').forEach(o => o.classList.remove('selected'));
                         b.classList.add('selected');
                         state.blockData[key] = b.dataset.value;
-                        if (key === 'selectorStyle' && b.dataset.value === 'thumbnails') {
-                            state.blockData.colours = normaliseDefaultCopyForThumbnailMode(readColoursFromUI());
+                        if (key === 'selectorStyle') {
+                            state.blockData.colours = readColoursFromUI();
+                            if (b.dataset.value === 'thumbnails') {
+                                state.blockData.colours = normaliseDefaultCopyForThumbnailMode(state.blockData.colours);
+                            }
                             renderItemsUI();
                         }
                         // Adjust constraints if layout changes
