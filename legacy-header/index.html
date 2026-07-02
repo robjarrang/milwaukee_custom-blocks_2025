@@ -279,6 +279,11 @@ SET @FallbackImageURL = "https://image.s50.sfmc-content.com/lib/fe30117175640478
 
 /* Dynamic mode - Content Block checks subscriber profile attributes and sets URLs */
 ]%%--><!--%%=ContentBlockById("799765")=%%--><!--%%[
+/* Hide trade badge for Bulgarian culture */
+IF Lowercase(@UserCulture) == "bg-bg" THEN
+    SET @ShowBadge = "false"
+ENDIF
+
 /* Hide badge if no trade was determined, image is missing, or fallback image is used */
 IF Empty(@LogoImageURL) OR @LogoImageURL == @FallbackImageURL OR @LogoType == "Generic" THEN
     SET @ShowBadge = "false"
@@ -328,6 +333,11 @@ SET @FallbackImageURL = "https://image.s50.sfmc-content.com/lib/fe30117175640478
 
 /* Content Block handles URL lookup for trade logo */
 ]%%--><!--%%=ContentBlockById("799765")=%%--><!--%%[
+/* Hide trade badge for Bulgarian culture */
+IF Lowercase(@UserCulture) == "bg-bg" THEN
+    SET @ShowBadge = "false"
+ENDIF
+
 /* If image is missing or fallback was used, show the English version instead */
 IF Empty(@LogoImageURL) OR @LogoImageURL == @FallbackImageURL THEN
     SET @LogoImageURL = "${enGbFallback}"
