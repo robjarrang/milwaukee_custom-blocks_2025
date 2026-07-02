@@ -367,14 +367,11 @@
                 const starFullUrl = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/823420e3-81ac-4d1e-837f-ee4c009e8d59.png';
                 const starHalfUrl = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/5374e461-d11d-43be-8e12-016a0fc3ebe1.png';
                 const fullStarCount = starRating === '4.5' ? 4 : parseInt(starRating, 10);
-                let starIconsHtml = '';
-                for (let i = 0; i < fullStarCount; i++) {
-                    starIconsHtml += `<img alt="Star" src="${starFullUrl}" style="border:none;display:inline-block;outline:none;text-decoration:none;vertical-align:middle;width:20px;height:20px;" width="20" height="20">`;
-                }
-                if (starRating === '4.5') {
-                    starIconsHtml += `<img alt="Half Star" src="${starHalfUrl}" style="border:none;display:inline-block;outline:none;text-decoration:none;vertical-align:middle;width:20px;height:20px;" width="20" height="20">`;
-                }
-                starsHtml = `<tr><td align="center"><a href="${buttonLink}" style="text-decoration:none;" target="_blank">${starIconsHtml}</a></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>`;
+                const starUrls = [];
+                for (let i = 0; i < fullStarCount; i++) { starUrls.push(starFullUrl); }
+                if (starRating === '4.5') { starUrls.push(starHalfUrl); }
+                const starCellsHtml = starUrls.map((url, i) => `<td style="padding-left:${i === 0 ? 0 : 4}px;" valign="middle"><img alt="${url === starHalfUrl ? 'Half Star' : 'Star'}" src="${url}" style="border:none;display:block;outline:none;text-decoration:none;width:20px;height:20px;" width="20" height="20"></td>`).join('');
+                starsHtml = `<tr><td align="center"><a href="${buttonLink}" style="text-decoration:none;" target="_blank"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 auto;"><tr>${starCellsHtml}</tr></table></a></td></tr><tr><td><div style="clear: both; display: block; font-size: 8px; height: 8px; line-height: 8px; margin: 0px; mso-line-height-rule: exactly; padding: 0px;">&nbsp;</div></td></tr>`;
             }
 
             const spacers = utils.getFieldValue(prefix + 'spacers');
