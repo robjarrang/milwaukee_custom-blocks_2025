@@ -89,6 +89,7 @@
                     <div class="badge-option" data-value="M12">M12</div>
                     <div class="badge-option" data-value="M18">M18</div>
                     <div class="badge-option" data-value="MXFuel">MX Fuel</div>
+                    <div class="badge-option" data-value="OneKey">ONE-KEY&trade;</div>
                     <div class="badge-option" data-value="TruckTour">Truck Tour</div>
                     <div class="badge-option" data-value="AuthorisedDistribution">Authorised Dist.</div>
                     
@@ -225,7 +226,7 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         // Define which badge types are system logos vs trade logos
-        const systemLogos = ['M12', 'M18', 'MXFuel', 'TruckTour', 'AuthorisedDistribution'];
+        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'TruckTour', 'AuthorisedDistribution'];
         const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
 
         // EN-GB fallback image URLs for each trade (used when culture-specific image is missing)
@@ -367,6 +368,10 @@ SET @ShowBadge = "false"
                     image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/9bb4dd26-9f86-4a1c-9d9f-af3845341a4f.png",
                     path: "/systems/mx-fuel/"
                 },
+                OneKey: {
+                    image: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/45fa067b-4154-4a74-b5c3-8b46d49d8544.png",
+                    path: "/systems/one-key/"
+                },
                 TruckTour: {
                     image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/0c023144-dbc0-4a70-9e01-b2aa70593c98.png",
                     link: "https://uk.milwaukeetool.eu/trucktour2025/"
@@ -429,6 +434,7 @@ ENDIF`;
                 'M12': 'Milwaukee M12 System',
                 'M18': 'Milwaukee M18 System',
                 'MXFuel': 'Milwaukee MX FUEL System',
+                'OneKey': 'Milwaukee ONE-KEY System',
                 'TruckTour': 'Milwaukee Truck Tour',
                 'AuthorisedDistribution': 'Milwaukee Authorised Distributor',
                 'Automotive': 'Milwaukee Automotive Trade',
