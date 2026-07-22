@@ -90,6 +90,7 @@
                     <div class="badge-option" data-value="M18">M18</div>
                     <div class="badge-option" data-value="MXFuel">MX Fuel</div>
                     <div class="badge-option" data-value="OneKey">ONE-KEY&trade;</div>
+                    <div class="badge-option" data-value="Shockwave">Shockwave</div>
                     <div class="badge-option" data-value="TruckTour">Truck Tour</div>
                     <div class="badge-option" data-value="AuthorisedDistribution">Authorised Dist.</div>
                     
@@ -226,7 +227,7 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         // Define which badge types are system logos vs trade logos
-        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'TruckTour', 'AuthorisedDistribution'];
+        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution'];
         const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
 
         // EN-GB fallback image URLs for each trade (used when culture-specific image is missing)
@@ -372,6 +373,11 @@ SET @ShowBadge = "false"
                     image: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/45fa067b-4154-4a74-b5c3-8b46d49d8544.png",
                     path: "/systems/one-key/"
                 },
+                Shockwave: {
+                    image: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/60055bef-93e8-4a0b-8856-f0452a8387fc.png",
+                    path: "/shockwave-impact-duty-sets/",
+                    includeCulturePath: true
+                },
                 TruckTour: {
                     image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/0c023144-dbc0-4a70-9e01-b2aa70593c98.png",
                     link: "https://uk.milwaukeetool.eu/trucktour2025/"
@@ -391,39 +397,43 @@ SET @ShowBadge = "false"
 SET @LogoLinkURL = "${config.link}"`;
             }
 
+            const linkExpression = (domain) => config.includeCulturePath
+                ? `Concat("${domain}/", Lowercase(@UserCulture), "${config.path}")`
+                : `"${domain}${config.path}"`;
+
             // Other system logos use culture-based URLs
             return `SET @LogoImageURL = "${config.image}"
-IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = "https://bg.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = "https://cz.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = "https://dk.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = "https://benl.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = "https://nl.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = "https://za.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = "https://ae.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = "https://uk.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = "https://ee.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = "https://fi.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = "https://befr.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = "https://fr.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = "https://frlu.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = "https://frch.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = "https://deat.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = "https://de.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = "https://delu.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = "https://dech.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = "https://hu.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = "https://it.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = "https://lv.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = "https://lt.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = "https://no.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = "https://pl.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = "https://pt.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = "https://ro.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = "https://sk.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = "https://es.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = "https://se.milwaukeetool.eu${config.path}"
-ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = "https://tr.milwaukeetool.eu${config.path}"
-ELSE SET @LogoLinkURL = "https://www.milwaukeetool.eu${config.path}"
+IF @UserCulture == "BG-BG" THEN SET @LogoLinkURL = ${linkExpression('https://bg.milwaukeetool.eu')}
+ELSEIF @UserCulture == "CS-CZ" THEN SET @LogoLinkURL = ${linkExpression('https://cz.milwaukeetool.eu')}
+ELSEIF @UserCulture == "DA-DK" THEN SET @LogoLinkURL = ${linkExpression('https://dk.milwaukeetool.eu')}
+ELSEIF @UserCulture == "NL-BE" THEN SET @LogoLinkURL = ${linkExpression('https://benl.milwaukeetool.eu')}
+ELSEIF @UserCulture == "NL-NL" THEN SET @LogoLinkURL = ${linkExpression('https://nl.milwaukeetool.eu')}
+ELSEIF @UserCulture == "EN-ZA" THEN SET @LogoLinkURL = ${linkExpression('https://za.milwaukeetool.eu')}
+ELSEIF @UserCulture == "AR-AE" THEN SET @LogoLinkURL = ${linkExpression('https://ae.milwaukeetool.eu')}
+ELSEIF @UserCulture == "EN-GB" THEN SET @LogoLinkURL = ${linkExpression('https://uk.milwaukeetool.eu')}
+ELSEIF @UserCulture == "ET-EE" THEN SET @LogoLinkURL = ${linkExpression('https://ee.milwaukeetool.eu')}
+ELSEIF @UserCulture == "FI-FI" THEN SET @LogoLinkURL = ${linkExpression('https://fi.milwaukeetool.eu')}
+ELSEIF @UserCulture == "FR-BE" THEN SET @LogoLinkURL = ${linkExpression('https://befr.milwaukeetool.eu')}
+ELSEIF @UserCulture == "FR-FR" THEN SET @LogoLinkURL = ${linkExpression('https://fr.milwaukeetool.eu')}
+ELSEIF @UserCulture == "FR-LU" THEN SET @LogoLinkURL = ${linkExpression('https://frlu.milwaukeetool.eu')}
+ELSEIF @UserCulture == "FR-CH" THEN SET @LogoLinkURL = ${linkExpression('https://frch.milwaukeetool.eu')}
+ELSEIF @UserCulture == "DE-AT" THEN SET @LogoLinkURL = ${linkExpression('https://deat.milwaukeetool.eu')}
+ELSEIF @UserCulture == "DE-DE" THEN SET @LogoLinkURL = ${linkExpression('https://de.milwaukeetool.eu')}
+ELSEIF @UserCulture == "DE-LU" THEN SET @LogoLinkURL = ${linkExpression('https://delu.milwaukeetool.eu')}
+ELSEIF @UserCulture == "DE-CH" THEN SET @LogoLinkURL = ${linkExpression('https://dech.milwaukeetool.eu')}
+ELSEIF @UserCulture == "HU-HU" THEN SET @LogoLinkURL = ${linkExpression('https://hu.milwaukeetool.eu')}
+ELSEIF @UserCulture == "IT-IT" THEN SET @LogoLinkURL = ${linkExpression('https://it.milwaukeetool.eu')}
+ELSEIF @UserCulture == "LV-LV" THEN SET @LogoLinkURL = ${linkExpression('https://lv.milwaukeetool.eu')}
+ELSEIF @UserCulture == "LT-LT" THEN SET @LogoLinkURL = ${linkExpression('https://lt.milwaukeetool.eu')}
+ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN SET @LogoLinkURL = ${linkExpression('https://no.milwaukeetool.eu')}
+ELSEIF @UserCulture == "PL-PL" THEN SET @LogoLinkURL = ${linkExpression('https://pl.milwaukeetool.eu')}
+ELSEIF @UserCulture == "PT-PT" THEN SET @LogoLinkURL = ${linkExpression('https://pt.milwaukeetool.eu')}
+ELSEIF @UserCulture == "RO-RO" THEN SET @LogoLinkURL = ${linkExpression('https://ro.milwaukeetool.eu')}
+ELSEIF @UserCulture == "SK-SK" THEN SET @LogoLinkURL = ${linkExpression('https://sk.milwaukeetool.eu')}
+ELSEIF @UserCulture == "ES-ES" THEN SET @LogoLinkURL = ${linkExpression('https://es.milwaukeetool.eu')}
+ELSEIF @UserCulture == "SV-SE" THEN SET @LogoLinkURL = ${linkExpression('https://se.milwaukeetool.eu')}
+ELSEIF @UserCulture == "TR-TR" THEN SET @LogoLinkURL = ${linkExpression('https://tr.milwaukeetool.eu')}
+ELSE SET @LogoLinkURL = ${config.includeCulturePath ? '"https://www.milwaukeetool.eu/en-gb' + config.path + '"' : '"https://www.milwaukeetool.eu' + config.path + '"'}
 ENDIF`;
         }
 
@@ -435,6 +445,7 @@ ENDIF`;
                 'M18': 'Milwaukee M18 System',
                 'MXFuel': 'Milwaukee MX FUEL System',
                 'OneKey': 'Milwaukee ONE-KEY System',
+                'Shockwave': 'Shockwave Impact Duty',
                 'TruckTour': 'Milwaukee Truck Tour',
                 'AuthorisedDistribution': 'Milwaukee Authorised Distributor',
                 'Automotive': 'Milwaukee Automotive Trade',
@@ -463,7 +474,7 @@ ENDIF`;
             const badgeAltText = getBadgeAltText(badgeType);
 
             // Badge HTML - conditionally shown via AMPscript
-            const badgeWidth = badgeType === 'OneKey' ? '140' : '100';
+            const badgeWidth = badgeType === 'Shockwave' ? '200' : (badgeType === 'OneKey' ? '140' : '100');
             const badgeHtml = showBadge === 'true' ? `<!--%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="${badgeAltText}" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="${badgeWidth}"></a><!--%%[ ENDIF ]%%-->` : '';
 
             return `<!-- START .legacy-header -->
