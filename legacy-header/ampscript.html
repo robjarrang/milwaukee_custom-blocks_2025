@@ -30,6 +30,8 @@ ELSEIF @System_M18 == "true" THEN
 SET @LogoType = "M18"
 ELSEIF @System_MXFuel == "true" THEN
 SET @LogoType = "MXFuel"
+ELSEIF @System_Shockwave == "true" THEN
+SET @LogoType = "Shockwave"
 ELSEIF @System_TruckTour == "true" THEN
 SET @LogoType = "TruckTour"
 ELSEIF @System_AuthorisedDistribution == "true" THEN
@@ -318,6 +320,75 @@ SET @LogoLinkURL = "https://tr.milwaukeetool.eu/systems/mx-fuel/"
 ELSE
 /* Default MXFuel link for any unmatched UserCulture */
 SET @LogoLinkURL = "https://www.milwaukeetool.eu/systems/mx-fuel/"
+ENDIF
+
+ELSEIF @LogoType == "Shockwave" THEN
+/* Default Shockwave values */
+SET @LogoImageURL = "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/60055bef-93e8-4a0b-8856-f0452a8387fc.png"
+
+/* Shockwave logo URLs for each UserCulture */
+IF @UserCulture == "BG-BG" THEN
+SET @LogoLinkURL = Concat("https://bg.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "CS-CZ" THEN
+SET @LogoLinkURL = Concat("https://cz.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "DA-DK" THEN
+SET @LogoLinkURL = Concat("https://dk.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "NL-BE" THEN
+SET @LogoLinkURL = Concat("https://benl.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "NL-NL" THEN
+SET @LogoLinkURL = Concat("https://nl.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "EN-ZA" THEN
+SET @LogoLinkURL = Concat("https://za.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "AR-AE" THEN
+SET @LogoLinkURL = Concat("https://ae.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "EN-GB" THEN
+SET @LogoLinkURL = Concat("https://uk.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "ET-EE" THEN
+SET @LogoLinkURL = Concat("https://ee.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "FI-FI" THEN
+SET @LogoLinkURL = Concat("https://fi.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "FR-BE" THEN
+SET @LogoLinkURL = Concat("https://befr.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "FR-FR" THEN
+SET @LogoLinkURL = Concat("https://fr.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "FR-LU" THEN
+SET @LogoLinkURL = Concat("https://frlu.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "FR-CH" THEN
+SET @LogoLinkURL = Concat("https://frch.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "DE-AT" THEN
+SET @LogoLinkURL = Concat("https://deat.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "DE-DE" THEN
+SET @LogoLinkURL = Concat("https://de.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "DE-LU" THEN
+SET @LogoLinkURL = Concat("https://delu.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "DE-CH" THEN
+SET @LogoLinkURL = Concat("https://dech.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "HU-HU" THEN
+SET @LogoLinkURL = Concat("https://hu.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "IT-IT" THEN
+SET @LogoLinkURL = Concat("https://it.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "LV-LV" THEN
+SET @LogoLinkURL = Concat("https://lv.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "LT-LT" THEN
+SET @LogoLinkURL = Concat("https://lt.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "NO-NO" OR @UserCulture == "NN-NO" THEN
+SET @LogoLinkURL = Concat("https://no.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "PL-PL" THEN
+SET @LogoLinkURL = Concat("https://pl.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "PT-PT" THEN
+SET @LogoLinkURL = Concat("https://pt.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "RO-RO" THEN
+SET @LogoLinkURL = Concat("https://ro.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "SK-SK" THEN
+SET @LogoLinkURL = Concat("https://sk.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "ES-ES" THEN
+SET @LogoLinkURL = Concat("https://es.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "SV-SE" THEN
+SET @LogoLinkURL = Concat("https://se.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSEIF @UserCulture == "TR-TR" THEN
+SET @LogoLinkURL = Concat("https://tr.milwaukeetool.eu/", Lowercase(@UserCulture), "/shockwave-impact-duty-sets/")
+ELSE
+SET @LogoLinkURL = "https://www.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/"
 ENDIF
 
 ELSEIF @LogoType == "TruckTour" THEN
