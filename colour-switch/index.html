@@ -160,6 +160,11 @@
                 <div id="fallbackProductNameEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
             </div>
             <div class="field-group">
+                <label class="field-label" for="fallbackSubtitleEditor">Fallback subtitle</label>
+                <div id="fallbackSubtitleEditor" class="quill-container limited-toolbar" data-lpignore="true"></div>
+                <div class="field-hint">Shown in the Outlook / Gmail / Yahoo fallback only. Leave blank to hide — this is independent of the interactive Subtitle field above.</div>
+            </div>
+            <div class="field-group">
                 <label class="field-label" for="fallbackImage">Fallback image URL</label>
                 <input type="url" id="fallbackImage" class="field-input" placeholder="https://...">
                 <div class="field-error">Please enter a valid URL.</div>
@@ -276,6 +281,7 @@
                 buttonText: { type: 'text', defaultValue: 'View product' },
                 fallbackProductName: { type: 'text', defaultValue: '' },
                 subtitle: { type: 'text', defaultValue: 'Select option' },
+                fallbackSubtitle: { type: 'text', defaultValue: 'Select option' },
                 fallbackImage: { type: 'url', defaultValue: 'https://placehold.co/1160x1160/cccccc/333333/png?text=580x580+(x2)' },
                 fallbackImageAltText: { type: 'text', defaultValue: '' },
                 colours: {
@@ -409,6 +415,7 @@
             elements.buttonLink = document.getElementById('buttonLink');
             elements.buttonText = document.getElementById('buttonText');
             elements.fallbackProductNameEditor = document.getElementById('fallbackProductNameEditor');
+            elements.fallbackSubtitleEditor = document.getElementById('fallbackSubtitleEditor');
             elements.subtitleEditor = document.getElementById('subtitleEditor');
             elements.fallbackImage = document.getElementById('fallbackImage');
             elements.fallbackImageAltText = document.getElementById('fallbackImageAltText');
@@ -462,6 +469,9 @@
                 : '';
             state.blockData.subtitle = state.editors.get('subtitle')
                 ? utils.sanitizeHtml(QuillConfigManager.getCleanContent(state.editors.get('subtitle'), true))
+                : '';
+            state.blockData.fallbackSubtitle = state.editors.get('fallbackSubtitle')
+                ? utils.sanitizeHtml(QuillConfigManager.getCleanContent(state.editors.get('fallbackSubtitle'), true))
                 : '';
             state.blockData.fallbackImage = elements.fallbackImage.value.trim();
             state.blockData.fallbackImageAltText = elements.fallbackImageAltText.value;
@@ -815,6 +825,17 @@
                 refreshPreview();
             }, moduleConfig.debounceDelay));
             state.editors.set('fallbackProductName', fallbackProductNameEditor);
+
+            const fallbackSubtitleEditor = await QuillConfigManager.initializeEditor(
+                elements.fallbackSubtitleEditor,
+                'title',
+                { placeholder: 'Leave blank to omit', maxLength: 120 }
+            );
+            fallbackSubtitleEditor.on('text-change', QuillConfigManager.createUpdateHandler(() => {
+                state.blockData.fallbackSubtitle = utils.sanitizeHtml(QuillConfigManager.getCleanContent(fallbackSubtitleEditor, true));
+                refreshPreview();
+            }, moduleConfig.debounceDelay));
+            state.editors.set('fallbackSubtitle', fallbackSubtitleEditor);
         }
 
         function applyLayoutConstraints() {
@@ -896,6 +917,7 @@
                 productPageLink, buttonFinalLink,
                 fallbackProductName: utils.getFieldValue('fallbackProductName'),
                 subtitle: utils.getFieldValue('subtitle'),
+                fallbackSubtitle: utils.getFieldValue('fallbackSubtitle'),
                 fallbackImage: utils.getFieldValue('fallbackImage'),
                 fallbackImageAltText: utils.getFieldValue('fallbackImageAltText'),
                 colours: resolvedColours,
@@ -1097,11 +1119,11 @@ u + .body .mwk-colour-swap-interactive{display:none !important;overflow:hidden !
             const fallbackImg = utils.escapeAttr(s.fallbackImage);
             const fallbackAlt = utils.escapeAttr(s.fallbackImageAltText);
 
-            const fallbackNameBlock = (s.fallbackProductName || s.subtitle) ? `
+            const fallbackNameBlock = (s.fallbackProductName || s.fallbackSubtitle) ? `
         <tr><td>${spacer(18)}</td></tr>
         <tr>
           <td class="mobile-text-center" align="center" style="text-align:center">
-            ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(6) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.subtitle)}</div>` : ''}
+            ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:24px;font-weight:bold;line-height:32px;margin:0;padding-bottom:0 !important;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.fallbackSubtitle) ? spacer(6) : ''}${s.fallbackSubtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:22px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackSubtitle)}</div>` : ''}
           </td>
         </tr>` : '';
 
@@ -1168,10 +1190,10 @@ ${swatches}
             const fallbackImg = utils.escapeAttr(s.fallbackImage);
             const fallbackAlt = utils.escapeAttr(s.fallbackImageAltText);
 
-            const fallbackNameBlock = (s.fallbackProductName || s.subtitle) ? `
+            const fallbackNameBlock = (s.fallbackProductName || s.fallbackSubtitle) ? `
                     <tr>
                       <td class="mobile-text-center" align="center" style="text-align:center">
-                        ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.subtitle) ? spacer(4) : ''}${s.subtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.subtitle)}</div>` : ''}
+                        ${s.fallbackProductName ? `<h2 style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackProductName)}</h2>` : ''}${(s.fallbackProductName && s.fallbackSubtitle) ? spacer(4) : ''}${s.fallbackSubtitle ? `<div style="color:${s.nameColour};font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:14px;font-weight:bold;line-height:20px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none">${utils.textHtml(s.fallbackSubtitle)}</div>` : ''}
                       </td>
                     </tr>
                     <tr><td>${spacer(18)}</td></tr>` : '';
@@ -1312,6 +1334,13 @@ ${body}
                         }
                     });
 
+                    // Backward compatibility: older saved content didn't have a separate
+                    // fallback subtitle field — the fallback used to mirror the interactive
+                    // subtitle. If missing from saved data, seed it so existing output is unchanged.
+                    if (!data || !data.hasOwnProperty('fallbackSubtitle')) {
+                        state.blockData.fallbackSubtitle = state.blockData.subtitle || '';
+                    }
+
                     // Ensure colours have IDs and required fields
                     if (Array.isArray(state.blockData.colours)) {
                         state.blockData.colours.forEach(c => {
@@ -1347,6 +1376,9 @@ ${body}
                         const sub = state.blockData.subtitle != null ? state.blockData.subtitle : 'Select option';
                         QuillConfigManager.setContent(state.editors.get('subtitle'), sub);
                         state.blockData.subtitle = sub;
+                    }
+                    if (state.editors.get('fallbackSubtitle')) {
+                        QuillConfigManager.setContent(state.editors.get('fallbackSubtitle'), state.blockData.fallbackSubtitle || '');
                     }
                     elements.fallbackImage.value = state.blockData.fallbackImage || '';
                     elements.fallbackImageAltText.value = state.blockData.fallbackImageAltText || '';
