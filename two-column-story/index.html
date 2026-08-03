@@ -862,8 +862,6 @@
         const spacerActions = {
             '.remove-btn': (spacer, index, spacers, context) => {
                 spacers.splice(index, 1);
-                // Force preview refresh after spacer removal
-                setTimeout(() => refreshPreview(), 50);
                 return true;
             }
         };
@@ -881,7 +879,10 @@
                 if (!itemEl) return;
 
                 const id = itemEl.dataset.id;
-                const currentItems = utils.getFieldValue(prefix + listType);
+                // Clone the array so mutating actions (move/remove/duplicate) don't modify
+                // state.blockData in place, which would make updateData's dirty-check
+                // think nothing changed and skip refreshing the preview.
+                const currentItems = [...utils.getFieldValue(prefix + listType)];
                 const itemIndex = currentItems.findIndex(i => i.id === id);
 
                 if (itemIndex === -1) return;
