@@ -93,6 +93,8 @@
                     <div class="badge-option" data-value="Shockwave">Shockwave</div>
                     <div class="badge-option" data-value="TruckTour">Truck Tour</div>
                     <div class="badge-option" data-value="AuthorisedDistribution">Authorised Dist.</div>
+                    <div class="badge-option" data-value="Hardline">Hardline</div>
+                    <div class="badge-option" data-value="Fastback">Fastback</div>
                     
                     <!-- Trade Logos -->
                     <div class="badge-option category-header">Trade Logos</div>
@@ -227,7 +229,7 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         // Define which badge types are system logos vs trade logos
-        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution'];
+        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution', 'Hardline', 'Fastback'];
         const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
 
         // EN-GB fallback image URLs for each trade (used when culture-specific image is missing)
@@ -385,6 +387,82 @@ SET @ShowBadge = "false"
                 AuthorisedDistribution: {
                     image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/5d3c1b88-4540-4505-af5f-82c03525794a.png",
                     path: "/"
+                },
+                Hardline: {
+                    image: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/5be7d614-4553-4bae-a19e-1674bf33edcc.png",
+                    defaultLink: "https://www.milwaukeetool.eu/en-eu/hardline-folding-knives/",
+                    cultureLinks: {
+                        "AR-AE": "https://ae.milwaukeetool.eu/ar-ae/hardline-folding-knives/",
+                        "BG-BG": "https://bg.milwaukeetool.eu/bg-bg/hardline-%d1%81%d0%b3%d1%8a%d0%b2%d0%b0%d0%b5%d0%bc%d0%b8-%d0%bd%d0%be%d0%b6%d0%be%d0%b2%d0%b5/",
+                        "CS-CZ": "https://cz.milwaukeetool.eu/cs-cz/hardline-zaviraci-nuz/",
+                        "DA-DK": "https://dk.milwaukeetool.eu/da-dk/hardline-foldeknive/",
+                        "DE-AT": "https://deat.milwaukeetool.eu/de-at/hardline-klappmesser/",
+                        "DE-CH": "https://dech.milwaukeetool.eu/de-ch/hardline-klappmesser/",
+                        "DE-DE": "https://de.milwaukeetool.eu/de-de/hardline-klappmesser/",
+                        "DE-LU": "https://delu.milwaukeetool.eu/de-lu/hardline-klappmesser/",
+                        "EN-EU": "https://www.milwaukeetool.eu/en-eu/hardline-folding-knives/",
+                        "EN-GB": "https://uk.milwaukeetool.eu/en-gb/hardline-folding-knives/",
+                        "EN-ZA": "https://za.milwaukeetool.eu/en-za/hardline-folding-knives/",
+                        "ES-ES": "https://es.milwaukeetool.eu/es-es/navajas-plegables-hardline/",
+                        "ET-EE": "https://ee.milwaukeetool.eu/et-ee/kokkupandavad-noad-hardline/",
+                        "FI-FI": "https://fi.milwaukeetool.eu/fi-fi/hardline-taittoveitset/",
+                        "FR-BE": "https://befr.milwaukeetool.eu/fr-be/couteaux-hardline/",
+                        "FR-CH": "https://frch.milwaukeetool.eu/fr-ch/couteaux-hardline/",
+                        "FR-FR": "https://fr.milwaukeetool.eu/fr-fr/couteaux-pliants-hardline/",
+                        "FR-LU": "https://frlu.milwaukeetool.eu/fr-lu/couteaux-pliants-hardline/",
+                        "HR-HR": "https://hr.milwaukeetool.eu/hr-hr/hardline-sklopivi-nozevi/",
+                        "HU-HU": "https://hu.milwaukeetool.eu/hu-hu/hardline-osszecsukhato-kes/",
+                        "IT-IT": "https://it.milwaukeetool.eu/it-it/coltello-sport-richiudibile-a-lama-extra-resistente/",
+                        "LT-LT": "https://lt.milwaukeetool.eu/lt-lt/hardline-lenktiniai-peiliai/",
+                        "LV-LV": "https://lv.milwaukeetool.eu/lv-lv/hardline-saliekamie-nazi/",
+                        "NL-BE": "https://benl.milwaukeetool.eu/nl-be/hardline-zakmessen/",
+                        "NL-NL": "https://nl.milwaukeetool.eu/nl-nl/hardline-zakmessen/",
+                        "NN-NO": "https://no.milwaukeetool.eu/nn-no/hardline-foldekniv/",
+                        "NO-NO": "https://no.milwaukeetool.eu/nn-no/hardline-foldekniv/",
+                        "PL-PL": "https://pl.milwaukeetool.eu/pl-pl/noze-skladane-hardline/",
+                        "PT-PT": "https://pt.milwaukeetool.eu/pt-pt/navalha-tradicional-hardline/",
+                        "RO-RO": "https://ro.milwaukeetool.eu/ro-ro/cutite-utilitare-pliabile-hardline/",
+                        "SK-SK": "https://sk.milwaukeetool.eu/sk-sk/hardline-skladacie-noze/",
+                        "SL-SI": "https://si.milwaukeetool.eu/sl-si/hardline-zlozljivi-nozi/",
+                        "SV-SE": "https://se.milwaukeetool.eu/sv-se/hardline-fallknivar/"
+                    }
+                },
+                Fastback: {
+                    image: "https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/8ffdaef5-89df-48a3-8310-3ced35b157c0.png",
+                    defaultLink: "https://www.milwaukeetool.eu/en-eu/fastback-folding-knife/",
+                    cultureLinks: {
+                        "AR-AE": "https://ae.milwaukeetool.eu/ar-ae/fastback-folding-knife/",
+                        "BG-BG": "https://bg.milwaukeetool.eu/bg-bg/fastback-%d1%81%d0%b3%d1%8a%d0%b2%d0%b0%d0%b5%d0%bc-%d0%bd%d0%be%d0%b6/",
+                        "CS-CZ": "https://cz.milwaukeetool.eu/cs-cz/fastback-zaviraci-nuz/",
+                        "DA-DK": "https://dk.milwaukeetool.eu/da-dk/fastback-foldekniv/",
+                        "DE-AT": "https://deat.milwaukeetool.eu/de-at/fastback-klappmesser/",
+                        "DE-CH": "https://dech.milwaukeetool.eu/de-ch/fastback-klappmesser/",
+                        "DE-DE": "https://de.milwaukeetool.eu/de-de/fastback-klappmesser/",
+                        "DE-LU": "https://delu.milwaukeetool.eu/de-lu/fastback-klappmesser/",
+                        "EN-EU": "https://www.milwaukeetool.eu/en-eu/fastback-folding-knife/",
+                        "EN-GB": "https://uk.milwaukeetool.eu/en-gb/fastback-folding-knife/",
+                        "EN-ZA": "https://za.milwaukeetool.eu/en-za/fastback-folding-knife/",
+                        "ET-EE": "https://ee.milwaukeetool.eu/et-ee/fastbacki-kokkupandav-nuga/",
+                        "FI-FI": "https://fi.milwaukeetool.eu/fi-fi/fastback-taittoveitsi/",
+                        "FR-BE": "https://befr.milwaukeetool.eu/fr-be/couteau-de-poche-fastback/",
+                        "FR-CH": "https://frch.milwaukeetool.eu/fr-ch/couteau-de-poche-fastback/",
+                        "FR-FR": "https://fr.milwaukeetool.eu/fr-fr/couteau-de-poche-fastback/",
+                        "FR-LU": "https://frlu.milwaukeetool.eu/fr-lu/couteau-de-poche-fastback/",
+                        "HR-HR": "https://hr.milwaukeetool.eu/hr-hr/fastback-sklopivi-noz/",
+                        "HU-HU": "https://hu.milwaukeetool.eu/hu-hu/fastback-osszecsukhato-kes-1/",
+                        "IT-IT": "https://it.milwaukeetool.eu/it-it/coltello-sport-richiudibile/",
+                        "LT-LT": "https://lt.milwaukeetool.eu/lt-lt/fastback-lenktinis-peilis/",
+                        "LV-LV": "https://lv.milwaukeetool.eu/lv-lv/fastback-saliekamais-nazis/",
+                        "NL-BE": "https://benl.milwaukeetool.eu/nl-be/fastback-zakmes/",
+                        "NL-NL": "https://nl.milwaukeetool.eu/nl-nl/fastback-zakmes/",
+                        "NN-NO": "https://no.milwaukeetool.eu/nn-no/fastback-foldekniv-1/",
+                        "NO-NO": "https://no.milwaukeetool.eu/nn-no/fastback-foldekniv-1/",
+                        "PL-PL": "https://pl.milwaukeetool.eu/pl-pl/noz-skladany-fastback/",
+                        "RO-RO": "https://ro.milwaukeetool.eu/ro-ro/cutit-pliabil-fastback/",
+                        "SK-SK": "https://sk.milwaukeetool.eu/sk-sk/fastback-skladaci-noz/",
+                        "SL-SI": "https://si.milwaukeetool.eu/sl-si/fastback-zlozljiv-zepni-noz/",
+                        "SV-SE": "https://se.milwaukeetool.eu/sv-se/fastback-fallkniv/"
+                    }
                 }
             };
 
@@ -395,6 +473,17 @@ SET @ShowBadge = "false"
             if (logoType === 'TruckTour') {
                 return `SET @LogoImageURL = "${config.image}"
 SET @LogoLinkURL = "${config.link}"`;
+            }
+
+            // Logos with a full per-culture URL map (e.g. Hardline, Fastback)
+            if (config.cultureLinks) {
+                const cultureConditions = Object.entries(config.cultureLinks)
+                    .map(([culture, url], index) => `${index === 0 ? 'IF' : 'ELSEIF'} @UserCulture == "${culture}" THEN SET @LogoLinkURL = "${url}"`)
+                    .join('\n');
+                return `SET @LogoImageURL = "${config.image}"
+${cultureConditions}
+ELSE SET @LogoLinkURL = "${config.defaultLink}"
+ENDIF`;
             }
 
             const linkExpression = (domain) => config.includeCulturePath
@@ -448,6 +537,8 @@ ENDIF`;
                 'Shockwave': 'Shockwave Impact Duty',
                 'TruckTour': 'Milwaukee Truck Tour',
                 'AuthorisedDistribution': 'Milwaukee Authorised Distributor',
+                'Hardline': 'Milwaukee Hardline',
+                'Fastback': 'Milwaukee Fastback',
                 'Automotive': 'Milwaukee Automotive Trade',
                 'Carpentry': 'Milwaukee Carpentry Trade',
                 'Construction': 'Milwaukee Construction Trade',
