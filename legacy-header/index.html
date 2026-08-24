@@ -131,6 +131,10 @@
                     <input type="url" id="customLinkUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
                     <div class="field-error" id="customLinkUrlError">Please enter a valid URL.</div>
                 </div>
+                <div class="field-group">
+                    <label class="field-label" for="customImageWidth">Custom Image Width (px)</label>
+                    <input type="number" id="customImageWidth" class="field-input" min="20" max="580" step="4" placeholder="100">
+                </div>
             </div>
         </div>
 
@@ -165,7 +169,8 @@
                 showBadge: { type: 'text', defaultValue: 'true' },
                 badgeType: { type: 'text', defaultValue: 'dynamic' },
                 customImageUrl: { type: 'url', defaultValue: '' },
-                customLinkUrl: { type: 'url', defaultValue: '' }
+                customLinkUrl: { type: 'url', defaultValue: '' },
+                customImageWidth: { type: 'number', defaultValue: '100' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -235,6 +240,7 @@
             elements.customImageUrlError = document.getElementById('customImageUrlError');
             elements.customLinkUrl = document.getElementById('customLinkUrl');
             elements.customLinkUrlError = document.getElementById('customLinkUrlError');
+            elements.customImageWidth = document.getElementById('customImageWidth');
         }
 
         function setLoadingState(loading) {
@@ -631,7 +637,7 @@ ENDIF`;
             const badgeAltText = getBadgeAltText(badgeType);
 
             // Badge HTML - conditionally shown via AMPscript
-            const badgeWidth = badgeType === 'Shockwave' ? '200' : (badgeType === 'OneKey' ? '140' : (badgeType === 'Hardline' || badgeType === 'Fastback' ? '160' : '100'));
+            const badgeWidth = badgeType === 'Shockwave' ? '200' : (badgeType === 'OneKey' ? '140' : (badgeType === 'Hardline' || badgeType === 'Fastback' ? '160' : (badgeType === 'custom' ? (utils.getFieldValue('customImageWidth') || '100') : '100')));
             const badgeHtml = showBadge === 'true' ? `<!--%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="${badgeAltText}" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="${badgeWidth}"></a><!--%%[ ENDIF ]%%-->` : '';
 
             return `<!-- START .legacy-header -->
@@ -735,6 +741,12 @@ ${badgeHtml}
             setupUrlInput(elements.customImageUrl, elements.customImageUrlError, 'customImageUrl');
             setupUrlInput(elements.customLinkUrl, elements.customLinkUrlError, 'customLinkUrl');
 
+            if (elements.customImageWidth) {
+                const widthHandler = (e) => debouncedUpdateData('customImageWidth', e.target.value.trim());
+                elements.customImageWidth.addEventListener('input', widthHandler);
+                state.eventListeners.push({ element: elements.customImageWidth, event: 'input', handler: widthHandler });
+            }
+
             // Copy/Paste configuration buttons
             const copyConfigBtn = document.getElementById('copyConfigBtn');
             const pasteConfigBtn = document.getElementById('pasteConfigBtn');
@@ -766,6 +778,7 @@ ${badgeHtml}
             // Update Custom badge URL fields
             if (elements.customImageUrl) elements.customImageUrl.value = utils.getFieldValue('customImageUrl') || '';
             if (elements.customLinkUrl) elements.customLinkUrl.value = utils.getFieldValue('customLinkUrl') || '';
+            if (elements.customImageWidth) elements.customImageWidth.value = utils.getFieldValue('customImageWidth') || '100';
         }
 
         // Copy/Paste Configuration Functions
