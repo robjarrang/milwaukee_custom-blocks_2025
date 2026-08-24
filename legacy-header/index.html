@@ -95,6 +95,7 @@
                     <div class="badge-option" data-value="AuthorisedDistribution">Authorised Dist.</div>
                     <div class="badge-option" data-value="Hardline">Hardline</div>
                     <div class="badge-option" data-value="Fastback">Fastback</div>
+                    <div class="badge-option" data-value="TrueView">TRUEVIEW&trade;</div>
                     
                     <!-- Trade Logos -->
                     <div class="badge-option category-header">Trade Logos</div>
@@ -281,7 +282,7 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         // Define which badge types are system logos vs trade logos
-        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution', 'Hardline', 'Fastback'];
+        const systemLogos = ['M12', 'M18', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution', 'Hardline', 'Fastback', 'TrueView'];
         const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
 
         // EN-GB fallback image URLs for each trade (used when culture-specific image is missing)
@@ -534,6 +535,45 @@ SET @ShowBadge = "false"
                         "SL-SI": "https://si.milwaukeetool.eu/sl-si/fastback-zlozljiv-zepni-noz/",
                         "SV-SE": "https://se.milwaukeetool.eu/sv-se/fastback-fallkniv/"
                     }
+                },
+                TrueView: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/00c1f353-7123-49d0-8d73-3d487fc266bd.png",
+                    defaultLink: "https://www.milwaukeetool.eu/en-eu/work-lights/",
+                    cultureLinks: {
+                        "AR-AE": "https://ae.milwaukeetool.eu/ar-ae/lighting/",
+                        "BG-BG": "https://bg.milwaukeetool.eu/bg-bg/%d0%be%d1%81%d0%b2%d0%b5%d1%82%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5/",
+                        "CS-CZ": "https://cz.milwaukeetool.eu/cs-cz/pracovni-osvetleni/",
+                        "DA-DK": "https://dk.milwaukeetool.eu/da-dk/arbejdsbelysning/",
+                        "DE-AT": "https://deat.milwaukeetool.eu/de-at/arbeitsleuchten/",
+                        "DE-CH": "https://dech.milwaukeetool.eu/de-ch/beleuchtung/",
+                        "DE-DE": "https://de.milwaukeetool.eu/de-de/arbeitsleuchten/",
+                        "DE-LU": "https://delu.milwaukeetool.eu/de-lu/arbeitsleuchten/",
+                        "EN-EU": "https://www.milwaukeetool.eu/en-eu/work-lights/",
+                        "EN-GB": "https://uk.milwaukeetool.eu/en-gb/work-lights/",
+                        "EN-ZA": "https://za.milwaukeetool.eu/en-za/lighting/",
+                        "ES-ES": "https://es.milwaukeetool.eu/es-es/iluminacion/",
+                        "ET-EE": "https://ee.milwaukeetool.eu/et-ee/valgustus/",
+                        "FI-FI": "https://fi.milwaukeetool.eu/fi-fi/tyovalaisimet/",
+                        "FR-BE": "https://befr.milwaukeetool.eu/fr-be/eclairage/",
+                        "FR-CH": "https://frch.milwaukeetool.eu/fr-ch/eclairage/",
+                        "FR-FR": "https://fr.milwaukeetool.eu/fr-fr/eclairage/",
+                        "FR-LU": "https://frlu.milwaukeetool.eu/fr-lu/eclairage/",
+                        "HR-HR": "https://hr.milwaukeetool.eu/hr-hr/rasvjeta/",
+                        "HU-HU": "https://hu.milwaukeetool.eu/hu-hu/munkalampak/",
+                        "IT-IT": "https://it.milwaukeetool.eu/it-it/illuminazione-professionale/",
+                        "LT-LT": "https://lt.milwaukeetool.eu/lt-lt/apsvietimo-iranga/",
+                        "LV-LV": "https://lv.milwaukeetool.eu/lv-lv/apgaismojums/",
+                        "NL-BE": "https://benl.milwaukeetool.eu/nl-be/verlichting/",
+                        "NL-NL": "https://nl.milwaukeetool.eu/nl-nl/werkverlichting/",
+                        "NN-NO": "https://no.milwaukeetool.eu/nn-no/belysning/",
+                        "NO-NO": "https://no.milwaukeetool.eu/nn-no/belysning/",
+                        "PL-PL": "https://pl.milwaukeetool.eu/pl-pl/oswietlenie-robocze/",
+                        "PT-PT": "https://pt.milwaukeetool.eu/pt-pt/iluminacao/",
+                        "RO-RO": "https://ro.milwaukeetool.eu/ro-ro/produse-de-iluminat/",
+                        "SK-SK": "https://sk.milwaukeetool.eu/sk-sk/pracovne-osvetlenie/",
+                        "SL-SI": "https://si.milwaukeetool.eu/sl-si/delovne-svetilke/",
+                        "SV-SE": "https://se.milwaukeetool.eu/sv-se/belysning/"
+                    }
                 }
             };
 
@@ -610,6 +650,7 @@ ENDIF`;
                 'AuthorisedDistribution': 'Milwaukee Authorised Distributor',
                 'Hardline': 'Milwaukee Hardline',
                 'Fastback': 'Milwaukee Fastback',
+                'TrueView': 'Milwaukee TRUEVIEW',
                 'Automotive': 'Milwaukee Automotive Trade',
                 'Carpentry': 'Milwaukee Carpentry Trade',
                 'Construction': 'Milwaukee Construction Trade',
@@ -637,7 +678,7 @@ ENDIF`;
             const badgeAltText = getBadgeAltText(badgeType);
 
             // Badge HTML - conditionally shown via AMPscript
-            const badgeWidth = badgeType === 'Shockwave' ? '200' : (badgeType === 'OneKey' ? '140' : (badgeType === 'Hardline' || badgeType === 'Fastback' ? '160' : (badgeType === 'custom' ? (utils.getFieldValue('customImageWidth') || '100') : '100')));
+            const badgeWidth = badgeType === 'Shockwave' ? '200' : (badgeType === 'OneKey' ? '140' : (badgeType === 'Hardline' || badgeType === 'Fastback' || badgeType === 'TrueView' ? '160' : (badgeType === 'custom' ? (utils.getFieldValue('customImageWidth') || '100') : '100')));
             const badgeHtml = showBadge === 'true' ? `<!--%%[ IF @ShowBadge == "true" AND NOT Empty(@LogoImageURL) THEN ]%%--><a href="%%=RedirectTo(@LogoLinkURL)=%%" target="_blank"><img alt="${badgeAltText}" src="%%=v(@LogoImageURL)=%%" style="border: none; display: inline-block; height: auto; outline: none; text-decoration: none;" width="${badgeWidth}"></a><!--%%[ ENDIF ]%%-->` : '';
 
             return `<!-- START .legacy-header -->
