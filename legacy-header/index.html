@@ -113,6 +113,23 @@
                     <div class="badge-option" data-value="Networking">Networking</div>
                     <div class="badge-option" data-value="Plumbing">Plumbing</div>
                     <div class="badge-option" data-value="Utilities">Utilities</div>
+
+                    <!-- Custom -->
+                    <div class="badge-option category-header">Custom</div>
+                    <div class="badge-option" data-value="custom">Custom Image</div>
+                </div>
+            </div>
+
+            <div id="customBadgeFieldsGroup" style="display: none;">
+                <div class="field-group">
+                    <label class="field-label" for="customImageUrl">Custom Image URL</label>
+                    <input type="url" id="customImageUrl" class="field-input" placeholder="https://image.s50.sfmc-content.com/...">
+                    <div class="field-error" id="customImageUrlError">Please enter a valid URL.</div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="customLinkUrl">Custom Link URL</label>
+                    <input type="url" id="customLinkUrl" class="field-input" placeholder="https://www.milwaukeetool.eu/">
+                    <div class="field-error" id="customLinkUrlError">Please enter a valid URL.</div>
                 </div>
             </div>
         </div>
@@ -146,7 +163,9 @@
             name: 'Legacy Header',
             fields: {
                 showBadge: { type: 'text', defaultValue: 'true' },
-                badgeType: { type: 'text', defaultValue: 'dynamic' }
+                badgeType: { type: 'text', defaultValue: 'dynamic' },
+                customImageUrl: { type: 'url', defaultValue: '' },
+                customLinkUrl: { type: 'url', defaultValue: '' }
             },
             debounceDelay: 300,
             maxRetries: 3
@@ -189,6 +208,14 @@
                 const fieldConfig = moduleConfig.fields[fieldName];
                 return (value !== undefined && value !== null) ? value : fieldConfig.defaultValue;
             },
+            isValidUrl(string) {
+                if (!string || string.trim() === '') return true;
+                const testString = string.replace(/%%[^%]+%%/g, 'ampscript');
+                try {
+                    const url = new URL(testString);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) { return false; }
+            },
             escapeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
@@ -203,6 +230,11 @@
             elements.showBadgeSelector = document.getElementById('showBadgeSelector');
             elements.badgeTypeSelector = document.getElementById('badgeTypeSelector');
             elements.badgeTypeGroup = document.getElementById('badgeTypeGroup');
+            elements.customBadgeFieldsGroup = document.getElementById('customBadgeFieldsGroup');
+            elements.customImageUrl = document.getElementById('customImageUrl');
+            elements.customImageUrlError = document.getElementById('customImageUrlError');
+            elements.customLinkUrl = document.getElementById('customLinkUrl');
+            elements.customLinkUrlError = document.getElementById('customLinkUrlError');
         }
 
         function setLoadingState(loading) {
@@ -217,6 +249,20 @@
             if (elements.badgeTypeGroup) {
                 elements.badgeTypeGroup.style.display = showBadge === 'true' ? 'block' : 'none';
             }
+        }
+
+        function toggleCustomBadgeFieldsVisibility(badgeType) {
+            if (elements.customBadgeFieldsGroup) {
+                elements.customBadgeFieldsGroup.style.display = badgeType === 'custom' ? 'block' : 'none';
+            }
+        }
+
+        function validateUrlInput(input, errorElement) {
+            const value = input.value.trim();
+            const isValid = !value || utils.isValidUrl(value);
+            input.classList.toggle('error', !isValid);
+            if (errorElement) errorElement.style.display = isValid ? 'none' : 'block';
+            return isValid;
         }
 
         function updateData(field, value) {
@@ -346,6 +392,25 @@ ENDIF
 IF Empty(@LogoImageURL) OR @LogoImageURL == @FallbackImageURL THEN
     SET @LogoImageURL = "${enGbFallback}"
 ENDIF
+]%%-->`;
+            }
+
+            // Manual custom logo - literal image/link URLs supplied by the user
+            if (badgeType === 'custom') {
+                const customImageUrl = (utils.getFieldValue('customImageUrl') || '').trim().replace(/"/g, '');
+                const customLinkUrl = (utils.getFieldValue('customLinkUrl') || '').trim().replace(/"/g, '');
+                if (!customImageUrl || !customLinkUrl) {
+                    return `<!--%%[
+VAR @ShowBadge
+SET @ShowBadge = "false"
+]%%-->`;
+                }
+                return `<!--%%[
+/* Legacy Header - Manual Custom Logo */
+VAR @LogoImageURL, @LogoLinkURL, @ShowBadge
+SET @ShowBadge = "true"
+SET @LogoImageURL = "${customImageUrl}"
+SET @LogoLinkURL = "${customLinkUrl}"
 ]%%-->`;
             }
 
@@ -553,7 +618,8 @@ ENDIF`;
                 'Manufacturing': 'Milwaukee Manufacturing Trade',
                 'Networking': 'Milwaukee Networking Trade',
                 'Plumbing': 'Milwaukee Plumbing Trade',
-                'Utilities': 'Milwaukee Utilities Trade'
+                'Utilities': 'Milwaukee Utilities Trade',
+                'custom': 'Milwaukee'
             };
             return labels[badgeType] || 'Milwaukee Badge';
         }
@@ -646,11 +712,28 @@ ${badgeHtml}
                         updateData('badgeType', btn.dataset.value);
                         elements.badgeTypeSelector.querySelectorAll('.badge-option').forEach(o => o.classList.remove('selected'));
                         btn.classList.add('selected');
+                        toggleCustomBadgeFieldsVisibility(btn.dataset.value);
                     };
                     opt.addEventListener('click', handler);
                     state.eventListeners.push({ element: opt, event: 'click', handler });
                 });
             }
+
+            // Custom badge URL fields
+            function setupUrlInput(inputEl, errorEl, key) {
+                if (!inputEl) return;
+                const validate = () => validateUrlInput(inputEl, errorEl);
+                const inputHandler = (e) => {
+                    if (validate()) debouncedUpdateData(key, e.target.value.trim());
+                };
+                inputEl.addEventListener('input', inputHandler);
+                inputEl.addEventListener('blur', validate);
+                state.eventListeners.push({ element: inputEl, event: 'input', handler: inputHandler });
+                state.eventListeners.push({ element: inputEl, event: 'blur', handler: validate });
+            }
+
+            setupUrlInput(elements.customImageUrl, elements.customImageUrlError, 'customImageUrl');
+            setupUrlInput(elements.customLinkUrl, elements.customLinkUrlError, 'customLinkUrl');
 
             // Copy/Paste configuration buttons
             const copyConfigBtn = document.getElementById('copyConfigBtn');
@@ -678,6 +761,11 @@ ${badgeHtml}
             elements.badgeTypeSelector.querySelectorAll('.badge-option').forEach(btn => {
                 btn.classList.toggle('selected', btn.dataset.value === badgeType);
             });
+            toggleCustomBadgeFieldsVisibility(badgeType);
+
+            // Update Custom badge URL fields
+            if (elements.customImageUrl) elements.customImageUrl.value = utils.getFieldValue('customImageUrl') || '';
+            if (elements.customLinkUrl) elements.customLinkUrl.value = utils.getFieldValue('customLinkUrl') || '';
         }
 
         // Copy/Paste Configuration Functions
