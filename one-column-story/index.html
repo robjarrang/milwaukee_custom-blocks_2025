@@ -85,6 +85,7 @@
             <div class="field-group"><label for="imageUrl" class="field-label">Image URL</label><input type="url" id="imageUrl" class="field-input"><div class="field-error" id="imageUrlError">Please enter a valid URL.</div></div>
             <div class="field-group"><label for="imageAlt" class="field-label">Image Alt Text</label><input type="text" id="imageAlt" class="field-input"></div>
             <div class="field-group"><label for="imageLink" class="field-label">Image Link URL</label><input type="url" id="imageLink" class="field-input"><div class="field-error" id="imageLinkError">Please enter a valid URL.</div></div>
+            <div class="field-group"><label for="imageHeight" class="field-label">Image Height (optional, px)</label><input type="number" id="imageHeight" class="field-input" min="0" step="4" placeholder="Leave blank for auto. Set only to resolve Outlook height issues."></div>
         </div>
         <div class="section-divider">
             <div class="section-title">Content Settings</div>
@@ -150,6 +151,7 @@
                 imageUrl: { type: 'url', defaultValue: 'https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/6af0d75d-71ff-46f5-b96a-689613f8be09.jpg' },
                 imageAlt: { type: 'text', defaultValue: 'Story Image', maxLength: 150 },
                 imageLink: { type: 'url', defaultValue: 'https://www.milwaukeetool.eu/' },
+                imageHeight: { type: 'text', defaultValue: '' },
                 title: { type: 'richtext', defaultValue: 'Tempus Euismod Phasellus', maxLength: 100 },
                 titleFontSize: { type: 'number', defaultValue: 20 },
                 titleAlignment: { type: 'text', defaultValue: 'center' },
@@ -225,6 +227,7 @@
             elements.imageAlt = document.getElementById('imageAlt');
             elements.imageLink = document.getElementById('imageLink');
             elements.imageLinkError = document.getElementById('imageLinkError');
+            elements.imageHeight = document.getElementById('imageHeight');
             elements.titleEditor = document.getElementById('titleEditor');
             elements.titleFontSize = document.getElementById('titleFontSize');
             elements.titleAlignmentSelector = document.getElementById('titleAlignmentSelector');
@@ -371,6 +374,11 @@
             const imageUrl = utils.getFieldValue('imageUrl');
             const imageAlt = utils.getFieldValue('imageAlt');
             const imageLink = utils.getFieldValue('imageLink');
+            const imageHeightRaw = utils.getFieldValue('imageHeight');
+            const imageHeight = (imageHeightRaw !== undefined && imageHeightRaw !== null && String(imageHeightRaw).trim() !== '' && !isNaN(parseInt(imageHeightRaw, 10)) && parseInt(imageHeightRaw, 10) > 0)
+                ? parseInt(imageHeightRaw, 10)
+                : null;
+            const heightAttr = imageHeight ? ` height="${imageHeight}"` : '';
             const title = processRichText(utils.getFieldValue('title'));
             const titleSize = utils.getFieldValue('titleFontSize');
             const titleAlign = utils.getFieldValue('titleAlignment');
@@ -395,7 +403,7 @@
                 contentHtml = `<tr><td style="padding: 0;"><table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${itemRowsHtml}</table></td></tr>`;
             }
             const textContentTable = `<table border="0" cellpadding="0" cellspacing="0" class="sect color-bg-1" style="background-color: ${bgColor}; width: 100%;"><tr><td class="mobile-hide" height="40" style="margin: 0; padding: 0;">&nbsp;</td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td style="padding: 20px;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="sect" style="width: 100%;"><tr><td class="mobile-hide"><div style="font-size: 20px; height: 20px; line-height: 20px;">&nbsp;</div></td></tr><tr><td class="${titleMobileClass}" style="text-align: ${titleAlign};"><h2 style="color: #ffffff; font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans'; font-size: ${titleSize}px; font-weight: bold; line-height: ${titleLineHeight}px; margin: 0; text-transform: uppercase;">${title}</h2></td></tr><tr><td><div style="font-size: 4px; height: 4px; line-height: 4px;">&nbsp;</div></td></tr>${contentHtml}<tr><td><div style="font-size: 16px; height: 16px; line-height: 16px;">&nbsp;</div></td></tr>${showButton ? `<tr><td><table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width: 100%;"><tr><td align="${buttonAlign}" class="block" style="width: 100%;" valign="top"><table border="0" cellpadding="0" cellspacing="0" class="button-2-white${utils.getFieldValue('buttonMobileAlignment') === 'center' ? ' button-mobile-center' : ''}" role="presentation" style="background-color: transparent; border: 2px solid #ffffff; border-collapse: separate; border-radius: 4px !important;"><tr><td align="center" style="border-radius: 4px !important; color: #ffffff; font-family: 'Helvetica Neue LT W05_55 Roman', sans-serif, 'Open-Sans'; font-size: 16px; font-weight: bold; line-height: 28px; mso-line-height-rule: exactly; mso-text-raise: 2px; padding: 12px 20px; text-transform: uppercase;"><a href="${buttonLink}" style="color: #ffffff; text-decoration: none;" target="_blank">${buttonText}</a></td></tr></table></td></tr></table></td></tr>` : ''}</table></td></tr></table>`;
-            const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"></a></div></td>`;
+            const imageCell = `<td align="center" class="block" dir="ltr" style="width: 290px; vertical-align: top;"><div><a href="${imageLink}" target="_blank"><img align="top" alt="${imageAlt}" class="fill no-hover" src="${imageUrl}" style="border: none; display: block; height: auto; outline: none; text-decoration: none;" width="290"${heightAttr}></a></div></td>`;
             const textCell = `<td class="block" dir="ltr" style="width: 290px; vertical-align: top;"><!--[if (gte mso 9)|(IE)]><table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top"><![endif]-->${textContentTable}<!--[if (gte mso 9)|(IE)]></td></tr><tr><td height="100%">&nbsp;</td></tr></table><![endif]--></td>`;
             
             // For mobile compatibility, image always comes first in HTML source order
@@ -588,6 +596,7 @@
             setupTextInput(elements.imageUrl, 'imageUrl', true, elements.imageUrlError);
             setupTextInput(elements.imageAlt, 'imageAlt');
             setupTextInput(elements.imageLink, 'imageLink', true, elements.imageLinkError);
+            addListener(elements.imageHeight, 'input', e => debouncedUpdateData('imageHeight', e.target.value.trim()));
             setupNumberInput(elements.titleFontSize, 'titleFontSize');
             setupOptionSelector(elements.titleAlignmentSelector, 'titleAlignment');
             setupOptionSelector(elements.titleMobileAlignmentSelector, 'titleMobileAlignment');
@@ -872,7 +881,7 @@
             setSelectorState(elements.layoutSelector, 'layout');
 
             // Optimize field updates using modern array methods
-            const fieldKeys = ['imageUrl', 'imageAlt', 'imageLink', 'titleFontSize', 'descriptionFontSize', 'buttonLink'];
+            const fieldKeys = ['imageUrl', 'imageAlt', 'imageLink', 'imageHeight', 'titleFontSize', 'descriptionFontSize', 'buttonLink'];
             fieldKeys.forEach(key => { 
                 if (elements[key]) elements[key].value = utils.getFieldValue(key); 
             });
