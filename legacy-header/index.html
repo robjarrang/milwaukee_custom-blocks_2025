@@ -87,6 +87,7 @@
                     <!-- System Logos -->
                     <div class="badge-option category-header">System Logos</div>
                     <div class="badge-option" data-value="M12">M12</div>
+                    <div class="badge-option" data-value="M12Fuel">M12 Fuel</div>
                     <div class="badge-option" data-value="M18">M18</div>
                     <div class="badge-option" data-value="M18Fuel">M18 Fuel</div>
                     <div class="badge-option" data-value="MXFuel">MX Fuel</div>
@@ -283,9 +284,10 @@
         const debouncedUpdateData = utils.debounce(updateData, moduleConfig.debounceDelay);
 
         // Define which badge types are system logos vs trade logos
-        const systemLogos = ['M12', 'M18', 'M18Fuel', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution', 'Hardline', 'Fastback', 'TrueView'];
+        const systemLogos = ['M12', 'M12Fuel', 'M18', 'M18Fuel', 'MXFuel', 'OneKey', 'Shockwave', 'TruckTour', 'AuthorisedDistribution', 'Hardline', 'Fastback', 'TrueView'];
         const tradeLogos = ['Automotive', 'Carpentry', 'Construction', 'Demolition', 'DrainCleaning', 'Drywall', 'Electrical', 'FireAndRescue', 'Hire', 'Landscaping', 'MaintenanceAndOperations', 'Manufacturing', 'Networking', 'Plumbing', 'Utilities'];
         const badgeWidths = new Map([
+            ['M12Fuel', '180'],
             ['M18Fuel', '180'],
             ['Shockwave', '200'],
             ['OneKey', '140'],
@@ -436,6 +438,10 @@ SET @ShowBadge = "false"
                 M12: {
                     image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/aee3c719-16d2-4817-9f74-67e0da54bb52.png",
                     path: "/systems/m12/"
+                },
+                M12Fuel: {
+                    image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/c6966fcc-066b-43db-91c0-f5b61b0bc6df.png",
+                    path: "/systems/m12/fuel/"
                 },
                 M18: {
                     image: "https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/8c31c2cd-e939-4b3c-b02d-f94706922741.png",
@@ -648,6 +654,7 @@ ENDIF`;
             const labels = {
                 'dynamic': 'Milwaukee Badge (Dynamic)',
                 'M12': 'Milwaukee M12 System',
+                'M12Fuel': 'Milwaukee M12 FUEL System',
                 'M18': 'Milwaukee M18 System',
                 'M18Fuel': 'Milwaukee M18 FUEL System',
                 'MXFuel': 'Milwaukee MX FUEL System',
