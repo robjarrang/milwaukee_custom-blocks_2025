@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Product Carousel Block</title>
+    <script>window.parent.postMessage({method:"handShake",origin:window.location.origin,payload:{tabs:['htmlblock']}},'*');</script>
+    <link rel="stylesheet" href="../shared-assets/customblock-styles.css">
+    <style>
+        body { background: white; padding: 10px; }
+        .container { box-shadow: none; }
+        .slide-item { background: #fafafa; border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+        .slide-item > summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+        .slide-item[open] > summary { margin-bottom: 12px; }
+        .slide-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        button { background: white; border: 1px solid #bbb; border-radius: 4px; color: #333; cursor: pointer; padding: 6px 10px; }
+        button:disabled { cursor: default; opacity: .5; }
+        #addSlide { background: #0074d9; border-color: #0074d9; color: white; font-weight: 600; padding: 8px 14px; }
+        textarea { font-family: inherit; resize: vertical; }
+        .field-input[aria-invalid="true"] { border-color: #b00020; }
+        .field-error, #errorBanner { color: #b00020; font-size: 13px; }
+        .fallback-fields > summary { cursor: pointer; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h2>Product Carousel</h2>
+        <p id="loadingStatus" role="status">Loading carousel…</p>
+        <p id="errorBanner" role="alert" hidden></p>
+        <div id="editor" hidden>
+            <details class="field-group">
+                <summary>Carousel appearance</summary>
+                <div class="field-group">
+                    <label for="backgroundUrl" class="field-label">Carousel background image URL</label>
+                    <input id="backgroundUrl" type="url" class="field-input" aria-describedby="backgroundUrl-error">
+                    <span id="backgroundUrl-error" class="field-error" hidden></span>
+                </div>
+            </details>
+            <div id="slides"></div>
+            <button id="addSlide" type="button">Add slide</button>
+        </div>
+    </main>
+
+    <template id="slideTemplate">
+        <details class="slide-item">
+            <summary></summary>
+            <div class="slide-controls">
+                <button type="button" data-action="up">Move up</button>
+                <button type="button" data-action="down">Move down</button>
+                <button type="button" data-action="remove">Remove</button>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Slide image URL</label>
+                <input class="field-input" type="url" data-field="imageUrl" required>
+                <span class="field-error" hidden></span>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Destination URL</label>
+                <input class="field-input" type="url" data-field="linkUrl" required>
+                <span class="field-error" hidden></span>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Title</label>
+                <textarea class="field-input" rows="2" data-field="title"></textarea>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Subtitle (optional)</label>
+                <textarea class="field-input" rows="2" data-field="subtitle"></textarea>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Image alt text (optional)</label>
+                <input class="field-input" type="text" data-field="altText">
+            </div>
+            <details class="fallback-fields">
+                <summary>Fallback card</summary>
+                <p class="field-help">The static grid uses the slide image, title and destination unless you override them. Add a button label to show a button.</p>
+                <div class="field-group">
+                    <label class="field-label">Fallback image URL</label>
+                    <input class="field-input" type="url" data-field="fallbackImageUrl">
+                    <span class="field-error" hidden></span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Fallback title</label>
+                    <textarea class="field-input" rows="2" data-field="fallbackTitle"></textarea>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Fallback destination URL</label>
+                    <input class="field-input" type="url" data-field="fallbackLinkUrl">
+                    <span class="field-error" hidden></span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Button label (optional)</label>
+                    <input class="field-input" type="text" data-field="buttonLabel">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Button URL</label>
+                    <input class="field-input" type="url" data-field="buttonUrl">
+                    <span class="field-error" hidden></span>
+                </div>
+            </details>
+        </details>
+    </template>
+
+    <script src="../shared-assets/customblock-bundle.js"></script>
+    <script>
+        'use strict';
+
+        const assetBase = 'https://image.s50.sfmc-content.com/lib/fe301171756404787c1679/m/1/';
+        const brandedAssetBase = 'https://image.mail.milwaukeetool.eu/lib/fe2f11717564047a761c78/m/1/';
+        const siteBase = 'https://www.milwaukeetool.eu/en-eu/tape-measure-';
+        const moduleConfig = {
+            fields: {
+                backgroundUrl: { defaultValue: brandedAssetBase + '20c03164-65c7-40d7-b0e9-0e1375c507a6.jpg' },
+                slides: {
+                    defaultValue: [
+                        {
+                            imageUrl: assetBase + 'dff399ff-4430-414c-9b6c-7e18e1774ae5.png',
+                            linkUrl: siteBase + 'stud-1/',
+                            title: 'Tape Measure STUD (Gen III)',
+                            fallbackImageUrl: assetBase + '786fb6e1-ed5a-4f39-a0f2-5c20e3442764.png',
+                            fallbackTitle: 'Tape Measure STUD™ (Gen III)\n\u00a0',
+                            buttonLabel: 'Learn More'
+                        },
+                        {
+                            imageUrl: assetBase + 'a890addd-b8f0-4a24-a3c1-0f005d7b6827.png',
+                            linkUrl: siteBase + 'wide-blade/',
+                            title: 'Tape Measure Wide Blade (Gen II)',
+                            fallbackImageUrl: assetBase + '1356ee50-48fc-4c7e-a396-af8ec38f9e2a.png',
+                            fallbackTitle: 'Tape Measure WIDE BLADE\n(Gen II)',
+                            buttonLabel: 'Find Out More'
+                        },
+                        {
+                            imageUrl: assetBase + 'c0bedda6-8e80-4b06-8212-d7c71ee63a5e.png',
+                            linkUrl: siteBase + 'magnetic/',
+                            title: 'Tape Measure Magentic\n(Gen IIII)',
+                            fallbackImageUrl: assetBase + '280a8f8a-09bc-4125-b3a9-1dda5914e6a6.png',
+                            fallbackTitle: 'Tape Measure MAGNETIC (Gen IV)',
+                            buttonLabel: 'VIEW HERE'
+                        },
+                        {
+                            imageUrl: assetBase + '950a9d07-1112-484a-96ea-d3c29a5a9040.png',
+                            linkUrl: siteBase + 'compact/',
+                            title: 'Tape Measure Compact\n(Gen II)',
+                            fallbackImageUrl: assetBase + 'ce5d0a80-be21-4ed7-9868-ea3ad44275c8.png',
+                            fallbackTitle: 'Tape Measure COMPACT (Gen II)',
+                            fallbackLinkUrl: siteBase + 'compact/?variant=2167972',
+                            buttonLabel: 'Find Out More'
+                        },
+                        {
+                            imageUrl: assetBase + '2f4014ec-b628-46a3-bc00-0b2028ced83b.png',
+                            linkUrl: siteBase + 'slim/',
+                            title: 'Tape Measure SLIM (Gen II)',
+                            fallbackImageUrl: assetBase + 'e3bced9d-0856-4834-b1b0-cc0b6ada071a.png',
+                            buttonLabel: 'SEE TAPE MEASURE'
+                        },
+                        {
+                            imageUrl: assetBase + 'a0ca9027-0d95-4c4b-9b14-003a632113c4.png',
+                            linkUrl: siteBase + 'autolock-1/',
+                            title: 'Tape Measure Autolock (Gen II)',
+                            fallbackImageUrl: assetBase + 'c38295b4-9ba3-4b67-9a59-57503d0c4aaf.png',
+                            fallbackTitle: 'Tape Measure AUTOLOCK (Gen II)',
+                            buttonLabel: 'TAKE A LOOK',
+                            buttonUrl: siteBase + 'autolock-1//'
+                        }
+                    ]
+                }
+            },
+            debounceDelay: 350,
+            maxRetries: 3
+        };
+
+        const carouselId = 'product-carousel-' + crypto.randomUUID();
+        const frameWidth = 620;
+        const arrowImage = brandedAssetBase + '0df10d87-1c98-4868-9fdf-0a71e8caaefd.png';
+        const state = { sdk: null, slides: [], backgroundUrl: '', updateTimer: null, frame: null, retries: 0 };
+        const elements = {
+            editor: document.getElementById('editor'),
+            loadingStatus: document.getElementById('loadingStatus'),
+            error: document.getElementById('errorBanner'),
+            background: document.getElementById('backgroundUrl'),
+            slides: document.getElementById('slides'),
+            addSlide: document.getElementById('addSlide'),
+            template: document.getElementById('slideTemplate')
+        };
+        const slideFields = [...elements.template.content.querySelectorAll('[data-field]')].map(input => input.dataset.field);
+
+        function isValidUrl(value) {
+            try {
+                const testValue = value.replace(/%%[\w.:-]+%%/g, 'personalisation');
+                return /^https?:\/\//i.test(testValue) && !/[\s<>"'\\]|%%/.test(testValue) && Boolean(new URL(testValue).hostname);
+            } catch {
+                return false;
+            }
+        }
+
+        function escapeHtml(value) {
+            const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return value.replace(/[&<>"']/g, character => entities[character]);
+        }
+
+        function escapeText(value) {
+            return escapeHtml(value).replace(/%%/g, '&#37;&#37;');
+        }
+
+        function formatLines(value) {
+            return escapeText(value).replace(/\r\n?|\n/g, '<br>');
+        }
+
+        function validateUrl(input) {
+            const value = input.value.trim();
+            const error = input.nextElementSibling;
+            error.textContent = !value && input.required ? 'Enter a URL to include this slide.'
+                : value && !isValidUrl(value) ? 'Enter a valid HTTP or HTTPS URL.' : '';
+            error.hidden = !error.textContent;
+            input.setAttribute('aria-invalid', String(!error.hidden));
+        }
+
+        function setSlideHeading(card, index) {
+            const title = state.slides[index].title?.trim().replace(/\s+/g, ' ');
+            card.firstElementChild.textContent = title ? `Slide ${index + 1} · ${title}` : `Slide ${index + 1}`;
+        }
+
+        function renderSlides(openIndex = 0, openFallback = false) {
+            const fragment = document.createDocumentFragment();
+            state.slides.forEach((slide, index) => {
+                const card = elements.template.content.firstElementChild.cloneNode(true);
+                card.dataset.index = index;
+                card.open = index === openIndex;
+                card.querySelector('.fallback-fields').open = card.open && openFallback;
+                setSlideHeading(card, index);
+                card.querySelector('[data-action="up"]').disabled = index === 0;
+                card.querySelector('[data-action="down"]').disabled = index === state.slides.length - 1;
+                card.querySelectorAll('[data-field]').forEach(input => {
+                    const field = input.dataset.field;
+                    input.id = `slide-${index + 1}-${field}`;
+                    input.previousElementSibling.htmlFor = input.id;
+                    input.value = slide[field] || '';
+                    if (input.type === 'url') {
+                        const error = input.nextElementSibling;
+                        error.id = input.id + '-error';
+                        input.setAttribute('aria-describedby', error.id);
+                        validateUrl(input);
+                    }
+                });
+                fragment.appendChild(card);
+            });
+            elements.slides.replaceChildren(fragment);
+        }
+
+        function showError(message) {
+            elements.error.textContent = message;
+            elements.error.hidden = !message;
+        }
+
+        function publishContent() {
+            clearTimeout(state.updateTimer);
+            cancelAnimationFrame(state.frame);
+            state.updateTimer = null;
+            state.frame = null;
+            if (elements.editor.hidden) return;
+            try {
+                const content = generateTemplate();
+                state.sdk.setContent(content);
+                state.sdk.setData({ slides: state.slides, backgroundUrl: state.backgroundUrl, content });
+                showError('');
+            } catch (error) {
+                showError(`Preview update failed: ${error.message}`);
+            }
+        }
+
+        function scheduleUpdate(delay = moduleConfig.debounceDelay) {
+            clearTimeout(state.updateTimer);
+            cancelAnimationFrame(state.frame);
+            state.updateTimer = setTimeout(() => {
+                state.frame = requestAnimationFrame(publishContent);
+            }, delay);
+        }
+
+        function initializeEventHandlers() {
+            elements.background.addEventListener('input', () => {
+                validateUrl(elements.background);
+                state.backgroundUrl = elements.background.value.trim();
+                scheduleUpdate();
+            });
+
+            elements.slides.addEventListener('input', event => {
+                const input = event.target;
+                const field = input.dataset.field;
+                if (!field) return;
+                const card = input.closest('.slide-item');
+                const index = Number(card.dataset.index);
+                if (input.type === 'url') validateUrl(input);
+                state.slides[index][field] = input.type === 'url' ? input.value.trim() : input.value;
+                if (field === 'title') setSlideHeading(card, index);
+                scheduleUpdate();
+            });
+
+            elements.slides.addEventListener('click', event => {
+                const button = event.target.closest('[data-action]');
+                if (!button) return;
+                const card = button.closest('.slide-item');
+                const index = Number(card.dataset.index);
+                const action = button.dataset.action;
+                const [slide] = state.slides.splice(index, 1);
+                const target = action === 'up' ? index - 1 : action === 'down' ? index + 1 : Math.min(index, state.slides.length - 1);
+                if (action !== 'remove') state.slides.splice(target, 0, slide);
+                renderSlides(target, card.querySelector('.fallback-fields').open);
+                const next = elements.slides.children[target];
+                (next ? next.firstElementChild : elements.addSlide).focus();
+                scheduleUpdate(0);
+            });
+
+            elements.addSlide.addEventListener('click', () => {
+                const index = state.slides.push({}) - 1;
+                renderSlides(index);
+                elements.slides.lastElementChild.querySelector('[data-field="imageUrl"]').focus();
+                scheduleUpdate(0);
+            });
+
+            window.addEventListener('beforeunload', () => {
+                clearTimeout(state.updateTimer);
+                cancelAnimationFrame(state.frame);
+            });
+        }
+
+        function loadData() {
+            state.sdk.getData(data => {
+                const slides = Array.isArray(data?.slides) ? data.slides : moduleConfig.fields.slides.defaultValue;
+                state.slides = slides.map(slide => Object.fromEntries(slideFields
+                    .filter(field => typeof slide?.[field] === 'string')
+                    .map(field => [field, slide[field]])));
+                state.backgroundUrl = typeof data?.backgroundUrl === 'string'
+                    ? data.backgroundUrl
+                    : moduleConfig.fields.backgroundUrl.defaultValue;
+                elements.background.value = state.backgroundUrl;
+                validateUrl(elements.background);
+                renderSlides();
+                elements.loadingStatus.hidden = true;
+                elements.editor.hidden = false;
+                scheduleUpdate(0);
+            });
+        }
+
+        function initializeWithRetry() {
+            try {
+                if (!window.sfdc?.BlockSDK) throw new Error('BlockSDK not loaded');
+                state.sdk = new window.sfdc.BlockSDK({ tabs: ['htmlblock'], onEditClose: publishContent });
+                loadData();
+            } catch (error) {
+                state.retries += 1;
+                if (state.retries <= moduleConfig.maxRetries) {
+                    setTimeout(initializeWithRetry, 1000 * state.retries);
+                } else {
+                    elements.loadingStatus.hidden = true;
+                    showError(`Initialisation failed: ${error.message}`);
+                }
+            }
+        }
+
+        initializeEventHandlers();
+        initializeWithRetry();
+
+        function carouselStyles(slideCount, ids) {
+            const { wrapper, carousel, interactiveToggle, fallbackToggle, radio } = ids;
+            const indexes = Array.from({ length: slideCount }, (_, index) => index);
+            const slidePercentage = 100 / slideCount;
+            const backgroundStyle = isValidUrl(state.backgroundUrl)
+                ? `background-image: url("${state.backgroundUrl}");`
+                : '';
+            const navigation = indexes.map(index => {
+                const next = (index + 1) % slideCount;
+                const previous = (index + slideCount - 1) % slideCount;
+                const offset = -slidePercentage * index;
+                const checked = `#${carousel} #${radio(index)}:checked`;
+                const arrows = slideCount > 1 ? `
+    ${checked} ~ .controls .next:nth-child(${next + 1}),
+    ${checked} ~ .controls .previous:nth-child(${slideCount + previous + 1}) {
+        display: inline-block;
+    }` : '';
+                return `
+    ${checked} ~ .frames {
+        -webkit-transform: translateX(${offset}%);
+        transform: translateX(${offset}%);
+    }
+    ${checked} ~ .progressBar .progress:nth-child(${index + 1}) { opacity: 1; }
+    ${arrows}`;
+            }).join('\n');
+
+            return `<style type="text/css">
+    #${wrapper}, #${wrapper} *, #${wrapper} *:after, #${wrapper} *:before {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+    }
+    #${wrapper} table, #${wrapper} td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    #${wrapper} table { border-spacing: 0; border-collapse: collapse; margin: 0 auto; }
+    #${wrapper} img { -ms-interpolation-mode: bicubic; border: 0; }
+    #${wrapper} [x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }
+    #${carousel} input[type="radio"] { display: none !important; opacity: 0; max-height: 0; visibility: hidden; }
+    @media only screen and (max-width: 480px) {
+        #${wrapper} .fallback .content-outer, #${wrapper} .fallback .content-inner { width: 100% !important; }
+        #${wrapper} .fallback .block { display: block !important; width: 100% !important; }
+        #${wrapper} .fallback .gap, #${wrapper} .fallback .side { display: none !important; }
+        #${wrapper} .fallback img.fill { max-width: 100% !important; height: auto !important; margin: 0 auto; }
+    }
+</style><!--[if !mso]><!-- --><style type="text/css">
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    #${fallbackToggle}:checked + .fallback { display: none !important; }
+    #${interactiveToggle}:checked + .interactive {
+        display: block !important;
+        max-height: none !important;
+        position: relative;
+        overflow: visible !important;
+    }
+    /* Carousel */
+    #${carousel} {
+        width: 100%;
+        max-width: 620px;
+        height: 100%;
+        display: block;
+        margin: auto;
+        position: relative;
+        overflow: hidden;
+        ${backgroundStyle}
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    #${carousel} .controls {
+        margin-left: auto;
+        margin-right: auto;
+        max-height: 0;
+        overflow: visible;
+    }
+
+    #${carousel} .frames {
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        margin: 0 auto;
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+        -webkit-transition: -webkit-transform .8s cubic-bezier(0.77, 0, 0.175, 1);
+        transition: transform .8s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    #${carousel} .frames .frame {
+        float: left;
+        position: relative;
+    }
+
+    #${carousel} .frames .frame a {
+        display: block;
+    }
+
+    #${carousel} .frames .frame img {
+        width: 100%;
+        height: auto;
+    }
+
+    #${carousel} .frames .frame .carTitle, #${carousel} .frames .frame .carSubTitle {
+        font-family: 'Helvetica Neue LT W05_93 Blk E', Arial, sans-serif, 'Open-Sans';
+        font-weight: bold;
+        color: #ffffff;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    #${carousel} .frames .frame .carTitle {
+        Margin: 0;
+        font-size: 28px;
+        line-height: 36px;
+    }
+
+    #${carousel} .frames .frame .carSubTitle {
+        Margin: 0 0 10px 0;
+        font-size: 20px;
+        line-height: 24px;
+    }
+
+    #${carousel} .arrows {
+        display: none;
+        margin-left: 0;
+        position: relative;
+        cursor: pointer;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        -webkit-tap-highlight-color: transparent;
+        font-size: 0px;
+    }
+
+    #${carousel} .progressBar {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        transition: all 500ms ease-in-out;
+    }
+
+    #${carousel} .progress {
+        background: #ffffff;
+        opacity: 0.5;
+        border-radius: 50%;
+        width: 8px;
+        height: 8px;
+        display: inline-block;
+        margin: 0 4px;
+    }
+
+    /* Arrow positions */
+    #${carousel} .controls {
+        width: 90%;
+    }
+
+    #${carousel} .arrows {
+        margin-top: -58px;
+        height: 40px;
+        width: 40px;
+        background-image: url("${arrowImage}");
+    }
+
+    #${carousel} .frames { min-width: ${slideCount * frameWidth}px; }
+    #${carousel} .frames .frame { width: ${frameWidth}px; }
+    #${carousel} .controls .arrows.next { float: right; }
+    #${carousel} .controls .arrows.previous {
+        float: left;
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+    #${carousel} .controls .arrows.initial { display: inline-block; }
+    #${carousel} input[type="radio"]:checked ~ .controls .arrows { display: none; }
+    #${carousel} .progressBar .progress:first-child { opacity: 1; }
+    #${carousel} input[type="radio"]:checked ~ .progressBar .progress { opacity: 0.5; }
+    ${navigation}
+
+    @media only screen and (max-width: 480px) {
+        #${carousel} .frames { min-width: ${slideCount * 100}%; }
+        #${carousel} .frames .frame { width: ${slidePercentage}%; }
+        #${carousel} .frames .frame .carTitle { font-size: 4vw !important; line-height: 5vw !important; padding: 0 10% !important; }
+    }
+}
+</style><!--<![endif]--><style type="text/css">
+    /* Samsung Mail and Outlook app fallback */
+    #MessageViewBody #${fallbackToggle}:checked + .fallback,
+    body[data-outlook-cycle] #${wrapper} .fallback,
+    body[data-outlook-cycle] #${fallbackToggle}:checked + .fallback {
+        display: block !important;
+        max-height: none !important;
+        position: relative;
+        overflow: visible !important;
+    }
+    #MessageViewBody #${interactiveToggle}:checked + .interactive,
+    body[data-outlook-cycle] #${wrapper} .interactive,
+    body[data-outlook-cycle] #${interactiveToggle}:checked + .interactive {
+        display: none !important;
+    }
+
+    @media screen yahoo {
+        #${wrapper} .fallback { display: block; max-height: none !important; }
+        #${wrapper} .interactive { display: none !important; max-height: 0; overflow: hidden; }
+    }
+</style>`;
+        }
+
+        function fallbackCard(slide) {
+            const link = isValidUrl(slide.fallbackLinkUrl || '') ? slide.fallbackLinkUrl : slide.linkUrl;
+            const image = isValidUrl(slide.fallbackImageUrl || '') ? slide.fallbackImageUrl : slide.imageUrl;
+            const title = slide.fallbackTitle?.trim() ? slide.fallbackTitle : slide.title;
+            const buttonLink = isValidUrl(slide.buttonUrl || '') ? slide.buttonUrl : link;
+            const button = slide.buttonLabel?.trim() ? `
+                <tr><td>${spacer(20)}</td></tr>
+                <tr><td>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                        <tr><td align="center" class="block" valign="top">
+                            <table border="0" cellpadding="0" cellspacing="0" class="button-2-white" role="presentation" style="background-color:transparent;border:2px solid #ffffff;border-collapse:separate;border-radius:4px !important;">
+                                <tr><td align="center" style="border-radius:4px !important;color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:bold;line-height:28px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:12px 20px;text-align:center;text-transform:uppercase;width:100%;">
+                                    <a href="${escapeHtml(buttonLink)}" style="color:#ffffff;text-decoration:none;" target="_blank">${formatLines(slide.buttonLabel)}</a>
+                                </td></tr>
+                            </table>
+                        </td></tr>
+                    </table>
+                </td></tr>` : '';
+
+            return `<td align="center" class="block" style="width:280px;" valign="top">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+        <tr><td>
+            <div><a href="${escapeHtml(link)}" target="_blank"><img align="top" alt="${imageAlt(slide, title)}" class="fill" src="${escapeHtml(image)}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="280"></a></div>
+        </td></tr>
+        <tr><td align="center" style="padding-bottom:12px;padding-top:12px;">
+            <table border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+                <tr><td>${spacer(12)}</td></tr>
+                <tr><td class="mobile-text-center" style="text-align:center;">
+                    <h2 style="color:#ffffff;font-family:'Helvetica Neue LT W05_93 Blk E',Arial,sans-serif,'Open-Sans';font-size:20px;font-stretch:condensed;font-weight:bold;line-height:28px;margin:0;text-transform:uppercase;mso-hyphenate:none;hyphens:none;">${formatLines(title)}</h2>
+                </td></tr>
+                <tr><td>${spacer(8)}</td></tr>
+                <tr><td class="mobile-text-center" style="color:#ffffff;font-family:'Helvetica Neue LT W05_55 Roman',sans-serif,'Open-Sans';font-size:16px;font-weight:normal;line-height:24px;margin:0;mso-line-height-rule:exactly;text-align:center;mso-hyphenate:none;hyphens:none;">${formatLines(slide.subtitle)}</td></tr>
+                ${button}
+                <tr><td>${spacer(20)}</td></tr>
+            </table>
+        </td></tr>
+    </table>
+</td>`;
+        }
+
+        function spacer(height) {
+            return `<div style="clear:both;display:block;font-size:${height}px;height:${height}px;line-height:${height}px;margin:0;mso-line-height-rule:exactly;padding:0;">&nbsp;</div>`;
+        }
+
+        function imageAlt(slide, title) {
+            const value = slide.altText?.trim() || title.replace(/\s+/g, ' ').trim() || 'View product';
+            return escapeText(value);
+        }
+
+        function fallbackGrid(slides) {
+            const rows = [];
+            for (let index = 0; index < slides.length; index += 2) {
+                const secondSlide = slides[index + 1];
+                rows.push(`<!-- START .fw-spacer -->
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;">
+    <tr><td>${spacer(20)}</td></tr>
+</table><!-- END .fw-spacer -->
+<!-- START .story-2col -->
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="content-outer" role="presentation" style="background-color:#000000;width:620px;">
+    <tr>
+        <td class="side" style="width:20px;">&nbsp;</td>
+        <td align="center" class="content-inner" style="width:580px;" valign="top">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:${secondSlide ? '100%' : '280px'};max-width:100%;">
+                <tr>
+                    ${fallbackCard(slides[index])}
+                    ${secondSlide ? `<td class="gap block" style="width:20px;">&nbsp;</td>${fallbackCard(secondSlide)}` : ''}
+                </tr>
+            </table>
+        </td>
+        <td class="side" style="width:20px;">&nbsp;</td>
+    </tr>
+</table><!-- END .story-2col -->`);
+            }
+            return rows.join('\n');
+        }
+
+        function generateTemplate() {
+            const slides = state.slides
+                .filter(slide => isValidUrl(slide.imageUrl || '') && isValidUrl(slide.linkUrl || ''))
+                .map(slide => ({ ...slide, title: slide.title || '', subtitle: slide.subtitle || '' }));
+            if (!slides.length) return '';
+
+            const ids = {
+                wrapper: carouselId,
+                carousel: carouselId + '-track',
+                interactiveToggle: carouselId + '-interactive-toggle',
+                fallbackToggle: carouselId + '-fallback-toggle',
+                radio: index => carouselId + '-slide-' + (index + 1)
+            };
+            const radios = slides.map((slide, index) =>
+                `<input id="${ids.radio(index)}" name="${ids.carousel}" type="radio">`).join('\n');
+            const frames = slides.map(slide => `<div class="frame">
+    <a href="${escapeHtml(slide.linkUrl)}" target="_blank"><img alt="${imageAlt(slide, slide.title)}" class="fill no-hover" src="${escapeHtml(slide.imageUrl)}" style="border:none;display:block;height:auto;outline:none;text-decoration:none;" width="${frameWidth}"></a>
+    <p class="carTitle">${formatLines(slide.title)}</p><p class="carSubTitle">${formatLines(slide.subtitle)}</p>
+</div>`).join('\n');
+            const progress = slides.map(() => '<div class="progress"></div>').join(' ');
+            const controls = slides.length > 1 ? ['next', 'previous'].flatMap(direction =>
+                slides.map((slide, index) => {
+                    const initial = direction === 'next' ? index === 1 : index === slides.length - 1;
+                    return `<label class="arrows ${direction}${initial ? ' initial' : ''}" for="${ids.radio(index)}">&nbsp;</label>`;
+                })
+            ).join('\n') : '';
+            const toggle = id => `<input checked="checked" id="${id}" name="${id}" style="display:none;max-height:0;visibility:hidden;" type="checkbox">`;
+
+            return `${carouselStyles(slides.length, ids)}
+<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+    <tr><td align="center" class="content-inner" style="width:580px;" valign="top">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" class="sect" role="presentation" style="width:100%;">
+            <tr><td align="center" class="block" style="width:100%;" valign="top">
+                <!-- Carousel Start -->
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;" width="100%">
+                    <tr><td id="${ids.wrapper}" style="text-align:center;">
+                        <!--[if !mso]><!-- -->${toggle(ids.interactiveToggle)}<div class="interactive" style="display:none;max-height:0;overflow:hidden;">
+                            <div id="${ids.carousel}">
+                                ${radios}
+                                <div class="frames">${frames}</div>
+                                <div class="progressBar">${progress}</div>
+                                <div class="controls">${controls}</div>
+                            </div>
+                        </div><!--<![endif]-->
+                        <!--[if !mso]><!-- -->${toggle(ids.fallbackToggle)}<!--<![endif]--><div class="fallback">
+                            ${fallbackGrid(slides)}
+                        </div>
+                    </td></tr>
+                </table>
+                <!-- Carousel End -->
+            </td></tr>
+        </table>
+    </td></tr>
+</table>`;
+        }
+    </script>
+</body>
+</html>
